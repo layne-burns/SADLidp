@@ -59,12 +59,13 @@ def within(pred: list[float], act: list[float], sigma: list[float], k: float) ->
 
 
 def top_k_hits(pred: dict[str, float], actual_all: dict[str, float], k: int = 12) -> tuple[int, int] | None:
-    """Of our top-k predicted, how many finished in the actual top k among everyone at the position."""
+    """Of our top-k predicted, how many finished in the actual top k among everyone at the position
+    (a player tied with the k-th best score counts as in it)."""
     if len(pred) < k or len(actual_all) < k:
         return None
     ours = sorted(pred, key=lambda pid: (-pred[pid], pid))[:k]
-    best = set(sorted(actual_all, key=lambda pid: (-actual_all[pid], pid))[:k])
-    return sum(pid in best for pid in ours), k
+    cut = sorted(actual_all.values(), reverse=True)[k - 1]
+    return sum(actual_all.get(pid, float("-inf")) >= cut for pid in ours), k
 
 
 def phi(x: float) -> float:

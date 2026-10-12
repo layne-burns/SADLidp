@@ -95,22 +95,27 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         late = sum(1 for r in rows.values() if r.get("late"))
         backfill = sum(1 for r in rows.values() if r.get("backfill"))
         row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {}}
+        page = storage.read_json(wd / "consensus.json") or {}
+        so_week = {s: float((page.get("sigma_out") or {}).get(s) or so[s]) for s in IDP_SLOTS}  # as the page used
         for slot in IDP_SLOTS:
             cand = {pid: v for pid, v in pred_all.items() if slots.get(pid) == slot and pid in played}
             pool = sorted(cand, key=lambda pid: (-cand[pid], pid))[:N_EVAL]
             pred = [cand[pid] for pid in pool]
             act = [played[pid] for pid in pool]
-            sig = [(s_mu[slot] ** 2 + so[slot] ** 2) ** 0.5] * len(pool)
+            sig = [(s_mu[slot] ** 2 + so_week[slot] ** 2) ** 0.5] * len(pool)
+            partial = 0 < len(pool) < N_EVAL  # a snapshot missing games: shown, but kept out of the season numbers
             base = []
             for pid in pool:
                 past = history.get(pid) or []
                 if len(past) >= 2:
                     base.append((cand[pid], played[pid], sum(past) / len(past)))
             everyone = {pid: pts for pid, pts in played.items() if slots.get(pid) == slot}
-            top = metrics.top_k_hits({pid: cand[pid] for pid in pool}, everyone, 12)
+            top = None if partial else metrics.top_k_hits({pid: cand[pid] for pid in pool}, everyone, 12)
             summ = _summary(pred, act, sig, base)
-            summ.update(top12=top, pearson=None, spearman=None, r2=None)  # weekly: too few for correlations
+            summ.update(top12=top, pearson=None, spearman=None, r2=None, partial=partial)  # weekly: no correlations
             row["by_slot"][slot] = summ
+            if partial:
+                continue
             resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
             agg = season_rows[slot]
             agg["pred"] += pred
@@ -123,10 +128,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             if top:
                 agg["top12"][0] += top[0]
                 agg["top12"][1] += top[1]
+        row["partial_slots"] = [slot for slot in IDP_SLOTS if row["by_slot"][slot]["partial"]]
         weekly.append(row)
 
         # suggestions: issued live (decision log) or rebuilt (replayed page)
-        page = storage.read_json(wd / "consensus.json") or {}
         res = {pid: weeklog.stat_result(line, sc, final=True) for pid, line in lines.items()}
 
         def result(pid, res=res):
@@ -147,11 +152,16 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             e["outcome"] = weeklog.outcome(result(e["w"]), e["over"], result(e["over"]) if e["over"] else None)
             suggestions.append(e)
 
-        # tiers as shown that week: average score per tier among players who played
-        for slot in IDP_SLOTS:
-            for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
-                bucket = tiers[slot].setdefault(t["tier"], [])
-                bucket += [played[p["id"]] for p in t["players"] if p["id"] in played]
+        # tiers as shown when you set waivers (the pre-waiver sync's log); a rebuilt week's page is that
+        # moment. A live week's final page is not: by then it lists only the players yet to play.
+        shown = ((storage.read_json(wd / "tiers_log.json") or {}).get("prewaiver") or {}).get("players") or {}
+        if not shown and page.get("replayed"):
+            for slot in IDP_SLOTS:
+                for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
+                    shown.update({p["id"]: {"slot": slot, "tier": t["tier"]} for p in t["players"]})
+        for pid, r in shown.items():
+            if pid in played and r.get("slot") in tiers:
+                tiers[r["slot"]].setdefault(r["tier"], []).append(played[pid])
 
         for pid, pts in played.items():
             history.setdefault(pid, []).append(pts)

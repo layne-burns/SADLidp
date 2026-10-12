@@ -533,3 +533,35 @@ def test_breakdown_and_stats_page(tmp_path):
     stats = (site / "stats.html").read_text()
     assert "How the numbers did" in stats  # no week has final stats here: the page says so
     assert json.loads((site / "stats.json").read_text()) is None or "_resid" not in (site / "stats.json").read_text()
+
+
+def test_breakdowns_after_kickoff_and_on_old_pages(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)
+    run_sync(CFG, data, cache, SUNDAY_EVE, force=True, client=FakeClient(routes()), log=lambda m: None)
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    zero = next(p for p in d["positions"]["LB"]["played"] if p["id"] == "z1")  # zero-filled, then locked
+    part = zero["breakdown"]["parts"][0]
+    assert zero["mu"] == 0.0 and part["pts"] == 0.0 and part["zero"] is True  # from the frozen record
+
+    # a page written before breakdowns existed: plain rows, no toggle that opens onto nothing
+    def strip(obj):
+        if isinstance(obj, dict):
+            obj.pop("breakdown", None)
+            for v in obj.values():
+                strip(v)
+        elif isinstance(obj, list):
+            for v in obj:
+                strip(v)
+
+    strip(d)
+    (data / "2026" / "week05" / "consensus.json").write_text(json.dumps(d))
+    html = build_site(data, tmp_path / "site", CFG).read_text()
+    assert "Zero Fill" in html and 'class="bd"' not in html and "sources ▾" not in html
+
+
+def test_a_source_that_never_posted_says_so(tmp_path):
+    out = run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, client=FakeClient(routes(proj_status=404)), log=print)
+    d = json.loads((tmp_path / "d" / "2026" / "week05" / "consensus.json").read_text())
+    part = d["my_idps"]["LB"]["players"][0]["breakdown"]["parts"][0]
+    assert out.synced and part == {"source": "Sleeper", "missing": "nothing posted for this week yet"}

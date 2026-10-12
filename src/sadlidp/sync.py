@@ -254,18 +254,22 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
     """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
     them, the share of μ, or why a source has nothing for him."""
     eff = (cons_row or {}).get("eff") or {}
+    frozen_pts = (cons_row or {}).get("parts") or {}  # a locked player: each source's points at his kickoff
     parts = []
     for name in SOURCES:
         label = SOURCE_LABELS.get(name, name)
         src = info.get(name) or {}
-        if pid in values.get(name, {}):
+        pts = values.get(name, {}).get(pid, frozen_pts.get(name))
+        if pts is not None:
             row = (source_rows.get(name) or {}).get(pid)
             stats = (row or {}).get("stats") or {}
             shown = [[lbl, round(scoring.num(stats.get(k)), 2)] for k, lbl in STAT_LABELS
                      if scoring.num(sc.get(k)) and scoring.num(stats.get(k)) >= 0.05]  # fmt: skip
-            parts.append({"source": label, "kind": groups.get(name), "pts": round(values[name][pid], 2),
+            parts.append({"source": label, "kind": groups.get(name), "pts": round(pts, 2),
                           "share": eff.get(name), "stats": shown, "late": bool(row and row.get("late")),
                           "zero": row is None})  # fmt: skip
+        elif not src.get("last_success"):
+            parts.append({"source": label, "missing": "nothing posted for this week yet"})
         elif src.get("stale"):
             parts.append({"source": label, "missing": "not used this week (its data is too old)"})
         elif not src.get("rows_used"):
@@ -465,6 +469,7 @@ def run_sync(
             "max": c["max"],
             "n_sources": c["n_sources"],
             "eff": c.get("eff") or {},
+            "parts": {name: round(v[pid], 3) for name, v in values.items() if pid in v},
             "reasons": list(status_of(pid).reasons),
             "flags": list(status_of(pid).flags),
         }
@@ -474,7 +479,7 @@ def run_sync(
     for pid, rec in frozen.items():
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
-            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff")}
+            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff", "parts")}
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)

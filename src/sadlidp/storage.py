@@ -107,7 +107,9 @@ def load_source(path: Path) -> dict:
 
 
 def save_source(path: Path, result, rows: dict[str, dict]) -> None:
-    fetches = [*(read_json(path, {}) or {}).get("fetches", []), result.fetched_at][-50:]
+    old = read_json(path, {}) or {}
+    earlier = old.get("fetches") or ([old["last_success"]] if old.get("last_success") else [])  # schema 1: one
+    fetches = [*earlier, result.fetched_at][-50:]
     write_json(
         path,
         {

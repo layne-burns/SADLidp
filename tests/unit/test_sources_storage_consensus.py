@@ -126,3 +126,13 @@ def test_unchanged_rows_keep_their_first_seen_time_and_files_are_one_row_per_lin
     lines = path.read_text().splitlines()
     assert sum(1 for line in lines if line.startswith('  "a": {')) == 1 and len(lines) == 7
     assert storage.read_json(path) == {"rows": again, "week": 5}
+
+
+def test_an_old_format_file_keeps_its_last_fetch_in_fetches(tmp_path):
+    from sadlidp.sources.base import AdapterResult
+
+    path = tmp_path / "s.json"
+    path.write_text(json.dumps({"last_success": "2026-10-11T09:00:00-04:00", "rows": {}}))  # schema 1
+    res = AdapterResult(name="x", kind="projection", status="ok", week=5, fetched_at="2026-10-12T05:00:00-04:00")
+    storage.save_source(path, res, {})
+    assert json.loads(path.read_text())["fetches"] == ["2026-10-11T09:00:00-04:00", "2026-10-12T05:00:00-04:00"]

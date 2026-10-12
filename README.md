@@ -69,5 +69,5 @@ Pushes to `claude/**` branches also run a live preview in CI: the branch's commi
 | `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/`, `scoring`, `consensus`, `tiers`, `roster`, `gate`, `site/` |
 | `config/sadl.toml` | all tunables (SPEC §9) |
 | `data/<season>/` | `league.json`, `schedule.json`, `gate.json` (windows already run) |
-| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json`, `rosters.json`, `players_idp.json`, `actuals.json`, `sources/<source>.json` (projections frozen at kickoff) |
+| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json`, `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections frozen at kickoff), `frozen.json`, `badges.json`, `tiers_log.json` |
 | `probe/` | the Phase 1 data-source probe (SPEC §13) |

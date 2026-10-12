@@ -19,6 +19,8 @@
 {%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
 {%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{%- endmacro %}
 {%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
+{%- macro card_open(p) -%}{% if p.breakdown %}<li class="item"><details class="bd"><summary><div class="row">{% else %}<li class="item"><div class="row">{% endif %}{%- endmacro %}
+{%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
 {%- macro bdbody(p) -%}{% if p.breakdown %}<div class="bdbody">
 {% for part in p.breakdown.parts %}{% if part.missing %}<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
 {% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.late %} · captured after kickoff{% endif %}
@@ -47,14 +49,14 @@
       <h3>{{ slot }} <span class="count">{{ m.count }}/{{ m.limit }} rostered</span></h3>
       <ul>
         {% for p in m.players %}
-        <li class="item"><details class="bd"><summary><div class="row">
+        {{ card_open(p) }}
           <div><span class="name">{{ p.name }}</span>
             {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
             {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
             {{ tags(p) }}
             <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(d.positions[slot].tier_count) }}{% endif %}</div></div>
           <div class="pts">{{ pts(p) }}</div>
-</div></summary>{{ bdbody(p) }}</details></li>
+{{ card_close(p) }}
         {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
       </ul>
       {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
@@ -96,13 +98,13 @@
           <p class="tierhead">Tier {{ t.tier }}</p>
           <ul>
             {% for p in t.players %}
-            <li class="item"><details class="bd"><summary><div class="row">
+            {{ card_open(p) }}
               <div><span class="name">{{ p.name }}</span>
                 {% if p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
                 <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
               <div class="pts">{{ pts(p) }}</div>
-</div></summary>{{ bdbody(p) }}</details></li>
+{{ card_close(p) }}
             {% endfor %}
           </ul>
         </div>
@@ -114,11 +116,11 @@
           <p class="tierhead">Already played this week</p>
           <ul>
             {% for p in pos.played %}
-            <li class="item"><details class="bd"><summary><div class="row">
+            {{ card_open(p) }}
               <div><span class="name">{{ p.name }}</span>
                 <div class="sub">{{ p.team }} {{ opp(p) }} · {{ ('Tier ' ~ p.tier ~ ' before kickoff') if p.tier else 'not tiered before kickoff' }}</div></div>
               <div class="pts">{{ pts(p) }}</div>
-</div></summary>{{ bdbody(p) }}</details></li>
+{{ card_close(p) }}
             {% endfor %}
           </ul>
           {% if pos.played_hidden > 0 %}<p class="hidden-note">{{ pos.played_hidden }} more not shown.</p>{% endif %}

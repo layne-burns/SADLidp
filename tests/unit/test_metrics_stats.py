@@ -72,3 +72,26 @@ def test_evaluate_pools_baseline_and_residual_sigma(tmp_path):
     sigma = residual_sigma_out(data, 2026, cfg, target_week=5)
     assert sigma is not None and sigma["LB"] > 0 and "DL" not in sigma  # no DL in this data: keeps last season
     assert residual_sigma_out(data, 2026, cfg, target_week=4) is None  # only weeks ≤ 2 count: too few
+
+
+def test_a_tie_at_the_kth_score_counts_as_a_hit():
+    pred = {f"p{i:02d}": 20 - i for i in range(12)}
+    act = {f"p{i:02d}": 30 - i for i in range(11)} | {"p11": 10.0, "a99": 10.0}  # p11 tied for 12th
+    assert metrics.top_k_hits(pred, act, 12) == (12, 12)
+
+
+def test_partial_weeks_stay_out_of_the_season_and_tiers_come_from_the_prewaiver_log(tmp_path):
+    data = _season(tmp_path)
+    wd = data / "2026" / "week03"
+    src = json.loads((wd / "sources" / "sleeper_proj.json").read_text())
+    src["rows"] = dict(list(src["rows"].items())[:20])  # a snapshot saved after most games had started
+    (wd / "sources" / "sleeper_proj.json").write_text(json.dumps(src))
+    log = {"prewaiver": {"players": {"p0": {"slot": "LB", "tier": 1}, "p1": {"slot": "LB", "tier": 3}}}}
+    (wd / "tiers_log.json").write_text(json.dumps(log))
+    page = {"positions": {"LB": {"tiers": [{"tier": 1, "players": [{"id": "p5"}]}]}}}  # a live week's last page
+    (wd / "consensus.json").write_text(json.dumps(page))
+    ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
+    w3 = ev["weekly"][2]
+    assert w3["by_slot"]["LB"]["partial"] and w3["by_slot"]["LB"]["n"] == 20 and w3["partial_slots"] == ["LB"]
+    assert ev["season_by_slot"]["LB"]["n"] == 100  # weeks 1-2 only
+    assert ev["tiers"]["LB"] == [{"tier": 1, "n": 1, "avg": 6.0}, {"tier": 3, "n": 1, "avg": 8.0}]

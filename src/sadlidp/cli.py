@@ -4,6 +4,7 @@ sadlidp sync [--force] [--now ISO]   # gate, fetch, score, tier; writes data/<se
 sadlidp build                        # render the latest week into site/
 sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the sources' archives (§5.3)
 sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
+sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -134,6 +135,32 @@ def cmd_replay(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_tune(args: argparse.Namespace) -> int:
+    """Measure the tiers against final scores under candidate z and source splits (read-only)."""
+    from .sleeper import Sleeper
+    from .sync import make_client
+    from .tune import format_report, load_weeks, report
+
+    cfg = load_config(args.config)
+    data_dir = Path(args.data_dir)
+    league = json.loads((data_dir / str(args.season) / "league.json").read_text())
+    sleeper = Sleeper(make_client(cfg), args.cache_dir)
+    rostered = {}
+    for d in sorted((data_dir / str(args.season)).glob("week*/actuals.json")):
+        week = int(d.parent.name.removeprefix("week"))
+        matchups, err = sleeper.matchups(league["league_id"], week)
+        if matchups:
+            rostered[week] = {str(p) for m in matchups for p in m.get("players") or []}
+        else:
+            print(f"tune: week {week}: no matchups ({err}); skipped")
+    weeks = load_weeks(data_dir, args.season, rostered)
+    if not weeks:
+        print("tune: no week with final stats, saved sources and rosters")
+        return 1
+    print(format_report(report(weeks, cfg)))
+    return 0
+
+
 def cmd_gate(args: argparse.Namespace) -> int:
     from . import gate, storage
     from .sync import fetch_schedule, make_client
@@ -192,6 +219,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--season", type=int, required=True)
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_replay)
+    p = sub.add_parser("tune", parents=[common], help="measure the tiers against final scores (read-only)")
+    p.add_argument("--season", type=int, required=True)
+    p.add_argument("--cache-dir", default=".cache")
+    p.set_defaults(func=cmd_tune)
     sub.add_parser("leakcheck", help="scan PATH... or --staged REPO for secrets")
     args = parser.parse_args(argv)
     return args.func(args)

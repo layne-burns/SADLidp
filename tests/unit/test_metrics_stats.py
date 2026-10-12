@@ -94,4 +94,7 @@ def test_partial_weeks_stay_out_of_the_season_and_tiers_come_from_the_prewaiver_
     w3 = ev["weekly"][2]
     assert w3["by_slot"]["LB"]["partial"] and w3["by_slot"]["LB"]["n"] == 20 and w3["partial_slots"] == ["LB"]
     assert ev["season_by_slot"]["LB"]["n"] == 100  # weeks 1-2 only
-    assert ev["tiers"]["LB"] == [{"tier": 1, "n": 1, "avg": 6.0}, {"tier": 3, "n": 1, "avg": 8.0}]
+    assert ev["tiers"]["LB"] == [
+        {"tier": 1, "n": 1, "avg": 6.0, "margin": None},
+        {"tier": 3, "n": 1, "avg": 8.0, "margin": None},
+    ]

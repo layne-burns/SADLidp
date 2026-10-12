@@ -5,6 +5,7 @@ sadlidp build                        # render the latest week into site/
 sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the sources' archives (§5.3)
 sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
 sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
+sadlidp backtest fetch|run --season YYYY                 # last season's archive: store it, test ideas on it
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -161,6 +162,35 @@ def cmd_tune(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_backtest(args: argparse.Namespace) -> int:
+    """Last season's Sleeper archive: `fetch` stores it compactly, `run` scores the standard checks."""
+    from . import backtest
+    from .sleeper import Sleeper
+    from .sync import make_client
+
+    cfg = load_config(args.config)
+    data_dir = Path(args.data_dir)
+    season = args.season or datetime.now(ET).year - 1
+    sc = (json.loads((data_dir / str(season + 1) / "league.json").read_text()) or {}).get("scoring_settings") or {}
+    if not sc:
+        print(f"backtest: no league.json for {season + 1} to score {season} with")
+        return 1
+    if args.what == "fetch":
+        sleeper = Sleeper(make_client(cfg), args.cache_dir)
+        players = {str(k): v for k, v in sleeper.players(datetime.now(ET).date().isoformat()).items()}
+        written = backtest.fetch(sleeper, data_dir, season, players, sc, redo=args.redo)
+        print(f"backtest: {season}: wrote weeks {written or 'none (already archived)'}")
+        return 0
+    rows = backtest.load(data_dir, season, sc)
+    if not rows:
+        print(
+            f"backtest: no archive under {backtest.archive_dir(data_dir, season)}; run `sadlidp backtest fetch` first"
+        )
+        return 1
+    print(backtest.format_report(backtest.report(rows, sc), season))
+    return 0
+
+
 def cmd_gate(args: argparse.Namespace) -> int:
     from . import gate, storage
     from .sync import fetch_schedule, make_client
@@ -223,6 +253,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--season", type=int, required=True)
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_tune)
+    p = sub.add_parser("backtest", parents=[common], help="last season's archive: fetch it, run the checks")
+    p.add_argument("what", choices=["fetch", "run"])
+    p.add_argument("--season", type=int, help="the archived season (default: last year)")
+    p.add_argument("--redo", action="store_true", help="refetch weeks already archived")
+    p.add_argument("--cache-dir", default=".cache")
+    p.set_defaults(func=cmd_backtest)
     sub.add_parser("leakcheck", help="scan PATH... or --staged REPO for secrets")
     args = parser.parse_args(argv)
     return args.func(args)

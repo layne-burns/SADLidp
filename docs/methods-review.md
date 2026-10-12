@@ -6,10 +6,12 @@ whether tools like bootstrap percolation or anything else from a quantitative de
 ## Headline
 **The biggest unused dataset is Sleeper's own 2025 archive.** `api.sleeper.com/projections/nfl/2025/<week>`
 still serves every week's IDP projections, and `v1/stats/nfl/regular/2025/<week>` the final stats:
-18 weeks, **12,616 player-games** with a pre-game projection and a result, against about 700 for 2026 so
-far. The rows are real projections, not restated results (fractional stats such as 0.31 sacks; projection
+18 weeks, **11,091 player-games** with a non-zero pre-game projection and a result (12,616 with any
+stat line), against about 700 for 2026 so far. The rows are real projections, not restated results (fractional stats such as 0.31 sacks; projection
 and result agree exactly only when both are 0; r = 0.54 overall). Everything below was measured on it,
-with SADL's scoring applied, then re-checked on 2026 weeks 2–4.
+with SADL's scoring applied, then re-checked on 2026 weeks 2–4. The archive now lives in
+`data/2025/archive/` and `sadlidp backtest run --season 2025` reproduces the skill, form, swing and sack
+numbers.
 
 Each number is a within-week correlation between a prediction and SADL points, so the week's level is
 removed first. On 2025 the margins are about ±0.05; on 2026 they are ±0.20.

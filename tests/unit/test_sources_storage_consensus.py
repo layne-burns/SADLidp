@@ -10,6 +10,7 @@ from sadlidp import storage
 from sadlidp.consensus import consensus
 from sadlidp.sigma import within_player_sd
 from sadlidp.sources import sleeper_proj
+from sadlidp.sources.base import FetchContext
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 NOW = datetime(2026, 10, 13, 18, 0, tzinfo=UTC)
@@ -23,10 +24,14 @@ class FakeSleeper:
         return self.payload, self.error
 
 
+def ctx(sleeper, season=2026, week=5):
+    return FetchContext(None, sleeper, season, week, NOW, {}, {})
+
+
 def test_sleeper_proj_keeps_real_rows_and_marks_placeholders():
     rows = json.loads((FIXTURES / "sleeper_projections_week05_sample.json").read_text())
     placeholder = {"player_id": "999", "week": 5, "opponent": None, "stats": {}}
-    res = sleeper_proj.fetch(FakeSleeper(rows + [placeholder]), 2026, 5, NOW)
+    res = sleeper_proj.fetch(ctx(FakeSleeper(rows + [placeholder])))
     assert res.ok and len(res.rows) == len(rows) and res.no_projection_ids == {"999"}
     some = next(iter(res.rows.values()))
     assert "gp" in some["stats"] and not any(k.startswith("pts_") for k in some["stats"])
@@ -35,11 +40,9 @@ def test_sleeper_proj_keeps_real_rows_and_marks_placeholders():
 
 
 def test_sleeper_proj_wrong_week_and_failure():
-    res = sleeper_proj.fetch(
-        FakeSleeper([{"player_id": "1", "week": 4, "stats": {"gp": 1}, "opponent": "X"}]), 2026, 5, NOW
-    )
+    res = sleeper_proj.fetch(ctx(FakeSleeper([{"player_id": "1", "week": 4, "stats": {"gp": 1}, "opponent": "X"}])))
     assert res.status == "not_yet_published" and res.week == 4
-    res = sleeper_proj.fetch(FakeSleeper(None, "HTTP 503"), 2026, 5, NOW)
+    res = sleeper_proj.fetch(ctx(FakeSleeper(None, "HTTP 503")))
     assert res.status == "failed" and res.error == "HTTP 503"
 
 

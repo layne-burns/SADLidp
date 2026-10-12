@@ -12,10 +12,14 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from . import backfill as backfillmod
 from . import gate as gatemod
 from . import scoring, storage, weeklog
+from .backfill import imputer_for, source_cfg
 from .config import load_alias
 from .consensus import consensus
+from .impute import load_or_build_priors
+from .matching import Matcher, load_nicknames, load_overrides
 from .net import Client
 from .pool import PlayerStatus, player_status, rostered_ids
 from .positions import IDP_SLOTS, also_eligible, player_name, slot_of
@@ -23,15 +27,15 @@ from .roster import panel, starter_slots
 from .schedule import ET, NFLVERSE_GAMES, Schedule
 from .sigma import within_player_sd
 from .sleeper import Sleeper, my_roster, position_limits, resolve_league, season_of
-from .sources import sleeper_proj
-from .sources.base import SUSPECT, AdapterResult
+from .sources import espn_proj, sleeper_proj
+from .sources.base import SUSPECT, AdapterResult, FetchContext
 from .tiers import build_tiers, place
 
 SLIM_FIELDS = (
     "full_name", "first_name", "last_name", "position", "fantasy_positions",
     "team", "status", "active", "injury_status", "espn_id", "fantasy_data_id",
 )  # fmt: skip
-SOURCES = {sleeper_proj.NAME: (sleeper_proj, "projection")}
+SOURCES = {sleeper_proj.NAME: (sleeper_proj, "projection"), espn_proj.NAME: (espn_proj, "projection")}
 
 
 @dataclass
@@ -52,6 +56,18 @@ def _guard(label: str, fn: Callable, default, warnings: list[str], log: Callable
         warnings.append(f"{label} failed ({type(e).__name__}); skipped this sync")
         log(traceback.format_exc())
         return default
+
+
+def make_client(cfg: dict) -> Client:
+    """The run's HTTP client, spaced per host by `net.host_interval_s` (SPEC §7)."""
+    return Client(host_intervals=(cfg.get("net") or {}).get("host_interval_s") or {})
+
+
+def build_matcher(cfg: dict, players: dict) -> Matcher:
+    """One §6.1 matcher per run: the players DB, `player_overrides.toml` and the nickname table."""
+    root = Path(cfg.get("_root", "config"))
+    return Matcher(players, load_overrides(root / "player_overrides.toml"),
+                   load_nicknames(root / "aliases" / "nicknames.json"))  # fmt: skip
 
 
 def fetch_schedule(client: Client, cfg: dict, season: int, data_dir: Path) -> tuple[Schedule, str]:
@@ -118,31 +134,34 @@ def refresh_actuals(
     return written
 
 
-def backfill_projections(sleeper: Sleeper, data_dir: Path, season: int, before_week: int, now: datetime) -> list[int]:
-    """Past weeks' pre-game Sleeper projections (still served; Phase 1), written once and flagged."""
-    done = []
-    for week in range(1, before_week):
-        path = storage.week_dir(data_dir, season, week) / "sources" / f"{sleeper_proj.NAME}.json"
-        if path.exists():
-            continue
-        res = sleeper_proj.fetch(sleeper, season, week, now)
-        if res.ok:
-            storage.save_source(path, res, {pid: {**row, "backfill": True} for pid, row in res.rows.items()})
-            done.append(week)
-    return done
+def observed_after(source: dict, published_at: str | None = None) -> datetime | None:
+    """§5.3: a player is observed by a source this week only if his kickoff is after this instant, max(the
+    source's first successful fetch of the week, its `published_at`). None: the file records no fetch."""
+    first = (source.get("fetches") or [source.get("last_success")])[0]
+    stamps = [datetime.fromisoformat(t) for t in (first, source.get("published_at"), published_at) if t]
+    return max(stamps) if stamps else None
 
 
-def zero_fill(source: dict, valued: dict, idp: dict, status_of: Callable[[str], PlayerStatus]) -> dict[str, float]:
-    """§6.4 absence rule: a complete source that lists neither a row nor a placeholder for an active
-    player with an unlocked game this week projects him at 0 (placeholders stay missing)."""
-    complete = {slot for slot, u in (source.get("universe") or {}).items() if (u or {}).get("complete")}
+def zero_fill(
+    source: dict, valued: dict, idp: dict, status_of: Callable[[str], PlayerStatus], published_at: str | None = None
+) -> dict[str, float]:
+    """§6.4 absence rule under §5.3: a complete source that lists neither a row nor a placeholder for an
+    active player it observed (his kickoff after `observed_after`) projects him at 0. If the universe names
+    `zero_fill_ids`, only those players can be filled. Everyone else stays missing. A file with no recorded
+    fetch observes the players whose game is still to come."""
+    complete = {slot: u for slot, u in (source.get("universe") or {}).items() if (u or {}).get("complete")}
+    listed = {slot: set(u["zero_fill_ids"]) for slot, u in complete.items() if u.get("zero_fill_ids") is not None}
     placeholders = set(source.get("no_projection_ids") or [])
+    since = observed_after(source, published_at)
     out = {}
     for pid, p in idp.items():
-        if pid in valued or pid in placeholders or slot_of(p) not in complete or not p.get("active"):
+        slot = slot_of(p)
+        if pid in valued or pid in placeholders or slot not in complete or not p.get("active"):
+            continue
+        if slot in listed and pid not in listed[slot]:
             continue
         st = status_of(pid)
-        if st.kickoff is not None and not st.locked:
+        if st.kickoff is not None and (not st.locked if since is None else st.kickoff > since):
             out[pid] = 0.0
     return out
 
@@ -241,7 +260,7 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     }
 
 
-SOURCE_LABELS = {"sleeper_proj": "Sleeper"}
+SOURCE_LABELS = {"sleeper_proj": "Sleeper", "espn_proj": "ESPN"}
 STAT_LABELS = (
     ("idp_tkl_solo", "solo"), ("idp_tkl_ast", "ast"), ("idp_tkl_loss", "TFL"), ("idp_sack", "sack"),
     ("idp_qb_hit", "QB hit"), ("idp_pass_def", "PD"), ("idp_int", "INT"), ("idp_ff", "FF"), ("idp_fum_rec", "FR"),
@@ -250,33 +269,64 @@ STAT_LABELS = (
 
 
 def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, groups: dict, info: dict,
-              sc: dict) -> dict:  # fmt: skip
+              sc: dict, kickoff: datetime | None = None, now: datetime | None = None,
+              placeholders: dict | None = None) -> dict:  # fmt: skip
     """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
-    them, the share of μ, or why a source has nothing for him."""
+    them (each [label, value, imputed], §6.2), the share of μ, or why an enabled source has nothing for him."""
     eff = (cons_row or {}).get("eff") or {}
     frozen_pts = (cons_row or {}).get("parts") or {}  # a locked player: each source's points at his kickoff
     parts = []
     for name in SOURCES:
+        if name not in info:
+            continue  # disabled
         label = SOURCE_LABELS.get(name, name)
-        src = info.get(name) or {}
+        src = info[name] or {}
+        since = src.get("observed_after")
         pts = values.get(name, {}).get(pid, frozen_pts.get(name))
         if pts is not None:
             row = (source_rows.get(name) or {}).get(pid)
-            stats = (row or {}).get("stats") or {}
-            shown = [[lbl, round(scoring.num(stats.get(k)), 2)] for k, lbl in STAT_LABELS
+            stats, est = (row or {}).get("stats") or {}, set((row or {}).get("imputed") or ())
+            shown = [[lbl, round(scoring.num(stats.get(k)), 2), k in est] for k, lbl in STAT_LABELS
                      if scoring.num(sc.get(k)) and scoring.num(stats.get(k)) >= 0.05]  # fmt: skip
             parts.append({"source": label, "kind": groups.get(name), "pts": round(pts, 2),
                           "share": eff.get(name), "stats": shown, "late": bool(row and row.get("late")),
-                          "zero": row is None})  # fmt: skip
-        elif not src.get("last_success"):
-            parts.append({"source": label, "missing": "nothing posted for this week yet"})
+                          "zero": row is None and pid in values.get(name, {})})  # fmt: skip
+        elif not src.get("last_success") or not src.get("rows_used"):
+            read = src.get("status") in ("ok", "not_yet_published", SUSPECT)
+            parts.append({"source": label, "missing": "nothing posted for this week yet" if read
+                          else "couldn't be read this sync"})  # fmt: skip
         elif src.get("stale"):
             parts.append({"source": label, "missing": "not used this week (its data is too old)"})
-        elif not src.get("rows_used"):
-            parts.append({"source": label, "missing": "nothing posted for this week yet"})
+        elif pid in (placeholders or {}).get(name, ()):
+            parts.append({"source": label, "missing": "no projection for him"})
+        elif (
+            kickoff is not None
+            and since
+            and kickoff <= datetime.fromisoformat(since)
+            and (now is None or kickoff <= now)
+        ):
+            parts.append({"source": label, "missing": "first read this week after his game started"})  # §5.3
         else:
             parts.append({"source": label, "missing": "no projection for him"})
-    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None}
+    est = any(st[2] for part in parts for st in part.get("stats") or ())
+    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None, "est": est}
+
+
+def footer_info(info: dict) -> dict:
+    """A source's run.json entry as the page footer shows it: the adapter's report shrinks to its match
+    rate and the unmatched players, counted and listed (SPEC §6.1)."""
+    out = {k: v for k, v in info.items() if k != "report"}
+    match = (info.get("report") or {}).get("match")
+    if match:
+        by = match.get("by_method") or {}
+        out["match"] = {
+            "rate": match.get("teamed_match_rate"),
+            "unmatched": by.get("unmatched", 0) + by.get("ambiguous", 0),
+            "names": [
+                " ".join(str(u[k]) for k in ("name", "team", "slot") if u.get(k)) for u in match.get("unmatched") or []
+            ],
+        }
+    return out
 
 
 def attach_breakdowns(site_part, make: Callable[[str], dict]) -> None:
@@ -326,7 +376,7 @@ def run_sync(
 ) -> SyncOutcome:
     data_dir = Path(data_dir)
     now = (now or datetime.now(ET)).replace(microsecond=0)  # whole seconds: every browser parses the timestamps
-    client = client or Client()
+    client = client or make_client(cfg)
     sleeper = Sleeper(client, cache_dir)
     warnings: list[str] = []
 
@@ -384,6 +434,11 @@ def run_sync(
     # actuals first, so this sync's imputation and logs see last week's stats (SPEC §6.5)
     actuals = _guard("actuals refresh", lambda: refresh_actuals(sleeper, data_dir, season, sched, now, players), [],
                      warnings, log)  # fmt: skip
+    # one matcher (§6.1) and one imputer (§6.2: last season's priors, this season's actuals before the week)
+    matcher = _guard("player matching", lambda: build_matcher(cfg, players), None, warnings, log)
+    priors = _guard("imputation priors", lambda: load_or_build_priors(sleeper, data_dir, season, players, log), None,
+                    warnings, log)  # fmt: skip
+    imputer = imputer_for(cfg, priors, data_dir, season, week, players)
 
     # sources -> frozen snapshots
     wdir = storage.week_dir(data_dir, season, week)
@@ -399,6 +454,8 @@ def run_sync(
     groups: dict[str, str] = {}
     late_rows: dict[str, dict] = {}
     source_rows: dict[str, dict] = {}
+    placeholders: dict[str, set[str]] = {}  # per source: players it explicitly lists with no projection
+    zero_filled: dict[str, set[str]] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
     fetched_ok: set[str] = set()
@@ -407,8 +464,9 @@ def run_sync(
             continue
         path = wdir / "sources" / f"{name}.json"
         existing = storage.load_source(path)
+        ctx = FetchContext(client, sleeper, season, week, now, idp, source_cfg(cfg, name), matcher, imputer)
         try:
-            res = module.fetch(sleeper, season, week, now)
+            res = module.fetch(ctx)
         except Exception as e:  # a broken adapter is a failed source, never a failed sync (SPEC §7)
             log(traceback.format_exc())
             res = AdapterResult(name=name, kind=kind, status="failed", week=week, fetched_at=now.isoformat(),
@@ -416,7 +474,8 @@ def run_sync(
         before = len(existing.get("rows") or {})
         if res.ok and before and len(res.rows) < shrink * before:  # SPEC §7: a shrunken fetch isn't merged
             res.status, res.error = SUSPECT, f"{len(res.rows)} rows against {before} before"
-        info = res.summary()
+        info = {**res.summary(), "label": SOURCE_LABELS.get(name, name), "published_at": res.published_at,
+                "report": res.report}  # fmt: skip
         late_ok = bool(((cfg.get("sources") or {}).get(name) or {}).get("late_rows"))
         if res.ok:
             fetched_ok.add(name)
@@ -445,12 +504,25 @@ def run_sync(
         values[name] = {
             pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp
         }
-        if kind == "projection":
-            zeros = zero_fill(storage.load_source(path), values[name], idp, status_of)
+        if kind == "projection":  # zero-fill only players the source observed this week (§5.3)
+            stored = storage.load_source(path)
+            since = observed_after(stored, res.published_at)
+            zeros = zero_fill(stored, values[name], idp, status_of, res.published_at)
             values[name].update(zeros)
-            info["zero_filled"] = len(zeros)
+            zero_filled[name] = set(zeros)
+            placeholders[name] = set(stored.get("no_projection_ids") or [])
+            info.update(zero_filled=len(zeros), observed_after=since.isoformat() if since else None)
         run["sources"][name] = info
 
+    # zero-fills alone don't make a number for a player another source explicitly lists with no projection
+    # (e.g. a retired player Sleeper still carries as a placeholder and ESPN no longer lists): he stays
+    # "no projection", as before ESPN joined (§6.4)
+    listed_empty = set().union(*placeholders.values()) if placeholders else set()
+    only_zero = {pid for zf in zero_filled.values() for pid in zf if pid in listed_empty
+                 and all(pid in zero_filled.get(n, ()) for n in values if pid in values[n])}  # fmt: skip
+    for vals in values.values():
+        for pid in only_zero:
+            vals.pop(pid, None)
     if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
@@ -637,10 +709,12 @@ def run_sync(
             "names": names,
         }
 
-    backfilled = _guard("backfill", lambda: backfill_projections(sleeper, data_dir, season, week, now), [], warnings,
-                        log)  # fmt: skip
-    if backfilled:
-        log(f"sync: backfilled Sleeper projections for weeks {backfilled}")  # a note, not a page banner
+    backfilled = _guard("backfill", lambda: backfillmod.run(SOURCES, cfg, data_dir, season, range(1, week), now,
+                                                           client=client, sleeper=sleeper, players=idp,
+                                                           matcher=matcher, priors=priors, log=log),
+                        {}, warnings, log)  # fmt: skip
+    for name, weeks in backfilled.items():
+        log(f"sync: backfilled {SOURCE_LABELS.get(name, name)} weeks {weeks}")  # a note, not a page banner
 
     recap = _guard("last week's results", lambda: last_week_recap(data_dir, season, week, sched, sc, players), None,
                    warnings, log)  # fmt: skip
@@ -651,6 +725,7 @@ def run_sync(
         warnings=warnings,
         backfilled=backfilled,
         actuals_written=actuals,
+        impute_priors=(priors or {}).get("season"),  # None: built-in position rates (§6.2)
         window=window.id if window else "forced",
     )
     site_data = {
@@ -666,11 +741,14 @@ def run_sync(
         "my_idps": my_out,
         "last_week": recap,
         "sigma_out": sigma_out,
-        "sources": run["sources"],
+        "sources": {name: footer_info(info) for name, info in run["sources"].items()},
         "warnings": warnings,
     }
     attach_breakdowns(
-        site_data, lambda pid: breakdown(pid, cons.get(pid), source_rows, values, groups, run["sources"], sc)
+        site_data,
+        lambda pid: breakdown(
+            pid, cons.get(pid), source_rows, values, groups, run["sources"], sc, kickoff_of(pid), now, placeholders
+        ),
     )
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})

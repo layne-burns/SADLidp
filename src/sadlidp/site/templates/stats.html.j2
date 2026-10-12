@@ -57,10 +57,39 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     </div>
   </section>
 
+  {% set srcs = s.season_by_source or {} %}
+  {% if srcs|length > 1 %}
+  <section aria-labelledby="src-h">
+    <h2 id="src-h">Each source on the same players</h2>
+    <div class="slot">
+      <p>Each week's players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
+      <div class="scroll"><table>
+        <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
+        {% for slot in slots %}
+        {% for name, by_slot in srcs.items() %}{% set x = by_slot.get(slot) %}{% if x %}
+        <tr><td>{{ s.source_labels[name] }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td>
+          <td class="num">{{ pct(x.covered / x.pool) if x.pool else '—' }} <small>({{ x.covered }})</small></td></tr>
+        {% endif %}{% endfor %}
+        <tr><td><b>All together</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
+        {% endfor %}
+      </table></div>
+      <details><summary>Each source, week by week</summary>
+        <div class="scroll"><table>
+          <tr><th>Wk</th><th>Source</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
+          {% for w in s.weekly %}{% for name, by_slot in (w.by_source or {}).items() %}
+          <tr><td>{{ w.week }}</td><td>{{ s.source_labels.get(name, name) }}</td>{% for slot in slots %}{% set x = by_slot.get(slot) %}<td class="num">{% if x and x.covered %}{{ f1(x.mae) }} <small>({{ x.covered }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
+          {% endfor %}{% endfor %}
+        </table></div>
+        <p class="note">Average miss in points, with the number of players each source covered in brackets.</p>
+      </details>
+    </div>
+  </section>
+  {% endif %}
+
   <section aria-labelledby="weeks-h">
     <h2 id="weeks-h">Week by week</h2>
     <div class="slot">
-      <p class="note">Average miss in points. "archive" = projections fetched after the week from Sleeper's archive; "late" = some captured after kickoff.</p>
+      <p class="note">Average miss in points. "archive" = projections fetched after the week from the sources' archives; "late" = some captured after kickoff.</p>
       <table>
         <tr><th>Wk</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}<th></th></tr>
         {% for w in s.weekly %}
@@ -116,7 +145,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <section aria-labelledby="weights-h">
     <h2 id="weights-h">Who gets how much say</h2>
     <div class="slot">
-      <p>{% if s.sources|length == 1 %}Only {{ s.sources[0].name }} so far: it's 100% of every number. As more sources are added, each one's share, and how it changes week to week as their accuracy is measured, shows here.{% endif %}</p>
+      <p>{% if s.sources|length == 1 %}Only {{ s.sources[0].name }} so far: it's 100% of every number. As more sources are added, each one's share, and how it changes week to week as their accuracy is measured, shows here.{% else %}{{ s.sources|map(attribute='name')|join(' and ') }} have an equal say ({{ pct(s.sources[0].share) }} each) in every number they {{ 'both' if s.sources|length == 2 else 'all' }} project; where only one of them has a number for a player, his is that one's. Once enough weeks are scored, each source's share will follow its accuracy.{% endif %}</p>
     </div>
   </section>
 
@@ -136,6 +165,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   </details>
 {% endif %}
 </main>
-<footer><p>Computed from the weeks saved in the repo; nothing here changes the numbers on the main page yet. Weeks 1–4 use Sleeper's archived projections.</p></footer>
+<footer><p>Computed from the weeks saved in the repo; nothing here changes the numbers on the main page yet. Weeks marked "archive" use projections fetched after the fact from each source's archive.</p></footer>
 </body>
 </html>

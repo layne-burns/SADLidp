@@ -7,19 +7,21 @@ at all is `suspect` (Sleeper rewrites a week's rows in a batch; mid-batch it ser
 
 from __future__ import annotations
 
-from datetime import datetime
-
 from ..positions import IDP_SLOTS
-from ..sleeper import Sleeper
-from .base import OK, SUSPECT, AdapterResult
+from .base import OK, SUSPECT, AdapterResult, FetchContext
 
 NAME = "sleeper_proj"
+HOST = "api.sleeper.com"  # for the backfill runner's per-host request budget (§5.3)
 
 
-def fetch(sleeper: Sleeper, season: int, week: int, now: datetime) -> AdapterResult:
-    result = AdapterResult(name=NAME, kind="projection", status="failed", week=week, fetched_at=now.isoformat())
-    payload, error = sleeper.projections(season, week)
+def fetch(ctx: FetchContext) -> AdapterResult:
+    """Uses ctx.sleeper, season, week and now; Sleeper's ids need no matching and its lines no imputation."""
+    week = ctx.week
+    result = AdapterResult(name=NAME, kind="projection", status="failed", week=week, fetched_at=ctx.now.isoformat())
+    payload, error = ctx.sleeper.projections(ctx.season, week)
     if payload is None:
+        client = getattr(ctx.sleeper, "client", None)
+        result.status = "blocked" if HOST in (getattr(client, "blocked_hosts", None) or ()) else "failed"  # §7
         result.error = error
         return result
     if not isinstance(payload, list):

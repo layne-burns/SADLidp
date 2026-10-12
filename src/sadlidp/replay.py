@@ -1,13 +1,14 @@
 """Rebuild a past week's page from saved data (D22 week picker; owner request 2026-10-12).
 
 Runs the normal sync pipeline offline, as of one minute before the week's first kickoff, against:
-- the week's saved projection snapshot (the backfilled Sleeper rows);
+- every source file saved for the week (SPEC §5.3: no refetch; each source's live fetch fails, so the
+  sync uses the saved rows, and a source with no file that week is left out);
 - the rosters and lineups of that week (Sleeper's matchups for the week);
 - the saved league settings, schedule and last season's σ_out.
 
-Each projected player takes his team from the projection row and is treated as healthy (that week's
-injury news isn't known). The result is written as the week's consensus.json, marked `replayed`;
-the site build then re-scores it with the week's final stats like any past week.
+Each projected player takes his team from a projection row (Sleeper's first) and is treated as healthy
+(that week's injury news isn't known). The result is written as the week's consensus.json, marked
+`replayed`; the site build then re-scores it with the week's final stats like any past week.
 """
 
 from __future__ import annotations
@@ -22,13 +23,13 @@ from pathlib import Path
 from . import storage
 from .net import Response
 from .schedule import NFLVERSE_GAMES, Schedule
-from .sleeper import API, V1
-from .sync import run_sync
+from .sleeper import V1
+from .sync import SOURCES, run_sync
 
 NOTE = (
     "Rebuilt after the fact: tiers and suggestions as they would have looked before the week's first game, "
-    "from Sleeper's archived projections and that week's rosters. That week's injury news isn't known, so "
-    "everyone projected to play is treated as available."
+    "from the projections saved for that week (from each source's archive) and that week's rosters. That "
+    "week's injury news isn't known, so everyone projected to play is treated as available."
 )
 
 
@@ -57,10 +58,12 @@ def replay_week(
     data_dir = Path(data_dir)
     wdir = storage.week_dir(data_dir, season, week)
     league = storage.read_json(data_dir / str(season) / "league.json")
-    source = storage.read_json(wdir / "sources" / "sleeper_proj.json")
+    saved = {
+        name: wdir / "sources" / f"{name}.json" for name in SOURCES if (wdir / "sources" / f"{name}.json").exists()
+    }
     sched_json = storage.read_json(data_dir / str(season) / "schedule.json")
-    if not league or not source or not sched_json:
-        raise FileNotFoundError(f"week {week}: league.json, schedule.json or the projection snapshot is missing")
+    if not league or not saved or not sched_json:
+        raise FileNotFoundError(f"week {week}: league.json, schedule.json or every source snapshot is missing")
     kicks = [g.kickoff for g in Schedule.from_json(sched_json).week_games(week) if g.kickoff]
     now = min(kicks) - timedelta(minutes=1)
 
@@ -81,17 +84,18 @@ def replay_week(
         }
         for m in matchups
     ]
-    rows = source.get("rows") or {}
     players = dict(players_db)
-    for pid, row in rows.items():
-        players[pid] = {**players.get(pid, {}), "team": row.get("team"), "status": "Active", "active": True,
-                        "injury_status": None}  # fmt: skip
-    projections = [
-        {"player_id": pid, "week": week, "team": r.get("team"), "opponent": r.get("opponent"), "stats": r["stats"]}
-        for pid, r in rows.items()
-    ] + [  # the snapshot's placeholders stay "no projection" (never zero-filled)
-        {"player_id": pid, "week": week, "opponent": None, "stats": {}} for pid in source.get("no_projection_ids") or []
-    ]
+    for path in reversed(saved.values()):  # the first source's team wins (Sleeper's rows carry that week's team)
+        for pid, row in (storage.load_source(path).get("rows") or {}).items():
+            team = row.get("team") or players.get(pid, {}).get("team")
+            players[pid] = {**players.get(pid, {}), "team": team, "status": "Active", "active": True,
+                            "injury_status": None}  # fmt: skip
+    # sources with no file that week are switched off; the backfill runner has nothing to do in a replay
+    sources_cfg = {**(cfg.get("sources") or {})}
+    for name in SOURCES:
+        if name not in saved:
+            sources_cfg[name] = {**(sources_cfg.get(name) or {}), "enabled": False}
+    run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0}}
     lid = league["league_id"]
     routes = {
         f"{V1}/state/nfl": {"season": str(season), "season_type": "regular", "week": week, "display_week": week},
@@ -101,21 +105,29 @@ def replay_week(
         f"{V1}/league/{lid}/rosters": rosters,
         f"{V1}/league/{lid}/matchups/{week}": matchups,
         f"{V1}/players/nfl": players,
-        f"{API}/projections/nfl/{season}/{week}": projections,
-        NFLVERSE_GAMES: None,  # served from the saved schedule below
+        NFLVERSE_GAMES: None,  # served from the saved schedule below; projections aren't served at all
     }
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         (tmp / str(season)).mkdir(parents=True)
         storage.write_json(tmp / str(season) / "schedule.json", sched_json)
-        prev = data_dir / str(season - 1) / "sigma_out.json"
-        if prev.exists():
-            (tmp / str(season - 1)).mkdir(parents=True)
-            shutil.copy(prev, tmp / str(season - 1) / "sigma_out.json")
-        run_sync(cfg, tmp, tmp / "cache", now=now, force=True, client=ReplayClient(routes), log=log)
+        (tmp / str(season - 1)).mkdir(parents=True)
+        for name in ("sigma_out.json", "impute_priors.json"):
+            if (data_dir / str(season - 1) / name).exists():
+                shutil.copy(data_dir / str(season - 1) / name, tmp / str(season - 1) / name)
+        (storage.week_dir(tmp, season, week) / "sources").mkdir(parents=True)
+        for name, path in saved.items():
+            shutil.copy(path, storage.week_dir(tmp, season, week) / "sources" / f"{name}.json")
+        run_sync(run_cfg, tmp, tmp / "cache", now=now, force=True, client=ReplayClient(routes), log=log)
         data = json.loads((storage.week_dir(tmp, season, week) / "consensus.json").read_text())
     data["replayed"] = {"as_of": now.isoformat(), "note": NOTE}
-    data["warnings"] = [w for w in data.get("warnings", []) if not w.startswith(("σ_out", "live stats"))]
+    # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows
+    noise = ("σ_out", "live stats", *(f"{name}: failed" for name in SOURCES))
+    data["warnings"] = [w for w in data.get("warnings", []) if not w.startswith(noise)]
+    for name in saved:  # each source was read from its saved file, not fetched: say so, not "failed"
+        src = (data.get("sources") or {}).get(name)
+        if src is not None:
+            src.update(status="saved", error=None)
     out = wdir / "consensus.json"
     storage.write_json(out, data)
     return out

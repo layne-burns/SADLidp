@@ -1,10 +1,10 @@
 """Polite stdlib HTTP client (ported from the Phase 1 probe, probe/phttp.py).
 
 Per-host request spacing, retries with backoff, an identifying User-Agent, a global
-deadline with a per-host circuit breaker, and manual redirect handling that only sends
-credentials (Cookie/Authorization, cookie jar) over https to the original site. Error
-strings never contain request headers or exception messages that could echo them
-(SPEC.md D5, §7).
+deadline with per-host circuit breakers (timeouts, 429, bot challenges), and manual
+redirect handling that only sends credentials (Cookie/Authorization, cookie jar) over
+https to the original site. Error strings never contain request headers or exception
+messages that could echo them (SPEC.md D5, §7).
 """
 
 from __future__ import annotations
@@ -34,6 +34,7 @@ SAFE_RESPONSE_HEADERS = {
     "retry-after",
     "server",
     "cf-cache-status",
+    "cf-mitigated",
     "x-requests-remaining",
     "x-requests-used",
     "x-requests-last",
@@ -41,6 +42,9 @@ SAFE_RESPONSE_HEADERS = {
 RETRY_STATUSES = {429, 500, 502, 503, 504}
 MAX_REDIRECTS = 5
 DEAD_AFTER_TIMEOUTS = 2
+CHALLENGE_STATUSES = {403, 503}
+CHALLENGE_MARKERS = (b"just a moment", b"cf-chl")
+CHALLENGE_SNIFF_BYTES = 4096
 
 
 @dataclass
@@ -52,6 +56,7 @@ class Response:
     body: bytes = b""
     error: str | None = None
     elapsed_s: float = 0.0
+    challenged: bool = False  # a bot challenge (SPEC §7); the host is blocked for the rest of the run
 
     @property
     def ok(self) -> bool:
@@ -105,6 +110,14 @@ def credentials_allowed(url: str, origin_domain: str) -> bool:
     )
 
 
+def is_challenge(status: int | None, headers: dict[str, str], body: bytes) -> bool:
+    """A 403/503 with `cf-mitigated`, or a "Just a moment" / cf-chl page (SPEC §7)."""
+    if status not in CHALLENGE_STATUSES:
+        return False
+    head = body[:CHALLENGE_SNIFF_BYTES].lower()
+    return "cf-mitigated" in headers or any(m in head for m in CHALLENGE_MARKERS)
+
+
 def _decode(body: bytes, encoding: str | None) -> bytes:
     enc = (encoding or "").strip().lower()
     if enc in ("gzip", "x-gzip"):
@@ -143,8 +156,10 @@ class Client:
         deadline_s: float = 20 * 60,
         sleep=time.sleep,
         clock=time.monotonic,
+        host_intervals: dict[str, float] | None = None,
     ):
         self.min_interval_s = min_interval_s
+        self.host_intervals = {h.lower(): float(s) for h, s in (host_intervals or {}).items()}
         self.timeout_s = timeout_s
         self.retries = retries
         self._sleep = sleep
@@ -154,13 +169,15 @@ class Client:
         self._timeouts: Counter = Counter()
         self.dead_hosts: set[str] = set()
         self.rate_limited_hosts: set[str] = set()
+        self.blocked_hosts: set[str] = set()
         self._opener = urllib.request.build_opener(_NoRedirect)
         self.request_count = 0
 
     def _space(self, host: str) -> None:
+        """Wait out the host's interval (`host_intervals`, else `min_interval_s`) since its last request."""
         last = self._last_request.get(host)
         if last is not None:
-            wait = self.min_interval_s - (self._clock() - last)
+            wait = self.host_intervals.get(host, self.min_interval_s) - (self._clock() - last)
             if wait > 0:
                 self._sleep(wait)
         self._last_request[host] = self._clock()
@@ -196,6 +213,8 @@ class Client:
             return _Raw(error=f"transfer error: {type(e).__name__}", retryable=True)
 
     def _skip(self, host: str) -> str | None:
+        if host in self.blocked_hosts:
+            return "blocked: challenge earlier this run"
         if host in self.dead_hosts:
             return "skipped: host unresponsive"
         if host in self.rate_limited_hosts:
@@ -230,6 +249,7 @@ class Client:
         Set-Cookie only accepted) on https hops whose base domain is `credential_domain`,
         or the original request's base domain if not given. Only GET/HEAD are retried
         by default: a POST (e.g. a login) is never re-sent unless `retries` says so.
+        A bot challenge is never retried and blocks its host for the rest of the run (§7).
         """
         headers = dict(headers or {})
         origin_domain = credential_domain or base_domain(urllib.parse.urlsplit(url).hostname or "")
@@ -237,6 +257,7 @@ class Client:
         start = self._clock()
         current = url
         raw = _Raw()
+        challenged = False
         for _hop in range(MAX_REDIRECTS + 1):
             host = urllib.parse.urlsplit(current).hostname or ""
             allowed = credentials_allowed(current, origin_domain)
@@ -259,6 +280,10 @@ class Client:
                         self.dead_hosts.add(host)
                 elif raw.status is not None:
                     self._timeouts[host] = 0
+                if is_challenge(raw.status, raw.headers, raw.body):
+                    challenged = True
+                    self.blocked_hosts.add(host)
+                    break
                 if raw.status == 429 and attempt == max_retries:
                     self.rate_limited_hosts.add(host)
                 if not (raw.retryable or raw.status in RETRY_STATUSES) or attempt == max_retries:
@@ -286,4 +311,5 @@ class Client:
             body=raw.body,
             error=raw.error,
             elapsed_s=round(self._clock() - start, 2),
+            challenged=challenged,
         )

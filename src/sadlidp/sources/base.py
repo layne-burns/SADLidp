@@ -3,10 +3,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
 OK = "ok"
 STATUSES = {OK, "skipped", "not_yet_published", "suspect", "blocked", "parse_error", "budget", "failed"}
 SUSPECT = "suspect"  # the response looks incomplete (e.g. the source is mid-update): not merged
+
+
+@dataclass
+class FetchContext:
+    """What every `fetch(ctx)` gets (§5.1 calling convention)."""
+
+    client: object  # net.Client (or a test double with .get)
+    sleeper: object  # sleeper.Sleeper
+    season: int
+    week: int
+    now: datetime
+    players: dict[str, dict]  # the week's IDP players, by Sleeper id
+    cfg: dict  # the source's own config table plus "espn_league_id"
+    matcher: object | None = None  # matching.Matcher (§6.1)
+    imputer: object | None = None  # impute.Imputer (§6.2)
+    archive: bool = False  # the backfill runner is asking for a past week (§5.3)
 
 
 @dataclass
@@ -21,6 +38,8 @@ class AdapterResult:
     universe: dict[str, dict] = field(default_factory=dict)  # slot -> {"complete": bool, "depth": int|None}
     covered_keys: set[str] = field(default_factory=set)
     error: str | None = None
+    published_at: str | None = None  # when the source says it posted the week's data, if it does (§5.3)
+    report: dict = field(default_factory=dict)  # pages, match counts, unmatched players, imputed keys (§5.1)
 
     @property
     def ok(self) -> bool:

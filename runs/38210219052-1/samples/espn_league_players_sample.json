@@ -1,0 +1,2715 @@
+[
+ {
+  "draftAuctionValue": 0,
+  "droppedByEliminatedTeam": false,
+  "id": 3138826,
+  "keeperValue": 0,
+  "keeperValueFuture": 0,
+  "lineupLocked": true,
+  "onTeamId": 0,
+  "player": {
+   "active": true,
+   "defaultPositionId": 11,
+   "draftRanksByRankType": {
+    "ELIMINATION": {
+     "auctionValue": 6,
+     "published": false,
+     "rank": 98,
+     "rankSourceId": 0,
+     "rankType": "ELIMINATION",
+     "slotId": 0
+    },
+    "PPR": {
+     "auctionValue": 4,
+     "published": false,
+     "rank": 83,
+     "rankSourceId": 0,
+     "rankType": "PPR",
+     "slotId": 0
+    },
+    "STANDARD": {
+     "auctionValue": 4,
+     "published": false,
+     "rank": 83,
+     "rankSourceId": 0,
+     "rankType": "STANDARD",
+     "slotId": 0
+    },
+    "SUPERFLEX": {
+     "auctionValue": 4,
+     "published": false,
+     "rank": 94,
+     "rankSourceId": 0,
+     "rankType": "SUPERFLEX",
+     "slotId": 0
+    }
+   },
+   "droppable": true,
+   "eligibleSlots": [
+    10,
+    15,
+    20,
+    21
+   ],
+   "firstName": "Fred",
+   "fullName": "Fred Warner",
+   "id": 3138826,
+   "injured": false,
+   "injuryStatus": "ACTIVE",
+   "jersey": "54",
+   "lastName": "Warner",
+   "lastNewsDate": 1791334645000,
+   "ownership": {
+    "activityLevel": null,
+    "auctionValueAverage": 3.65,
+    "auctionValueAverageChange": -0.29,
+    "averageDraftPosition": 55.44,
+    "averageDraftPositionPercentChange": -0.56,
+    "date": 1791779413428,
+    "leagueType": 0,
+    "percentChange": 0.01,
+    "percentOwned": 98.23,
+    "percentStarted": 94.92
+   },
+   "proTeamId": 25,
+   "rankings": {
+    "0": [
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "1": [],
+    "2": [
+     {
+      "auctionValue": 0,
+      "averageRank": 6.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 4.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 6,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 6,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "3": [
+     {
+      "auctionValue": 0,
+      "averageRank": 7.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 5.666666666666667,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 5,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 5,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "4": [
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "5": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.3333333333333335,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ]
+   },
+   "seasonOutlook": "Everyone knows who runs the middle of the field for the 49ers. Last year ended a stretch of seven straight seasons with at least 118 tackles for this Canton-bound linebacker. The next streak begins this year.",
+   "stats": [
+    {
+     "appliedTotal": 38.0,
+     "externalId": "401872992",
+     "id": "01401872992",
+     "proTeamId": 25,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "106": 1.0,
+      "107": 5.0,
+      "108": 5.0,
+      "109": 10.0,
+      "110": 3.0,
+      "111": 2.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 30.0,
+     "externalId": "401872975",
+     "id": "01401872975",
+     "proTeamId": 25,
+     "scoringPeriodId": 4,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 4.0,
+      "108": 3.0,
+      "109": 7.0,
+      "110": 2.0,
+      "111": 1.0,
+      "113": 2.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 58.0,
+     "externalId": "401872958",
+     "id": "01401872958",
+     "proTeamId": 25,
+     "scoringPeriodId": 3,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 10.0,
+      "108": 7.0,
+      "109": 17.0,
+      "110": 5.0,
+      "111": 3.0,
+      "112": 2.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedAverage": 38.4,
+     "appliedTotal": 192.0,
+     "externalId": "2026",
+     "id": "002026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 1.0,
+      "106": 3.0,
+      "107": 29.0,
+      "108": 21.0,
+      "109": 50.0,
+      "110": 14.0,
+      "111": 9.0,
+      "112": 2.0,
+      "113": 3.0,
+      "155": 5.0,
+      "210": 5.0,
+      "99": 0.5
+     }
+    },
+    {
+     "appliedTotal": 36.15265909,
+     "externalId": "20265",
+     "id": "1120265",
+     "proTeamId": 0,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 0.266440551,
+      "103": 0.00517,
+      "104": 0.00243,
+      "105": 0.008214051,
+      "106": 0.240910204,
+      "107": 3.935108202,
+      "108": 4.96193277,
+      "109": 8.897040972,
+      "110": 2.0,
+      "111": 1.0,
+      "112": 0.211492992,
+      "113": 0.562035487,
+      "210": 1.0,
+      "93": 0.000608,
+      "94": 0.007605603,
+      "95": 0.127824127,
+      "96": 0.156591633,
+      "97": 0.000912672,
+      "98": 0.000913,
+      "99": 0.133220275
+     }
+    },
+    {
+     "appliedAverage": 36.379094929166676,
+     "appliedTotal": 436.54913915,
+     "externalId": "2026",
+     "id": "102026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 2.842829934,
+      "103": 0.0625,
+      "104": 0.02939886,
+      "105": 0.099221153,
+      "106": 2.910060885,
+      "107": 48.04158043,
+      "108": 60.5775191,
+      "109": 108.6190995,
+      "110": 36.0,
+      "111": 21.0,
+      "112": 2.508508223,
+      "113": 6.239821152,
+      "210": 12.0,
+      "93": 0.00735,
+      "94": 0.091871438,
+      "95": 1.3,
+      "96": 1.891539576,
+      "97": 0.011024573,
+      "98": 0.011,
+      "99": 1.421414967
+     }
+    }
+   ]
+  },
+  "ratings": {
+   "0": {
+    "positionalRanking": 3,
+    "totalRanking": 3,
+    "totalRating": 192.0
+   }
+  },
+  "rosterLocked": true,
+  "status": "FREEAGENT",
+  "tradeLocked": false
+ },
+ {
+  "draftAuctionValue": 0,
+  "droppedByEliminatedTeam": false,
+  "id": 3728281,
+  "keeperValue": 0,
+  "keeperValueFuture": 0,
+  "lineupLocked": true,
+  "onTeamId": 0,
+  "player": {
+   "active": true,
+   "defaultPositionId": 11,
+   "draftRanksByRankType": {
+    "ELIMINATION": {
+     "auctionValue": 5,
+     "published": false,
+     "rank": 111,
+     "rankSourceId": 0,
+     "rankType": "ELIMINATION",
+     "slotId": 0
+    },
+    "PPR": {
+     "auctionValue": 6,
+     "published": false,
+     "rank": 71,
+     "rankSourceId": 0,
+     "rankType": "PPR",
+     "slotId": 0
+    },
+    "STANDARD": {
+     "auctionValue": 6,
+     "published": false,
+     "rank": 71,
+     "rankSourceId": 0,
+     "rankType": "STANDARD",
+     "slotId": 0
+    },
+    "SUPERFLEX": {
+     "auctionValue": 6,
+     "published": false,
+     "rank": 83,
+     "rankSourceId": 0,
+     "rankType": "SUPERFLEX",
+     "slotId": 0
+    }
+   },
+   "droppable": true,
+   "eligibleSlots": [
+    10,
+    15,
+    20,
+    21
+   ],
+   "firstName": "Blake",
+   "fullName": "Blake Cashman",
+   "id": 3728281,
+   "injured": false,
+   "injuryStatus": "ACTIVE",
+   "jersey": "51",
+   "lastName": "Cashman",
+   "lastNewsDate": 1791335066000,
+   "ownership": {
+    "activityLevel": null,
+    "auctionValueAverage": 3.24,
+    "auctionValueAverageChange": -0.06,
+    "averageDraftPosition": 69.06,
+    "averageDraftPositionPercentChange": -0.05,
+    "date": 1791779413464,
+    "leagueType": 0,
+    "percentChange": 0.11,
+    "percentOwned": 94.9,
+    "percentStarted": 87.97
+   },
+   "proTeamId": 16,
+   "rankings": {
+    "0": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.3333333333333335,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "1": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "2": [
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 3.3333333333333335,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 5,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "3": [
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 3.3333333333333335,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "4": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.6666666666666665,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "5": [
+     {
+      "auctionValue": 0,
+      "averageRank": 4.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 4.333333333333333,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 5,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ]
+   },
+   "seasonOutlook": "The famously bold Brian Flores leverages Cashman's speed and football IQ in \"creeper\" packages, blitzing him through the B-gap or pairing him with other blitzers to overwhelm offensive lines. Few players can deliver his mix of tackles and splash plays.",
+   "stats": [
+    {
+     "appliedTotal": 32.0,
+     "externalId": "401872987",
+     "id": "01401872987",
+     "proTeamId": 16,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 4.0,
+      "108": 5.0,
+      "109": 9.0,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 1.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 30.0,
+     "externalId": "401872974",
+     "id": "01401872974",
+     "proTeamId": 16,
+     "scoringPeriodId": 4,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 5.0,
+      "108": 3.0,
+      "109": 8.0,
+      "110": 2.0,
+      "111": 1.0,
+      "155": 1.0,
+      "210": 1.0,
+      "96": 1.0
+     }
+    },
+    {
+     "appliedTotal": 36.0,
+     "externalId": "401872959",
+     "id": "01401872959",
+     "proTeamId": 16,
+     "scoringPeriodId": 3,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 2.0,
+      "107": 5.0,
+      "108": 3.0,
+      "109": 8.0,
+      "110": 2.0,
+      "111": 1.0,
+      "113": 1.0,
+      "155": 1.0,
+      "210": 1.0,
+      "99": 1.0
+     }
+    },
+    {
+     "appliedAverage": 33.8,
+     "appliedTotal": 169.0,
+     "externalId": "2026",
+     "id": "002026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 5.0,
+      "107": 20.0,
+      "108": 22.0,
+      "109": 42.0,
+      "110": 12.0,
+      "111": 6.0,
+      "112": 4.0,
+      "113": 1.0,
+      "155": 5.0,
+      "210": 5.0,
+      "96": 1.0,
+      "99": 2.5
+     }
+    },
+    {
+     "appliedTotal": 36.23115427,
+     "externalId": "20265",
+     "id": "1120265",
+     "proTeamId": 0,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 0.630929465,
+      "103": 0.00521,
+      "104": 0.00245,
+      "105": 0.008277248,
+      "106": 0.037047765,
+      "107": 4.088528863,
+      "108": 5.155386918,
+      "109": 9.243915781,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 0.228631883,
+      "113": 0.315429061,
+      "210": 1.0,
+      "93": 0.000613,
+      "94": 0.007664119,
+      "95": 0.0444,
+      "96": 0.024081047,
+      "97": 0.00092,
+      "98": 0.00092,
+      "99": 0.315464732
+     }
+    },
+    {
+     "appliedAverage": 36.48256825241667,
+     "appliedTotal": 437.79081903,
+     "externalId": "2026",
+     "id": "102026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 7.046325603,
+      "103": 0.0625,
+      "104": 0.0294,
+      "105": 0.099253781,
+      "106": 0.431122209,
+      "107": 49.67755461,
+      "108": 62.64038331,
+      "109": 112.3179379,
+      "110": 37.0,
+      "111": 22.0,
+      "112": 3.684566114,
+      "113": 3.722001886,
+      "210": 12.0,
+      "93": 0.00735,
+      "94": 0.091901649,
+      "95": 0.516,
+      "96": 0.280229436,
+      "97": 0.011028198,
+      "98": 0.011,
+      "99": 3.523162802
+     }
+    }
+   ]
+  },
+  "ratings": {
+   "0": {
+    "positionalRanking": 8,
+    "totalRanking": 9,
+    "totalRating": 169.0
+   }
+  },
+  "rosterLocked": true,
+  "status": "FREEAGENT",
+  "tradeLocked": false
+ },
+ {
+  "draftAuctionValue": 0,
+  "droppedByEliminatedTeam": false,
+  "id": 4043130,
+  "keeperValue": 0,
+  "keeperValueFuture": 0,
+  "lineupLocked": true,
+  "onTeamId": 0,
+  "player": {
+   "active": true,
+   "defaultPositionId": 11,
+   "draftRanksByRankType": {
+    "ELIMINATION": {
+     "auctionValue": 6,
+     "published": false,
+     "rank": 95,
+     "rankSourceId": 0,
+     "rankType": "ELIMINATION",
+     "slotId": 0
+    },
+    "PPR": {
+     "auctionValue": 8,
+     "published": false,
+     "rank": 65,
+     "rankSourceId": 0,
+     "rankType": "PPR",
+     "slotId": 0
+    },
+    "STANDARD": {
+     "auctionValue": 8,
+     "published": false,
+     "rank": 66,
+     "rankSourceId": 0,
+     "rankType": "STANDARD",
+     "slotId": 0
+    },
+    "SUPERFLEX": {
+     "auctionValue": 8,
+     "published": false,
+     "rank": 76,
+     "rankSourceId": 0,
+     "rankType": "SUPERFLEX",
+     "slotId": 0
+    }
+   },
+   "droppable": true,
+   "eligibleSlots": [
+    10,
+    15,
+    20,
+    21
+   ],
+   "firstName": "Jordyn",
+   "fullName": "Jordyn Brooks",
+   "id": 4043130,
+   "injured": false,
+   "injuryStatus": "ACTIVE",
+   "jersey": "20",
+   "lastName": "Brooks",
+   "lastNewsDate": 1791745351000,
+   "ownership": {
+    "activityLevel": null,
+    "auctionValueAverage": 3.88,
+    "auctionValueAverageChange": -0.65,
+    "averageDraftPosition": 60.24,
+    "averageDraftPositionPercentChange": -1.27,
+    "date": 1791779413890,
+    "leagueType": 0,
+    "percentChange": 0.17,
+    "percentOwned": 92.91,
+    "percentStarted": 87.75
+   },
+   "proTeamId": 15,
+   "rankings": {
+    "0": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "1": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "2": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.3333333333333333,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "3": [
+     {
+      "auctionValue": 0,
+      "averageRank": 2.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.3333333333333335,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "4": [
+     {
+      "auctionValue": 0,
+      "averageRank": 4.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 4.666666666666667,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 4,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 6,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "5": [
+     {
+      "auctionValue": 0,
+      "averageRank": 3.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.6666666666666665,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 3,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ]
+   },
+   "seasonOutlook": "Frequently arriving at the point of attack before run concepts can fully develop, Brooks emerged as one of the league's top disruptors last season. You can tell your friends you took a Dolphin with a top pick.",
+   "stats": [
+    {
+     "appliedTotal": 25.0,
+     "externalId": "401872982",
+     "id": "01401872982",
+     "proTeamId": 15,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 7.0,
+      "108": 1.0,
+      "109": 8.0,
+      "110": 2.0,
+      "111": 1.0,
+      "156": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 47.0,
+     "externalId": "401872974",
+     "id": "01401872974",
+     "proTeamId": 15,
+     "scoringPeriodId": 4,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 8.0,
+      "108": 5.0,
+      "109": 13.0,
+      "110": 4.0,
+      "111": 2.0,
+      "113": 1.0,
+      "156": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 33.0,
+     "externalId": "401872952",
+     "id": "01401872952",
+     "proTeamId": 15,
+     "scoringPeriodId": 3,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 7.0,
+      "108": 3.0,
+      "109": 10.0,
+      "110": 3.0,
+      "111": 2.0,
+      "112": 1.0,
+      "156": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedAverage": 29.8,
+     "appliedTotal": 149.0,
+     "externalId": "2026",
+     "id": "002026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 0,
+     "stats": {
+      "107": 26.0,
+      "108": 17.0,
+      "109": 43.0,
+      "110": 13.0,
+      "111": 6.0,
+      "112": 2.0,
+      "113": 1.0,
+      "156": 5.0,
+      "210": 5.0
+     }
+    },
+    {
+     "appliedTotal": 37.79892682,
+     "externalId": "20265",
+     "id": "1120265",
+     "proTeamId": 0,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 0.384056632,
+      "103": 0.00538,
+      "104": 0.00253,
+      "105": 0.008549327,
+      "106": 0.035708824,
+      "107": 4.389136226,
+      "108": 5.53443457,
+      "109": 9.923570796,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 0.318032091,
+      "113": 0.272697761,
+      "210": 1.0,
+      "93": 0.000633,
+      "94": 0.007916043,
+      "95": 0.0483,
+      "96": 0.023210736,
+      "97": 0.00095,
+      "98": 0.00095,
+      "99": 0.192028316
+     }
+    },
+    {
+     "appliedAverage": 37.429040693,
+     "appliedTotal": 449.14848832,
+     "externalId": "2026",
+     "id": "102026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 3.982310661,
+      "103": 0.064,
+      "104": 0.030132638,
+      "105": 0.101697653,
+      "106": 0.411314596,
+      "107": 52.37525363,
+      "108": 66.04201816,
+      "109": 118.4172718,
+      "110": 39.0,
+      "111": 23.0,
+      "112": 3.744508262,
+      "113": 3.159980162,
+      "210": 12.0,
+      "93": 0.00753,
+      "94": 0.094164494,
+      "95": 0.619,
+      "96": 0.267354487,
+      "97": 0.011299739,
+      "98": 0.0113,
+      "99": 1.991155331
+     }
+    }
+   ]
+  },
+  "ratings": {
+   "0": {
+    "positionalRanking": 19,
+    "totalRanking": 27,
+    "totalRating": 149.0
+   }
+  },
+  "rosterLocked": true,
+  "status": "FREEAGENT",
+  "tradeLocked": false
+ },
+ {
+  "draftAuctionValue": 0,
+  "droppedByEliminatedTeam": false,
+  "id": 4426340,
+  "keeperValue": 0,
+  "keeperValueFuture": 0,
+  "lineupLocked": true,
+  "onTeamId": 0,
+  "player": {
+   "active": true,
+   "defaultPositionId": 11,
+   "draftRanksByRankType": {
+    "ELIMINATION": {
+     "auctionValue": 4,
+     "published": false,
+     "rank": 124,
+     "rankSourceId": 0,
+     "rankType": "ELIMINATION",
+     "slotId": 0
+    },
+    "PPR": {
+     "auctionValue": 2,
+     "published": false,
+     "rank": 140,
+     "rankSourceId": 0,
+     "rankType": "PPR",
+     "slotId": 0
+    },
+    "STANDARD": {
+     "auctionValue": 2,
+     "published": false,
+     "rank": 141,
+     "rankSourceId": 0,
+     "rankType": "STANDARD",
+     "slotId": 0
+    },
+    "SUPERFLEX": {
+     "auctionValue": 2,
+     "published": false,
+     "rank": 151,
+     "rankSourceId": 0,
+     "rankType": "SUPERFLEX",
+     "slotId": 0
+    }
+   },
+   "droppable": true,
+   "eligibleSlots": [
+    10,
+    15,
+    20,
+    21
+   ],
+   "firstName": "Nakobe",
+   "fullName": "Nakobe Dean",
+   "id": 4426340,
+   "injured": false,
+   "injuryStatus": "ACTIVE",
+   "jersey": "17",
+   "lastName": "Dean",
+   "lastNewsDate": 1790818683000,
+   "lastVideoDate": 1788563171000,
+   "ownership": {
+    "activityLevel": null,
+    "auctionValueAverage": 1.41,
+    "auctionValueAverageChange": 0.0,
+    "averageDraftPosition": 103.76,
+    "averageDraftPositionPercentChange": -0.64,
+    "date": 1791779414650,
+    "leagueType": 0,
+    "percentChange": 0.1,
+    "percentOwned": 90.28,
+    "percentStarted": 80.94
+   },
+   "proTeamId": 13,
+   "rankings": {
+    "0": [
+     {
+      "auctionValue": 0,
+      "averageRank": 9.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 8.666666666666666,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 9,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 9,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 9,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 8,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "1": [
+     {
+      "auctionValue": 0,
+      "averageRank": 7.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 7.333333333333333,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 8,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "2": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 2.6666666666666665,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 2,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 5,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "3": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "4": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "5": [
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 1.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 1,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ]
+   },
+   "seasonOutlook": "Dean is most effective heading downhill as a blitzer or trigger player against the run, where his quickness allows him to disrupt plays early. He was brought to Las Vegas to set the tone defensively.",
+   "stats": [
+    {
+     "appliedTotal": 41.0,
+     "externalId": "401872986",
+     "id": "01401872986",
+     "proTeamId": 13,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 7.0,
+      "108": 5.0,
+      "109": 12.0,
+      "110": 4.0,
+      "111": 2.0,
+      "156": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 18.0,
+     "externalId": "401872976",
+     "id": "01401872976",
+     "proTeamId": 13,
+     "scoringPeriodId": 4,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 2.0,
+      "108": 3.0,
+      "109": 5.0,
+      "110": 1.0,
+      "111": 1.0,
+      "112": 1.5,
+      "156": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 53.0,
+     "externalId": "401872961",
+     "id": "01401872961",
+     "proTeamId": 13,
+     "scoringPeriodId": 3,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "106": 1.0,
+      "107": 1.0,
+      "108": 11.0,
+      "109": 12.0,
+      "110": 4.0,
+      "111": 2.0,
+      "112": 1.0,
+      "113": 1.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedAverage": 36.6,
+     "appliedTotal": 183.0,
+     "externalId": "2026",
+     "id": "002026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 3.0,
+      "106": 3.0,
+      "107": 14.0,
+      "108": 30.0,
+      "109": 44.0,
+      "110": 14.0,
+      "111": 7.0,
+      "112": 4.5,
+      "113": 1.0,
+      "155": 3.0,
+      "156": 2.0,
+      "210": 5.0,
+      "99": 1.5
+     }
+    },
+    {
+     "appliedTotal": 35.51304144,
+     "externalId": "20265",
+     "id": "1120265",
+     "proTeamId": 0,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 0.317097108,
+      "103": 0.00532,
+      "104": 0.0025,
+      "105": 0.00845291,
+      "106": 0.247915708,
+      "107": 3.984249789,
+      "108": 5.023897331,
+      "109": 9.00814712,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 0.588729127,
+      "113": 0.267660709,
+      "210": 1.0,
+      "93": 0.000626,
+      "94": 0.007826768,
+      "95": 0.071156091,
+      "96": 0.16114521,
+      "97": 0.000939,
+      "98": 0.000939,
+      "99": 0.158548554
+     }
+    },
+    {
+     "appliedAverage": 35.33640360208334,
+     "appliedTotal": 424.03684323,
+     "externalId": "2026",
+     "id": "102026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 3.095185579,
+      "103": 0.0638,
+      "104": 0.030012916,
+      "105": 0.10129359,
+      "106": 2.970843459,
+      "107": 48.07237447,
+      "108": 60.61634852,
+      "109": 108.688723,
+      "110": 36.0,
+      "111": 21.0,
+      "112": 6.924425841,
+      "113": 3.031183943,
+      "210": 12.0,
+      "93": 0.0075,
+      "94": 0.093790361,
+      "95": 0.599,
+      "96": 1.931048248,
+      "97": 0.011254843,
+      "98": 0.0113,
+      "99": 1.54759279
+     }
+    }
+   ]
+  },
+  "ratings": {
+   "0": {
+    "positionalRanking": 5,
+    "totalRanking": 6,
+    "totalRating": 183.0
+   }
+  },
+  "rosterLocked": true,
+  "status": "FREEAGENT",
+  "tradeLocked": false
+ },
+ {
+  "draftAuctionValue": 0,
+  "droppedByEliminatedTeam": false,
+  "id": 3915189,
+  "keeperValue": 0,
+  "keeperValueFuture": 0,
+  "lineupLocked": true,
+  "onTeamId": 0,
+  "player": {
+   "active": true,
+   "defaultPositionId": 11,
+   "draftRanksByRankType": {
+    "ELIMINATION": {
+     "auctionValue": 5,
+     "published": false,
+     "rank": 106,
+     "rankSourceId": 0,
+     "rankType": "ELIMINATION",
+     "slotId": 0
+    },
+    "PPR": {
+     "auctionValue": 1,
+     "published": false,
+     "rank": 249,
+     "rankSourceId": 0,
+     "rankType": "PPR",
+     "slotId": 0
+    },
+    "STANDARD": {
+     "auctionValue": 1,
+     "published": false,
+     "rank": 257,
+     "rankSourceId": 0,
+     "rankType": "STANDARD",
+     "slotId": 0
+    },
+    "SUPERFLEX": {
+     "auctionValue": 1,
+     "published": false,
+     "rank": 268,
+     "rankSourceId": 0,
+     "rankType": "SUPERFLEX",
+     "slotId": 0
+    }
+   },
+   "droppable": true,
+   "eligibleSlots": [
+    10,
+    15,
+    20,
+    21
+   ],
+   "firstName": "Roquan",
+   "fullName": "Roquan Smith",
+   "id": 3915189,
+   "injured": false,
+   "injuryStatus": "ACTIVE",
+   "jersey": "0",
+   "lastName": "Smith",
+   "lastNewsDate": 1791335093000,
+   "ownership": {
+    "activityLevel": null,
+    "auctionValueAverage": 0.35,
+    "auctionValueAverageChange": -0.06,
+    "averageDraftPosition": 137.76,
+    "averageDraftPositionPercentChange": -0.9,
+    "date": 1791779413505,
+    "leagueType": 0,
+    "percentChange": -0.05,
+    "percentOwned": 77.98,
+    "percentStarted": 69.32
+   },
+   "proTeamId": 33,
+   "rankings": {
+    "0": [
+     {
+      "auctionValue": 0,
+      "averageRank": 16.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 14.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 14,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 16,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 16,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 12,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "1": [
+     {
+      "auctionValue": 0,
+      "averageRank": 13.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 11.333333333333334,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 10,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 13,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 13,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 11,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "2": [
+     {
+      "auctionValue": 0,
+      "averageRank": 7.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 10.333333333333334,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 8,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 7,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 16,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "3": [
+     {
+      "auctionValue": 0,
+      "averageRank": 12.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 10.666666666666666,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 9,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 12,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 12,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 11,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "4": [
+     {
+      "auctionValue": 0,
+      "averageRank": 10.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 10.333333333333334,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 9,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 10,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 10,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 12,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ],
+    "5": [
+     {
+      "auctionValue": 0,
+      "averageRank": 14.0,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "averageRank": 13.666666666666666,
+      "published": true,
+      "rank": 0,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 11,
+      "rankSourceId": 5,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 14,
+      "rankSourceId": 7,
+      "rankType": "STANDARD",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 14,
+      "rankSourceId": 7,
+      "rankType": "PPR",
+      "slotId": 10
+     },
+     {
+      "auctionValue": 0,
+      "published": true,
+      "rank": 16,
+      "rankSourceId": 11,
+      "rankType": "PPR",
+      "slotId": 10
+     }
+    ]
+   },
+   "seasonOutlook": "Smith fits Jesse Minter's zone-heavy, disguise-based defense with quick processing in space and strong run fits as a second-level enforcer.",
+   "stats": [
+    {
+     "appliedTotal": 29.0,
+     "externalId": "401872993",
+     "id": "01401872993",
+     "proTeamId": 33,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 3.0,
+      "108": 5.0,
+      "109": 8.0,
+      "110": 2.0,
+      "111": 1.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 19.0,
+     "externalId": "401872973",
+     "id": "01401872973",
+     "proTeamId": 33,
+     "scoringPeriodId": 4,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "107": 5.0,
+      "108": 1.0,
+      "109": 6.0,
+      "110": 2.0,
+      "111": 1.0,
+      "155": 1.0,
+      "210": 1.0
+     }
+    },
+    {
+     "appliedTotal": 39.0,
+     "externalId": "401872960",
+     "id": "01401872960",
+     "proTeamId": 33,
+     "scoringPeriodId": 3,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 2.0,
+      "106": 1.0,
+      "107": 6.0,
+      "108": 3.0,
+      "109": 9.0,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 1.0,
+      "155": 1.0,
+      "210": 1.0,
+      "99": 1.0
+     }
+    },
+    {
+     "appliedAverage": 32.6,
+     "appliedTotal": 163.0,
+     "externalId": "2026",
+     "id": "002026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 0,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 2.0,
+      "106": 1.0,
+      "107": 26.0,
+      "108": 16.0,
+      "109": 42.0,
+      "110": 12.0,
+      "111": 6.0,
+      "112": 1.0,
+      "113": 2.0,
+      "155": 4.0,
+      "156": 1.0,
+      "210": 5.0,
+      "95": 1.0,
+      "99": 1.0
+     }
+    },
+    {
+     "appliedTotal": 34.40076682,
+     "externalId": "20265",
+     "id": "1120265",
+     "proTeamId": 0,
+     "scoringPeriodId": 5,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 1,
+     "stats": {
+      "100": 0.161666449,
+      "103": 0.005325873,
+      "104": 0.00251,
+      "105": 0.008458739,
+      "106": 0.094228547,
+      "107": 3.980803833,
+      "108": 5.019552189,
+      "109": 9.000356021,
+      "110": 3.0,
+      "111": 1.0,
+      "112": 0.241572704,
+      "113": 0.361138108,
+      "210": 1.0,
+      "93": 0.000627,
+      "94": 0.007832166,
+      "95": 0.048147392,
+      "96": 0.061248555,
+      "97": 0.00094,
+      "98": 0.00094,
+      "99": 0.080833224
+     }
+    },
+    {
+     "appliedAverage": 34.667032653583334,
+     "appliedTotal": 416.00439184,
+     "externalId": "2026",
+     "id": "102026",
+     "proTeamId": 0,
+     "scoringPeriodId": 0,
+     "seasonId": 2026,
+     "statSourceId": 1,
+     "statSplitTypeId": 0,
+     "stats": {
+      "100": 2.832975525,
+      "103": 0.0638,
+      "104": 0.03,
+      "105": 0.10133716,
+      "106": 1.109659504,
+      "107": 47.75280984,
+      "108": 60.2133969,
+      "109": 107.9662067,
+      "110": 35.0,
+      "111": 21.0,
+      "112": 2.376291674,
+      "113": 4.23369821,
+      "210": 12.0,
+      "93": 0.00751,
+      "94": 0.093830704,
+      "95": 0.754,
+      "96": 0.721278677,
+      "97": 0.011259684,
+      "98": 0.0113,
+      "99": 1.416487763
+     }
+    }
+   ]
+  },
+  "ratings": {
+   "0": {
+    "positionalRanking": 11,
+    "totalRanking": 13,
+    "totalRating": 163.0
+   }
+  },
+  "rosterLocked": true,
+  "status": "FREEAGENT",
+  "tradeLocked": false
+ }
+]

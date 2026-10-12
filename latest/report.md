@@ -1,6 +1,6 @@
 # Probe report
 
-Generated 2026-10-12T05:40:14.400305+00:00 · 53 requests
+Generated 2026-10-12T05:57:36.974553+00:00 · 55 requests
 
 ## 1. League
 
@@ -958,13 +958,13 @@ Dual-eligible rostered players: **20**
 | roster | player | team | position | fantasy_positions | reserve | taxi |
 |---|---|---|---|---|---|---|
 | 1 | Tuli Tuipulotu | LAC | DL | ['DL', 'LB'] | False | False |
-| 2 | Danielle Hunter | HOU | DE | ['DL', 'LB'] | False | False |
 | 2 | Dallas Turner | MIN | LB | ['DL', 'LB'] | False | False |
 | 2 | Carl Granderson | NO | DE | ['DL', 'LB'] | False | False |
-| 3 | Brian Burns | NYG | DE | ['DL', 'LB'] | True | False |
+| 2 | Danielle Hunter | HOU | DE | ['DL', 'LB'] | False | False |
 | 3 | David Bailey | NYJ | LB | ['DL', 'LB'] | False | False |
-| 5 | Josh Hines-Allen | JAX | DE | ['DL', 'LB'] | False | False |
+| 3 | Brian Burns | NYG | DE | ['DL', 'LB'] | True | False |
 | 5 | Will Anderson | HOU | DL | ['DL', 'LB'] | False | False |
+| 5 | Josh Hines-Allen | JAX | DE | ['DL', 'LB'] | False | False |
 | 7 | Nik Bonitto | DEN | LB | ['DL', 'LB'] | False | False |
 | 7 | Greg Rousseau | BUF | DE | ['DL', 'LB'] | False | False |
 | 8 | Donovan Ezeiruaku | DAL | DL | ['DL', 'LB'] | False | False |
@@ -973,10 +973,10 @@ Dual-eligible rostered players: **20**
 | 10 | T.J. Watt | PIT | LB | ['DL', 'LB'] | False | False |
 | 10 | Jaishawn Barham | DAL | LB | ['DL', 'LB'] | False | False |
 | 11 | Andrew Van Ginkel | MIN | LB | ['DL', 'LB'] | False | False |
-| 11 | Rueben Bain | TB | DL | ['DL', 'LB'] | False | False |
 | 11 | Arvell Reese | NYG | LB | ['DL', 'LB'] | False | False |
-| 12 | Micah Parsons | GB | LB | ['DL', 'LB'] | True | False |
+| 11 | Rueben Bain | TB | DL | ['DL', 'LB'] | False | False |
 | 12 | Boye Mafe | CIN | DL | ['DL', 'LB'] | False | False |
+| 12 | Micah Parsons | GB | LB | ['DL', 'LB'] | True | False |
 <details><summary>fantasy_positions orderings among dual-eligible players</summary>
 
 ```json
@@ -2205,6 +2205,46 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
 … (truncated; see report.json)
 ```
 </details>
+
+
+### ESPN league 942104146 (owner's public IDP league)
+| question | answer |
+|---|---|
+| settings readable without login | True (HTTP 200) |
+| IDP lineup slots enabled (ESPN slot id: count) | {'10': 2, '11': 2, '14': 2, '15': 1} |
+| players returned | 400 |
+| with a week-5 projection | 398 |
+| matched to Sleeper players | {'espn_id': 155, 'name': 237, 'ambiguous_name': 7, 'unmatched': 1} |
+| player pairs used for the mapping (week 4 actuals) | 366 |
+
+ESPN stat id → Sleeper key (exact agreement where either side is non-zero):
+
+| ESPN stat | mapped to | best candidate | agreement | n | runner-up |
+|---|---|---|---|---|---|
+| 68 | — | idp_tkl | 0.0 | 312 | idp_tkl_solo (0.0) |
+| 94 | — | idp_def_td | 1.0 | 1 | idp_pass_def_3p (0.333) |
+| 95 | idp_int | idp_int | 1.0 | 22 | idp_pass_def (0.156) |
+| 96 | idp_fum_rec | idp_fum_rec | 1.0 | 9 | idp_ff (0.125) |
+| 97 | — | idp_blk_kick | 1.0 | 2 | idp_tkl_loss (0.013) |
+| 99 | idp_sack | idp_sack | 1.0 | 51 | idp_qb_hit (0.26) |
+| 100 | — | idp_tkl_loss | 0.157 | 89 | idp_qb_hit (0.15) |
+| 103 | — | idp_def_td | 1.0 | 1 | idp_pass_def_3p (0.333) |
+| 105 | — | idp_def_td | 1.0 | 1 | idp_pass_def_3p (0.333) |
+| 106 | idp_ff | idp_ff | 1.0 | 18 | idp_fum_rec (0.125) |
+| 107 | idp_tkl_ast | idp_tkl_ast | 0.943 | 263 | idp_tkl_solo (0.192) |
+| 108 | idp_tkl_solo | idp_tkl_solo | 0.936 | 281 | idp_tkl_ast (0.185) |
+| 109 | idp_tkl | idp_tkl | 0.911 | 315 | idp_tkl_solo (0.149) |
+| 110 | — | idp_tkl_ast | 0.191 | 278 | idp_pass_def (0.158) |
+| 111 | — | idp_pass_def | 0.161 | 186 | idp_tkl_loss (0.152) |
+| 112 | — | idp_tkl_loss | 0.198 | 121 | idp_qb_hit (0.08) |
+| 113 | idp_pass_def | idp_pass_def | 1.0 | 96 | idp_int (0.156) |
+| 115 | — | idp_tkl | 0.0 | 312 | idp_tkl_solo (0.0) |
+| 118 | — | idp_pass_def | 0.01 | 96 | idp_tkl_ast (0.004) |
+| 155 | — | idp_pass_def | 0.21 | 210 | idp_tkl_ast (0.166) |
+| 156 | — | idp_tkl_loss | 0.166 | 205 | idp_qb_hit (0.137) |
+| 210 | — | idp_tkl_ast | 0.249 | 341 | idp_pass_def (0.22) |
+
+SADL-scored IDP keys with no ESPN stat (must be imputed, §6.2): **['idp_blk_kick', 'idp_def_td', 'idp_qb_hit', 'idp_safe', 'idp_tkl_loss']**
 
 
 ### FantasyPros (structure only)

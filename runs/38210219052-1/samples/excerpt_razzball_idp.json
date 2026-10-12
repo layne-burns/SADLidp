@@ -1,0 +1,253 @@
+[
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 7,
+  "rows": [
+   [
+    "2026 Projections",
+    "All | QB | RB | WR | TE | K | FLEX | DEF(Team) | DEF(IDP) | Vs FantasyPros"
+   ],
+   [
+    "This Week Projections",
+    "All | QB | RB | WR | TE | K | FLEX | DEF | IDP | What If: Off | Def | Vs FantasyPros | Next Week"
+   ],
+   [
+    "Snaps/Rushes/Targets",
+    "Teams: RateMaster | Team Plays/Splits Rates: RateMaster | Snaps | Rushes | Targets Totals: Snaps | Rushes | Targets"
+   ],
+   [
+    "18 Week Ranker",
+    "QB | STD (RB | WR | TE) | PPR (RB | WR | TE) | K | DEF(Team) | DEF(IDP)"
+   ],
+   [
+    "DFS Projections",
+    "DraftKings | FanDuel | Yahoo!"
+   ]
+  ]
+ },
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 2,
+  "rows": [
+   [
+    "Download Table as CSV",
+    "popup",
+    "download",
+    "Get CSV"
+   ],
+   [
+    "Note: Filters and sorting in the table below apply to the output"
+   ]
+  ]
+ },
+ {
+  "headers": [
+   "#",
+   "Name",
+   "Team",
+   "Pos",
+   "Pos Det",
+   "Games",
+   "Health",
+   "Snaps",
+   "Tackles",
+   "Tackles Solo",
+   "Tackles Ast",
+   "TFL",
+   "Sacks",
+   "Pass Def",
+   "Ints",
+   "Fum Forc",
+   "Fum Rec",
+   "Saf",
+   "TD Ret",
+   "Ret Yds",
+   "STD PTS"
+  ],
+  "id": "neorazzstatstable",
+  "row_count": 871,
+  "rows": [
+   [
+    "",
+    "Carson Schwesinger",
+    "CLE",
+    "LB",
+    "MLB",
+    "13",
+    "",
+    "742",
+    "113.1",
+    "53.4",
+    "56.6",
+    "11.7",
+    "1.4",
+    "2.2",
+    "1.3",
+    "0.7",
+    "0.4",
+    "0.0",
+    "0.2",
+    "19",
+    "166.7"
+   ],
+   [
+    "",
+    "Nakobe Dean",
+    "LV",
+    "LB",
+    "MLB",
+    "13",
+    "",
+    "748",
+    "110.8",
+    "49.9",
+    "53.0",
+    "12.4",
+    "2.8",
+    "2.6",
+    "0.6",
+    "0.8",
+    "0.4",
+    "0.1",
+    "0.1",
+    "11",
+    "163.2"
+   ],
+   [
+    "",
+    "Jacob Rodriguez",
+    "MIA",
+    "LB",
+    "MLB",
+    "13",
+    "",
+    "711",
+    "112.3",
+    "54.0",
+    "57.3",
+    "10.7",
+    "0.4",
+    "2.0",
+    "1.5",
+    "0.6",
+    "0.3",
+    "0.0",
+    "0.2",
+    "22",
+    "162.6"
+   ],
+   [
+    "",
+    "Nick Bolton",
+    "KC",
+    "LB",
+    "MLB",
+    "13",
+    "",
+    "729",
+    "109.4",
+    "51.7",
+    "54.9",
+    "11.0",
+    "1.2",
+    "4.1",
+    "0.9",
+    "0.7",
+    "0.3",
+    "0.0",
+    "0.1",
+    "13",
+    "160.9"
+   ],
+   [
+    "",
+    "Foyesade Oluokun",
+    "JAC",
+    "LB",
+    "MLB",
+    "13",
+    "",
+    "692",
+    "104.6",
+    "50.1",
+    "53.1",
+    "10.1",
+    "0.7",
+    "5.8",
+    "1.0",
+    "0.7",
+    "0.3",
+    "0.0",
+    "0.2",
+    "15",
+    "156.5"
+   ]
+  ]
+ },
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 2,
+  "rows": [
+   [
+    "Download Table as CSV",
+    "popup",
+    "download",
+    "Get CSV"
+   ],
+   [
+    "Note: Filters and sorting in the table below apply to the output"
+   ]
+  ]
+ },
+ {
+  "headers": [
+   "#",
+   "Name",
+   "Team",
+   "Pos",
+   "PTS/G"
+  ],
+  "id": "neorazzstatstable",
+  "row_count": 65,
+  "rows": [
+   [
+    "",
+    "Tyquan Thornton",
+    "KC",
+    "WR",
+    "2.8"
+   ],
+   [
+    "",
+    "Quentin Johnston",
+    "LAC",
+    "WR",
+    "4.9"
+   ],
+   [
+    "",
+    "Riley Moss",
+    "DEN",
+    "DB",
+    "5.3"
+   ],
+   [
+    "",
+    "Rob Beal",
+    "MIA",
+    "DL",
+    "2.9"
+   ],
+   [
+    "",
+    "Christian Gonzalez",
+    "NE",
+    "DB",
+    "6.2"
+   ]
+  ]
+ }
+]

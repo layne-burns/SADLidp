@@ -1,0 +1,115 @@
+[
+ {
+  "headers": [
+   "Category",
+   "Week 4",
+   "Season"
+  ],
+  "id": null,
+  "row_count": 4,
+  "rows": [
+   [
+    "Starts",
+    "4/5 (80.0%)",
+    "16/23 (69.6%)"
+   ],
+   [
+    "Sits",
+    "2/3 (66.7%)",
+    "4/12 (33.3%)"
+   ],
+   [
+    "Streamers",
+    "1/3 (33.3%)",
+    "5/14 (35.7%)"
+   ],
+   [
+    "Overall",
+    "7/11 (63.6%)",
+    "25/49 (51.0%)"
+   ]
+  ]
+ },
+ {
+  "headers": [
+   "Player",
+   "Pos",
+   "Team",
+   "Opponent",
+   "Call"
+  ],
+  "id": null,
+  "row_count": 9,
+  "rows": [
+   [
+    "Jared Verse",
+    "DL",
+    "CLE",
+    "NYJ",
+    "START"
+   ],
+   [
+    "K\u2019Lavon Chaisson",
+    "DL",
+    "WAS",
+    "NYG",
+    "START"
+   ],
+   [
+    "Zaire Franklin",
+    "LB",
+    "GB",
+    "CHI",
+    "START"
+   ],
+   [
+    "Jack Gibbens",
+    "LB",
+    "ARI",
+    "DET",
+    "START"
+   ],
+   [
+    "Cole Bishop",
+    "DB",
+    "BUF",
+    "LAR",
+    "START"
+   ]
+  ]
+ },
+ {
+  "headers": [
+   "Player",
+   "Pos",
+   "Team",
+   "Opponent",
+   "Why We\u2019re Sitting"
+  ],
+  "id": null,
+  "row_count": 3,
+  "rows": [
+   [
+    "Uchenna Nwosu",
+    "DL",
+    "SEA",
+    "SF",
+    "49ers have allowed 0 sacks this season"
+   ],
+   [
+    "Daiyan Henley",
+    "LB",
+    "LAC",
+    "DEN",
+    "Broncos allow the fewest LB tackles"
+   ],
+   [
+    "Jalen Pitre",
+    "DB",
+    "HOU",
+    "TEN",
+    "Titans offer limited safety tackle opportunities"
+   ]
+  ]
+ }
+]

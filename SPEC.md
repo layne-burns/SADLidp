@@ -5,7 +5,7 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 
 **Goal:** an on-demand tool that pulls IDP projections and rankings from every reliable source it can reach, rescores them to SADL's exact Sleeper scoring, blends them into a weighted consensus with an uncertainty for each player, and publishes **weekly streaming tiers** per position to GitHub Pages. The list covers only players actually available in SADL, shown next to your own rostered IDPs.
 
-**Status:** agreed spec (v2, 2026-10-12). Building follows the phases in §8, MVP first. Any change to decisions D1–D17 is made by amending this file. The spec went through two adversarial review rounds before agreement.
+**Status:** agreed spec (v2, 2026-10-12). Building follows the phases in §8, MVP first. Any change to decisions D1–D22 is made by amending this file. The spec went through two adversarial review rounds before agreement.
 
 ---
 
@@ -24,18 +24,22 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 | D10 | v1 scope | Weekly streaming tiers, **my roster vs waivers**, and **source accuracy tracking**. **Out of v1:** look-ahead weeks and an in-house matchup model. |
 | D11 | Weights | The projection : rank group split starts at **60:40** as a prior. Accuracy tracking may move it, with each group kept within 20–80%, and may also move per-source weights within each group (§6.5). |
 | D12 | Tiering | **Anchored significance tiers** (§6.6). |
-| D13 | Sync timing | Manual button, plus an automatic run before SADL waivers process, plus weekend injury refreshes (§4.3). |
+| D13 | Sync timing | Manual button, plus an automatic run before SADL waivers process, plus weekend injury refreshes (§4.3). *Planned (PR 5):* a Thursday window so RotoBaller's Thursday-morning rankings are captured before TNF. **Added 2026-10-12 (D22):** a Sunday-evening results window after the afternoon games. |
 | D14 | Dual eligibility | A player's position is **the one Sleeper counts toward the max-2 roster limit**. **Verified in Phase 1 (§13): Sleeper's designated `position` field** (DE/DT/NT/DL→DL, LB/OLB/ILB/MLB→LB, CB/S/FS/SS/DB→DB), not `fantasy_positions[0]`. He appears **only** in that position's list, with a **dual-eligible** tag (e.g. "LB · also DL"). |
-| D15 | Swap badges | **Both**: `START over X`, meaning the waiver player likely outscores your projected starter this week, and `UPGRADE over Y`, meaning he likely outscores your other eligible player at that position (§6.7). |
-| D16 | FP data privacy | FP rows are committed **encrypted only** (key in Actions secrets). The site shows FP **only through the blend**: no FP column, and FP is excluded from the displayed min–max range. FP's aggregate accuracy metrics may be shown. *Open before Phase 3:* whether the free ECR rows still need this treatment (§13). |
-| D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one. FantasyPros ECR, RotoBaller and the ESPN league come next (Phase 3), then accuracy weighting. Weeks 1–5 are backfilled if Sleeper serves past weekly projections. |
-| D18 | Vegas odds (docket) | Owner request: Vegas odds feed tier creation and analysis, in a **post-MVP phase** (§8 Phase 5). Two candidate signals, to be designed when that phase starts: **game lines** (spread, total, moneylines → implied team totals and expected game script), which the nflverse schedule already provides free for every game (week 6 lines present on 2026-10-12); and **player props** (tackles + assists, solo tackles, sacks) from The Odds API as a market-implied projection source (§6.2). This amends D10, which kept matchup modelling out of v1. |
+| D15 | Swap badges | **Both**: `START over X`, meaning the waiver player likely outscores your projected starter this week, and `UPGRADE over Y`, meaning he likely outscores your other eligible player at that position (§6.7). **Amended 2026-10-12 (owner):** suggestions are still shown when the player they compare against is locked ("still neat to see"). A locked player is compared on his frozen pre-kickoff μ and status, and a suggestion that can't pay off this week (your starter there is locked, or the drop target is) is marked *for reference* (§6.7). |
+| D16 | FP data privacy | **Closed 2026-10-12 (owner): the free FantasyPros ECR rows are stored like every other free source** (plain JSON in `data/`, included in the displayed range). No source is private now. The generic `sources.<name>.private` flag remains for any future private source: its rows are never written to `data/`, it is used only in the live blend, and it is left out of the range, the breakdown and `data.json`. The earlier encryption design (age, `FP_DATA_KEY`) is retired. |
+| D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one (done). **Phases 3 and 4 are built together** in six PRs (§8): more sources, accuracy weighting, the Stats page and the per-player breakdown. Weeks 1–4 are backfilled from every source with an archive. |
+| D18 | Vegas odds (docket) | Owner request: Vegas odds feed tier creation and analysis, in a **post-MVP phase** (§8 Phase 5). Two candidate signals, to be designed when that phase starts: **game lines** (spread, total, moneylines → implied team totals and expected game script), which the nflverse schedule already provides free for every game (week 6 lines present on 2026-10-12); and **player props** (tackles + assists, solo tackles, sacks) from The Odds API as a market-implied projection source (§6.2). This amends D10, which kept matchup modelling out of v1. **Amended 2026-10-12 (owner idea):** team-defense (D/ST) rankings, e.g. FantasyPros D/ST ECR, are a third candidate signal, as a matchup scalar on IDP projections. It is a signal, not a player source: captured with backfill from PR 4, never blended until it proves itself. A pilot on weeks 1–4 found no detectable effect (|r| ≤ 0.1, every CI includes 0; Sleeper's projections already move with the matchup). PR 6 backtests D/ST rank and opponent implied total on 2025 (position-week fixed effects, clustered SEs, both halves of the season); a signal is used only if that passes **and** walk-forward 2026 consensus residuals improve, as an additive term fitted on consensus residuals. |
+| D19 | Per-player breakdown | Owner request: each player shown on the page expands to show every enabled source's number converted to SADL points (projections: points and projected stats, estimated keys marked; rankings: the rank and its mapped points), its share of his blend, and the line "weighted average = μ". This relaxes §6.4's rule that the site JSON never holds per-source values (that rule served FP privacy, D16, now closed). |
+| D20 | Stats page | Owner request: a Stats page showing the source weights week over week (as recorded when in force) and how well the predictions did, with standard metrics (MAE against a naive baseline, RMSE, bias, rank correlation, interval hit rates, top-k hits, Brier score and calibration, START/UPGRADE results, tier separation), per source and for the consensus, by position, weekly and season to date. Plain-language headlines, a glossary and small-sample display rules (§6.8, PR 2 and PR 6). |
+| D21 | Sources after Phase 1 + live checks | **In:** Sleeper (projection), ESPN league 942104146 (projection), FantasyPros free ECR (rank), RotoBaller weekly article (rank), FantasyData weekly IDP rankings (rank; new, free, current week only). **Out (checked live 2026-10-12):** Razzball (weekly IDP rankings and Pigskinonator IDP are members-only, even rendered; its free page is last season's rest-of-season), Fantasy Sharks (Cloudflare bot challenge, which we don't work around), CBS (no IDP projections), FFToday (IDP rankings are season-long only). |
+| D22 | Scored results | Owner request 2026-10-12: on Sunday evening the page shows the week so far: each of your players' score (live or final), this week's issued suggestions that have played with both players' results and whether the suggestion paid off, and per position an "already played" list of available players with their pre-kickoff tier, projection and score. After the week rolls over, a "last week" recap below the tiers lists every issued suggestion with both players' final scores (from `actuals.json`, provisional until the stat-correction window closes), whether it paid off (void if either didn't play; reference suggestions not counted), and a "paid off X of Y" line linked from the header. **Week picker (owner request, same day):** every synced week keeps its own page (`week-<season>-<NN>.html`, `index.html` = the current week) built from that week's committed data, so a week stays viewable after the sources move on; a past week's page is re-scored from its `actuals.json`, showing every listed player's final score and each suggestion's outcome. Weeks 1–4 (before the first live sync) are rebuilt by `sadlidp replay` from the saved projection snapshots, that week's rosters and lineups (Sleeper matchups) and the saved league settings, as of one minute before the week's first kickoff; projected players are treated as healthy because that week's injury news isn't known, and the page says so. A projection first captured after kickoff is kept and marked (§6.5), so players who played before the first sync don't show "no projection". |
 
 ## 2. Defaults (engineer-chosen; changeable via config or a spec amendment)
 - **Stack:** Python 3.12, `uv`, `httpx`, `selectolax`, `pydantic`, `jinja2`, `pytest`, `ruff`, and `age` for encryption. No database. Normalized JSON snapshots are committed under `data/`.
 - **Pool:** available players are those on no SADL roster. All of them are tiered after filters. The page shows the top **25 per position** (config) and says how many more are hidden. Your rostered IDPs are always shown.
 - **Hidden from the waiver pool:** `injury_status` ∈ {Out, Doubtful, IR, PUP, NFI, Sus, NA, DNR, COV}, or `status` ≠ Active, `active=false`, `team=null`, on bye, or **locked** (his game has kicked off). Questionable players are shown with a flag. Any other non-null code is shown with a flag and logged as unknown. Your own players always show, with a status badge.
-- **Page:** mobile-first. Header "Week N · data as of <time>" (a small JS warning appears if the data is >36 h old in a game week), then the My IDPs panel, then DL / LB / DB tabs, then a sources status footer (status, row count, match rate, staleness and accuracy per source).
+- **Page:** mobile-first. Header "Week N · data as of <time>" (a small JS warning appears if the data is >36 h old in a game week), then the My IDPs panel, then DL / LB / DB tabs, then a sources status footer (status, row count, match rate, staleness and accuracy per source). Once games start (D22): scores next to your players, a "this week's suggestions that have played" list with outcomes, and an "already played this week" list under each position's tiers.
 - **Privacy:** sources are plaintext by default. Any source can be marked `private: true` in config to get the D16 treatment, which FP always has.
 
 ---
@@ -83,7 +87,8 @@ data/<season>/week<NN>/
     players_idp.json           # slim IDP subset of the players DB (never the full ~5 MB file)
     rosters.json  run.json  consensus.json  actuals.json
     sources/<src>.json         # normalized rows only, never raw payloads
-    sources/<private>.json.age # private sources (FP): encrypted normalized rows
+    frozen.json                # each player's μ/σ/range/status at his last sync before kickoff (§6.5)
+    badges.json  tiers_log.json  # START/UPGRADE and tier logs for evaluation (§6.5, §6.7)
 data/<season>/accuracy.json
 tests/  tests/fixtures/        # offline; recorded and scrubbed responses
 .github/workflows/{sync.yml, ci.yml, probe.yml}
@@ -107,13 +112,14 @@ League name match: case-insensitive, trimmed, exact, against config `["SADL", "S
   - *Pre-waiver window:* the next waiver-processing instant is computed from league settings (daily or weekly mode; field encodings confirmed in Phase 1 and pinned by a test). open = instant − 12 h, close = instant − 1 h.
   - *Saturday window:* 12:00–18:00 ET.
   - *Sunday window:* open = first Sunday kickoff − 4 h, close = first Sunday kickoff − 15 min. Hourly Sunday slots put at least three slots in this window, including for 9:30 ET international games.
+  - *Results window (D22, added 2026-10-12):* open = the last Sunday kickoff before 17:00 ET + 4¼ h, close = open + 6 h (`gate.results_after_h`, `gate.results_window_h`). A game counts as final 4 h after kickoff, so the afternoon games are final when it opens; the 3-hourly 03:17 UTC slot falls inside it in both EDT and EST weeks. If Sleeper's live stats can't be fetched, the results window stays open so the next slot retries.
   - *Off-season:* the gate exits 0 with no Sleeper league calls and no commit unless `state.season_type == regular`, the league `status` is not complete, and the week is ≤ the last fantasy week.
 - **Adapters verify the week** the source claims (page label or response field). A mismatch gives status `not_yet_published`: the rows aren't ingested and the footer shows "week N not posted yet".
 
 ## 5. Sources
 ### 5.1 Adapter contract
 Every adapter returns an `AdapterResult` with these fields:
-- `status`: one of ok, skipped, not_yet_published, auth_expired, blocked, parse_error, budget, or failed.
+- `status`: one of ok, skipped, not_yet_published, suspect (§7), auth_expired, blocked, parse_error, budget, or failed.
 - `kind`: projection or rank.
 - `universe`: the positions covered, the list depth D per list, and `complete` (true or false) per position.
 - `covered_keys`: the Sleeper stat keys it projects (projection sources only).
@@ -197,6 +203,9 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
   - **On a failed fetch** the file is left untouched. Staleness is recorded per source in `run.json` (time of the last successful fetch), not per row. A stale source stays in the live consensus up to `max_source_age_h`.
   - For accuracy, a value fetched more than 4 days before kickoff counts as missing.
   - The kickoff rule applies to syncs. `sadlidp backfill` writes past weeks from archived pre-game projections and marks those rows `backfill: true`.
+- **Late rows (added 2026-10-12, D22):** for a source configured with `late_rows = true` (Sleeper projections), a player first seen after his kickoff is kept once with `late: true` instead of being skipped, then frozen like any other row. Sleeper's 47 pre-kickoff MNF rows of week 5 were unchanged after its batch restamp; whether its rows ever change after kickoff is re-checked post-game, and until that check passes, late rows are display-only and never used for accuracy weights. The page marks a late projection with "*".
+- **Frozen week record (added 2026-10-12):** `frozen.json` holds, per player with a μ, his μ, σ_μ, range, source count and status as of his last sync before kickoff, under the same rule as the source files (updated while unlocked, never after kickoff). Every frozen row stores the kickoff it was written for, so a player cut or traded after playing stays frozen. For a locked player, the page, the My IDPs comparison and later evaluation of "the consensus as shown" read this record, so his numbers can't drift after he locks.
+- **Decision logs (added 2026-10-12):** `badges.json` records every START/UPGRADE suggestion per (week, player, badge, compared player) with its odds, μs, σ_out, action and reference flags; until its lock time (the earlier kickoff of the two players compared) it takes the latest state and is marked withdrawn if it disappears, and after that it is frozen. A suggestion that disappears because its player was claimed (by you or anyone; `claimed_by`) is not withdrawn: it is frozen at the claim as it stood, so the suggestions you followed are judged too. A badge counts as issued if it was active at lock (or at its claim). `tiers_log.json` records the waiver tiers shown at the pre-waiver sync and, per player, at his last sync before kickoff.
 - **Actuals:** week N is re-scored on every sync until 4 days after its last game, which picks up stat corrections. Weights use week N only after that.
 - **Scoring for weights:** sources and actuals are scored on **core points**: SADL points excluding idp_def_td, idp_safe, idp_blk_kick, return yards and the bonuses tied to them, which are unpredictable and dominate squared error. Displayed MAE uses full points.
 - **Evaluation pool:** per position, the top `N_eval` (default 50) by the frozen consensus computed with **prior** weights, which avoids a feedback loop. Players who were Out/IR/bye at freeze time and late scratches are excluded.
@@ -214,24 +223,29 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 
 ### 6.7 My IDPs panel (D15)
 - **Outcome probabilities use predictive σ:** σ_pred,i² = σ_μ,i² + σ_out,p². σ_out,p is the RMS of (actual − frozen μ) for evaluated pool players at position p once 3 evaluated weeks exist. Before that, it is last season's within-player SD of weekly SADL points (players with ≥8 games) under the current scoring.
-- **Eligible** = your rostered players at the position (D14) who pass every §2 waiver-pool filter (the same injury codes, `status`, `active`, `team`, bye and locked rules), have a μ, and are not in `reserve`.
+- **Comparable** (amended 2026-10-12; formerly "eligible") = your rostered players at the position (D14) who are not in `reserve`, have a μ, and pass every §2 waiver-pool filter **except** the locked rule: the same injury codes, `status`, `active`, `team` and bye rules. A locked player is judged on his μ and status from the frozen week record (§6.5) at his kickoff, so a later injury tag can't empty the slot.
 - **Limit count** = your rostered players at the position, excluding `reserve` (IR), which Phase 1 showed Sleeper doesn't count (§13); `taxi` players are counted.
-- **S (projected starter)** = the eligible player with the highest μ. If there is none, μ_S = 0 and σ_pred,S = 0.
-- **B (other)** = the remaining eligible player, if any.
+- **S (projected starter)** = the comparable player with the highest μ. If there is none, μ_S = 0 and σ_pred,S = 0.
+- **B (other)** = the remaining comparable player, if any.
 - **START over S badge** on waiver player W when `Φ((μ_W − μ_S)/√(σ_pred,W² + σ_pred,S²)) ≥ swap_threshold` (default 0.6). Suggested move:
   - "add W, no drop" if you're under the position limit;
   - otherwise "add W, drop B" if B exists;
   - otherwise the panel says that your other player is unavailable this week (bye/Out/IR) and leaves the drop choice to you.
 - **UPGRADE over B badge** (only when B exists and W lacks START) uses the same formula against B.
-- **Locked starter:** if your Sleeper starting slot at the position (from matchups `starters`) holds a locked player, START is turned off for that position ("starter locked").
+- **Locked players (amended 2026-10-12, D15):** suggestions are never suppressed. A suggestion whose move can't be made this week is flagged `reference` with its reasons, sorted after the actionable ones, muted, and explained in words:
+  - `starter_locked` (START and UPGRADE): your Sleeper starting slot at the position (matchups `starters`) holds a locked player, or, when no lineup is known at all, S is locked. An empty slot in a known lineup is not locked. SADL starts exactly one DL/LB/DB, so nothing added at that position can score this week.
+  - `drop_locked`: the player the move would drop is locked (for "you choose the drop": every other non-IR player at the position is locked); Sleeper won't drop him.
+  - A locked rostered player with no frozen record but a pre-kickoff projection (the first week only) is judged as playable at kickoff; later injury tags are ignored.
+  - Waiver players whose game has started stay out of the pool.
 - **Context shown:** each rostered player's μ, σ, tier placement and status, plus the league's waiver type. There is no FAAB advice in v1.
 
 ## 7. Failure handling and security
 - **Fatal:** a failure of the documented Sleeper /v1 endpoints (state, user, leagues, league, rosters, players). The job fails, nothing deploys, and the last good site stays live.
 - **Non-fatal:**
-  - Every source adapter, including Sleeper projections.
+  - Every source adapter, including Sleeper projections. An adapter that raises is recorded as a `failed` source (error = step and exception type, traceback in the job log only); actuals refresh, σ_out, matchups, backfill and the decision logs are isolated the same way (added 2026-10-12).
   - A `/stats` failure shows a banner, skips the accuracy update, and reuses cached season rates.
   - A sync succeeds if ≥1 projection or rank source returns rows. If none do, the page shows the stale data with a banner.
+  - *Incomplete fetches (added 2026-10-12):* a fetch that looks incomplete is `suspect` and isn't merged; the earlier rows stay, with a banner. Two cases: a Sleeper response with no real rows at all (Sleeper rewrites a week's rows in a batch, and mid-batch serves only placeholders: seen live at 09:10 UTC on 2026-10-12, and its batches also run during game days), and any source whose fetch has fewer rows than `sources.shrink_guard` (0.6) × the rows already stored for the week. A gate window counts as done only when at least one source fetched successfully in that run, so the next slot retries.
 - **Secrets:**
   - Authenticated responses, cookies and API keys are never committed, logged, uploaded as workflow artifacts, or stored in actions/cache. All four are readable by others in a public repo (pull requests, including from forks, can restore caches created on main).
   - Private and keyed sources (FantasyPros, The Odds API) bypass the HTTP cache. Their responses stay in memory only, and the cache never stores Cookie, Set-Cookie or Authorization headers. The Odds once-per-event rule is enforced from a fetch log in `run.json` (event id, fetched_at, credits remaining), never from a cached URL.
@@ -265,8 +279,13 @@ Tiers are computed over the available pool after §2 filters, locked players rem
    - **FP probe output is a structure report only:** HTTP status, final URL path, whether the Premium marker and the week label are present, JSON key paths or table column headers, row counts per position, and the list of stat columns. It never contains cell values, player names, page text, headers or account details. If a full sample is needed for parser work, the probe age-encrypts the raw response to `FP_DATA_KEY`'s public recipient and commits only the `.age` file to `probe-fixtures`. You decrypt it locally and supply a value-redacted excerpt, and the synthetic FP fixtures are built from that.
    - **Deliverable:** a SPEC amendment covering the final source list, the verified facts, and the ESPN-league and FP-fallback questions, approved by the owner before Phase 3.
 2. **MVP (live ASAP):** skeleton, config, Sleeper client, scoring engine plus the ground-truth test, Sleeper projections adapter, snapshot/freeze storage, consensus, tiers, My IDPs, site, sync.yml (gate, concurrency, Pages), README setup. Then backfill weeks 1–5 if possible.
-3. **More sources:** FantasyPros ECR (storage per the owner's D16 decision), RotoBaller, the ESPN league (stat-id mapping from §13), matching/crosswalk, imputation, rank mapping and censoring.
-4. **Accuracy:** evaluation and adaptive weights, using data collected since the MVP went live plus the backfill. Accuracy table on the page.
+3–4. **More sources and accuracy, built together (D17, amended 2026-10-12)** in six PRs, each with its SPEC amendment as the first commit and a live preview:
+   1. Locked suggestions (D15) and the frozen week record, badge and tier logs, per-step error isolation.
+   2. Stats page v0 and the breakdown UI on Sleeper alone (D19, D20); frozen per-week players file; compact storage.
+   3. Multi-source core and ESPN: per-host request spacing, matching and crosswalk, imputation, the observation rule, list-scoped merges, the backfill runner.
+   4. FantasyPros ECR and rank → value mapping; FantasyPros D/ST captured as a D18 signal.
+   5. RotoBaller and FantasyData; the Thursday window (D13).
+   6. Accuracy weights, calibrated START/UPGRADE odds, the full Stats page, archive-integrity checks, the D18 team-defense backtest.
 5. **Vegas odds (D18):** design, then build, the odds signal for tiers: a game-line adjustment from the nflverse spread/total (free) and/or a props projection source (needs `ODDS_API_KEY`). Accuracy tracking (Phase 4) decides whether each signal earns weight: it must lower projection error, not just move numbers.
 6. **Polish:** accuracy and `z` tuning, UI refinements.
 
@@ -322,6 +341,8 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - *Backfill:* runs inside every sync for this season's past weeks that have no Sleeper snapshot yet (rows marked `backfill: true`). There is no separate `sadlidp backfill` command.
   - *No-projection players:* available players with no μ are shown as a count per position, not listed.
   - *CI:* `ci.yml` adds a live preview on claude/** pushes. It runs a forced sync into a scratch directory and publishes it to the `preview` branch.
+- **2026-10-12 · D22 added (owner request):** scored results on the page, a Sunday-evening results window, and late rows for projections first seen after kickoff (§2, §4.3, §6.5).
+- **2026-10-12 · Phase 3+4 plan approved (owner):** D16 closed (FantasyPros ECR stored like other free sources); D15, D17, D18 amended; D19 (per-player breakdown), D20 (Stats page) and D21 (source list after live checks: FantasyData in; Razzball, Fantasy Sharks, CBS, FFToday out) added; §8 rewritten as six PRs. PR 1: locked suggestions as *for reference*, comparable players and the frozen week record (§6.5, §6.7), badge and tier logs, error isolation (§7), nflverse schedule read from raw.githubusercontent.com.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
@@ -368,7 +389,7 @@ Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 2. ESPN: projections through the owner's public league 942104146 with IDP enabled; verified by probe run 4 (above).
 3. The Odds API: deferred until after the MVP.
 
-**Still open (before Phase 3):** do the free FantasyPros ECR rows still need D16's encrypted storage and blend-only display, or can they be committed like other public sources?
+**Answered 2026-10-12:** the free FantasyPros ECR rows are committed like other public sources (D16 closed).
 
 **Still open (before Phase 5, D18):** which odds signal(s): game lines, props, or both; how they enter the tiers (an adjustment to μ, a separate projection source, or display only); and whether to get an Odds API key for props.
 

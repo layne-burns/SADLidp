@@ -30,6 +30,11 @@ class PlayerStatus:
     def locked(self) -> bool:
         return "locked" in self.reasons
 
+    @property
+    def comparable(self) -> bool:
+        """Can anchor a My IDPs comparison: nothing but his game having started keeps him off the field."""
+        return all(r == "locked" for r in self.reasons)
+
 
 def player_status(player: dict, schedule: Schedule, week: int, now: datetime) -> PlayerStatus:
     st = PlayerStatus()

@@ -8,13 +8,13 @@
 :root {
   --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
   --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
-  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
     --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
-    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
   }
 }
 * { box-sizing: border-box; }
@@ -43,6 +43,20 @@ ul { list-style: none; margin: 0; padding: 0; }
 .chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
 .chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
 .sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
+.res { display: block; font-size: .8rem; font-weight: 600; color: var(--text); }
+.res.live { color: var(--warn); }
+.res.dnp { color: var(--muted); font-weight: normal; }
+.out { font-weight: 700; }
+.out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
+.card.played { opacity: .95; border-style: dashed; }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
+.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .85rem; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
 .tabs > input { position: absolute; opacity: 0; pointer-events: none; }
 .tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
   border: 1px solid var(--line); background: var(--card); font-weight: 600; }
@@ -66,12 +80,20 @@ a { color: var(--accent); }
 {% for f in p.flags if f != 'Q' %}<span class="tag q">{{ f }}</span>{% endfor %}
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
-{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% else %}<small>no projection</small>{% endif %}{%- endmacro %}
+{%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
+{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{%- endmacro %}
+{%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
+{%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
+{%- macro pts_text(r) -%}{% if r %}{% if r.state == 'final' %}scored {{ '%.1f'|format(r.pts) }}{% elif r.state == 'live' %}{{ '%.1f'|format(r.pts) }} so far{% elif r.state == 'unavailable' %}score unavailable{% else %}did not play{% endif %}{% else %}not played yet{% endif %}{%- endmacro %}
 <header>
   <h1>SADL IDP streamer</h1>
-  <p class="meta">{{ d.league.name }} · Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
+  <p class="meta">{{ d.league.name }} · {{ d.season }} Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
+  {% if nav and nav|length > 1 %}<nav class="weeks" aria-label="Weeks">{% for n in nav %}<a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here" aria-current="page"{% endif %}>{{ n.label }}{% if n.latest %} · now{% endif %}</a>{% endfor %}</nav>{% endif %}
+  {% if d.replayed %}<p class="pastweek">{{ d.replayed.note }}</p>{% endif %}
+  {% if not latest %}<p class="pastweek">You're looking at a past week. {% if final %}{% if final.provisional %}Scores are provisional (stat corrections still possible).{% else %}All scores are final.{% endif %}{% else %}Final stats weren't captured for this week, so scores are as of the last sync.{% endif %}{% if not d.replayed %} Suggestions and tiers are as they stood at the week's last sync.{% endif %}</p>{% endif %}
   <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
   {% for w in d.warnings %}<p class="banner">{{ w }}</p>{% endfor %}
+  {% if d.last_week and d.last_week.summary.decided %}<p class="meta"><a href="#lw-h">Last week: {{ d.last_week.summary.hits }} of {{ d.last_week.summary.decided }} suggestions paid off ↓</a></p>{% endif %}
 </header>
 <main>
   <section aria-labelledby="my-h">
@@ -86,20 +108,34 @@ a { color: var(--accent); }
             {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
             {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
             {{ tags(p) }}
-            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }} · {{ p.tier|tier(d.positions[slot].tier_count) }}</div></div>
+            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(d.positions[slot].tier_count) }}{% endif %}</div></div>
           <div class="pts">{{ pts(p) }}</div>
         </li>
         {% else %}<li class="row"><span class="sub">No {{ slot }} rostered</span></li>{% endfor %}
       </ul>
-      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so there are no START suggestions.</p>{% endif %}
+      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
       {% for s in m.suggestions %}
-      <div class="sugg">
-        <span class="chip {{ s.badge|lower }}">{{ s.badge }}</span>
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s) }}
         <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
         · {{ '%.1f'|format(s.player.mu) }} pts{% if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}{% else %}; you have no playable {{ slot }} this week{% endif %}.
-        <div class="sub">{{ action(s, m.names) }}</div>
+        {% if latest is not defined or latest %}<div class="sub">{{ action(s, m.names) }}</div>
+        {% if s.reference %}<div class="why">For reference: {{ why(s, m.names, slot) }}.</div>{% endif %}{% endif %}
+        {% if s.player.result %}<div class="sub">Result: {{ pts_text(s.player.result) }}{% if s.over %} vs {{ m.names.get(s.over, 'your player') }} {{ pts_text(s.over_result) }}{% endif %}</div>{{ outcome(s) }}{% endif %}
       </div>
       {% endfor %}
+      {% if m.played_suggestions %}
+      <p class="tierhead" style="margin-top:10px">This week's suggestions that have played</p>
+      {% for s in m.played_suggestions %}
+      <div class="sugg">
+        {{ chip(s) }} <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
+        · projected {{ '%.1f'|format(s.player.mu) }}, {{ pts_text(s.player.result) }}
+        {% if s.over %}<div class="sub">vs {{ m.names.get(s.over, 'your player') }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+        {{ outcome(s) }}
+      </div>
+      {% endfor %}
+      {% if m.played_suggestions_hidden %}<p class="hidden-note">{{ m.played_suggestions_hidden }} more not shown.</p>{% endif %}
+      {% endif %}
     </div>
     {% endfor %}
   </section>
@@ -117,7 +153,7 @@ a { color: var(--accent); }
             {% for p in t.players %}
             <li class="row">
               <div><span class="name">{{ p.name }}</span>
-                {% if p.badge %}<span class="chip {{ p.badge.badge|lower }}">{{ p.badge.badge }}</span>{% endif %}
+                {% if p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
                 <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
               <div class="pts">{{ pts(p) }}</div>
@@ -128,10 +164,44 @@ a { color: var(--accent); }
         {% else %}<p class="note">No available {{ slot }} with a projection this week.</p>{% endfor %}
         {% if pos.hidden > 0 %}<p class="hidden-note">{{ pos.hidden }} more available {{ slot }} not shown.</p>{% endif %}
         {% if pos.no_projection > 0 %}<p class="hidden-note">{{ pos.no_projection }} available {{ slot }} {{ 'has' if pos.no_projection == 1 else 'have' }} no projection this week.</p>{% endif %}
+        {% if pos.played %}
+        <div class="card played">
+          <p class="tierhead">Already played this week</p>
+          <ul>
+            {% for p in pos.played %}
+            <li class="row">
+              <div><span class="name">{{ p.name }}</span>
+                <div class="sub">{{ p.team }} {{ opp(p) }} · {{ ('Tier ' ~ p.tier ~ ' before kickoff') if p.tier else 'not tiered before kickoff' }}</div></div>
+              <div class="pts">{{ pts(p) }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% if pos.played_hidden > 0 %}<p class="hidden-note">{{ pos.played_hidden }} more not shown.</p>{% endif %}
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
   </section>
+  {% set lw = d.last_week %}
+  {% if lw and (lw.slots.DL or lw.slots.LB or lw.slots.DB) %}
+  <section aria-labelledby="lw-h">
+    <h2 id="lw-h">Last week's suggestions (week {{ lw.week }})</h2>
+    <div class="slot">
+      <p class="note">{% if lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).{% else %}No suggestions were decided.{% endif %}
+        {% if lw.provisional %}Scores are provisional until stat corrections close {{ lw.settles|et }}.{% else %}Final scores.{% endif %}</p>
+      {% for slot in slots %}{% for s in lw.slots[slot] %}
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s) }} <b>{{ s.name }}</b> <span class="sub">{{ s.team or '' }} · {{ slot }}</span>
+        · projected {{ '%.1f'|format(s.mu_w) }}, {{ pts_text(s.result) }}
+        {% if s.over %}<div class="sub">vs {{ s.over_name }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+        {{ outcome(s) }}
+        {% if s.reference %}<div class="why">Shown for reference at the time; not counted.</div>{% endif %}
+      </div>
+      {% endfor %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </main>
 <footer>
   <h2>Sources</h2>
@@ -144,14 +214,15 @@ a { color: var(--accent); }
     {% endfor %}
   </table>
   <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
-  Tiers group players statistically indistinguishable from each tier's best. <a href="data.json">data.json</a></p>
+  Tiers group players statistically indistinguishable from each tier's best.
+  * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="{{ data_href or 'data.json' }}">data.json</a></p>
 </footer>
-<script>
+{% if latest is not defined or latest %}<script>
 (function () {
   var t = document.getElementById("asof");
   var age = (Date.now() - Date.parse(t.getAttribute("datetime"))) / 36e5;
   if (age > 36) document.getElementById("stale").hidden = false;
 })();
-</script>
+</script>{% endif %}
 </body>
 </html>

@@ -9,6 +9,7 @@ sadlidp leakcheck PATH... | --staged REPO
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from datetime import datetime
@@ -59,6 +60,29 @@ def cmd_build(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_replay(args: argparse.Namespace) -> int:
+    """Rebuild past weeks' pages from saved data plus that week's Sleeper matchups (D22)."""
+    from .net import Client
+    from .replay import replay_week
+    from .sleeper import Sleeper
+
+    cfg = load_config(args.config)
+    first, _, last = args.weeks.partition("-")
+    weeks = range(int(first), int(last or first) + 1)
+    data_dir = Path(args.data_dir)
+    league = json.loads((data_dir / str(args.season) / "league.json").read_text())
+    sleeper = Sleeper(Client(), args.cache_dir)
+    players = {str(k): v for k, v in sleeper.players(datetime.now(ET).date().isoformat()).items()}
+    for week in weeks:
+        matchups, err = sleeper.matchups(league["league_id"], week)
+        if not matchups:
+            print(f"replay: week {week}: no matchups ({err}); skipped")
+            continue
+        out = replay_week(cfg, data_dir, args.season, week, matchups, players, log=lambda m: None)
+        print(f"replay: week {week} -> {out}")
+    return 0
+
+
 def cmd_gate(args: argparse.Namespace) -> int:
     from . import gate, storage
     from .net import Client
@@ -106,6 +130,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--now", help="ISO time to evaluate (default: now)")
     p.add_argument("--season", type=int)
     p.set_defaults(func=cmd_gate)
+    p = sub.add_parser("replay", parents=[common], help="rebuild past weeks' pages from saved data")
+    p.add_argument("--weeks", required=True, help="e.g. 1-4")
+    p.add_argument("--season", type=int, required=True)
+    p.add_argument("--cache-dir", default=".cache")
+    p.set_defaults(func=cmd_replay)
     sub.add_parser("leakcheck", help="scan PATH... or --staged REPO for secrets")
     args = parser.parse_args(argv)
     return args.func(args)

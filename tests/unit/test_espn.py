@@ -288,3 +288,10 @@ def test_team_table_is_in_sleeper_vocabulary():
     teamed = [e["player"] for e in ESPN if e["player"]["proTeamId"] and str(e["player"]["id"]) in by_espn]
     assert len(teamed) > 20  # live (1,511 players, 2026-10-12): all 256 pairs where both sides have a team agreed
     assert all(table[str(p["proTeamId"])] == by_espn[str(p["id"])]["team"] for p in teamed)
+
+
+def test_a_short_response_that_misses_most_of_a_slot_zero_fills_nobody_there():
+    res = espn_proj.fetch(ctx(FakeClient(ESPN[:15])))  # one short page with a quarter of the players
+    assert res.ok and not res.report["complete"] and "came back" in res.report["why_incomplete"]
+    low = [s for s, c in res.report["coverage"].items() if c is not None and c < espn_proj.MIN_COVERAGE]
+    assert low and all(res.universe[s]["zero_fill_ids"] == [] and not res.universe[s]["complete"] for s in low)

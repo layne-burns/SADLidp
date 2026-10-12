@@ -153,15 +153,15 @@
 </main>
 <footer>
   <h2>Sources</h2>
-  <table>
+  <div class="scroll"><table class="sources">
     <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
     {% for name, s in d.sources.items() %}
-    <tr><td>{{ s.label or name }}</td><td>{{ s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
+    <tr><td>{{ s.label or name }}</td><td>{{ 'from saved data' if s.status == 'saved' else s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
       <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
       <td>{% if s.match and s.match.rate is not none %}{{ '%.1f'|format(s.match.rate * 100) }}%{% if s.match.unmatched %}{% if s.match.names %}<details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>{% else %} <small>{{ s.match.unmatched }} unmatched</small>{% endif %}{% endif %}{% else %}—{% endif %}</td>
       <td>{{ s.last_success|et }}</td></tr>
     {% endfor %}
-  </table>
+  </table></div>
   <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
   Tiers group players statistically indistinguishable from each tier's best.
   Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).

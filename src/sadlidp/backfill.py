@@ -130,6 +130,11 @@ def run(
                 log(f"backfill: {name} week {w}: {why}; retried next sync")
                 continue
             path = storage.week_dir(data_dir, season, w) / "sources" / f"{name}.json"
+            stored = len(storage.load_source(path).get("rows") or {})
+            shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
+            if stored and len(res.rows) < shrink * stored:  # a --redo never shrinks a week (SPEC §7)
+                log(f"backfill: {name} week {w}: {len(res.rows)} rows against {stored}; kept the stored rows")
+                continue
             storage.save_source(path, res, {pid: {**row, "backfill": True} for pid, row in res.rows.items()})
             done.setdefault(name, []).append(w)
     return done

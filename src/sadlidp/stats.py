@@ -177,6 +177,12 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 agg["top12"][0] += top[0]
                 agg["top12"][1] += top[1]
         row["partial_slots"] = [slot for slot in IDP_SLOTS if row["by_slot"][slot]["partial"]]
+        # a source read live for the first time partway through the week covers only the games still to come
+        row["joined_midweek"] = sorted(
+            name for name, rows in sources.items()
+            if not any(r.get("backfill") for r in rows.values())
+            and any(x["pool"] and x["covered"] < x["pool"] / 2 for x in row["by_source"].get(name, {}).values())
+        )  # fmt: skip
         weekly.append(row)
 
         # suggestions: issued live (decision log) or rebuilt (replayed page)

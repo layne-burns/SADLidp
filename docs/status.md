@@ -5,7 +5,7 @@ be worked. Done so far: Phase 2 MVP (#2), locked suggestions + scored results + 
 rebuilt (#3), Stats page + per-player breakdown + deploy-on-merge (#4). The live page updates by itself
 after every merge to `main` that changes code or config.
 
-## 1. Finish PR 3: ESPN as a second projection source (built, not yet reviewed)
+## 1. Finish PR 3: ESPN as a second projection source (#5: reviewed, fixes pushed; merging)
 State: committed and pushed on `claude/compassionate-archimedes-fqrz1j` (5e8a636), rebased on main,
 204 tests pass. A live run worked: ESPN 1,511 IDPs, 99.7% matched to Sleeper, weeks 1–4 backfilled for
 both sources, 50/50 blend with ESPN's estimated stats (TFL, QB hits) marked `*`.

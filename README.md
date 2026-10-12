@@ -25,10 +25,10 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 
 ## Reading the page
 - **Week N · data as of …:** a yellow banner appears when the data is more than 36 hours old.
-- **Points** are SADL points. **±** is how much the sources disagree about a player, not week-to-week luck. With one source it's a fixed default.
+- **Points** are SADL points, the blend of the sources (Sleeper and ESPN). **±** is how much the sources disagree about a player, not week-to-week luck; a player only one source projects gets a default.
 - **Where a number comes from:** tap a player to see each source's points for him, the projected stats behind them, and its share of his number (equal shares for now). A source with nothing for him says why. Stats marked \* are our estimates: ESPN doesn't project TFL, QB hits, defensive TDs or safeties, so those come from the player's own rates this season, shrunk toward last season's (SPEC §6.2).
 - **How the numbers did →** (the Stats page): how far off the projections were each week and season to date, by position, against a naive guess (each player's own average), plus whether the START/UPGRADE odds held up. Each source is also scored on the same players, picked by all sources together, with how many of them it covered. Small samples say "not enough games yet".
-- **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). With one source every ± is the same, so for now the tiers are equal-width point bands.
+- **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). Where the sources disagree, the ± is wider and so are the tiers.
 - **My IDPs** places your DL, LB and DB against the waiver tiers.
   - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
   - **UPGRADE:** the same test against your other player at that position.

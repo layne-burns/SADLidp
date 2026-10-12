@@ -124,6 +124,10 @@ def replay_week(
     # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows
     noise = ("σ_out", "live stats", *(f"{name}: failed" for name in SOURCES))
     data["warnings"] = [w for w in data.get("warnings", []) if not w.startswith(noise)]
+    for name in saved:  # each source was read from its saved file, not fetched: say so, not "failed"
+        src = (data.get("sources") or {}).get(name)
+        if src is not None:
+            src.update(status="saved", error=None)
     out = wdir / "consensus.json"
     storage.write_json(out, data)
     return out

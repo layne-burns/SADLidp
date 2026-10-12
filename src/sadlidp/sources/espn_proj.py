@@ -22,6 +22,7 @@ SLOT_IDS = [10, 11, 14, 15]  # lineup slots LB, DL, DB, DP
 PAGE_SIZE = 400
 MAX_PAGES = 6
 MIN_MATCH_RATE = 0.98
+MIN_COVERAGE = 0.6  # live 2026-10-12: 0.82 DL, 0.82 LB, 0.73 DB (the gap is stale Sleeper records)
 MAP_VERSION = 1
 STAT_MAP = {
     "108": "idp_tkl_solo",
@@ -165,20 +166,34 @@ def fetch(ctx: FetchContext) -> AdapterResult:
         why.append(
             f"matched {'no' if rate is None else f'{rate:.1%} of'} players with an NFL team (< {MIN_MATCH_RATE:.0%})"
         )
-    complete = not why
+    # coverage per slot: a short or skewed response must not zero-fill the players it left out (§5.2)
+    got = {str(p.get("id")) for p in players}
+    coverage = {}
+    for slot in IDP_SLOTS:
+        expect = [
+            str(p["espn_id"])
+            for p in ctx.players.values()
+            if slot_of(p) == slot and p.get("espn_id") not in (None, "") and p.get("active") and p.get("team")
+        ]
+        coverage[slot] = sum(e in got for e in expect) / len(expect) if expect else None
+    slot_ok = {s: not why and (c is None or c >= MIN_COVERAGE) for s, c in coverage.items()}
+    for s, c in coverage.items():
+        if not why and c is not None and c < MIN_COVERAGE:
+            why.append(f"{s}: only {c:.0%} of Sleeper's {s}s with an ESPN id came back (< {MIN_COVERAGE:.0%})")
+    complete = all(slot_ok.values())
     zero_fill: dict[str, list[str]] = {slot: [] for slot in IDP_SLOTS}
-    if complete:  # an incomplete result zero-fills nobody
-        for pid, p in ctx.players.items():
-            if slot_of(p) in zero_fill and p.get("espn_id") not in (None, ""):
-                zero_fill[slot_of(p)].append(pid)
+    for pid, p in ctx.players.items():  # an incomplete slot zero-fills nobody
+        if slot_ok.get(slot_of(p)) and p.get("espn_id") not in (None, ""):
+            zero_fill[slot_of(p)].append(pid)
     result.universe = {
-        s: {"complete": complete, "depth": None, "zero_fill_ids": sorted(ids)} for s, ids in zero_fill.items()
+        s: {"complete": slot_ok[s], "depth": None, "zero_fill_ids": sorted(ids)} for s, ids in zero_fill.items()
     }
     result.covered_keys = covered
     result.report |= {
         "with_projection": with_projection,
         "match": summary,
         "complete": complete,
+        "coverage": {k: round(v, 3) if v is not None else None for k, v in coverage.items()},
         "why_incomplete": "; ".join(why) or None,
         "duplicates": repeats,
         "unresolved_teams": dict(unresolved),

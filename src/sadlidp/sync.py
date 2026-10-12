@@ -269,7 +269,8 @@ STAT_LABELS = (
 
 
 def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, groups: dict, info: dict,
-              sc: dict, kickoff: datetime | None = None) -> dict:  # fmt: skip
+              sc: dict, kickoff: datetime | None = None, now: datetime | None = None,
+              placeholders: dict | None = None) -> dict:  # fmt: skip
     """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
     them (each [label, value, imputed], §6.2), the share of μ, or why an enabled source has nothing for him."""
     eff = (cons_row or {}).get("eff") or {}
@@ -289,14 +290,21 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
                      if scoring.num(sc.get(k)) and scoring.num(stats.get(k)) >= 0.05]  # fmt: skip
             parts.append({"source": label, "kind": groups.get(name), "pts": round(pts, 2),
                           "share": eff.get(name), "stats": shown, "late": bool(row and row.get("late")),
-                          "zero": row is None})  # fmt: skip
+                          "zero": row is None and pid in values.get(name, {})})  # fmt: skip
         elif not src.get("last_success") or not src.get("rows_used"):
             read = src.get("status") in ("ok", "not_yet_published", SUSPECT)
             parts.append({"source": label, "missing": "nothing posted for this week yet" if read
                           else "couldn't be read this sync"})  # fmt: skip
         elif src.get("stale"):
             parts.append({"source": label, "missing": "not used this week (its data is too old)"})
-        elif kickoff is not None and since and kickoff <= datetime.fromisoformat(since):
+        elif pid in (placeholders or {}).get(name, ()):
+            parts.append({"source": label, "missing": "no projection for him"})
+        elif (
+            kickoff is not None
+            and since
+            and kickoff <= datetime.fromisoformat(since)
+            and (now is None or kickoff <= now)
+        ):
             parts.append({"source": label, "missing": "first read this week after his game started"})  # §5.3
         else:
             parts.append({"source": label, "missing": "no projection for him"})
@@ -446,6 +454,8 @@ def run_sync(
     groups: dict[str, str] = {}
     late_rows: dict[str, dict] = {}
     source_rows: dict[str, dict] = {}
+    placeholders: dict[str, set[str]] = {}  # per source: players it explicitly lists with no projection
+    zero_filled: dict[str, set[str]] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
     fetched_ok: set[str] = set()
@@ -499,9 +509,20 @@ def run_sync(
             since = observed_after(stored, res.published_at)
             zeros = zero_fill(stored, values[name], idp, status_of, res.published_at)
             values[name].update(zeros)
+            zero_filled[name] = set(zeros)
+            placeholders[name] = set(stored.get("no_projection_ids") or [])
             info.update(zero_filled=len(zeros), observed_after=since.isoformat() if since else None)
         run["sources"][name] = info
 
+    # zero-fills alone don't make a number for a player another source explicitly lists with no projection
+    # (e.g. a retired player Sleeper still carries as a placeholder and ESPN no longer lists): he stays
+    # "no projection", as before ESPN joined (§6.4)
+    listed_empty = set().union(*placeholders.values()) if placeholders else set()
+    only_zero = {pid for zf in zero_filled.values() for pid in zf if pid in listed_empty
+                 and all(pid in zero_filled.get(n, ()) for n in values if pid in values[n])}  # fmt: skip
+    for vals in values.values():
+        for pid in only_zero:
+            vals.pop(pid, None)
     if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
@@ -725,7 +746,9 @@ def run_sync(
     }
     attach_breakdowns(
         site_data,
-        lambda pid: breakdown(pid, cons.get(pid), source_rows, values, groups, run["sources"], sc, kickoff_of(pid)),
+        lambda pid: breakdown(
+            pid, cons.get(pid), source_rows, values, groups, run["sources"], sc, kickoff_of(pid), now, placeholders
+        ),
     )
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})

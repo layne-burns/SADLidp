@@ -62,7 +62,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <section aria-labelledby="src-h">
     <h2 id="src-h">Each source on the same players</h2>
     <div class="slot">
-      <p>Each week's players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was. A source first read partway through a week only covers the games still to come (ESPN in week 5, its first week: the Monday-night game); projections for games already played are never kept.</p>
+      <p>Each week's players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
       <div class="scroll"><table>
         <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
         {% for slot in slots %}

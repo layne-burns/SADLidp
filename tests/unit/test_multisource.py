@@ -68,6 +68,18 @@ def multi_routes() -> dict:
     players, proj = r[f"{V1}/players/nfl"], r[f"{API}/projections/nfl/2026/5"]
     for pid, p in ESPN_PLAYERS.items():
         players[pid] = {"injury_status": None, **p, **players.get(pid, {})}
+    # the trimmed ESPN list is this test's ESPN world: one Sleeper player per slot outside it keeps his ESPN
+    # id (so ESPN zero-fills him); the rest carry none, as for players ESPN has never listed
+    in_espn = {str(e["player"]["id"]) for e in ESPN}
+    kept: set[str] = set()
+    for pid in sorted(players):
+        p, slot = players[pid], slot_of(players[pid])
+        if not p.get("espn_id") or str(p["espn_id"]) in in_espn:
+            continue
+        if slot and slot not in kept and p.get("active") and p.get("team"):
+            kept.add(slot)
+            continue
+        players[pid] = {**p, "espn_id": None}
     have = {x["player_id"] for x in proj}
     template = next(x for x in proj if x["player_id"] == "11017")
     for pid, p in ESPN_PLAYERS.items():
@@ -222,6 +234,20 @@ def test_backfill_runner_writes_espn_weeks_within_its_budgets(tmp_path):
     storage.write_json(live, {**doc, "rows": {k: {**r, "backfill": False} for k, r in doc["rows"].items()}})
     done, logs = run(tmp_path / "d2", redo=True)
     assert done == {"espn_proj": [1, 3, 4]} and "backfill: espn_proj week 2 has live rows; left alone" in logs
+    # a --redo never shrinks a stored week: a short response (e.g. caught mid-update) keeps the rows
+    week1 = storage.week_dir(tmp_path / "d", 2026, 1) / "sources" / "espn_proj.json"
+    rows = storage.load_source(week1)["rows"]
+
+    class Short(Client):
+        def get(self, url, headers=None, **kw):
+            resp = super().get(url, headers, **kw)
+            if url.split("?")[0] == LEAGUE_URL and resp.ok:
+                resp.body = json.dumps({"players": json.loads(resp.body)["players"][:10]}).encode()
+            return resp
+
+    done, logs = run(tmp_path / "d", client=Short(multi_routes()), redo=True)
+    assert 1 not in done.get("espn_proj", []) and storage.load_source(week1)["rows"] == rows
+    assert any("week 1:" in m and "kept the stored rows" in m for m in logs)
     _, logs = run(tmp_path / "d4", {**CFG, "sources": {**CFG["sources"], "espn_proj": {"enabled": True}}})
     assert logs == ["backfill: espn_proj is disabled or has no archive (sources.espn_proj.archive); nothing to do"]
 
@@ -237,6 +263,7 @@ def test_replay_reads_every_saved_source_of_the_week(tmp_path):
     assert both and all({"Sleeper", "ESPN"} <= {p["source"] for p in c["breakdown"]["parts"] if "pts" in p}
                         for c in both)  # fmt: skip
     assert not [w for w in d["warnings"] if w.startswith(("espn_proj", "sleeper_proj"))]
+    assert {s["status"] for s in d["sources"].values()} == {"saved"}  # read from saved files, not "failed"
     # a source with no file that week is left out of the rebuilt page, not shown as missing
     (data / "2026" / "week04" / "sources" / "sleeper_proj.json").unlink()
     d = json.loads(replay_week(CFG, data, 2026, 4, truth["matchups"], r[f"{V1}/players/nfl"], log=lambda m: None)
@@ -323,3 +350,18 @@ def test_stats_score_each_source_on_the_consensus_pool(tmp_path):
     assert "Sleeper and ESPN have an equal say (50% each)" in html and "60% <small>(90)</small>" in html
     single = env.get_template("stats.html.j2").render(s=ev1, slots=("DL", "LB", "DB"), league_name="SADL")
     assert "Each source on the same players" not in single and "Only Sleeper so far" in single
+
+
+def test_zero_fills_alone_never_bring_back_a_player_another_source_lists_as_no_projection(tmp_path):
+    r = multi_routes()
+    players, proj = r[f"{V1}/players/nfl"], r[f"{API}/projections/nfl/2026/5"]
+    in_espn = {str(e["player"]["id"]) for e in ESPN}
+    gone = next(pid for pid, p in sorted(players.items()) if p.get("espn_id") and str(p["espn_id"]) not in in_espn
+                and slot_of(p) and p.get("active") and p.get("team"))  # fmt: skip
+    proj[:] = [x for x in proj if x["player_id"] != gone]
+    proj.append({"player_id": gone, "week": 5, "team": players[gone]["team"], "opponent": None, "stats": {}})
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=Client(r), log=lambda m: None)
+    week = data / "2026" / "week05"
+    assert gone not in json.loads((week / "frozen.json").read_text())["players"]  # "no projection", not 0.0
+    assert gone not in {c["id"] for c in cards(json.loads((week / "consensus.json").read_text()))}

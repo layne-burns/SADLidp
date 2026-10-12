@@ -378,7 +378,7 @@ def run_sync(
     }
     frozen, _ = storage.merge_rows((storage.read_json(frozen_path) or {}).get("players", {}), records, now, kickoff_of)
     for pid, rec in frozen.items():
-        if status_of(pid).locked:
+        if pid in idp and status_of(pid).locked:
             cons[pid] = {k: rec[k] for k in ("mu", "sigma", "min", "max", "n_sources")}
 
     # waiver pool and tiers
@@ -415,6 +415,8 @@ def run_sync(
         if st.locked and rec is not None:
             reasons = [*rec.get("reasons", []), "locked"]
             panel_status[pid] = PlayerStatus(reasons, list(rec.get("flags", [])), st.kickoff, st.opponent)
+        elif st.locked and pid in cons:  # projected before kickoff but no record (first week): ignore later tags
+            panel_status[pid] = PlayerStatus(["locked"], list(st.flags), st.kickoff, st.opponent)
     threshold = float((cfg.get("swap") or {}).get("threshold", 0.6))
     my_panel = panel(me or {}, players, cons, panel_status, waiver_order, limits, sigma_out, threshold, lineup)
 
@@ -476,7 +478,7 @@ def run_sync(
         for pid in pnl["players"]:
             c = cons.get(pid)
             tier = place(c["mu"], c["sigma"], tiers_by_slot[slot], z) if c else None
-            card = _player_card(pid, players.get(pid, {}), c, status_of(pid), tier, None, True)
+            card = _player_card(pid, players.get(pid, {}), c, panel_status.get(pid, status_of(pid)), tier, None, True)
             card["result"] = results.get(pid)
             card.update(reserve=pid in pnl["reserve"], taxi=pid in pnl["taxi"], role=(
                 "starter" if pid == pnl["starter"] else "other" if pid == pnl["other"] else None))  # fmt: skip

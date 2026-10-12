@@ -7,9 +7,10 @@ P(W outscores S) ≥ threshold, and UPGRADE (only when B exists and W lacks STAR
 ≥ threshold. Outcome probabilities use predictive σ² = σ_μ² + σ_out². IR (`reserve`) players are shown
 but never comparable and don't count toward the limit (Phase 1); taxi does.
 
-A suggestion whose move can't be made this week is still shown, flagged `reference` with its reasons:
-START when the lineup starter is locked (or, with no lineup, when S is locked) or its drop target is
-locked; UPGRADE when B is locked.
+A suggestion that can't pay off this week is still shown, flagged `reference` with its reasons:
+`starter_locked` when the lineup starter at the position is locked (or, with no lineup known, S is): SADL
+starts exactly one DL/LB/DB, so nothing added there can score this week; `drop_locked` when the player
+it would drop is locked (Sleeper won't drop him).
 """
 
 from __future__ import annotations
@@ -33,7 +34,8 @@ def p_outscores(mu_w: float, sp_w: float, mu_ref: float, sp_ref: float) -> float
 
 def starter_slots(roster_positions: list[str], starters: list[str] | None) -> dict[str, str | None]:
     """Who sits in your lineup's DL/LB/DB slot (matchups `starters` is aligned with roster_positions)."""
-    starters = starters or []
+    if not starters:
+        return {}  # lineup unknown (distinct from an empty slot, which maps to None)
     out: dict[str, str | None] = {}
     for idx, slot in enumerate(roster_positions or []):
         if slot in IDP_SLOTS and slot not in out:
@@ -76,7 +78,7 @@ def panel(
         other = comparable[-1] if len(comparable) > 1 else None
         count = sum(1 for pid in here if pid not in reserve)
         lineup_pid = lineup.get(slot)
-        starter_locked = locked(lineup_pid) if lineup_pid else locked(starter)
+        starter_locked = locked(lineup_pid) if slot in lineup else locked(starter)
         mu_s, sp_s = (cons[starter]["mu"], sp(starter)) if starter else (0.0, 0.0)
         # with no comparable B, the drop is yours to choose among the others (S included)
         drop_pool = [pid for pid in here if pid not in reserve and pid != starter]
@@ -98,7 +100,7 @@ def panel(
             elif other:
                 p_up = p_outscores(cons[w]["mu"], sp(w), cons[other]["mu"], sp(other))
                 if p_up >= threshold:
-                    why = ["drop_locked"] if locked(other) else []
+                    why = (["starter_locked"] if starter_locked else []) + (["drop_locked"] if locked(other) else [])
                     badges[w] = {"badge": "UPGRADE", "over": other, "p": round(p_up, 3), "action": "add_drop",
                                  "drop": other, "reference": bool(why), "why": why}  # fmt: skip
         out[slot] = {

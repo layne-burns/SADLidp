@@ -117,8 +117,8 @@ def test_locked_starter_still_anchors_and_start_is_reference():
     assert (
         start["badge"] == "START" and start["over"] == "s" and start["reference"] and start["why"] == ["starter_locked"]
     )
-    up = lb["badges"]["w2"]  # B (o) is unlocked: dropping him is still possible this week
-    assert up["badge"] == "UPGRADE" and up["reference"] is False and up["why"] == []
+    up = lb["badges"]["w2"]  # one LB lineup slot and it's locked: nothing added can score this week
+    assert up["badge"] == "UPGRADE" and up["reference"] and up["why"] == ["starter_locked"]
 
 
 def test_locked_drop_target_makes_suggestions_reference():
@@ -140,6 +140,14 @@ def test_unknown_lineup_uses_s_and_unavailable_players_stay_out():
     assert bye_locked["badges"]["w1"]["action"] == "choose_drop" and bye_locked["badges"]["w1"]["why"] == [
         "drop_locked"
     ]
+
+
+def test_empty_slot_in_a_known_lineup_is_not_locked():
+    # the matchup is known and the LB slot is empty: W can be added and started even though S (benched) played
+    lb = _panel({"players": ["s", "o"]}, statuses=_statuses(s=LOCKED), lineup={"LB": None})
+    assert not lb["starter_locked"] and lb["badges"]["w1"]["reference"] is False
+    assert rs.starter_slots(["DL", "LB", "DB"], None) == {} and rs.starter_slots(["DL", "LB", "DB"], []) == {}
+    assert rs.starter_slots(["DL", "LB", "DB"], ["a", "0", "c"])["LB"] is None
 
 
 def test_everything_unlocked_is_actionable():

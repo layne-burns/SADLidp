@@ -53,7 +53,9 @@ def _why(badge: dict, names: dict, slot: str) -> str:
     """Why a suggestion can't be acted on this week (D15 amended)."""
     reasons = []
     if "starter_locked" in (badge.get("why") or []):
-        reasons.append(f"your {slot} starter's game has started, so the swap can't be made this week")
+        reasons.append(
+            f"your {slot} starter's game has started, so nothing added at {slot} can score for you this week"
+        )
     if "drop_locked" in (badge.get("why") or []):
         who = names.get(badge.get("drop")) if badge.get("drop") else f"your other {slot}"
         reasons.append(f"{who}'s game has started, so the drop can't be made this week")

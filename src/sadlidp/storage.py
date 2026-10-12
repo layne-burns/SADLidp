@@ -41,11 +41,14 @@ def merge_rows(
     `late: true` and then frozen like any other row.
     """
 
-    def locked(pid: str) -> bool:
+    def locked(pid: str, row: dict | None = None) -> bool:
         k = kickoff_of(pid)
-        return k is not None and k <= fetched_at
+        if k is not None and k <= fetched_at:
+            return True
+        stored = (row or {}).get("kickoff")  # the kickoff when the row was written: a player cut or traded
+        return bool(stored) and datetime.fromisoformat(stored) <= fetched_at  # after playing stays frozen
 
-    merged = {pid: row for pid, row in existing.items() if locked(pid)}
+    merged = {pid: row for pid, row in existing.items() if locked(pid, row)}
     counts = {"frozen": len(merged), "updated": 0, "added": 0, "deleted": 0, "skipped_after_kickoff": 0, "late": 0}
     stamp = fetched_at.isoformat()
     for pid, row in fetched.items():
@@ -59,7 +62,8 @@ def merge_rows(
                 counts["skipped_after_kickoff"] += 1  # first seen after kickoff: can't be a pre-game value
             continue
         counts["updated" if pid in existing else "added"] += 1
-        merged[pid] = {**row, "fetched_at": stamp}
+        k = kickoff_of(pid)
+        merged[pid] = {**row, "fetched_at": stamp, **({"kickoff": k.isoformat()} if k else {})}
     counts["deleted"] = sum(1 for pid in existing if pid not in merged)
     return merged, counts
 

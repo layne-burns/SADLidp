@@ -154,7 +154,7 @@ def build_week_logs(
     for slot in IDP_SLOTS:
         for w, b in my_panel[slot]["badges"].items():
             kicks = [k for k in (kickoff_of(w), kickoff_of(b["over"]) if b["over"] else None) if k]
-            current[f"{w}|{b['badge']}"] = {
+            current[f"{w}|{b['badge']}|{b['over'] or ''}"] = {
                 "slot": slot, "w": w, "badge": b["badge"], "over": b["over"], "p": b["p"], "action": b["action"],
                 "drop": b["drop"], "reference": b["reference"], "why": b["why"], "mu_w": round(cons[w]["mu"], 3),
                 "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
@@ -404,7 +404,8 @@ def run_sync(
     }
     frozen, _ = storage.merge_rows((storage.read_json(frozen_path) or {}).get("players", {}), records, now, kickoff_of)
     for pid, rec in frozen.items():
-        if pid in idp and status_of(pid).locked:
+        stored = rec.get("kickoff")
+        if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
             cons[pid] = {k: rec[k] for k in ("mu", "sigma", "min", "max", "n_sources")}
 
     # waiver pool and tiers
@@ -524,6 +525,8 @@ def run_sync(
             if datetime.fromisoformat(e["lock_at"]) > now:
                 continue
             w, over = e["w"], e.get("over")
+            if status_of(w).kickoff is None or status_of(w).kickoff > now:
+                continue  # issued, but the suggested player hasn't played yet: still in the live list
             c = cons.get(w) or {"mu": e["mu_w"], "sigma": None, "min": None, "max": None, "n_sources": 0}
             card = _player_card(w, players.get(w, {}), c, status_of(w), None, None, False)
             card["result"] = results.get(w)

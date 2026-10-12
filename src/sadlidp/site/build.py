@@ -112,8 +112,12 @@ def _why(badge: dict, names: dict, slot: str) -> str:
             f"your {slot} starter's game has started, so nothing added at {slot} can score for you this week"
         )
     if "drop_locked" in (badge.get("why") or []):
-        who = names.get(badge.get("drop")) if badge.get("drop") else f"your other {slot}"
-        reasons.append(f"{who}'s game has started, so the drop can't be made this week")
+        if badge.get("drop"):
+            reasons.append(
+                f"{names.get(badge['drop'], 'that player')}'s game has started, so the drop can't be made this week"
+            )
+        else:
+            reasons.append(f"every {slot} you could drop has already kicked off, so the drop can't be made this week")
     return "; ".join(reasons)
 
 

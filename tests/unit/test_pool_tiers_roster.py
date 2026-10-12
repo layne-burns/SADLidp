@@ -135,11 +135,13 @@ def test_unknown_lineup_uses_s_and_unavailable_players_stay_out():
     # locked *and* ruled out at kickoff: not comparable, so the slot falls to o
     out = _panel({"players": ["s", "o"]}, statuses=_statuses(s=PlayerStatus(reasons=["Out", "locked"])))
     assert out["starter"] == "o" and out["other"] is None
-    # choose_drop: the only other player is locked, so you can't make the drop this week
-    bye_locked = _panel({"players": ["s", "o"]}, statuses=_statuses(o=PlayerStatus(reasons=["Out", "locked"])))
-    assert bye_locked["badges"]["w1"]["action"] == "choose_drop" and bye_locked["badges"]["w1"]["why"] == [
-        "drop_locked"
-    ]
+    # choose_drop: the other player is out and locked, but S can still be dropped, so it's actionable
+    out_locked = _panel({"players": ["s", "o"]}, statuses=_statuses(o=PlayerStatus(reasons=["Out", "locked"])))
+    assert out_locked["badges"]["w1"]["action"] == "choose_drop" and out_locked["badges"]["w1"]["why"] == []
+    # ... unless every droppable player has kicked off too
+    both = _statuses(s=LOCKED, o=PlayerStatus(reasons=["Out", "locked"]))
+    all_locked = _panel({"players": ["s", "o"]}, statuses=both, lineup={"LB": "s"})
+    assert all_locked["badges"]["w1"]["why"] == ["starter_locked", "drop_locked"]
 
 
 def test_empty_slot_in_a_known_lineup_is_not_locked():

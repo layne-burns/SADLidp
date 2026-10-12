@@ -271,7 +271,8 @@ def test_decision_logs(tmp_path):
     run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # pre-waiver window
     week = data / "2026" / "week05"
     badges = json.loads((week / "badges.json").read_text())["badges"]
-    anz = badges["4118|START"]
+    assert [k for k in badges if k.startswith("4118|")] == ["4118|START|11742"]  # vs Cedric Gray
+    anz = badges["4118|START|11742"]
     assert anz["active"] and anz["first_p"] == anz["p"] and anz["reference"] is False
     assert anz["lock_at"] == "2026-10-08T20:15:00-04:00"  # TB @ DAL kicks off before his LB comparison
     tiers = json.loads((week / "tiers_log.json").read_text())
@@ -279,11 +280,12 @@ def test_decision_logs(tmp_path):
     assert tiers["last_pre_kickoff"]["4118"]["slot"] == "LB"
     # after TNF kickoff the badge and the TB player's tier row are frozen
     run_sync(CFG, data, tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
-    assert json.loads((week / "badges.json").read_text())["badges"]["4118|START"] == anz
+    assert json.loads((week / "badges.json").read_text())["badges"]["4118|START|11742"] == anz
     assert (
         json.loads((week / "tiers_log.json").read_text())["last_pre_kickoff"]["4118"]
         == tiers["last_pre_kickoff"]["4118"]
     )
+    assert tiers["last_pre_kickoff"]["4118"]["kickoff"] == "2026-10-08T20:15:00-04:00"  # stored with the record
 
 
 def test_a_raising_adapter_never_fails_the_sync(tmp_path, monkeypatch):

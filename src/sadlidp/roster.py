@@ -80,8 +80,8 @@ def panel(
         lineup_pid = lineup.get(slot)
         starter_locked = locked(lineup_pid) if slot in lineup else locked(starter)
         mu_s, sp_s = (cons[starter]["mu"], sp(starter)) if starter else (0.0, 0.0)
-        # with no comparable B, the drop is yours to choose among the others (S included)
-        drop_pool = [pid for pid in here if pid not in reserve and pid != starter]
+        # with no comparable B, the drop is yours to choose among all non-IR players here (S included)
+        drop_pool = [pid for pid in here if pid not in reserve]
 
         badges: dict[str, dict] = {}
         for w in waiver_ids.get(slot, []):

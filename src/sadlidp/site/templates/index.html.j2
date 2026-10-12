@@ -112,7 +112,7 @@ a { color: var(--accent); }
         </li>
         {% else %}<li class="row"><span class="sub">No {{ slot }} rostered</span></li>{% endfor %}
       </ul>
-      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so START suggestions are for reference.</p>{% endif %}
+      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
       {% for s in m.suggestions %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
         {{ chip(s) }}

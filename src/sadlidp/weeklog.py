@@ -1,6 +1,6 @@
 """Per-week decision logs for later evaluation (SPEC.md §6.5, D15, D20).
 
-`badges.json`: every START/UPGRADE suggestion, keyed `W|BADGE`. Until the earlier kickoff of W and the
+`badges.json`: every START/UPGRADE suggestion, keyed `W|BADGE|OVER`. Until the earlier kickoff of W and the
 player he is compared with (`lock_at`) it takes the latest state (`active` false if withdrawn); after
 that it is frozen, so "issued" = active at the last sync before lock. `tiers_log.json`: the waiver tiers
 as shown at the pre-waiver sync and, per player, at his last sync before kickoff.
@@ -20,14 +20,15 @@ def _open(entry: dict, now: datetime) -> bool:
 
 
 def update_badge_log(existing: dict[str, dict], current: dict[str, dict], now: datetime) -> dict[str, dict]:
+    """Keys are `W|BADGE|OVER` (the comparison is part of the suggestion). An open entry takes the latest
+    state; one that disappears before its lock is marked withdrawn; after lock nothing changes."""
     stamp = now.isoformat()
-    out = {key: ({**e, "active": key in current} if _open(e, now) else e) for key, e in existing.items()}
+    live = {key for key, e in current.items() if _open(e, now)}
+    out = {key: ({**e, "active": key in live} if _open(e, now) else e) for key, e in existing.items()}
     for key, entry in current.items():
         old = out.get(key)
-        if old is not None and not _open(old, now):
-            continue  # locked: frozen as issued (or withdrawn)
-        if old is None and not _open(entry, now):
-            continue  # first seen after lock: never issued
+        if not _open(entry, now) or (old is not None and not _open(old, now)):
+            continue  # past its lock: frozen as issued or withdrawn, or first seen after lock (never issued)
         out[key] = {
             **entry,
             "first_seen": (old or {}).get("first_seen", stamp),

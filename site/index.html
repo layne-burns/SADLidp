@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SADL IDP Streamer</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+  --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
+    --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 18px; }
+h1 { font-size: 1.35rem; margin: 0 0 2px; }
+h2 { font-size: 1.1rem; margin: 22px 0 8px; }
+h3 { font-size: 1rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.meta, .count, .sub, small, .note, .hidden-note { color: var(--muted); }
+.count { font-size: .85rem; font-weight: normal; }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.card, .slot { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.name { font-weight: 600; }
+.sub { font-size: .85rem; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pts small { font-weight: normal; margin-left: 2px; }
+.tag, .chip { display: inline-block; font-size: .72rem; border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+  border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.tag.q { color: var(--warn); border-color: var(--warn); }
+.tag.bad { color: var(--bad); border-color: var(--bad); }
+.chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
+.chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
+.sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
+.res { display: block; font-size: .8rem; font-weight: 600; color: var(--text); }
+.res.live { color: var(--warn); }
+.res.dnp { color: var(--muted); font-weight: normal; }
+.out { font-weight: 700; }
+.out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
+.card.played { opacity: .95; border-style: dashed; }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
+.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .85rem; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabpanel { display: none; margin-top: 12px; }
+#tab-DL:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DL:checked ~ #panel-DL { display: block; }
+#tab-LB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-LB:checked ~ #panel-LB { display: block; }
+#tab-DB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DB:checked ~ #panel-DB { display: block; }
+
+.tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+footer { padding-bottom: 30px; font-size: .85rem; }
+a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>SADL IDP streamer</h1>
+  <p class="meta">Slow Ass Draft League · 2026 Week 5 · data as of <time id="asof" datetime="2026-10-12T05:16:07-04:00">Mon Oct 12, 5:16 AM ET</time> · FAAB waivers</p>
+  
+  
+  
+  <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
+  <p class="banner">sleeper_proj: this fetch looked incomplete and was skipped (only placeholder rows; Sleeper may be mid-update)</p><p class="banner">no source has usable rows for this week yet; the tiers are empty until one does</p>
+  
+</header>
+<main>
+  <section aria-labelledby="my-h">
+    <h2 id="my-h">My IDPs</h2>
+    
+    <div class="slot">
+      <h3>DL <span class="count">1/2 rostered</span></h3>
+      <ul>
+        
+        <li class="row">
+          <div><span class="name">Greg Rousseau</span>
+            
+            
+            <span class="tag">also LB</span>
+
+
+
+            <div class="sub">BUF @ LAR · no projection</div></div>
+          <div class="pts"><small>no projection</small></div>
+        </li>
+        
+      </ul>
+      
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>LB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="row">
+          <div><span class="name">Nik Bonitto</span>
+            
+            
+            <span class="tag">also DL</span>
+
+
+<span class="tag bad">locked</span>
+            <div class="sub">DEN @ LAC</div></div>
+          <div class="pts"><small>no projection</small><span class="res">scored 27.0</span></div>
+        </li>
+        
+        <li class="row">
+          <div><span class="name">Roquan Smith</span>
+            
+            
+            
+
+
+<span class="tag bad">locked</span>
+            <div class="sub">BAL @ ATL</div></div>
+          <div class="pts"><small>no projection</small><span class="res">scored 13.0</span></div>
+        </li>
+        
+      </ul>
+      <p class="note">Your LB starter's game has started, so suggestions here are for reference.</p>
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>DB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="row">
+          <div><span class="name">Jaquan Brisker</span>
+            
+            
+            
+
+
+<span class="tag bad">locked</span>
+            <div class="sub">PIT vs IND</div></div>
+          <div class="pts"><small>no projection</small><span class="res">scored 17.0</span></div>
+        </li>
+        
+        <li class="row">
+          <div><span class="name">Evan Williams</span>
+            
+            
+            
+
+
+<span class="tag bad">locked</span>
+            <div class="sub">GB vs CHI</div></div>
+          <div class="pts"><small>no projection</small><span class="res">scored 21.0</span></div>
+        </li>
+        
+      </ul>
+      <p class="note">Your DB starter's game has started, so suggestions here are for reference.</p>
+      
+      
+    </div>
+    
+  </section>
+
+  <section aria-labelledby="tiers-h">
+    <h2 id="tiers-h">Streaming tiers (available players)</h2>
+    <div class="tabs">
+      <input type="radio" name="pos" id="tab-DL" checked><label for="tab-DL">DL</label><input type="radio" name="pos" id="tab-LB"><label for="tab-LB">LB</label><input type="radio" name="pos" id="tab-DB"><label for="tab-DB">DB</label>
+      
+      <div class="tabpanel" id="panel-DL">
+        <p class="note">No available DL with a projection this week.</p>
+        
+        <p class="hidden-note">23 available DL have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-LB">
+        <p class="note">No available LB with a projection this week.</p>
+        
+        <p class="hidden-note">15 available LB have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-DB">
+        <p class="note">No available DB with a projection this week.</p>
+        
+        <p class="hidden-note">28 available DB have no projection this week.</p>
+        
+      </div>
+      
+    </div>
+  </section>
+  
+  
+</main>
+<footer>
+  <h2>Sources</h2>
+  <table>
+    <tr><th>Source</th><th>Status</th><th>Players</th><th>Last success</th></tr>
+    
+    <tr><td>sleeper_proj</td><td>suspect (stale, not used)</td>
+      <td>0 <small>+4357 without a projection</small></td>
+      <td>—</td></tr>
+    
+  </table>
+  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL 5.681, LB 5.625, DB 5.228).
+  Tiers group players statistically indistinguishable from each tier's best.
+  * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="data-2026-05.json">data.json</a></p>
+</footer>
+<script>
+(function () {
+  var t = document.getElementById("asof");
+  var age = (Date.now() - Date.parse(t.getAttribute("datetime"))) / 36e5;
+  if (age > 36) document.getElementById("stale").hidden = false;
+})();
+</script>
+</body>
+</html>

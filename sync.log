@@ -1,0 +1,5 @@
+sync: season 2026, target week 5, forced
+sync: backfilled Sleeper projections for weeks [1, 2, 3, 4]
+warning: sleeper_proj: this fetch looked incomplete and was skipped (only placeholder rows; Sleeper may be mid-update)
+warning: no source has usable rows for this week yet; the tiers are empty until one does
+sync: synced (synced); season 2026, week 5

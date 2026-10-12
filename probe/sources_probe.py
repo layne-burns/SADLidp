@@ -344,23 +344,29 @@ def probe_espn(
     # 00/10 = season actual/projected splits; 11{season}{week} = that week's projection, 01 = last week's actual
     extra_splits = [f"11{season}{week}", f"01{season}{week - 1}"] if week else []
     stats_filter = {"value": 3, "additionalValue": [f"00{season}", f"10{season}", *extra_splits]}
+    sort = {"sortPercOwned": {"sortAsc": False, "sortPriority": 1}}  # run 2 got HTTP 400 without it
     variants = {
-        "by_slots": {"filterSlotIds": {"value": ESPN_IDP_SLOT_IDS}, "limit": 150},
-        "by_ids": {"filterIds": {"value": list(espn_ids or [])}, "limit": len(espn_ids or []) or 1},
+        # exactly run 1's request (HTTP 200), as a control
+        "control_run1": ({"filterSlotIds": {"value": ESPN_IDP_SLOT_IDS}, "limit": 150, **sort}, False),
+        "by_ids": ({"filterIds": {"value": list(espn_ids or [])}, "limit": len(espn_ids or []) or 1, **sort}, False),
+        "by_ids_scoring_period": (
+            {"filterIds": {"value": list(espn_ids or [])}, "limit": len(espn_ids or []) or 1, **sort},
+            True,
+        ),
     }
-    for label, f in variants.items():
-        if label == "by_ids" and not espn_ids:
+    for label, (f, with_period) in variants.items():
+        if label.startswith("by_ids") and not espn_ids:
             sec[label] = {"skipped": "no ESPN ids from Sleeper"}
             continue
         filters = {"players": {**f, "filterStatsForTopScoringPeriodIds": stats_filter}}
-        url = ESPN_URL.format(season=season) + (f"&scoringPeriodId={week}" if week else "")
+        url = ESPN_URL.format(season=season) + (f"&scoringPeriodId={week}" if week and with_period else "")
         r = client.get(url, headers={"X-Fantasy-Filter": json.dumps(filters)})
         rep = _req_summary(r)
         if r.ok:
             try:
                 payload = r.json()
                 rep["shape"] = an.espn_shape(payload, week) if week else None
-                if label == "by_ids":
+                if label == "by_ids" and r.ok:
                     rep["key_paths"] = st.json_key_paths(payload, max_depth=5, max_paths=120)
                     sample = {"players": (payload.get("players") or [])[:5]} if isinstance(payload, dict) else None
             except ValueError:

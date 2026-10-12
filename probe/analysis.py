@@ -421,6 +421,68 @@ def leg_boundaries(transactions: list[dict]) -> dict:
     return {str(leg): {"first": _et(min(v)), "last": _et(max(v)), "n": len(v)} for leg, v in sorted(by_leg.items())}
 
 
+def d14_add_time_replay(
+    transactions: list[dict], rosters: list[dict], players: dict[str, dict], limits: dict[str, int], min_leg: int = 2
+) -> dict:
+    """Which counting rule did Sleeper enforce when free-agent/waiver adds went through?
+
+    Replays completed transactions backwards from the current rosters. For every in-season
+    (leg >= min_leg) IDP add, counts the roster right after the add under each rule, with and
+    without current IR/taxi players. Sleeper enforces limits at add time (trades and the draft
+    can exceed them), so the enforced rule never shows an add that ends over the limit.
+    Leg 1 is skipped: draft picks aren't transactions, so pre-draft rosters can't be rebuilt.
+    """
+    state = {r["roster_id"]: set(r.get("players") or []) for r in rosters}
+    reserve = {r["roster_id"]: set(r.get("reserve") or []) for r in rosters}
+    taxi = {r["roster_id"]: set(r.get("taxi") or []) for r in rosters}
+    done = sorted(
+        (t for t in transactions if t.get("status") == "complete"),
+        key=lambda t: num(t.get("status_updated") or t.get("created")),
+        reverse=True,
+    )
+    variants = ("all", "excl_reserve", "excl_reserve_taxi")
+    out = {rule: {v: {"adds_checked": 0, "at_limit": 0, "over": []} for v in variants} for rule in D14_RULES}
+    for t in done:
+        adds, drops = t.get("adds") or {}, t.get("drops") or {}
+        if t.get("type") in ("free_agent", "waiver") and int(num(t.get("leg"))) >= min_leg:
+            for pid, rid in adds.items():
+                p = players.get(pid)
+                if not p or not is_idp(p) or rid not in state:
+                    continue
+                sets = {
+                    "all": state[rid],
+                    "excl_reserve": state[rid] - reserve[rid],
+                    "excl_reserve_taxi": state[rid] - reserve[rid] - taxi[rid],
+                }
+                for rule, fn in D14_RULES.items():
+                    for slot in fn(p):
+                        if slot not in limits:
+                            continue
+                        for v, ids in sets.items():
+                            n = sum(slot in fn(players.get(q, {})) for q in ids)
+                            o = out[rule][v]
+                            o["adds_checked"] += 1
+                            o["at_limit"] += n == limits[slot]
+                            if n > limits[slot]:
+                                o["over"].append(
+                                    {
+                                        "leg": t.get("leg"),
+                                        "roster_id": rid,
+                                        "player": player_name(p),
+                                        "slot": slot,
+                                        "count": n,
+                                    }
+                                )
+        for pid, rid in adds.items():
+            state.get(rid, set()).discard(pid)
+        for pid, rid in drops.items():
+            state.setdefault(rid, set()).add(pid)
+    consistent = sorted(
+        r for r in D14_RULES if not out[r]["excl_reserve"]["over"] and out[r]["excl_reserve"]["adds_checked"]
+    )
+    return {"min_leg": min_leg, "rules": out, "consistent_rules_excl_reserve": consistent}
+
+
 def failed_waiver_notes(transactions: list[dict]) -> dict:
     """Sleeper's reasons for failed waiver claims (may mention position limits: D14 evidence)."""
     notes = Counter(

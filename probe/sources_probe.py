@@ -62,6 +62,7 @@ PUBLIC_PAGES = {
     "fantasynerds_idp_weekly": "https://www.fantasynerds.com/nfl/idp-weekly-projections",
     "razzball_idp_ros": "https://football.razzball.com/projections-idp-restofseason/",
     "razzball_idp_weekly": "https://football.razzball.com/projections-idp-weekly/",
+    "razzball_idp_weekly_rankings": "https://football.razzball.com/weekly-rankings-idp/",
     "espn_idp_rankings_article": "https://www.espn.com/fantasy/football/story/_/page/FFWeeklyPlayerRank26-49804332/nfl-fantasy-football-rankings-2026-idp",
 }
 GUESSED_URLS = {"razzball_idp_ros", "razzball_idp_weekly"}  # a 404 here means "wrong URL", not "no source"
@@ -72,6 +73,11 @@ INDEX_PAGES = {
     "rotoballer_idp": ("https://www.rotoballer.com/?s=idp+rankings+week", r"idp.*rank.*week|week.*idp.*rank"),
     "thehuddle_idp": ("https://www.thehuddle.com/", r"week[-\s]?\d+.*idp|idp.*week[-\s]?\d+"),
     "razzball_idp": ("https://football.razzball.com/", r"idp|individual[- ]defen"),
+    # the IDP ROS page's nav links to "This Week Projections" by position
+    "razzball_idp_this_week": (
+        "https://football.razzball.com/projections-idp-restofseason/",
+        r"(this[- ]?week|weekly)[^\"]*(idp|defen)|(idp|defen)[^\"]*(this[- ]?week|weekly)",
+    ),
 }
 SCHEDULE_URLS = [
     "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
@@ -79,7 +85,7 @@ SCHEDULE_URLS = [
 ]
 CROSSWALK_URL = "https://github.com/dynastyprocess/data/raw/master/files/db_playerids.csv"
 ESPN_URL = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leaguedefaults/3?view=kona_player_info"
-ESPN_IDP_SLOT_IDS = [8, 9, 10, 11, 12, 13, 14, 15]  # DT, DE, LB, DL, CB, S, DB, DP (to be verified)
+ESPN_IDP_SLOT_IDS = [8, 9, 10, 11, 12, 13, 14, 15]  # guessed IDP slots; run 1 returned only one player
 ODDS_BASE = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
 ODDS_MARKETS = "player_tackles_assists,player_solo_tackles,player_sacks"
 
@@ -328,34 +334,34 @@ def probe_fantasypros(client: Client, out_dir: Path) -> dict:
 # ---------------------------------------------------------------- ESPN, Odds
 
 
-def probe_espn(client: Client, season: int, week: int | None) -> tuple[dict, dict | None]:
-    sec: dict = {"week_used": week}
+def probe_espn(
+    client: Client, season: int, week: int | None, espn_ids: list[int] | None = None
+) -> tuple[dict, dict | None]:
+    """ESPN's default-league player feed. `by_ids` asks for known IDPs (ESPN ids from Sleeper's
+    players DB); `by_slots` keeps the slot-id filter from run 1 for comparison."""
+    sec: dict = {"week_used": week, "ids_requested": len(espn_ids or [])}
     sample = None
     # 00/10 = season actual/projected splits; 11{season}{week} = that week's projection, 01 = last week's actual
     extra_splits = [f"11{season}{week}", f"01{season}{week - 1}"] if week else []
-    filters = {
-        "players": {
-            "filterSlotIds": {"value": ESPN_IDP_SLOT_IDS},
-            "filterStatsForTopScoringPeriodIds": {
-                "value": 3,
-                "additionalValue": [f"00{season}", f"10{season}", *extra_splits],
-            },
-            "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
-            "limit": 150,
-        }
+    stats_filter = {"value": 3, "additionalValue": [f"00{season}", f"10{season}", *extra_splits]}
+    variants = {
+        "by_slots": {"filterSlotIds": {"value": ESPN_IDP_SLOT_IDS}, "limit": 150},
+        "by_ids": {"filterIds": {"value": list(espn_ids or [])}, "limit": len(espn_ids or []) or 1},
     }
-    for label, extra in (("default", ""), ("scoring_period", f"&scoringPeriodId={week}")):
-        if label == "scoring_period" and not week:
-            sec[label] = {"skipped": "week unknown"}
+    for label, f in variants.items():
+        if label == "by_ids" and not espn_ids:
+            sec[label] = {"skipped": "no ESPN ids from Sleeper"}
             continue
-        r = client.get(ESPN_URL.format(season=season) + extra, headers={"X-Fantasy-Filter": json.dumps(filters)})
+        filters = {"players": {**f, "filterStatsForTopScoringPeriodIds": stats_filter}}
+        url = ESPN_URL.format(season=season) + (f"&scoringPeriodId={week}" if week else "")
+        r = client.get(url, headers={"X-Fantasy-Filter": json.dumps(filters)})
         rep = _req_summary(r)
         if r.ok:
             try:
                 payload = r.json()
                 rep["shape"] = an.espn_shape(payload, week) if week else None
-                rep["key_paths"] = st.json_key_paths(payload, max_depth=5, max_paths=120)
-                if label == "default":
+                if label == "by_ids":
+                    rep["key_paths"] = st.json_key_paths(payload, max_depth=5, max_paths=120)
                     sample = {"players": (payload.get("players") or [])[:5]} if isinstance(payload, dict) else None
             except ValueError:
                 rep["error"] = "not JSON"

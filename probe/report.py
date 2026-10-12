@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import json
 
-GUESSED_URLS = {"razzball_idp_ros", "razzball_idp_weekly"}  # a 404 means wrong URL, not "no source"
+GUESSED_URLS = {
+    "razzball_idp_ros",
+    "razzball_idp_weekly",
+    "razzball_idp_weekly_rankings",
+}  # a 404 means wrong URL, not "no source"
 
 
 def stringify_keys(obj):
@@ -87,6 +91,27 @@ def _d14(d14: dict) -> str:
         "\nPlayers whose `position` and `fantasy_positions[0]` map to different slots: "
         f"**{d14.get('players_where_position_and_fantasy_first_disagree')}**\n"
     )
+    return md
+
+
+def _d14_replay(rep: dict) -> str:
+    if not rep:
+        return ""
+    rows = []
+    for rule, variants in rep.get("rules", {}).items():
+        for v, o in variants.items():
+            rows.append([rule, v, o["adds_checked"], o["at_limit"], len(o["over"])])
+    md = (
+        f"\n### Add-time replay (in-season adds, leg ≥ {rep.get('min_leg')})\n"
+        "Sleeper enforces limits when a player is added (trades and the draft can exceed them), so the "
+        "enforced rule never shows an add that ends over the limit.\n\n"
+        f"**Rules consistent with every add (IR excluded):** {rep.get('consistent_rules_excl_reserve')}\n\n"
+    )
+    md += _table(["rule", "roster subset", "adds checked", "ended exactly at limit", "ended over limit"], rows)
+    for rule, variants in rep.get("rules", {}).items():
+        over = variants.get("excl_reserve", {}).get("over") or []
+        if over:
+            md += _details(f"adds that would be over the limit under '{rule}' (IR excluded)", over)
     return md
 
 
@@ -245,6 +270,7 @@ def render_markdown(report: dict) -> str:
     md.append(_details("full league settings", lg.get("settings")))
 
     md.append("\n## 2. D14: which position counts toward the limit?\n" + _d14(sl.get("d14")))
+    md.append(_d14_replay(sl.get("d14_add_time") or {}))
 
     md.append("\n## 3. Waiver timing\n" + _details("observed waiver processing", sl.get("waivers")))
     md.append(

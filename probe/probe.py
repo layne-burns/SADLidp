@@ -96,7 +96,9 @@ def _run_probes(args, now, season_hint, out, client, report, samples) -> None:
     season = sl.get("season") or season_hint
     week = target_week or (sl.get("weeks_used") or {}).get("week_used")
 
-    res = _guarded(report, "espn_api", sp.probe_espn, client, season, week)
+    rostered = samples.get("sleeper_players_rostered.json") or {}
+    espn_ids = sorted({int(p["espn_id"]) for p in rostered.values() if str(p.get("espn_id") or "").isdigit()})[:60]
+    res = _guarded(report, "espn_api", sp.probe_espn, client, season, week, espn_ids)
     if res:
         secs["espn_api"], espn_sample = res
         if espn_sample:

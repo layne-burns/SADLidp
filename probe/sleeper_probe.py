@@ -33,6 +33,8 @@ class SleeperProbe:
         self.client = client
         self.section: dict = {"requests": [], "errors": []}
         self.samples: dict[str, object] = {}
+        self._roster_list: list[dict] = []
+        self._player_db: dict[str, dict] = {}
 
     def _json(self, label: str, url: str):
         r = self.client.get(url)
@@ -168,6 +170,7 @@ class SleeperProbe:
             s["d14"] = {"inconclusive": "rosters unavailable"}
             return
         self.samples["rosters.json"] = rosters
+        self._roster_list, self._player_db = rosters, players
         rostered = {pid for r in rosters for key in ("players", "reserve", "taxi") for pid in (r.get(key) or [])}
         # rostered players regardless of team, so released players can be reconstructed offline
         self.samples["players_rostered.json"] = {pid: _slim(players[pid]) for pid in sorted(rostered) if pid in players}
@@ -196,8 +199,9 @@ class SleeperProbe:
         gt = self._ground_truth_week(league, players, week)
         self.section["ground_truth"] = gt
         best = gt.get("v1") or gt.get("api") or {}
-        has_bonus = any(best.get("bonus_hits", {}).values())
-        if best.get("players_compared") and not has_bonus and week > 1:
+        # bonus_hits only lists threshold keys SADL scores; {} means none to test, so no fallback
+        hits = best.get("bonus_hits") or {}
+        if best.get("players_compared") and hits and not any(hits.values()) and week > 1:
             # SPEC §10: the acceptance fixture needs at least one threshold-bonus hit; try the week before
             self.section["ground_truth_prev_week"] = self._ground_truth_week(league, players, week - 1)
 
@@ -241,6 +245,9 @@ class SleeperProbe:
         self.section["waivers"] = an.waiver_timing(txns)
         self.section["rollover"] = an.leg_boundaries(txns)
         self.section["failed_waiver_notes"] = an.failed_waiver_notes(txns)
+        if self._roster_list and self._player_db:
+            limits = an.position_limits(league.get("settings") or {})
+            self.section["d14_add_time"] = an.d14_add_time_replay(txns, self._roster_list, self._player_db, limits)
 
     def _projections(self, season: int, week: int | None, players: dict) -> None:
         if not week:

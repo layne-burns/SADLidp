@@ -54,6 +54,26 @@ def test_d14_inconclusive_without_data_or_discrimination():
     assert res["discriminating"] == [] and res["verdict"].startswith("inconclusive")
 
 
+def test_d14_add_time_replay_identifies_enforced_rule():
+    # Roster 1 now: Pure DL, Edge Hybrid (position LB, DL-first), Pure LB, plus an IR DL.
+    players = dict(PLAYERS, x={"full_name": "IR Tackle", "position": "DT", "fantasy_positions": ["DL"]})
+    rosters = [{"roster_id": 1, "players": ["2", "1", "3", "x"], "reserve": ["x"]}]
+    txns = [
+        {"type": "free_agent", "status": "complete", "leg": 3, "status_updated": 300, "adds": {"1": 1}, "drops": None},
+        {"type": "waiver", "status": "complete", "leg": 1, "status_updated": 100, "adds": {"3": 1}, "drops": None},
+        {"type": "waiver", "status": "failed", "leg": 3, "status_updated": 400, "adds": {"5": 1}, "drops": None},
+    ]
+    res = an.d14_add_time_replay(txns, rosters, players, {"DL": 2, "LB": 2, "DB": 2})
+    pos = res["rules"]["position"]
+    fp = res["rules"]["fantasy_positions[0]"]
+    # adding the hybrid: by position he's the 2nd LB (ok); DL-first makes 2 DL + IR DL
+    assert pos["excl_reserve"]["over"] == [] and pos["excl_reserve"]["at_limit"] == 1
+    assert fp["excl_reserve"]["over"] == [] and fp["all"]["over"][0]["count"] == 3
+    assert res["consistent_rules_excl_reserve"] == ["all_eligible", "fantasy_positions[0]", "position"]
+    # leg-1 and failed transactions are not checked
+    assert pos["all"]["adds_checked"] == 1
+
+
 def test_d14_reserve_variant_excludes_ir():
     rosters = [{"roster_id": 7, "players": ["2", "x", "y"], "reserve": ["y"]}]
     players = {"2": PLAYERS["2"], "x": {"position": "DT"}, "y": {"position": "DE"}}

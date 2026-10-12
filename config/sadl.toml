@@ -50,6 +50,18 @@ enabled = true
 archive = true              # past weeks through scoringPeriodId
 late_rows = false
 
+[sources.fp_ecr]            # FantasyPros weekly ECR, DL/LB/DB pages, free and logged out (D9; SPEC §5.2)
+enabled = true
+archive = true              # past weeks through ?week=N
+late_rows = false
+
+[sources.fp_dst]            # FantasyPros D/ST ranks: a signal, stored and backfilled, never blended (D18)
+enabled = true
+archive = true
+
+[censor]
+M = 10                      # unlisted players ranked up to depth + M by projection get a censored rank (SPEC §6.4)
+
 [backfill]                  # per sync, after the live fetches (SPEC §5.3); the rest waits for the next sync
 budget_s = 300
 max_requests = 40           # per host

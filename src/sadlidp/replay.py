@@ -24,7 +24,7 @@ from . import storage
 from .net import Response
 from .schedule import NFLVERSE_GAMES, Schedule
 from .sleeper import V1
-from .sync import SOURCES, run_sync
+from .sync import SIGNALS, SOURCES, run_sync
 
 NOTE = (
     "Rebuilt after the fact: tiers and suggestions as they would have looked before the week's first game, "
@@ -92,7 +92,7 @@ def replay_week(
                             "injury_status": None}  # fmt: skip
     # sources with no file that week are switched off; the backfill runner has nothing to do in a replay
     sources_cfg = {**(cfg.get("sources") or {})}
-    for name in SOURCES:
+    for name in [*SOURCES, *SIGNALS]:  # signals aren't part of a page: never read in a replay
         if name not in saved:
             sources_cfg[name] = {**(sources_cfg.get(name) or {}), "enabled": False}
     run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0}}

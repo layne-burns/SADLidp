@@ -40,6 +40,7 @@ class AdapterResult:
     error: str | None = None
     published_at: str | None = None  # when the source says it posted the week's data, if it does (§5.3)
     report: dict = field(default_factory=dict)  # pages, match counts, unmatched players, imputed keys (§5.1)
+    lists: dict[str, dict[str, float]] = field(default_factory=dict)  # rank sources: list -> {pid: rank}, whole list
 
     @property
     def ok(self) -> bool:

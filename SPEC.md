@@ -138,7 +138,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 | Source | Kind | Access | Notes |
 |---|---|---|---|
 | Sleeper projections (`api.sleeper.com/projections/nfl/{season}/{week}`) | Projection (full lines) | Free, undocumented | ✅ **MVP source.** RotoWire data; ~630 real IDP rows/week with solo, assisted, TFL, sack, QB hit, PD, INT, FF, FR. Query with `position[]=DL&LB&DB` (returns granular positions too). Universe: complete for DL/LB/DB. Past weeks retrievable and still pre-game → backfill weeks 1–4. |
-| FantasyPros weekly ECR (IDP, DL, LB, DB pages) | Rank | ✅ **Free, no login** | ✅ Embedded `ecrData` JSON: ~376 IDP players, ~25 experts, weekly, STD scoring. Treated as private (D16) like all FP data. |
+| FantasyPros weekly ECR (DL, LB, DB pages) | Rank | ✅ **Free, no login** | ✅ Embedded `ecrData` JSON: ~375 IDP players, ~25 experts, weekly, STD scoring. Stored like other free sources (D16 closed). PR 4 source. |
 | ~~FantasyPros IDP projections~~ | | Logged-in only | ❌ Dropped (owner decision; the login sits behind Cloudflare Turnstile). |
 | RotoBaller weekly IDP rankings article | Rank | ✅ Free | ✅ Three tables (DL/edge, LB, DB), top 50 each, `Rank/Player/Team/Opponent`. Article URL found weekly from its search page. |
 | ESPN league 942104146 (owner's public league, IDP enabled) | Projection (solo, assisted, total tackles, sack, INT, FF, FR, PD; no TFL or QB hit) | Free, no secrets | ✅ **Verified (probe run 4):** readable logged out; 398 of 400 IDPs returned had a week projection; stat-id mapping in §13. Phase 3 source. |
@@ -149,11 +149,13 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 
 **Redundancy:** accuracy weighting can't detect sources that copy each other. Config `prior_weight_cap` can limit aggregate sources such as FP ECR.
 
-**FantasyPros adapter (free ECR only, D9):**
-- **Fetch:** the four public ranking pages (IDP, DL, LB, DB), logged out, no cookies. Parse the embedded `ecrData` JSON: players, ECR ranks, positions, week and expert count.
-- **Detection:** `ecrData.week` (and the page's week label) must match the target week, otherwise `not_yet_published`.
-- **Statuses:** `blocked` (403/429/503 or a challenge page), `parse_error` (no `ecrData`) and `not_yet_published` → a banner with that reason. There is no login state.
-- **Privacy:** D16 applies until the owner decides otherwise (§13).
+**FantasyPros adapter (free ECR only, D9; built in PR 4, checked live 2026-10-12):**
+- **Fetch:** the public DL, LB and DB ranking pages (`/nfl/rankings/{dl,lb,db}.php?week=N`), logged out, no cookies, 5 s apart (robots.txt crawl delay). Parse the embedded `ecrData` JSON: players, `rank_ecr`, positions, week, expert count and `last_updated_ts`. The combined IDP page isn't read: it is the same experts' ranks across positions, so it would count FP twice.
+- **Detection:** each page's `ecrData.year` and `ecrData.week` must match the target season and week and its `players` must be non-empty, otherwise that list is `not_yet_published` (on 2026-10-12, `?week=6` returned `week` 6 with 0 players). Past weeks stay available through `?week=N` (week 1's ranks, last updated 9/13, were served on 2026-10-12), so FP supports backfill (§5.3). `published_at` = the earliest list's `last_updated_ts`.
+- **Statuses:** `blocked` (403/429/503 or a challenge page), `parse_error` (no `ecrData`), `not_yet_published` and `failed`, per list. The result is `ok` when at least one list is. There is no login state.
+- **Rows:** per matched player, `ranks` {list: `rank_ecr`} (a player can sit on two lists, e.g. DL and LB), the FP id, team and `rank_ave`/`rank_std`; `universe` per list: `complete` false, depth D = the list's length. Team codes go through `config/aliases/fp_teams.json` (JAC → JAX; FA = no team); FP's DE/DT → DL, CB/S → DB are used only for matching guards.
+- **List-scoped merges:** a list that wasn't read this sync (any status but ok) keeps its stored ranks (§6.5's deletion applies only to the lists the fetch read).
+- **D/ST signal (D18):** the DST page (`dst.php?week=N`) is stored as `sources/fp_dst.json` (kind `signal`: team → rank, opponent), frozen at each team's kickoff and backfilled like a source. It never enters the consensus; PR 6 backtests it. Its failure is a footer line, never a banner.
 
 **ESPN adapter (owner's league, PR 3; re-verified live 2026-10-12):**
 - **Fetch:** `lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{espn.league_id}?view=kona_player_info&scoringPeriodId={week}` with an `X-Fantasy-Filter` of `filterSlotIds` [10, 11, 14, 15] (LB, DL, DB, DP), sorted by percent owned, `limit` 400 and `offset` 0, 400, 800, … until a page has fewer than 400 players (at most 6 pages). On 2026-10-12 this returned 1,511 IDPs (400/400/400/311), no duplicates, 964 with a week-6 projection line. The league is public: no cookies or secrets.
@@ -176,7 +178,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 - **Matching (amended 2026-10-12, PR 3):** the Sleeper ID is canonical. In order:
   1. `config/player_overrides.toml` (`[<source>] "<source id>" = "<sleeper id>"`, or `"<name>|<TEAM>" = "<sleeper id>"`);
   2. Sleeper's own id fields (`espn_id`, `fantasy_data_id`), accepted only if they land on an IDP;
-  3. a crosswalk id (FantasyPros, PR 4), same guard;
+  3. a crosswalk id, same guard: FantasyPros ids through the DynastyProcess `db_playerids.csv` (`fantasypros_id` → `sleeper_id`), fetched at most once per America/New_York day through the file cache; if it can't be read, matching goes on without it (PR 4);
   4. normalized name (lowercase, punctuation and suffixes Jr/Sr/II–V dropped) + team + a slot the player is eligible for;
   5. normalized name + team;
   6. normalized name alone, only if it is unique among Sleeper IDPs, the source row has a team, and the slot is eligible;
@@ -205,12 +207,14 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
   - Let Q be the P values of the full projection pool at the list's own granular position (e.g. all S for an S list; rostered players included), sorted descending and indexed from 1. For r > |V|, whether from a list deeper than projection coverage or a censored rank, the value is min(V_|V|, Q_min(⌈r⌉,|Q|)).
   - If |V| < 10, Q replaces V and rank r maps to Q_r (rank to rank, no rescaling).
   - The curve is built from P, never from μ. The value attaches to the player's D14 position.
+  - *A player on two of a source's lists (added 2026-10-12, PR 4):* the list of his D14 position is used; if he isn't on it, the list where he ranks best.
+  - *Q's granular position (PR 4):* FantasyPros lists are DL, LB and DB, so Q is the projection pool at that D14 position.
 - **Fallback when no projection source exists that week:** for each position, rank players ex ante (by Sleeper's archived weekly projections if available, otherwise by trailing points per game). Then map rank r to last season's mean actual SADL points at that ex-ante rank, smoothed with isotonic regression plus a moving average. Accuracy isn't updated for fallback weeks.
-- **Censoring rank:** before any censoring, compute P⁰_i, the within-group weighted mean of the projection sources' *listed* (uncensored) values. Players are ranked by P⁰ within each source list's own position taxonomy (e.g. among S for an S list; among the D14 position for a DL/LB/DB list). In a fallback week the ex-ante rank is used instead. Both censoring rules below use this P⁰-rank and are applied once. Censored values are never used to re-rank.
+- **Censoring rank:** (PR 4: every projection source so far is complete, so no projection value is censored and P⁰ = P, zero-fills included.) Before any censoring, compute P⁰_i, the within-group weighted mean of the projection sources' *listed* (uncensored) values. Players are ranked by P⁰ within each source list's own position taxonomy (e.g. among S for an S list; among the D14 position for a DL/LB/DB list). In a fallback week the ex-ante rank is used instead. Both censoring rules below use this P⁰-rank and are applied once. Censored values are never used to re-rank.
 - **Absence rules (per the adapter's universe):**
   - A *complete* projection source: an active player with neither a row nor an entry in `no_projection_ids` counts as 0. A player in `no_projection_ids` is *missing* for that source, never 0.
   - A *depth-D* projection source: an unlisted player whose P⁰-rank is ≤ D+M (default M = 10) gets the source's lowest listed value in that list.
-  - A *depth-D* rank source: an unlisted player whose P⁰-rank is ≤ D+M gets rank max(D+1, his P⁰-rank).
+  - A *depth-D* rank source: an unlisted player whose P⁰-rank is ≤ D+M gets rank max(D+1, his P⁰-rank). Only players the source observed (§5.3) and who aren't on another of its lists are censored; the page marks the value "not on its list".
   - A player with no P⁰, or anything else not covered above, is *missing* for that source.
 - **Mean:** P_i and R_i are the weighted means of the covering sources within each group (weights renormalized over those sources). μ_i = α·P_i + (1−α)·R_i when both exist, otherwise whichever exists. If a group has no sources at all that week, the page says so.
 - **No projection:** a player with no value from any source has no μ. He isn't tiered and is listed under "no projection" below the tiers. A rostered player with no μ shows as "no projection" and is not eligible as S or B (§6.7).
@@ -325,7 +329,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 6. **Polish:** accuracy and `z` tuning, UI refinements.
 
 ## 9. Config tunables (`config/sadl.toml`)
-`league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `sources.shrink_guard=0.6`, `sources.<name>.{archive, late_rows}`, `backfill.{budget_s=300, max_requests}`, `net.host_interval_s.<host>`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
+`league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `sources.shrink_guard=0.6`, `sources.<name>.{archive, late_rows}`, `backfill.{budget_s=300, max_requests}`, `net.host_interval_s.<host>`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`, `sources.fp_ecr` and `sources.fp_dst` (`archive = true`; PR 4).
 
 ## 10. Verification
 - **Unit tests** (pytest, offline fixtures):
@@ -380,6 +384,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · Phase 3+4 plan approved (owner):** D16 closed (FantasyPros ECR stored like other free sources); D15, D17, D18 amended; D19 (per-player breakdown), D20 (Stats page) and D21 (source list after live checks: FantasyData in; Razzball, Fantasy Sharks, CBS, FFToday out) added; §8 rewritten as six PRs. PR 1: locked suggestions as *for reference*, comparable players and the frozen week record (§6.5, §6.7), badge and tier logs, error isolation (§7), nflverse schedule read from raw.githubusercontent.com.
 - **2026-10-12 · PR 2 (Stats v0 + breakdown):** per-player breakdown on every card (D19, §6.4); `stats.html` (§6.8) from data already committed; `players.json` frozen per week replaces `players_idp.json` (§3.3); compact source files with `schema_version` 2 and a `fetches` list, unchanged rows keep their first-seen `fetched_at` (§6.5); residual σ_out behind `sigma_out.method` (§6.7). CI previews are per branch: the branch's committed data is copied to a scratch directory, a forced live sync runs on top, and the result is published to `previews/<branch>`. `sync.yml` also runs (forced) on a push to `main` that changes `src/`, `config/`, the lockfile or the workflow, so merged features reach the page without waiting for a window (owner request).
 - **2026-10-12 · PR 3 (multi-source core + ESPN):** `fetch(ctx)` adapters (§5.1); ESPN adapter re-verified live (paging 1,511 IDPs, archive via `scoringPeriodId`, §5.2); observation rule, backfill runner and replays from saved sources (§5.3); matching precedence with TOML overrides and nickname table (§6.1); imputation anchors and empirical-Bayes priors (§6.2); per-host spacing and challenge breaker (§7); per-source Stats rows (§6.8). Crosswalk and list-scoped merges move to PR 4.
+- **2026-10-12 · PR 4 (FantasyPros ECR + rank → value):** FP DL/LB/DB pages read live and archived through `?week=N` (§5.2; the combined IDP page isn't read); crosswalk ids from DynastyProcess (§6.1 step 3); rank → value curves, the two-list rule and censoring of observed players (§6.4); the 60:40 group split now applies; list-scoped merges; FP D/ST ranks stored as a `signal` file, never blended (D18). The Stats page scores FP on its mapped points like a projection source.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

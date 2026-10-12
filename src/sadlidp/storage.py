@@ -22,7 +22,14 @@ def read_json(path: Path, default=None):
     return json.loads(path.read_text()) if path.exists() else default
 
 
-COMPACT_KEYS = {"rows", "players", "stats", "badges", "last_pre_kickoff"}  # per-player maps: one entry per line
+COMPACT_KEYS = {
+    "rows",
+    "players",
+    "stats",
+    "badges",
+    "last_pre_kickoff",
+    "lists",
+}  # per-player maps: one entry per line
 
 
 def dumps(obj) -> str:
@@ -125,5 +132,7 @@ def save_source(path: Path, result, rows: dict[str, dict]) -> None:
             "no_projection_ids": sorted(result.no_projection_ids),
             "universe": result.universe,
             "covered_keys": sorted(result.covered_keys),
+            # a rank source's whole lists as last read, players already played included: the rank curves (§6.4)
+            **({"lists": result.lists} if getattr(result, "lists", None) else {}),
         },
     )

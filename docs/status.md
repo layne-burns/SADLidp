@@ -31,12 +31,13 @@ To do:
   - allow late and backfilled rows in accuracy weights.
   If not, keep them display-only.
 
-## 3. PR 4: FantasyPros ECR + rank → value mapping
-- FantasyPros DL/LB/DB ranking pages (free ECR, `?week=N` for past weeks, crawl-delay 5 s).
-- Crosswalk ids and list-scoped merges (moved here from PR 3).
-- Rank → points mapping (SPEC §6.4: V/Q curves, effective rank, censoring of observed players only).
-- Projections/rankings group split with the 60:40 prior.
-- FantasyPros D/ST ranks captured as a signal only (D18), never blended.
+## 3. PR 4: FantasyPros ECR + rank → value mapping (built 2026-10-12, draft PR open)
+- [x] FantasyPros DL/LB/DB ranking pages (free ECR, `?week=N` for past weeks, crawl-delay 5 s).
+- [x] Crosswalk ids (DynastyProcess) and list-scoped merges.
+- [x] Rank → points mapping (SPEC §6.4: V/Q curves, the two-list rule, censoring of observed players only).
+- [x] Projections/rankings group split with the 60:40 prior.
+- [x] FantasyPros D/ST ranks captured as a signal only (D18), never blended.
+- [ ] CI + live preview checked, merge.
 
 ## 4. PR 5: RotoBaller + FantasyData + a Thursday sync window
 - RotoBaller weekly IDP article:

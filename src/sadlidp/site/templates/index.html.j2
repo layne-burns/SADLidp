@@ -23,7 +23,7 @@
 {%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
 {%- macro bdbody(p) -%}{% if p.breakdown %}<div class="bdbody">
 {% for part in p.breakdown.parts %}{% if part.missing %}<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
-{% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.late %} · captured after kickoff{% endif %}
+{% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.rank is defined and part.rank is not none %} · {% if part.censored %}not on its {{ part.list }} list, so ranked just past its end (#{{ part.rank }}){% else %}{{ part.list }} rank #{{ part.rank }}{% endif %}{% endif %}{% if part.late %} · captured after kickoff{% endif %}
 {% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
 {% endif %}{% endfor %}
 {% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.mu) }} pts{% if kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}.</div>{% endif %}

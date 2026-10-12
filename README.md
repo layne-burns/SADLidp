@@ -18,6 +18,7 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
   - **Pre-waiver:** from 12 h to 1 h before SADL's waivers process at 00:00 Pacific on Wednesday, so Tuesday noon to 11 PM PT.
   - **Saturday:** 12:00 to 6:00 PM ET, after the final injury reports.
   - **Sunday:** from 4 h to 15 min before the first Sunday kickoff, including 9:30 AM ET international games.
+  - **Sunday evening:** from 4¼ h after the last afternoon kickoff, for 6 h, so the page shows the afternoon's final scores.
 - **When a sync fails,** nothing is deployed and the previous page stays up. The run's log is under Actions.
 - **To check the windows,** run `uv run sadlidp gate`. It prints this week's windows and whether one is due.
 
@@ -29,6 +30,10 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
   - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
   - **UPGRADE:** the same test against your other player at that position.
   - These odds include game-to-game spread (σ<sub>out</sub>, measured from last season's actual SADL points). The suggested move says whether to add only, add and drop, or choose the drop yourself.
+  - **For reference** (muted, sorted last): shown even when the move can't be made this week, with the reason: your starter's game has started (SADL starts one player per position, so nothing added there can score), or the player you'd drop is locked.
+- **Scores:** once a game starts, cards show SADL points so far, then the final score (a game counts as final 4 h after kickoff). "Already played this week" lists the waiver players whose games have started, and "This week's suggestions that have played" shows each suggestion's result: ✓ paid off, ✗ didn't, or void if one of the two didn't play. A suggestion you followed counts too. A projection first captured after kickoff is marked \*.
+- **Last week:** a recap of last week's suggestions with final scores, provisional until Sleeper's stat corrections close (Friday night).
+- **Weeks:** every synced week keeps its page, linked at the top. A past week is re-scored with its final stats. Weeks 1–4 were rebuilt after the fact from Sleeper's archived projections and that week's rosters (`sadlidp replay --weeks 1-4`), and say so.
 - **Tags:**
   - Q: questionable.
   - "also LB": dual eligible. The player is listed under the position Sleeper counts toward the 2-per-position limit.

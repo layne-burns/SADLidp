@@ -1,0 +1,77 @@
+name: ci
+
+# Lint, offline tests and the leak-guard pattern scan (SPEC.md §3.1, §7). Pushes to claude/** branches
+# also get a live preview: a forced sync against the real league into a scratch directory, published
+# to the `preview` branch (replaced on every run) so a change can be checked before it merges.
+on:
+  pull_request:
+  push:
+    branches: ["claude/**"]
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - run: uv run --frozen ruff check .
+      - run: uv run --frozen ruff format --check .
+      - run: uv run --frozen pytest -q
+      - name: Leak-guard pattern scan
+        run: uv run --frozen sadlidp leakcheck tests/fixtures $(test -d data && echo data)
+
+  preview:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    concurrency:
+      group: preview
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Live forced sync into a scratch directory
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/preview-src"
+          mkdir -p "$out"
+          uv run --frozen --no-dev sadlidp sync --force --data-dir "$out/data" --cache-dir "$RUNNER_TEMP/cache" | tee "$out/sync.log"
+          uv run --frozen --no-dev sadlidp build --data-dir "$out/data" --site-dir "$out/site"
+          uv run --frozen --no-dev sadlidp gate --data-dir "$out/data" | tee "$out/gate.log"
+          echo "Live preview of ${GITHUB_SHA::7} ($GITHUB_REF_NAME), $(date -u +%FT%TZ)" > "$out/README.md"
+
+      - name: Leak guard and stage
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          wt="$RUNNER_TEMP/preview"
+          git worktree add --detach "$wt"
+          git -C "$wt" checkout -q --orphan preview
+          git -C "$wt" rm -rfq .
+          cp -R "$RUNNER_TEMP/preview-src/." "$wt/"
+          git -C "$wt" add -A
+          uv run --frozen --no-dev sadlidp leakcheck --staged "$wt"
+          git -C "$wt" commit -qm "preview of ${GITHUB_SHA::7}"
+
+      # The token is only handed to git, never to the Python steps.
+      - name: Publish to the preview branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          git -C "$RUNNER_TEMP/preview" push -q --force
+          "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/preview

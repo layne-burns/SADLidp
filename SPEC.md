@@ -313,6 +313,15 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · Owner decisions closing Phase 1:** FantasyPros = free ECR only (D9 superseded; no FP credentials); The Odds API deferred past the MVP; ESPN projections through the owner's public IDP league 942104146 (§5.2), pending probe run 4.
 - **2026-10-12 · D18 added (owner request):** Vegas odds docketed for tier creation and analysis as Phase 5 (game lines from the nflverse schedule and/or Odds API props); polish moves to Phase 6.
 - **2026-10-12 · ESPN verified (probe run 4):** league 942104146 readable logged out; stat-id mapping recorded in §13; ESPN rows impute TFL and QB hits.
+- **2026-10-12 · Phase 2 (MVP) build notes:**
+  - *Stack:* the probe's stdlib HTTP client (per-host spacing, retries, deadline, circuit breakers) and dataclasses stand in for httpx and pydantic. selectolax waits for the first HTML source (Phase 3). §2 stays the target list.
+  - *Modules:* `consensus.py` is §3.2's `aggregate.py`. Added `pool.py` (§2 filters), `gate.py` (§4.3), `sigma.py` (σ_out, §6.7) and `positions.py` (D14).
+  - *Gate state:* windows already run are recorded in `data/<season>/gate.json` (not `run.json`), committed with the sync's data, so a failed run or push leaves the window open. The gate decides from the committed `league.json`. Sleeper league calls happen only once a window is due, or when no `league.json` exists yet.
+  - *Last fantasy week:* playoff_week_start + playoff weeks − 1, with ⌈log2 playoff_teams⌉ rounds. Any `playoff_round_type` other than 0 is read as two weeks per round, which can only make the season longer.
+  - *No usable source:* the page still publishes, with a banner, but the window stays open so the next slot retries.
+  - *Backfill:* runs inside every sync for this season's past weeks that have no Sleeper snapshot yet (rows marked `backfill: true`). There is no separate `sadlidp backfill` command.
+  - *No-projection players:* available players with no μ are shown as a count per position, not listed.
+  - *CI:* `ci.yml` adds a live preview on claude/** pushes. It runs a forced sync into a scratch directory and publishes it to the `preview` branch.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

@@ -1,0 +1,227 @@
+"""End-to-end, offline: run_sync over real (trimmed) Sleeper/nflverse fixtures, then build the site."""
+
+import copy
+import json
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+import pytest
+
+from sadlidp import cli
+from sadlidp.config import load_config
+from sadlidp.net import Response
+from sadlidp.positions import slot_of
+from sadlidp.schedule import NFLVERSE_GAMES, Schedule
+from sadlidp.site.build import build_site, latest_week_dir
+from sadlidp.sleeper import API, V1
+from sadlidp.sync import run_sync
+
+ROOT = Path(__file__).parents[2]
+FIXTURES = ROOT / "tests" / "fixtures"
+CFG = load_config(ROOT / "config" / "sadl.toml")
+NOW = datetime(2026, 10, 6, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: inside the week-5 pre-waiver window
+LEAGUE = json.loads((FIXTURES / "sleeper_league.json").read_text())
+LID = LEAGUE["league_id"]
+ROSTERS = json.loads((FIXTURES / "sleeper_rosters.json").read_text())
+ME = ROSTERS[0]["owner_id"]
+GAMES_CSV = (FIXTURES / "nflverse_games_2026.csv").read_text()
+SCHED = Schedule.from_csv(GAMES_CSV, 2026, {"LA": "LAR"})
+
+
+class FakeClient:
+    """Exact-URL routes (query ignored): dict/list -> JSON, str -> raw text, int -> HTTP status; else 404."""
+
+    def __init__(self, routes: dict):
+        self.routes, self.calls = routes, []
+
+    def get(self, url, **kw):
+        self.calls.append(url)
+        body = self.routes.get(url.split("?")[0], 404)
+        if isinstance(body, int):
+            return Response(url=url, final_url=url, status=body)
+        raw = body if isinstance(body, str) else json.dumps(body)
+        return Response(url=url, final_url=url, status=200, body=raw.encode())
+
+
+def _players_and_projections():
+    players = json.loads((FIXTURES / "sleeper_players_rostered.json").read_text())
+    proj = json.loads((FIXTURES / "sleeper_projections_week05_sample.json").read_text())
+    for r in proj:  # the sample's waiver players aren't in the rostered-players fixture
+        p = r["player"]
+        players.setdefault(
+            r["player_id"],
+            {
+                "full_name": f"{p['first_name']} {p['last_name']}",
+                "position": p["position"],
+                "fantasy_positions": p["fantasy_positions"],
+                "team": r["team"],
+                "status": "Active",
+                "active": True,
+                "injury_status": p["injury_status"],
+            },
+        )
+    players["4118"]["full_name"] = "Alex <i>Anzalone</i>"  # escaping check
+    # unrostered LBs with a game: z1 is absent from the source (counts as 0), z2 is a placeholder (missing)
+    z1 = {"full_name": "Zero Fill", "position": "LB", "fantasy_positions": ["LB"], "team": "NYJ", "status": "Active"}
+    players["z1"] = {**z1, "active": True, "injury_status": None}
+    players["z2"] = {**players["z1"], "full_name": "Place Holder"}
+    proj.append({"player_id": "z2", "week": 5, "team": "NYJ", "opponent": None, "stats": {}})
+    template = next(r for r in proj if r["player_id"] == "11017")
+    for pid in ROSTERS[0]["players"]:  # weak projections for my IDPs that the sample lacks
+        p = players.get(pid, {})
+        opp = SCHED.opponent(p.get("team"), 5)
+        if slot_of(p) and opp and not any(r["player_id"] == pid for r in proj):
+            row = copy.deepcopy(template)
+            row.update(player_id=pid, team=p["team"], opponent=opp.lstrip("@"))
+            row["stats"] = {"gp": 1.0, "idp_tkl_solo": 1.0, "idp_tkl_ast": 1.0, "idp_tkl": 2.0}
+            proj.append(row)
+    return players, proj
+
+
+def routes(season_type="regular", proj_status=None):
+    players, proj = _players_and_projections()
+    truth = json.loads((FIXTURES / "sleeper_week04_ground_truth.json").read_text())
+    return {
+        f"{V1}/state/nfl": {"season": "2026", "season_type": season_type, "week": 5, "display_week": 5},
+        NFLVERSE_GAMES: GAMES_CSV,
+        f"{V1}/user/lbburnsy": {"user_id": ME},
+        f"{V1}/user/{ME}/leagues/nfl/2026": [LEAGUE, {**LEAGUE, "league_id": "other", "name": "Another league"}],
+        f"{V1}/league/{LID}": LEAGUE,
+        f"{V1}/league/{LID}/rosters": ROSTERS,
+        f"{V1}/league/{LID}/matchups/5": [],
+        f"{V1}/players/nfl": players,
+        f"{API}/projections/nfl/2026/5": proj_status or proj,
+        f"{V1}/stats/nfl/regular/2026/4": truth["stats"],
+    }
+
+
+@pytest.fixture
+def synced(tmp_path):
+    data, cache = tmp_path / "data", tmp_path / "cache"
+    client = FakeClient(routes())
+    out = run_sync(CFG, data_dir=data, cache_dir=cache, now=NOW, client=client, log=lambda m: None)
+    return out, data, cache, client
+
+
+def test_gated_sync_writes_the_week(synced):
+    out, data, _, _ = synced
+    assert out.synced and (out.season, out.week, out.window) == (2026, 5, "2026-w05-prewaiver")
+    week = data / "2026" / "week05"
+    for name in ("consensus.json", "run.json", "rosters.json", "players_idp.json", "sources/sleeper_proj.json"):
+        assert (week / name).exists(), name
+    assert json.loads((data / "2026" / "gate.json").read_text()) == {"windows_done": ["2026-w05-prewaiver"]}
+    league = json.loads((data / "2026" / "league.json").read_text())
+    assert league["user_id"] == ME and league["settings"]["waiver_day_of_week"] == 2
+    run = json.loads((week / "run.json").read_text())
+    assert run["backfilled"] == [] and run["window"] == "2026-w05-prewaiver"  # offline: no past projections
+    actuals = json.loads((data / "2026" / "week04" / "actuals.json").read_text())
+    assert actuals["week"] == 4 and len(actuals["stats"]) > 50
+    assert any("σ_out" in w for w in out.warnings)  # no 2025 stats offline: config defaults
+
+
+def test_site_data_tiers_and_my_idps(synced):
+    _, data, _, _ = synced
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    assert d["week"] == 5 and d["league"] == {
+        "name": "Slow Ass Draft League",
+        "waiver_type": "FAAB",
+        "limits": {"DL": 2, "LB": 2, "DB": 2},
+    }
+    rostered = {pid for r in ROSTERS for k in ("players", "reserve", "taxi") for pid in r.get(k) or []}
+    for slot, pos in d["positions"].items():
+        cards = [p for t in pos["tiers"] for p in t["players"]]
+        assert cards, slot
+        assert not {p["id"] for p in cards} & rostered
+        assert [p["mu"] for p in cards] == sorted((p["mu"] for p in cards), reverse=True)
+        assert all(p["slot"] == slot and p["n"] == 1 and p["sigma"] == 1.0 for p in cards)
+        assert [t["tier"] for t in pos["tiers"]] == list(range(1, len(pos["tiers"]) + 1))
+    lb_cards = [p for t in d["positions"]["LB"]["tiers"] for p in t["players"]]
+    assert (lb_cards[-1]["id"], lb_cards[-1]["mu"]) == ("z1", 0.0)  # §6.4: a complete source's silence = 0
+    assert "z2" not in {p["id"] for p in lb_cards} and d["positions"]["LB"]["no_projection"] == 1
+    assert d["positions"]["LB"]["tier_count"] == lb_cards[-1]["tier"]
+    lb = d["my_idps"]["LB"]
+    assert lb["count"] == 2 and {p["name"] for p in lb["players"]} == {"Cedric Gray", "Carson Schwesinger"}
+    assert lb["suggestions"][0]["badge"] == "START" and lb["suggestions"][0]["action"] == "add_drop"
+    assert lb["suggestions"][0]["drop"] in lb["names"]
+    db = d["my_idps"]["DB"]  # Tykee Smith (12.0) starts; weak Lassiter is the upgrade target
+    assert {s["badge"] for s in db["suggestions"]} == {"UPGRADE"}
+    assert {db["names"][s["drop"]] for s in db["suggestions"]} == {"Kamari Lassiter"}
+    text = (data / "2026" / "week05" / "consensus.json").read_text()
+    assert "idp_tkl" not in text  # per-source values never reach the site data
+
+
+def test_gate_runs_a_window_once_and_force_overrides(synced):
+    _, data, cache, _ = synced
+    client = FakeClient(routes())
+    again = run_sync(
+        CFG, data_dir=data, cache_dir=cache, now=NOW + timedelta(hours=1), client=client, log=lambda m: None
+    )
+    assert not again.synced and again.reason == "no gate window due"
+    assert not any("/league/" in url or "/user/" in url for url in client.calls)  # gate read league.json
+    forced = run_sync(CFG, data, cache, NOW + timedelta(hours=1), force=True, client=client, log=lambda m: None)
+    assert forced.synced and forced.window is None
+    assert json.loads((data / "2026" / "gate.json").read_text()) == {"windows_done": ["2026-w05-prewaiver"]}
+
+
+def test_failed_source_keeps_earlier_rows(synced):
+    _, data, cache, _ = synced
+    out = run_sync(CFG, data, cache, NOW + timedelta(hours=1), force=True, client=FakeClient(routes(proj_status=503)))
+    assert any(w.startswith("sleeper_proj: failed (HTTP 503)") for w in out.warnings)
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    assert d["positions"]["LB"]["tiers"] and d["sources"]["sleeper_proj"]["rows_used"] > 0
+
+
+def test_no_usable_source_keeps_the_window_open(tmp_path):
+    out = run_sync(
+        CFG, tmp_path / "d", tmp_path / "c", NOW, client=FakeClient(routes(proj_status=404)), log=lambda m: None
+    )
+    assert out.synced and out.window == "2026-w05-prewaiver"
+    assert any(w.startswith("no source has usable rows") for w in out.warnings)
+    assert not (tmp_path / "d" / "2026" / "gate.json").exists()  # the next slot in the window retries
+
+
+def test_backfill_writes_past_weeks_once(tmp_path):
+    r = routes()
+    week4 = [{**row, "week": 4} for row in r[f"{API}/projections/nfl/2026/5"][:5]]
+    client = FakeClient({**r, f"{API}/projections/nfl/2026/4": week4})
+    run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
+    run = json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())
+    assert run["backfilled"] == [4]
+    src = json.loads((tmp_path / "d" / "2026" / "week04" / "sources" / "sleeper_proj.json").read_text())
+    assert src["week"] == 4 and len(src["rows"]) == 5 and all(row["backfill"] for row in src["rows"].values())
+    run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
+    assert json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())["backfilled"] == []
+
+
+def test_off_season_stops_before_league_calls(tmp_path):
+    client = FakeClient(routes(season_type="off"))
+    out = run_sync(CFG, tmp_path / "data", tmp_path / "cache", NOW, client=client, log=lambda m: None)
+    assert not out.synced and out.reason.startswith("off-season")
+    assert not any("/league/" in url or "/user/" in url for url in client.calls)
+
+
+def test_build_site_renders_the_latest_week(synced, tmp_path):
+    _, data, _, _ = synced
+    assert latest_week_dir(data) == data / "2026" / "week05"
+    index = build_site(data, tmp_path / "site")
+    html = index.read_text()
+    assert "Week 5" in html and "My IDPs" in html and "START" in html and "UPGRADE" in html
+    assert "Alex &lt;i&gt;Anzalone&lt;/i&gt;" in html and "<i>Anzalone" not in html
+    assert "drop Kamari Lassiter" in html and "1 available LB has no projection" in html
+    site = index.parent
+    assert json.loads((site / "data.json").read_text()) == json.loads((data / "2026/week05/consensus.json").read_text())
+    assert (site / ".nojekyll").exists()
+
+
+def test_cli_sync_build_and_leakcheck(tmp_path, monkeypatch, capsys):
+    out_file = tmp_path / "gh_output"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(out_file))
+    monkeypatch.setattr("sadlidp.sync.Client", lambda: FakeClient(routes()))
+    data, site = str(tmp_path / "data"), str(tmp_path / "site")
+    cfg = str(ROOT / "config" / "sadl.toml")
+    args = ["--config", cfg, "--data-dir", data, "--cache-dir", str(tmp_path / "c"), "--now", NOW.isoformat()]
+    assert cli.main(["sync", *args]) == 0
+    assert out_file.read_text() == "synced=true\nseason=2026\nweek=5\nwindow=2026-w05-prewaiver\n"
+    assert cli.main(["build", "--data-dir", data, "--site-dir", site]) == 0
+    assert cli.main(["leakcheck", data, site]) == 0
+    assert "0 hits" in capsys.readouterr().out

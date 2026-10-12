@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SADL IDP Streamer</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+  --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
+    --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 18px; }
+h1 { font-size: 1.35rem; margin: 0 0 2px; }
+h2 { font-size: 1.1rem; margin: 22px 0 8px; }
+h3 { font-size: 1rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.meta, .count, .sub, small, .note, .hidden-note { color: var(--muted); }
+.count { font-size: .85rem; font-weight: normal; }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.card, .slot { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.name { font-weight: 600; }
+.sub { font-size: .85rem; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pts small { font-weight: normal; margin-left: 2px; }
+.tag, .chip { display: inline-block; font-size: .72rem; border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+  border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.tag.q { color: var(--warn); border-color: var(--warn); }
+.tag.bad { color: var(--bad); border-color: var(--bad); }
+.chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
+.chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
+.sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabpanel { display: none; margin-top: 12px; }
+{% for slot in slots %}#tab-{{ slot }}:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-{{ slot }}:checked ~ #panel-{{ slot }} { display: block; }
+{% endfor %}
+.tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+footer { padding-bottom: 30px; font-size: .85rem; }
+a { color: var(--accent); }
+</style>
+</head>
+<body>
+{%- macro opp(p) -%}{% if p.opp %}{% if p.opp.startswith('@') %}@ {{ p.opp[1:] }}{% else %}vs {{ p.opp }}{% endif %}{% endif %}{%- endmacro %}
+{%- macro tags(p) -%}
+{% for a in p.also %}<span class="tag">also {{ a }}</span>{% endfor %}
+{% if 'Q' in p.flags %}<span class="tag q">Q</span>{% endif %}
+{% for f in p.flags if f != 'Q' %}<span class="tag q">{{ f }}</span>{% endfor %}
+{% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
+{%- endmacro %}
+{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% else %}<small>no projection</small>{% endif %}{%- endmacro %}
+<header>
+  <h1>SADL IDP streamer</h1>
+  <p class="meta">{{ d.league.name }} · Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
+  <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
+  {% for w in d.warnings %}<p class="banner">{{ w }}</p>{% endfor %}
+</header>
+<main>
+  <section aria-labelledby="my-h">
+    <h2 id="my-h">My IDPs</h2>
+    {% for slot in slots %}{% set m = d.my_idps[slot] %}
+    <div class="slot">
+      <h3>{{ slot }} <span class="count">{{ m.count }}/{{ m.limit }} rostered</span></h3>
+      <ul>
+        {% for p in m.players %}
+        <li class="row">
+          <div><span class="name">{{ p.name }}</span>
+            {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
+            {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
+            {{ tags(p) }}
+            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }} · {{ p.tier|tier(d.positions[slot].tier_count) }}</div></div>
+          <div class="pts">{{ pts(p) }}</div>
+        </li>
+        {% else %}<li class="row"><span class="sub">No {{ slot }} rostered</span></li>{% endfor %}
+      </ul>
+      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so there are no START suggestions.</p>{% endif %}
+      {% for s in m.suggestions %}
+      <div class="sugg">
+        <span class="chip {{ s.badge|lower }}">{{ s.badge }}</span>
+        <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
+        · {{ '%.1f'|format(s.player.mu) }} pts{% if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}{% else %}; you have no playable {{ slot }} this week{% endif %}.
+        <div class="sub">{{ action(s, m.names) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="tiers-h">
+    <h2 id="tiers-h">Streaming tiers (available players)</h2>
+    <div class="tabs">
+      {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
+      {% for slot in slots %}{% set pos = d.positions[slot] %}
+      <div class="tabpanel" id="panel-{{ slot }}">
+        {% for t in pos.tiers %}
+        <div class="card">
+          <p class="tierhead">Tier {{ t.tier }}</p>
+          <ul>
+            {% for p in t.players %}
+            <li class="row">
+              <div><span class="name">{{ p.name }}</span>
+                {% if p.badge %}<span class="chip {{ p.badge.badge|lower }}">{{ p.badge.badge }}</span>{% endif %}
+                {{ tags(p) }}
+                <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
+              <div class="pts">{{ pts(p) }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% else %}<p class="note">No available {{ slot }} with a projection this week.</p>{% endfor %}
+        {% if pos.hidden > 0 %}<p class="hidden-note">{{ pos.hidden }} more available {{ slot }} not shown.</p>{% endif %}
+        {% if pos.no_projection > 0 %}<p class="hidden-note">{{ pos.no_projection }} available {{ slot }} {{ 'has' if pos.no_projection == 1 else 'have' }} no projection this week.</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+<footer>
+  <h2>Sources</h2>
+  <table>
+    <tr><th>Source</th><th>Status</th><th>Players</th><th>Last success</th></tr>
+    {% for name, s in d.sources.items() %}
+    <tr><td>{{ name }}</td><td>{{ s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
+      <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
+      <td>{{ s.last_success|et }}</td></tr>
+    {% endfor %}
+  </table>
+  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
+  Tiers group players statistically indistinguishable from each tier's best. <a href="data.json">data.json</a></p>
+</footer>
+<script>
+(function () {
+  var t = document.getElementById("asof");
+  var age = (Date.now() - Date.parse(t.getAttribute("datetime"))) / 36e5;
+  if (age > 36) document.getElementById("stale").hidden = false;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+name: sync
+
+# The SADL IDP sync (SPEC.md §3.1, §4.3). The schedule only wakes the Python gate, which syncs when a
+# window is due (pre-waiver, Saturday, Sunday morning). "Run workflow" is the sync button: it always
+# syncs. Commits made with GITHUB_TOKEN don't retrigger workflows. A failed sync deploys nothing, so
+# the last good site stays live.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"
+    - cron: "17 10,11,13,14,16 * * 0" # with the line above: hourly Sunday slots 09:17-16:17 UTC
+
+permissions: {}
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      synced: ${{ steps.sync.outputs.synced }}
+    steps:
+      # ref: main checks out the tip at this moment, so the gate sees a window a queued run just recorded.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Date in New York
+        id: day
+        run: echo "day=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
+
+      # Only Sleeper's public players DB lives here, fetched at most once per New York day (SPEC §4.1).
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: sleeper-players-${{ steps.day.outputs.day }}
+
+      - name: Sync
+        id: sync
+        env:
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
+        run: uv run --frozen --no-dev sadlidp sync $FORCE
+
+      - name: Build site
+        if: steps.sync.outputs.synced == 'true'
+        run: uv run --frozen --no-dev sadlidp build
+
+      - name: Leak guard and commit
+        if: steps.sync.outputs.synced == 'true'
+        env:
+          MSG: "sync: ${{ steps.sync.outputs.season }} week ${{ steps.sync.outputs.week }} (${{ steps.sync.outputs.window }})"
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          uv run --frozen --no-dev sadlidp leakcheck --staged .
+          uv run --frozen --no-dev sadlidp leakcheck site
+          if git diff --cached --quiet; then echo "no data changes"; else git commit -qm "$MSG"; fi
+
+      # The token is only handed to git, never to the Python steps.
+      - name: Push data to main
+        if: steps.sync.outputs.synced == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          for attempt in 1 2 3; do
+            if git push -q "$remote" HEAD:refs/heads/main; then exit 0; fi
+            echo "push rejected (attempt $attempt); rebasing onto the new main"
+            git fetch -q "$remote" main
+            git rebase -q FETCH_HEAD || { git rebase --abort; echo "rebase conflict" >&2; exit 1; }
+          done
+          echo "could not push after 3 attempts" >&2
+          exit 1
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.sync.outputs.synced == 'true'
+        with:
+          path: site
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.synced == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

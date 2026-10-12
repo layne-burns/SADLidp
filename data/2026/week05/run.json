@@ -1,7 +1,7 @@
 {
  "actuals_written": [],
  "backfilled": {},
- "generated_at": "2026-10-12T15:23:07-04:00",
+ "generated_at": "2026-10-12T16:07:28-04:00",
  "impute_priors": 2025,
  "schedule": "nflverse",
  "season": 2026,
@@ -13,10 +13,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -93,10 +93,10 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -116,10 +116,10 @@
   "fp_ecr": {
    "censored": 12,
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "mapped": 34,
    "merge": {
     "added": 0,
@@ -183,10 +183,10 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T15:23:07-04:00",
+ "generated_at": "2026-10-12T16:07:28-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -11724,10 +11724,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "match": {
     "names": [
      "Jeremiah Moon CAR DL",
@@ -11757,10 +11757,10 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -11780,10 +11780,10 @@
   "fp_ecr": {
    "censored": 12,
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "mapped": 34,
    "match": {
     "names": [],
@@ -11809,10 +11809,10 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:23:07-04:00",
+   "fetched_at": "2026-10-12T16:07:28-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-12T15:23:07-04:00",
+   "last_success": "2026-10-12T16:07:28-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,

@@ -395,3 +395,31 @@ def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
     sugg = next(s for s in w5["my_idps"]["LB"]["suggestions"] if s["player"]["id"] == "4118")
     assert sugg["outcome"] == "void"  # Cedric Gray has no stat line in this fixture
     assert "looking at a past week" not in (site / "index.html").read_text()
+
+
+def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
+    from sadlidp.replay import replay_week
+
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # league + schedule
+    truth = json.loads((FIXTURES / "sleeper_week04_ground_truth.json").read_text())
+    players, proj = _players_and_projections()
+    week4 = data / "2026" / "week04" / "sources" / "sleeper_proj.json"
+    rows = {r["player_id"]: {"stats": r["stats"], "team": r["team"], "opponent": r["opponent"], "backfill": True}
+            for r in proj if r.get("opponent")}  # fmt: skip
+    storage_rows = {"rows": rows, "no_projection_ids": ["z2"], "source": "sleeper_proj", "week": 4}
+    week4.parent.mkdir(parents=True, exist_ok=True)
+    week4.write_text(json.dumps(storage_rows))
+    out = replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None)
+    d = json.loads(out.read_text())
+    assert d["week"] == 4 and d["replayed"]["as_of"] == "2026-10-01T20:14:00-04:00"  # just before week 4's TNF
+    rostered = {p for m in truth["matchups"] for p in m["players"]}
+    tiered = {p["id"] for s in d["positions"].values() for t in s["tiers"] for p in t["players"]}
+    assert tiered and not tiered & rostered  # availability from that week's rosters
+    assert "z2" not in tiered  # a placeholder stays "no projection"
+    mine = next(m for m in truth["matchups"] if m["roster_id"] == ROSTERS[0]["roster_id"])
+    my_ids = {p["id"] for s in d["my_idps"].values() for p in s["players"]}
+    assert my_ids <= set(mine["players"]) and my_ids
+    html = build_site(data, tmp_path / "site").read_text()  # index = week 5; week 4 page rebuilt
+    page = (tmp_path / "site" / "week-2026-04.html").read_text()
+    assert "Rebuilt after the fact" in page and "as they stood at the week" not in page and "week-2026-04.html" in html

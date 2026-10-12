@@ -89,7 +89,8 @@ a { color: var(--accent); }
   <h1>SADL IDP streamer</h1>
   <p class="meta">{{ d.league.name }} · Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
   {% if nav and nav|length > 1 %}<nav class="weeks" aria-label="Weeks">{% for n in nav %}<a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here" aria-current="page"{% endif %}>Week {{ n.week }}{% if n.latest %} · now{% endif %}</a>{% endfor %}</nav>{% endif %}
-  {% if not latest %}<p class="pastweek">You're looking at a past week. {% if final %}{% if final.provisional %}Scores are provisional (stat corrections still possible).{% else %}All scores are final.{% endif %}{% else %}Final stats weren't captured for this week, so scores are as of the last sync.{% endif %} Suggestions and tiers are as they stood at the week's last sync.</p>{% endif %}
+  {% if d.replayed %}<p class="pastweek">{{ d.replayed.note }}</p>{% endif %}
+  {% if not latest %}<p class="pastweek">You're looking at a past week. {% if final %}{% if final.provisional %}Scores are provisional (stat corrections still possible).{% else %}All scores are final.{% endif %}{% else %}Final stats weren't captured for this week, so scores are as of the last sync.{% endif %}{% if not d.replayed %} Suggestions and tiers are as they stood at the week's last sync.{% endif %}</p>{% endif %}
   <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
   {% for w in d.warnings %}<p class="banner">{{ w }}</p>{% endfor %}
   {% if d.last_week and d.last_week.summary.decided %}<p class="meta"><a href="#lw-h">Last week: {{ d.last_week.summary.hits }} of {{ d.last_week.summary.decided }} suggestions paid off ↓</a></p>{% endif %}

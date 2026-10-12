@@ -1,8 +1,8 @@
 {
  "dead_hosts": [],
- "generated_at": "2026-10-12T05:37:33.959975+00:00",
+ "generated_at": "2026-10-12T05:40:14.400305+00:00",
  "probe_version": 2,
- "request_count": 52,
+ "request_count": 53,
  "sections": {
   "crosswalk": {
    "bytes": 2639486,
@@ -56,20 +56,316 @@
   },
   "espn_api": {
    "by_ids": {
-    "bytes": 284,
+    "bytes": 572570,
+    "content_type": "application/json;charset=utf-8",
+    "error": null,
+    "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info",
+    "key_paths": [
+     "$: object",
+     "players[]: array",
+     "players[].draftAuctionValue: int",
+     "players[].droppedByEliminatedTeam: bool",
+     "players[].id: int",
+     "players[].keeperValue: int",
+     "players[].keeperValueFuture: int",
+     "players[].lineupLocked: bool",
+     "players[].onTeamId: int",
+     "players[].player: object",
+     "players[].player.active: bool",
+     "players[].player.defaultPositionId: int",
+     "players[].player.draftRanksByRankType: object",
+     "players[].player.draftRanksByRankType.ELIMINATION: object",
+     "players[].player.draftRanksByRankType.PPR: object",
+     "players[].player.draftRanksByRankType.STANDARD: object",
+     "players[].player.draftRanksByRankType.SUPERFLEX: object",
+     "players[].player.droppable: bool",
+     "players[].player.eligibleSlots[]: array",
+     "players[].player.firstName: str",
+     "players[].player.fullName: str",
+     "players[].player.id: int",
+     "players[].player.injured: bool",
+     "players[].player.injuryStatus: str",
+     "players[].player.jersey: str",
+     "players[].player.lastName: str",
+     "players[].player.lastNewsDate: int",
+     "players[].player.lastVideoDate: int",
+     "players[].player.outlooks: object",
+     "players[].player.outlooks.outlooksByWeek: object",
+     "players[].player.ownership: object",
+     "players[].player.ownership.activityLevel: NoneType",
+     "players[].player.ownership.auctionValueAverage: float",
+     "players[].player.ownership.auctionValueAverageChange: float",
+     "players[].player.ownership.averageDraftPosition: float",
+     "players[].player.ownership.averageDraftPositionPercentChange: float",
+     "players[].player.ownership.date: int",
+     "players[].player.ownership.leagueType: int",
+     "players[].player.ownership.percentChange: float",
+     "players[].player.ownership.percentOwned: float",
+     "players[].player.ownership.percentStarted: float",
+     "players[].player.proTeamId: int",
+     "players[].player.rankings: object",
+     "players[].player.rankings.0[]: array",
+     "players[].player.rankings.1[]: array",
+     "players[].player.rankings.2[]: array",
+     "players[].player.rankings.3[]: array",
+     "players[].player.rankings.4[]: array",
+     "players[].player.rankings.5[]: array",
+     "players[].player.seasonOutlook: str",
+     "players[].player.stats[]: array",
+     "players[].ratings: object",
+     "players[].ratings.0: object",
+     "players[].ratings.0.positionalRanking: int",
+     "players[].ratings.0.totalRanking: int",
+     "players[].ratings.0.totalRating: float",
+     "players[].rosterLocked: bool",
+     "players[].status: str",
+     "players[].tradeLocked: bool",
+     "players[].waiverProcessDate: int"
+    ],
+    "shape": {
+     "default_position_ids": {
+      "1": 13,
+      "2": 7,
+      "3": 13,
+      "4": 10,
+      "5": 6
+     },
+     "players": 49,
+     "players_with_week_projection": 47,
+     "prior_week_actual_stat_ids": {
+      "0": 12,
+      "1": 12,
+      "10": 11,
+      "11": 11,
+      "13": 11,
+      "155": 23,
+      "156": 17,
+      "158": 23,
+      "2": 12,
+      "21": 12,
+      "210": 40,
+      "211": 12,
+      "212": 11,
+      "213": 18,
+      "22": 12,
+      "23": 13,
+      "24": 12,
+      "27": 12,
+      "28": 10,
+      "3": 12,
+      "39": 12,
+      "4": 10,
+      "40": 12,
+      "41": 22,
+      "42": 22,
+      "47": 21,
+      "48": 17,
+      "49": 13,
+      "5": 12,
+      "50": 13,
+      "53": 22,
+      "58": 22,
+      "59": 21,
+      "6": 12,
+      "60": 22,
+      "61": 22,
+      "64": 11,
+      "7": 12,
+      "8": 12,
+      "9": 11
+     },
+     "projection_stat_ids": {
+      "0": 10,
+      "1": 10,
+      "210": 38,
+      "212": 17,
+      "213": 22,
+      "23": 17,
+      "24": 17,
+      "25": 17,
+      "26": 17,
+      "27": 13,
+      "35": 17,
+      "36": 17,
+      "37": 17,
+      "38": 17,
+      "39": 17,
+      "40": 17,
+      "42": 22,
+      "43": 22,
+      "44": 22,
+      "45": 22,
+      "46": 22,
+      "47": 22,
+      "48": 21,
+      "49": 19,
+      "50": 18,
+      "53": 22,
+      "56": 22,
+      "57": 22,
+      "58": 22,
+      "60": 22,
+      "61": 22,
+      "62": 32,
+      "63": 32,
+      "66": 17,
+      "67": 22,
+      "68": 32,
+      "70": 17,
+      "71": 22,
+      "72": 32,
+      "73": 32
+     }
+    },
+    "status": 200,
+    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info"
+   },
+   "by_ids_scoring_period": {
+    "bytes": 572570,
     "content_type": "application/json;charset=utf-8",
     "error": null,
     "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
-    "status": 400,
+    "shape": {
+     "default_position_ids": {
+      "1": 13,
+      "2": 7,
+      "3": 13,
+      "4": 10,
+      "5": 6
+     },
+     "players": 49,
+     "players_with_week_projection": 47,
+     "prior_week_actual_stat_ids": {
+      "0": 12,
+      "1": 12,
+      "10": 11,
+      "11": 11,
+      "13": 11,
+      "155": 23,
+      "156": 17,
+      "158": 23,
+      "2": 12,
+      "21": 12,
+      "210": 40,
+      "211": 12,
+      "212": 11,
+      "213": 18,
+      "22": 12,
+      "23": 13,
+      "24": 12,
+      "27": 12,
+      "28": 10,
+      "3": 12,
+      "39": 12,
+      "4": 10,
+      "40": 12,
+      "41": 22,
+      "42": 22,
+      "47": 21,
+      "48": 17,
+      "49": 13,
+      "5": 12,
+      "50": 13,
+      "53": 22,
+      "58": 22,
+      "59": 21,
+      "6": 12,
+      "60": 22,
+      "61": 22,
+      "64": 11,
+      "7": 12,
+      "8": 12,
+      "9": 11
+     },
+     "projection_stat_ids": {
+      "0": 10,
+      "1": 10,
+      "210": 38,
+      "212": 17,
+      "213": 22,
+      "23": 17,
+      "24": 17,
+      "25": 17,
+      "26": 17,
+      "27": 13,
+      "35": 17,
+      "36": 17,
+      "37": 17,
+      "38": 17,
+      "39": 17,
+      "40": 17,
+      "42": 22,
+      "43": 22,
+      "44": 22,
+      "45": 22,
+      "46": 22,
+      "47": 22,
+      "48": 21,
+      "49": 19,
+      "50": 18,
+      "53": 22,
+      "56": 22,
+      "57": 22,
+      "58": 22,
+      "60": 22,
+      "61": 22,
+      "62": 32,
+      "63": 32,
+      "66": 17,
+      "67": 22,
+      "68": 32,
+      "70": 17,
+      "71": 22,
+      "72": 32,
+      "73": 32
+     }
+    },
+    "status": 200,
     "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
    },
-   "by_slots": {
-    "bytes": 284,
+   "control_run1": {
+    "bytes": 11376,
     "content_type": "application/json;charset=utf-8",
     "error": null,
-    "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
-    "status": 400,
-    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
+    "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info",
+    "shape": {
+     "default_position_ids": {
+      "3": 1
+     },
+     "players": 1,
+     "players_with_week_projection": 1,
+     "prior_week_actual_stat_ids": {
+      "107": 1,
+      "108": 1,
+      "109": 1,
+      "110": 1,
+      "113": 1,
+      "155": 1,
+      "210": 1
+     },
+     "projection_stat_ids": {
+      "100": 1,
+      "103": 1,
+      "104": 1,
+      "105": 1,
+      "106": 1,
+      "107": 1,
+      "108": 1,
+      "109": 1,
+      "110": 1,
+      "112": 1,
+      "113": 1,
+      "93": 1,
+      "94": 1,
+      "95": 1,
+      "96": 1,
+      "97": 1,
+      "98": 1,
+      "99": 1
+     }
+    },
+    "status": 200,
+    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info"
    },
    "ids_requested": 60,
    "week_used": 5
@@ -131,7 +427,7 @@
    "pages": {
     "projections_db": {
      "public": {
-      "bytes": 308628,
+      "bytes": 308478,
       "error": null,
       "final_path": "/nfl/projections/db.php",
       "markers": {
@@ -296,7 +592,7 @@
     },
     "rankings_db": {
      "public": {
-      "bytes": 559550,
+      "bytes": 559400,
       "ecrData": {
        "player_keys": [
         "note",
@@ -385,7 +681,7 @@
     },
     "rankings_dl": {
      "public": {
-      "bytes": 606350,
+      "bytes": 606200,
       "ecrData": {
        "player_keys": [
         "note",
@@ -561,7 +857,7 @@
     },
     "rankings_lb": {
      "public": {
-      "bytes": 567363,
+      "bytes": 567213,
       "ecrData": {
        "player_keys": [
         "note",
@@ -1553,7 +1849,7 @@
    "season_games": 272,
    "settled_week": 4,
    "source": {
-    "bytes": 2184052,
+    "bytes": 2184053,
     "content_type": "text/plain; charset=utf-8",
     "error": null,
     "final_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -2127,11 +2423,11 @@
       ],
       "in_reserve": false,
       "in_taxi": false,
-      "name": "Dallas Turner",
-      "player_id": "11667",
-      "position": "LB",
+      "name": "Danielle Hunter",
+      "player_id": "2393",
+      "position": "DE",
       "roster_id": 2,
-      "team": "MIN"
+      "team": "HOU"
      },
      {
       "fantasy_positions": [
@@ -2140,11 +2436,11 @@
       ],
       "in_reserve": false,
       "in_taxi": false,
-      "name": "Danielle Hunter",
-      "player_id": "2393",
-      "position": "DE",
+      "name": "Dallas Turner",
+      "player_id": "11667",
+      "position": "LB",
       "roster_id": 2,
-      "team": "HOU"
+      "team": "MIN"
      },
      {
       "fantasy_positions": [
@@ -2346,19 +2642,6 @@
        "DL",
        "LB"
       ],
-      "in_reserve": false,
-      "in_taxi": false,
-      "name": "Boye Mafe",
-      "player_id": "8343",
-      "position": "DL",
-      "roster_id": 12,
-      "team": "CIN"
-     },
-     {
-      "fantasy_positions": [
-       "DL",
-       "LB"
-      ],
       "in_reserve": true,
       "in_taxi": false,
       "name": "Micah Parsons",
@@ -2366,6 +2649,19 @@
       "position": "LB",
       "roster_id": 12,
       "team": "GB"
+     },
+     {
+      "fantasy_positions": [
+       "DL",
+       "LB"
+      ],
+      "in_reserve": false,
+      "in_taxi": false,
+      "name": "Boye Mafe",
+      "player_id": "8343",
+      "position": "DL",
+      "roster_id": 12,
+      "team": "CIN"
      }
     ],
     "dual_fantasy_positions_orderings": {
@@ -7988,10 +8284,10 @@
    "requests": [
     {
      "bytes": 211,
-     "elapsed_s": 0.09,
+     "elapsed_s": 0.12,
      "error": null,
      "headers": {
-      "age": "28",
+      "age": "9",
       "cache-control": "public, s-maxage=60, stale-while-revalidate=180, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
@@ -8007,11 +8303,11 @@
      "elapsed_s": 2.05,
      "error": null,
      "headers": {
-      "age": "568",
+      "age": "129",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=300, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
-      "etag": "W/\"0ceb2bdd14cf921bad9c189a587ca05f\"",
+      "etag": "W/\"00c6e67266a1be2752a9150826769d20\"",
       "server": "cloudflare"
      },
      "label": "players_db",
@@ -8020,7 +8316,7 @@
     },
     {
      "bytes": 413,
-     "elapsed_s": 1.79,
+     "elapsed_s": 1.84,
      "error": null,
      "headers": {
       "cache-control": "public, s-maxage=120, stale-while-revalidate=600, stale-if-error=900",
@@ -8035,11 +8331,12 @@
     },
     {
      "bytes": 8684,
-     "elapsed_s": 2.05,
+     "elapsed_s": 1.9,
      "error": null,
      "headers": {
+      "age": "161",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"78be01ef1028b83851f10cce3e1c34f1\"",
       "server": "cloudflare"
@@ -8050,11 +8347,12 @@
     },
     {
      "bytes": 3003,
-     "elapsed_s": 1.99,
+     "elapsed_s": 2.0,
      "error": null,
      "headers": {
+      "age": "161",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"3c7c1d905c1216cc35cfbd01ca67a9c5\"",
       "server": "cloudflare"
@@ -8065,11 +8363,12 @@
     },
     {
      "bytes": 9608,
-     "elapsed_s": 1.96,
+     "elapsed_s": 2.03,
      "error": null,
      "headers": {
+      "age": "161",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"d101f0c5dc149cd2ac9ad2156b3ca537\"",
       "server": "cloudflare"
@@ -8080,7 +8379,7 @@
     },
     {
      "bytes": 10601,
-     "elapsed_s": 2.14,
+     "elapsed_s": 2.07,
      "error": null,
      "headers": {
       "cache-control": "public, s-maxage=60, stale-while-revalidate=300, stale-if-error=600",
@@ -8095,12 +8394,12 @@
     },
     {
      "bytes": 585518,
-     "elapsed_s": 1.78,
+     "elapsed_s": 1.89,
      "error": null,
      "headers": {
-      "age": "450",
+      "age": "611",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "HIT",
+      "cf-cache-status": "UPDATING",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"cf0796b9f56579b86bf37902c00f3b43\"",
       "server": "cloudflare"
@@ -8111,11 +8410,12 @@
     },
     {
      "bytes": 957255,
-     "elapsed_s": 0.33,
+     "elapsed_s": 0.08,
      "error": null,
      "headers": {
+      "age": "160",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"5e78ba82cfdb494b212f549e252f89bb\"",
       "server": "cloudflare"
@@ -8126,11 +8426,12 @@
     },
     {
      "bytes": 267803,
-     "elapsed_s": 1.84,
+     "elapsed_s": 1.95,
      "error": null,
      "headers": {
+      "age": "161",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"7ff081280dbbb0e3208b224b709910d4\"",
       "server": "cloudflare"
@@ -8141,11 +8442,12 @@
     },
     {
      "bytes": 72081,
-     "elapsed_s": 0.13,
+     "elapsed_s": 0.08,
      "error": null,
      "headers": {
+      "age": "160",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"a679478f3e1d4a547bdc37c6dc2efed4\"",
       "server": "cloudflare"
@@ -8156,11 +8458,12 @@
     },
     {
      "bytes": 3900,
-     "elapsed_s": 2.01,
+     "elapsed_s": 1.97,
      "error": null,
      "headers": {
+      "age": "160",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"803ec15a2adc455db76814f844caa632\"",
       "server": "cloudflare"
@@ -8174,8 +8477,9 @@
      "elapsed_s": 2.0,
      "error": null,
      "headers": {
+      "age": "160",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"25a8096d5f80a4cc9ef2402c720d74bd\"",
       "server": "cloudflare"
@@ -8186,11 +8490,12 @@
     },
     {
      "bytes": 13766,
-     "elapsed_s": 1.96,
+     "elapsed_s": 2.04,
      "error": null,
      "headers": {
+      "age": "160",
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"4cdb154a42bcc03ff03e40313572ba85\"",
       "server": "cloudflare"
@@ -8201,11 +8506,11 @@
     },
     {
      "bytes": 5808,
-     "elapsed_s": 2.03,
+     "elapsed_s": 1.99,
      "error": null,
      "headers": {
       "cache-control": "public, s-maxage=300, stale-while-revalidate=300, stale-if-error=600",
-      "cf-cache-status": "EXPIRED",
+      "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
       "etag": "W/\"685f7064c4a2ddf8287ced6b0c99b284\"",
       "server": "cloudflare"
@@ -8216,9 +8521,10 @@
     },
     {
      "bytes": 2644037,
-     "elapsed_s": 0.17,
+     "elapsed_s": 0.08,
      "error": null,
      "headers": {
+      "age": "587",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=600, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
@@ -8231,9 +8537,10 @@
     },
     {
      "bytes": 763685,
-     "elapsed_s": 1.88,
+     "elapsed_s": 1.98,
      "error": null,
      "headers": {
+      "age": "587",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=600, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
@@ -8246,9 +8553,10 @@
     },
     {
      "bytes": 2601422,
-     "elapsed_s": 2.07,
+     "elapsed_s": 2.01,
      "error": null,
      "headers": {
+      "age": "587",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=600, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",
@@ -8261,10 +8569,10 @@
     },
     {
      "bytes": 569056,
-     "elapsed_s": 0.04,
+     "elapsed_s": 0.05,
      "error": null,
      "headers": {
-      "age": "597",
+      "age": "157",
       "cache-control": "public, s-maxage=600, stale-while-revalidate=300, stale-if-error=600",
       "cf-cache-status": "HIT",
       "content-type": "application/json; charset=utf-8",

@@ -1,6 +1,6 @@
 # Probe report
 
-Generated 2026-10-12T05:37:33.959975+00:00 · 52 requests
+Generated 2026-10-12T05:40:14.400305+00:00 · 53 requests
 
 ## 1. League
 
@@ -958,8 +958,8 @@ Dual-eligible rostered players: **20**
 | roster | player | team | position | fantasy_positions | reserve | taxi |
 |---|---|---|---|---|---|---|
 | 1 | Tuli Tuipulotu | LAC | DL | ['DL', 'LB'] | False | False |
-| 2 | Dallas Turner | MIN | LB | ['DL', 'LB'] | False | False |
 | 2 | Danielle Hunter | HOU | DE | ['DL', 'LB'] | False | False |
+| 2 | Dallas Turner | MIN | LB | ['DL', 'LB'] | False | False |
 | 2 | Carl Granderson | NO | DE | ['DL', 'LB'] | False | False |
 | 3 | Brian Burns | NYG | DE | ['DL', 'LB'] | True | False |
 | 3 | David Bailey | NYJ | LB | ['DL', 'LB'] | False | False |
@@ -975,8 +975,8 @@ Dual-eligible rostered players: **20**
 | 11 | Andrew Van Ginkel | MIN | LB | ['DL', 'LB'] | False | False |
 | 11 | Rueben Bain | TB | DL | ['DL', 'LB'] | False | False |
 | 11 | Arvell Reese | NYG | LB | ['DL', 'LB'] | False | False |
-| 12 | Boye Mafe | CIN | DL | ['DL', 'LB'] | False | False |
 | 12 | Micah Parsons | GB | LB | ['DL', 'LB'] | True | False |
+| 12 | Boye Mafe | CIN | DL | ['DL', 'LB'] | False | False |
 <details><summary>fantasy_positions orderings among dual-eligible players</summary>
 
 ```json
@@ -1832,7 +1832,7 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
  "season_games": 272,
  "settled_week": 4,
  "source": {
-  "bytes": 2184052,
+  "bytes": 2184053,
   "content_type": "text/plain; charset=utf-8",
   "error": null,
   "final_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -2056,24 +2056,153 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
 ```json
 {
  "by_ids": {
-  "bytes": 284,
+  "bytes": 572570,
   "content_type": "application/json;charset=utf-8",
   "error": null,
-  "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
-  "status": 400,
-  "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
- },
- "by_slots": {
-  "bytes": 284,
-  "content_type": "application/json;charset=utf-8",
-  "error": null,
-  "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
-  "status": 400,
-  "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
- },
- "ids_requested": 60,
- "week_used": 5
-}
+  "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info",
+  "key_paths": [
+   "$: object",
+   "players[]: array",
+   "players[].draftAuctionValue: int",
+   "players[].droppedByEliminatedTeam: bool",
+   "players[].id: int",
+   "players[].keeperValue: int",
+   "players[].keeperValueFuture: int",
+   "players[].lineupLocked: bool",
+   "players[].onTeamId: int",
+   "players[].player: object",
+   "players[].player.active: bool",
+   "players[].player.defaultPositionId: int",
+   "players[].player.draftRanksByRankType: object",
+   "players[].player.draftRanksByRankType.ELIMINATION: object",
+   "players[].player.draftRanksByRankType.PPR: object",
+   "players[].player.draftRanksByRankType.STANDARD: object",
+   "players[].player.draftRanksByRankType.SUPERFLEX: object",
+   "players[].player.droppable: bool",
+   "players[].player.eligibleSlots[]: array",
+   "players[].player.firstName: str",
+   "players[].player.fullName: str",
+   "players[].player.id: int",
+   "players[].player.injured: bool",
+   "players[].player.injuryStatus: str",
+   "players[].player.jersey: str",
+   "players[].player.lastName: str",
+   "players[].player.lastNewsDate: int",
+   "players[].player.lastVideoDate: int",
+   "players[].player.outlooks: object",
+   "players[].player.outlooks.outlooksByWeek: object",
+   "players[].player.ownership: object",
+   "players[].player.ownership.activityLevel: NoneType",
+   "players[].player.ownership.auctionValueAverage: float",
+   "players[].player.ownership.auctionValueAverageChange: float",
+   "players[].player.ownership.averageDraftPosition: float",
+   "players[].player.ownership.averageDraftPositionPercentChange: float",
+   "players[].player.ownership.date: int",
+   "players[].player.ownership.leagueType: int",
+   "players[].player.ownership.percentChange: float",
+   "players[].player.ownership.percentOwned: float",
+   "players[].player.ownership.percentStarted: float",
+   "players[].player.proTeamId: int",
+   "players[].player.rankings: object",
+   "players[].player.rankings.0[]: array",
+   "players[].player.rankings.1[]: array",
+   "players[].player.rankings.2[]: array",
+   "players[].player.rankings.3[]: array",
+   "players[].player.rankings.4[]: array",
+   "players[].player.rankings.5[]: array",
+   "players[].player.seasonOutlook: str",
+   "players[].player.stats[]: array",
+   "players[].ratings: object",
+   "players[].ratings.0: object",
+   "players[].ratings.0.positionalRanking: int",
+   "players[].ratings.0.totalRanking: int",
+   "players[].ratings.0.totalRating: float",
+   "players[].rosterLocked: bool",
+   "players[].status: str",
+   "players[].tradeLocked: bool",
+   "players[].waiverProcessDate: int"
+  ],
+  "shape": {
+   "default_position_ids": {
+    "1": 13,
+    "2": 7,
+    "3": 13,
+    "4": 10,
+    "5": 6
+   },
+   "players": 49,
+   "players_with_week_projection": 47,
+   "prior_week_actual_stat_ids": {
+    "0": 12,
+    "1": 12,
+    "10": 11,
+    "11": 11,
+    "13": 11,
+    "155": 23,
+    "156": 17,
+    "158": 23,
+    "2": 12,
+    "21": 12,
+    "210": 40,
+    "211": 12,
+    "212": 11,
+    "213": 18,
+    "22": 12,
+    "23": 13,
+    "24": 12,
+    "27": 12,
+    "28": 10,
+    "3": 12,
+    "39": 12,
+    "4": 10,
+    "40": 12,
+    "41": 22,
+    "42": 22,
+    "47": 21,
+    "48": 17,
+    "49": 13,
+    "5": 12,
+    "50": 13,
+    "53": 22,
+    "58": 22,
+    "59": 21,
+    "6": 12,
+    "60": 22,
+    "61": 22,
+    "64": 11,
+    "7": 12,
+    "8": 12,
+    "9": 11
+   },
+   "projection_stat_ids": {
+    "0": 10,
+    "1": 10,
+    "210": 38,
+    "212": 17,
+    "213": 22,
+    "23": 17,
+    "24": 17,
+    "25": 17,
+    "26": 17,
+    "27": 13,
+    "35": 17,
+    "36": 17,
+    "37": 17,
+    "38": 17,
+    "39": 17,
+    "40": 17,
+    "42": 22,
+    "43": 22,
+    "44": 22,
+    "45": 22,
+    "46": 22,
+    "47": 22,
+    "48": 21,
+    "49": 19,
+    "50": 18,
+    "53": 22,
+ 
+… (truncated; see report.json)
 ```
 </details>
 

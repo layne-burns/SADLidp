@@ -625,7 +625,8 @@ def run_sync(
             "scoring_settings": sc,
         },
     )
-    if window and fetched_ok and any(values.values()):  # else the window stays open: the next slot retries
+    results_missing = window is not None and window.kind == "results" and not isinstance(live_stats, dict)
+    if window and fetched_ok and any(values.values()) and not results_missing:  # else the next slot retries
         gate_path = season_dir / "gate.json"
         done_list = storage.read_json(gate_path, {}).get("windows_done", [])
         storage.write_json(gate_path, {"windows_done": sorted({*done_list, window.id})})

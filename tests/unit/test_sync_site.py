@@ -374,6 +374,23 @@ def test_a_followed_suggestion_is_judged_with_its_result(tmp_path):
     assert sugg["4118"]["player"]["result"] == {"pts": 20.0, "state": "final"}
 
 
+SUNDAY_EVE = datetime(2026, 10, 12, 3, 17, tzinfo=UTC)  # Sun Oct 11, 11:17 PM ET: inside the results window
+
+
+def test_the_results_window_stays_open_when_live_stats_fail(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)
+    out = run_sync(CFG, data, cache, SUNDAY_EVE, client=FakeClient(routes()), log=lambda m: None)  # /stats 404
+    assert out.window == "2026-w05-results"
+    done = json.loads((data / "2026" / "gate.json").read_text())["windows_done"]
+    assert "2026-w05-results" not in done  # the next slot in the window retries
+    r = routes()
+    r[f"{V1}/stats/nfl/regular/2026/5"] = {"4118": {"gp": 1, "idp_tkl_solo": 6}}
+    out = run_sync(CFG, data, cache, SUNDAY_EVE + timedelta(hours=3), client=FakeClient(r), log=lambda m: None)
+    assert out.window == "2026-w05-results"
+    assert "2026-w05-results" in json.loads((data / "2026" / "gate.json").read_text())["windows_done"]
+
+
 def test_a_failed_stats_fetch_says_so(tmp_path):
     data, cache = tmp_path / "d", tmp_path / "c"
     run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)
@@ -446,6 +463,7 @@ def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
     assert (site / "index.html").read_text() == (site / "week-2026-06.html").read_text()
     past = (site / "week-2026-05.html").read_text()
     assert 'href="week-2026-06.html"' in past and "Week 6 · now" in past and 'aria-current="page"' in past
+    assert "2026 Week 5" in past  # the header names the season
     assert "looking at a past week" in past and "provisional" in past
     w5 = json.loads((site / "data-2026-05.json").read_text())
     anz = next(p for t in w5["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "4118")
@@ -453,6 +471,15 @@ def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
     sugg = next(s for s in w5["my_idps"]["LB"]["suggestions"] if s["player"]["id"] == "4118")
     assert sugg["outcome"] == "void"  # Cedric Gray has no stat line in this fixture
     assert "looking at a past week" not in (site / "index.html").read_text()
+    # once pages span two seasons, the picker names the season
+    (data / "2027" / "week01").mkdir(parents=True)
+    w6 = json.loads((data / "2026" / "week06" / "consensus.json").read_text())
+    (data / "2027" / "week01" / "consensus.json").write_text(json.dumps({**w6, "season": 2027, "week": 1}))
+    build_site(data, site)
+    assert (
+        "2026 · Week 5" in (site / "index.html").read_text()
+        and "2027 · Week 1 · now" in (site / "index.html").read_text()
+    )
     # a run.json written before settles_at existed: the schedule still says week 5 isn't settled
     run = data / "2026" / "week05" / "run.json"
     run.write_text(json.dumps({k: v for k, v in json.loads(run.read_text()).items() if k != "settles_at"}))

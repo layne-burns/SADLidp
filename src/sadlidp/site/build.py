@@ -138,7 +138,12 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site") -> 
         shutil.rmtree(site)
     site.mkdir(parents=True)
     latest = weeks[-1][:2]
-    nav = [{"season": s, "week": w, "href": page_name(s, w), "latest": (s, w) == latest} for s, w, _ in weeks]
+    many = len({s for s, _, _ in weeks}) > 1  # name the season once pages span more than one
+    nav = [
+        {"season": s, "week": w, "href": page_name(s, w), "latest": (s, w) == latest,
+         "label": f"{s} · Week {w}" if many else f"Week {w}"}
+        for s, w, _ in weeks
+    ]  # fmt: skip
     for season, week, wdir in weeks:
         data = json.loads((wdir / "consensus.json").read_text())
         final = None

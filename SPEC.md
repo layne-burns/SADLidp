@@ -112,7 +112,7 @@ League name match: case-insensitive, trimmed, exact, against config `["SADL", "S
   - *Pre-waiver window:* the next waiver-processing instant is computed from league settings (daily or weekly mode; field encodings confirmed in Phase 1 and pinned by a test). open = instant − 12 h, close = instant − 1 h.
   - *Saturday window:* 12:00–18:00 ET.
   - *Sunday window:* open = first Sunday kickoff − 4 h, close = first Sunday kickoff − 15 min. Hourly Sunday slots put at least three slots in this window, including for 9:30 ET international games.
-  - *Results window (D22, added 2026-10-12):* open = the last Sunday kickoff before 17:00 ET + 4¼ h, close = open + 6 h (`gate.results_after_h`, `gate.results_window_h`). A game counts as final 4 h after kickoff, so the afternoon games are final when it opens; the 3-hourly 03:17 UTC slot falls inside it in both EDT and EST weeks.
+  - *Results window (D22, added 2026-10-12):* open = the last Sunday kickoff before 17:00 ET + 4¼ h, close = open + 6 h (`gate.results_after_h`, `gate.results_window_h`). A game counts as final 4 h after kickoff, so the afternoon games are final when it opens; the 3-hourly 03:17 UTC slot falls inside it in both EDT and EST weeks. If Sleeper's live stats can't be fetched, the results window stays open so the next slot retries.
   - *Off-season:* the gate exits 0 with no Sleeper league calls and no commit unless `state.season_type == regular`, the league `status` is not complete, and the week is ≤ the last fantasy week.
 - **Adapters verify the week** the source claims (page label or response field). A mismatch gives status `not_yet_published`: the rows aren't ingested and the footer shows "week N not posted yet".
 

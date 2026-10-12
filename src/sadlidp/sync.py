@@ -233,6 +233,52 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     }
 
 
+SOURCE_LABELS = {"sleeper_proj": "Sleeper"}
+STAT_LABELS = (
+    ("idp_tkl_solo", "solo"), ("idp_tkl_ast", "ast"), ("idp_tkl_loss", "TFL"), ("idp_sack", "sack"),
+    ("idp_qb_hit", "QB hit"), ("idp_pass_def", "PD"), ("idp_int", "INT"), ("idp_ff", "FF"), ("idp_fum_rec", "FR"),
+    ("idp_def_td", "TD"), ("idp_safe", "safety"), ("idp_blk_kick", "blocked kick"),
+)  # fmt: skip
+
+
+def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, groups: dict, info: dict,
+              sc: dict) -> dict:  # fmt: skip
+    """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
+    them, the share of μ, or why a source has nothing for him."""
+    eff = (cons_row or {}).get("eff") or {}
+    parts = []
+    for name in SOURCES:
+        label = SOURCE_LABELS.get(name, name)
+        src = info.get(name) or {}
+        if pid in values.get(name, {}):
+            row = (source_rows.get(name) or {}).get(pid)
+            stats = (row or {}).get("stats") or {}
+            shown = [[lbl, round(scoring.num(stats.get(k)), 2)] for k, lbl in STAT_LABELS
+                     if scoring.num(sc.get(k)) and scoring.num(stats.get(k)) >= 0.05]  # fmt: skip
+            parts.append({"source": label, "kind": groups.get(name), "pts": round(values[name][pid], 2),
+                          "share": eff.get(name), "stats": shown, "late": bool(row and row.get("late")),
+                          "zero": row is None})  # fmt: skip
+        elif src.get("stale"):
+            parts.append({"source": label, "missing": "not used this week (its data is too old)"})
+        elif not src.get("rows_used"):
+            parts.append({"source": label, "missing": "nothing posted for this week yet"})
+        else:
+            parts.append({"source": label, "missing": "no projection for him"})
+    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None}
+
+
+def attach_breakdowns(site_part, make: Callable[[str], dict]) -> None:
+    """Add a `breakdown` to every player card in the site data (cards carry id, mu and slot)."""
+    if isinstance(site_part, dict):
+        if "id" in site_part and "mu" in site_part and "slot" in site_part:
+            site_part["breakdown"] = make(site_part["id"])
+        for v in site_part.values():
+            attach_breakdowns(v, make)
+    elif isinstance(site_part, list):
+        for v in site_part:
+            attach_breakdowns(v, make)
+
+
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
     return {
         "id": pid,
@@ -340,6 +386,7 @@ def run_sync(
     values: dict[str, dict[str, float]] = {}
     groups: dict[str, str] = {}
     late_rows: dict[str, dict] = {}
+    source_rows: dict[str, dict] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
     fetched_ok: set[str] = set()
@@ -382,6 +429,7 @@ def run_sync(
             continue
         groups[name] = kind
         late_rows[name] = {pid: r for pid, r in rows.items() if r.get("late")}
+        source_rows[name] = rows
         values[name] = {
             pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp
         }
@@ -408,6 +456,7 @@ def run_sync(
             "min": c["min"],
             "max": c["max"],
             "n_sources": c["n_sources"],
+            "eff": c.get("eff") or {},
             "reasons": list(status_of(pid).reasons),
             "flags": list(status_of(pid).flags),
         }
@@ -417,7 +466,7 @@ def run_sync(
     for pid, rec in frozen.items():
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
-            cons[pid] = {k: rec[k] for k in ("mu", "sigma", "min", "max", "n_sources")}
+            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff")}
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)
@@ -602,6 +651,9 @@ def run_sync(
         "sources": run["sources"],
         "warnings": warnings,
     }
+    attach_breakdowns(
+        site_data, lambda pid: breakdown(pid, cons.get(pid), source_rows, values, groups, run["sources"], sc)
+    )
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})
     if badge_doc is not None:

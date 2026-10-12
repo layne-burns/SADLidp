@@ -56,7 +56,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
 def cmd_build(args: argparse.Namespace) -> int:
     from .site.build import build_site
 
-    print(f"build: wrote {build_site(args.data_dir, args.site_dir)}")
+    print(f"build: wrote {build_site(args.data_dir, args.site_dir, load_config(args.config))}")
     return 0
 
 

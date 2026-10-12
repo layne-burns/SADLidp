@@ -1,0 +1,13 @@
+# Hand-pinned source player -> Sleeper player id matches (SPEC.md §6.1 step 1). Checked before every other
+# matching step, without the IDP, team or slot guards, so keep entries few and current.
+#
+# One table per source (the adapter's name, e.g. espn_proj), keyed either by the source's own player id or
+# by "<Name>|<TEAM>" (the name as the source prints it; TEAM in Sleeper's codes, empty for a player with no
+# NFL team). Values are Sleeper player ids, as strings. Names are compared after normalization (case,
+# accents, punctuation and Jr/Sr/II-V suffixes ignored).
+#
+# [espn_proj]
+# "4034959" = "8297"             # ESPN player id -> Sleeper player id
+# "Jane Doe Jr.|CAR" = "12345"   # name and team, for a source without ids
+#
+# Unmatched players are listed in run.json and the page footer; add a line here when one should match.

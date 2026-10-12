@@ -43,6 +43,23 @@ shrink_guard = 0.6          # a fetch with fewer rows than this share of the sto
 [sources.sleeper_proj]
 enabled = true
 late_rows = true            # keep projections first seen after kickoff, flagged late (SPEC §6.5)
+archive = true              # past weeks still served: the backfill runner fills them (SPEC §5.3)
+
+[sources.espn_proj]         # the owner's public ESPN league ([espn] league_id; SPEC §5.2)
+enabled = true
+archive = true              # past weeks through scoringPeriodId
+late_rows = false
+
+[backfill]                  # per sync, after the live fetches (SPEC §5.3); the rest waits for the next sync
+budget_s = 300
+max_requests = 40           # per host
+
+[net.host_interval_s]       # seconds between requests to one host; others wait net.Client's 2 s (SPEC §7)
+"lm-api-reads.fantasy.espn.com" = 1.0
+"www.fantasypros.com" = 5.0  # its robots.txt crawl delay
+
+# [impute.m_k]              # overrides the empirical-Bayes m_k in data/<prev>/impute_priors.json (SPEC §6.2)
+# idp_tkl_loss = 50.0
 
 [gate]
 pre_waiver_open_h = 12      # window opens this many hours before waivers process

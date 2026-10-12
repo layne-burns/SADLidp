@@ -113,7 +113,7 @@ def test_gated_sync_writes_the_week(synced):
     league = json.loads((data / "2026" / "league.json").read_text())
     assert league["user_id"] == ME and league["settings"]["waiver_day_of_week"] == 2
     run = json.loads((week / "run.json").read_text())
-    assert run["backfilled"] == [] and run["window"] == "2026-w05-prewaiver"  # offline: no past projections
+    assert run["backfilled"] == {} and run["window"] == "2026-w05-prewaiver"  # offline: no past projections
     actuals = json.loads((data / "2026" / "week04" / "actuals.json").read_text())
     assert actuals["week"] == 4 and len(actuals["stats"]) > 50
     assert any("σ_out" in w for w in out.warnings)  # no 2025 stats offline: config defaults
@@ -211,11 +211,11 @@ def test_backfill_writes_past_weeks_once(tmp_path):
     client = FakeClient({**r, f"{API}/projections/nfl/2026/4": week4})
     run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
     run = json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())
-    assert run["backfilled"] == [4]
+    assert run["backfilled"] == {"sleeper_proj": [4]}
     src = json.loads((tmp_path / "d" / "2026" / "week04" / "sources" / "sleeper_proj.json").read_text())
     assert src["week"] == 4 and len(src["rows"]) == 5 and all(row["backfill"] for row in src["rows"].values())
     run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
-    assert json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())["backfilled"] == []
+    assert json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())["backfilled"] == {}
 
 
 def test_off_season_stops_before_league_calls(tmp_path):
@@ -241,7 +241,7 @@ def test_build_site_renders_the_latest_week(synced, tmp_path):
 def test_cli_sync_build_and_leakcheck(tmp_path, monkeypatch, capsys):
     out_file = tmp_path / "gh_output"
     monkeypatch.setenv("GITHUB_OUTPUT", str(out_file))
-    monkeypatch.setattr("sadlidp.sync.Client", lambda: FakeClient(routes()))
+    monkeypatch.setattr("sadlidp.sync.Client", lambda **kw: FakeClient(routes()))
     data, site = str(tmp_path / "data"), str(tmp_path / "site")
     cfg = str(ROOT / "config" / "sadl.toml")
     args = ["--config", cfg, "--data-dir", data, "--cache-dir", str(tmp_path / "c"), "--now", NOW.isoformat()]
@@ -497,7 +497,8 @@ def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
     week4 = data / "2026" / "week04" / "sources" / "sleeper_proj.json"
     rows = {r["player_id"]: {"stats": r["stats"], "team": r["team"], "opponent": r["opponent"], "backfill": True}
             for r in proj if r.get("opponent")}  # fmt: skip
-    storage_rows = {"rows": rows, "no_projection_ids": ["z2"], "source": "sleeper_proj", "week": 4}
+    storage_rows = {"rows": rows, "no_projection_ids": ["z2"], "source": "sleeper_proj", "week": 4,
+                    "last_success": NOW.isoformat(), "fetches": [NOW.isoformat()]}  # fmt: skip
     week4.parent.mkdir(parents=True, exist_ok=True)
     week4.write_text(json.dumps(storage_rows))
     out = replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None)
@@ -522,7 +523,7 @@ def test_breakdown_and_stats_page(tmp_path):
     anz = next(p for t in d["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "4118")
     part = anz["breakdown"]["parts"][0]
     assert part["source"] == "Sleeper" and part["share"] == 1.0 and part["pts"] == anz["mu"]
-    assert ["solo", 3.0] in [[k, round(v, 1)] for k, v in part["stats"]] and anz["breakdown"]["mu"] == anz["mu"]
+    assert ["solo", 3.0] in [[k, round(v, 1)] for k, v, _ in part["stats"]] and anz["breakdown"]["mu"] == anz["mu"]
     zero = next(p for t in d["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "z1")
     assert zero["breakdown"]["parts"][0]["zero"] is True  # absent from a complete source: counts as 0
     me = d["my_idps"]["DB"]["players"][0]
@@ -560,8 +561,8 @@ def test_breakdowns_after_kickoff_and_on_old_pages(tmp_path):
     assert "Zero Fill" in html and 'class="bd"' not in html and "sources ▾" not in html
 
 
-def test_a_source_that_never_posted_says_so(tmp_path):
+def test_a_source_with_no_rows_says_why(tmp_path):
     out = run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, client=FakeClient(routes(proj_status=404)), log=print)
     d = json.loads((tmp_path / "d" / "2026" / "week05" / "consensus.json").read_text())
     part = d["my_idps"]["LB"]["players"][0]["breakdown"]["parts"][0]
-    assert out.synced and part == {"source": "Sleeper", "missing": "nothing posted for this week yet"}
+    assert out.synced and part == {"source": "Sleeper", "missing": "couldn't be read this sync"}  # an HTTP 404

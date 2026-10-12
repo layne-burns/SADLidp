@@ -24,9 +24,10 @@
 {%- macro bdbody(p) -%}{% if p.breakdown %}<div class="bdbody">
 {% for part in p.breakdown.parts %}{% if part.missing %}<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
 {% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.late %} · captured after kickoff{% endif %}
-{% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
+{% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
 {% endif %}{% endfor %}
 {% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.mu) }} pts{% if kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}.</div>{% endif %}
+{% if p.breakdown.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
 </div>{% endif %}{%- endmacro %}
 {%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
 {%- macro pts_text(r) -%}{% if r %}{% if r.state == 'final' %}scored {{ '%.1f'|format(r.pts) }}{% elif r.state == 'live' %}{{ '%.1f'|format(r.pts) }} so far{% elif r.state == 'unavailable' %}score unavailable{% else %}did not play{% endif %}{% else %}not played yet{% endif %}{%- endmacro %}
@@ -153,15 +154,17 @@
 <footer>
   <h2>Sources</h2>
   <table>
-    <tr><th>Source</th><th>Status</th><th>Players</th><th>Last success</th></tr>
+    <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
     {% for name, s in d.sources.items() %}
-    <tr><td>{{ name }}</td><td>{{ s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
+    <tr><td>{{ s.label or name }}</td><td>{{ s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
       <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
+      <td>{% if s.match and s.match.rate is not none %}{{ '%.1f'|format(s.match.rate * 100) }}%{% if s.match.unmatched %}{% if s.match.names %}<details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>{% else %} <small>{{ s.match.unmatched }} unmatched</small>{% endif %}{% endif %}{% else %}—{% endif %}</td>
       <td>{{ s.last_success|et }}</td></tr>
     {% endfor %}
   </table>
   <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
   Tiers group players statistically indistinguishable from each tier's best.
+  Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).
   * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="{{ data_href or 'data.json' }}">data.json</a></p>
 </footer>
 {% if latest is not defined or latest %}<script>

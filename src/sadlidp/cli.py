@@ -2,6 +2,8 @@
 
 sadlidp sync [--force] [--now ISO]   # gate, fetch, score, tier; writes data/<season>/week<NN>/
 sadlidp build                        # render the latest week into site/
+sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the sources' archives (§5.3)
+sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -60,18 +62,66 @@ def cmd_build(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_replay(args: argparse.Namespace) -> int:
-    """Rebuild past weeks' pages from saved data plus that week's Sleeper matchups (D22)."""
-    from .net import Client
-    from .replay import replay_week
-    from .sleeper import Sleeper
+def _weeks(spec: str) -> range:
+    first, _, last = spec.partition("-")
+    return range(int(first), int(last or first) + 1)
+
+
+def cmd_backfill(args: argparse.Namespace) -> int:
+    """Fetch past weeks from every source with an archive (SPEC §5.3); `--redo` refetches backfilled weeks."""
+    from . import backfill
+    from .impute import load_or_build_priors
+    from .positions import slot_of
+    from .sleeper import Sleeper, season_of
+    from .sync import SOURCES, build_matcher, fetch_schedule, make_client
 
     cfg = load_config(args.config)
-    first, _, last = args.weeks.partition("-")
-    weeks = range(int(first), int(last or first) + 1)
+    if args.source and args.source not in SOURCES:
+        print(f"backfill: unknown source {args.source!r}; one of {', '.join(SOURCES)}")
+        return 2
+    now = datetime.now(ET).replace(microsecond=0)
+    client = make_client(cfg)
+    sleeper = Sleeper(client, args.cache_dir)
+    season = args.season or season_of(sleeper.state(), now.year)
+    data_dir = Path(args.data_dir)
+    sched, _ = fetch_schedule(client, cfg, season, data_dir)
+    target = sched.target_week(now) or max((g.week for g in sched.games), default=0) + 1
+    weeks = [w for w in (_weeks(args.weeks) if args.weeks else range(1, target)) if w < target]
+    players = {str(k): v for k, v in sleeper.players(now.date().isoformat()).items()}
+    idp = {pid: p for pid, p in players.items() if slot_of(p)}
+    priors = load_or_build_priors(sleeper, data_dir, season, players)
+    matcher = build_matcher(cfg, players)
+    done = backfill.run(
+        SOURCES,
+        cfg,
+        data_dir,
+        season,
+        weeks,
+        now,
+        client=client,
+        sleeper=sleeper,
+        players=idp,
+        matcher=matcher,
+        priors=priors,
+        only=args.source,
+        redo=args.redo,
+    )
+    written = "; ".join(f"{name} weeks {ws}" for name, ws in done.items()) or "nothing written"
+    print(f"backfill: season {season}, weeks before {target}: {written}")
+    return 0
+
+
+def cmd_replay(args: argparse.Namespace) -> int:
+    """Rebuild past weeks' pages from saved data plus that week's Sleeper matchups (D22)."""
+    from .replay import replay_week
+    from .sleeper import Sleeper
+    from .sync import make_client
+
+    cfg = load_config(args.config)
+    weeks = _weeks(args.weeks)
     data_dir = Path(args.data_dir)
     league = json.loads((data_dir / str(args.season) / "league.json").read_text())
-    sleeper = Sleeper(Client(), args.cache_dir)
+    sleeper = Sleeper(make_client(cfg), args.cache_dir)
     players = {str(k): v for k, v in sleeper.players(datetime.now(ET).date().isoformat()).items()}
     for week in weeks:
         matchups, err = sleeper.matchups(league["league_id"], week)
@@ -85,14 +135,13 @@ def cmd_replay(args: argparse.Namespace) -> int:
 
 def cmd_gate(args: argparse.Namespace) -> int:
     from . import gate, storage
-    from .net import Client
-    from .sync import fetch_schedule
+    from .sync import fetch_schedule, make_client
 
     cfg = load_config(args.config)
     now = _now(args.now) or datetime.now(ET)
     season = args.season or (now.year if now.month >= 3 else now.year - 1)
     season_dir = Path(args.data_dir) / str(season)
-    sched, source = fetch_schedule(Client(), cfg, season, Path(args.data_dir))
+    sched, source = fetch_schedule(make_client(cfg), cfg, season, Path(args.data_dir))
     settings = storage.read_json(season_dir / "league.json", {}).get("settings") or {"waiver_day_of_week": 2}
     week = sched.target_week(now)
     if week is None:
@@ -130,6 +179,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--now", help="ISO time to evaluate (default: now)")
     p.add_argument("--season", type=int)
     p.set_defaults(func=cmd_gate)
+    p = sub.add_parser("backfill", parents=[common], help="fetch past weeks from the sources' archives")
+    p.add_argument("--source", help="only this source (e.g. espn_proj)")
+    p.add_argument("--weeks", help="e.g. 1-5 (default: every week before the target week)")
+    p.add_argument("--redo", action="store_true", help="refetch weeks backfilled before (live weeks are kept)")
+    p.add_argument("--season", type=int)
+    p.add_argument("--cache-dir", default=".cache")
+    p.set_defaults(func=cmd_backfill)
     p = sub.add_parser("replay", parents=[common], help="rebuild past weeks' pages from saved data")
     p.add_argument("--weeks", required=True, help="e.g. 1-4")
     p.add_argument("--season", type=int, required=True)

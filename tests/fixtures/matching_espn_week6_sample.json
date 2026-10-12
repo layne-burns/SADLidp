@@ -1,0 +1,1974 @@
+{
+ "_note": "Live ESPN week-6 rows (2026-10-12, league 942104146) and the Sleeper players DB records they could match; `expect` is the reviewed matcher output (SPEC.md §6.1).",
+ "espn_teams": {
+  "0": null,
+  "1": "ATL",
+  "2": "BUF",
+  "3": "CHI",
+  "4": "CIN",
+  "5": "CLE",
+  "6": "DAL",
+  "7": "DEN",
+  "8": "DET",
+  "9": "GB",
+  "10": "TEN",
+  "11": "IND",
+  "12": "KC",
+  "13": "LV",
+  "14": "LAR",
+  "15": "MIA",
+  "16": "MIN",
+  "17": "NE",
+  "18": "NO",
+  "19": "NYG",
+  "20": "NYJ",
+  "21": "PHI",
+  "22": "ARI",
+  "23": "PIT",
+  "24": "LAC",
+  "25": "SF",
+  "26": "SEA",
+  "27": "TB",
+  "28": "WAS",
+  "29": "CAR",
+  "30": "JAX",
+  "33": "BAL",
+  "34": "HOU"
+ },
+ "espn_positions": {
+  "9": "DL",
+  "10": "DL",
+  "11": "LB",
+  "12": "DB",
+  "13": "DB"
+ },
+ "rows": [
+  {
+   "id": 2971498,
+   "fullName": "Adam Gotsis",
+   "proTeamId": 0,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "3232",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 2983055,
+   "fullName": "Javon Hargrave",
+   "proTeamId": 9,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "3256",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3040150,
+   "fullName": "Josey Jewell",
+   "proTeamId": 0,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "5334",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3124067,
+   "fullName": "Terrell Edmunds",
+   "proTeamId": 0,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "4974",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3129310,
+   "fullName": "Drue Tranquill",
+   "proTeamId": 12,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "6141",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3138826,
+   "fullName": "Fred Warner",
+   "proTeamId": 25,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "5041",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3139389,
+   "fullName": "D'Angelo Ross",
+   "proTeamId": 0,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "6476",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3863182,
+   "fullName": "Jerry Tillery",
+   "proTeamId": 11,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "6129",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3917142,
+   "fullName": "Akeem Davis-Gaither",
+   "proTeamId": 11,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "6860",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 4035666,
+   "fullName": "Leki Fotu",
+   "proTeamId": 0,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "6948",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 4036959,
+   "fullName": "Cole Christiansen",
+   "proTeamId": 12,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "7329",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 4037333,
+   "fullName": "Alex Highsmith",
+   "proTeamId": 23,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "7113",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 4046716,
+   "fullName": "Naquan Jones",
+   "proTeamId": 25,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "7853",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4240754,
+   "fullName": "Boye Mafe",
+   "proTeamId": 4,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "8343",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4241468,
+   "fullName": "Phidarian Mathis",
+   "proTeamId": 2,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "8273",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4243541,
+   "fullName": "Kalia Davis",
+   "proTeamId": 5,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "8375",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4360386,
+   "fullName": "Sydney Brown",
+   "proTeamId": 1,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "10919",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4362636,
+   "fullName": "Damone Clark",
+   "proTeamId": 8,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "8309",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4373956,
+   "fullName": "Jonah Laulu",
+   "proTeamId": 13,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "11827",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4428863,
+   "fullName": "Evan Williams",
+   "proTeamId": 9,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "11739",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4429040,
+   "fullName": "Vernon Broughton",
+   "proTeamId": 18,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "12618",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4565350,
+   "fullName": "Jay Higgins IV",
+   "proTeamId": 33,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "13024",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4567123,
+   "fullName": "Byron Young",
+   "proTeamId": 21,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "10925",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4567462,
+   "fullName": "Ja'Quan McMillian",
+   "proTeamId": 7,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "8752",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4683101,
+   "fullName": "Max Llewellyn",
+   "proTeamId": 15,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "13566",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4870988,
+   "fullName": "Avieon Terrell",
+   "proTeamId": 1,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "13389",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4360773,
+   "fullName": "Nick Hampton",
+   "proTeamId": 29,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "10973",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4360807,
+   "fullName": "Yasir Abdullah",
+   "proTeamId": 1,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "10992",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4361272,
+   "fullName": "Eku Leota",
+   "proTeamId": 22,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11336",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4361776,
+   "fullName": "Brenton Cox Jr.",
+   "proTeamId": 9,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11193",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4365629,
+   "fullName": "Daniel Hardy",
+   "proTeamId": 3,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "8520",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4394894,
+   "fullName": "Andrew Farmer II",
+   "proTeamId": 25,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11122",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4427207,
+   "fullName": "Trace Ford",
+   "proTeamId": 19,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "13137",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4427816,
+   "fullName": "Marist Liufau",
+   "proTeamId": 6,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11720",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4428989,
+   "fullName": "Chris Braswell",
+   "proTeamId": 34,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11679",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4576129,
+   "fullName": "Jalen McLeod",
+   "proTeamId": 30,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "12708",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4685415,
+   "fullName": "Travis Hunter",
+   "proTeamId": 30,
+   "defaultPositionId": 3,
+   "expect": {
+    "pid": "12530",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4714157,
+   "fullName": "Thomas Incoom",
+   "proTeamId": 29,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11441",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 5144894,
+   "fullName": "Trevor Nowaske",
+   "proTeamId": 8,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11348",
+    "how": "name_team"
+   }
+  },
+  {
+   "id": 4030924,
+   "fullName": "Elerson G. Smith",
+   "proTeamId": 5,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "7723",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4032200,
+   "fullName": "Robert Rochell",
+   "proTeamId": 29,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "7712",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4241473,
+   "fullName": "LaBryan Ray",
+   "proTeamId": 29,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "8274",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4242899,
+   "fullName": "DJ Davidson",
+   "proTeamId": 28,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "8262",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4243333,
+   "fullName": "Joe Tryon-Shoyinka",
+   "proTeamId": 21,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "7625",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4259590,
+   "fullName": "Tariq Castro-Fields",
+   "proTeamId": 21,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "8321",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4360304,
+   "fullName": "Xavier Thomas",
+   "proTeamId": 25,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11767",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4363052,
+   "fullName": "Beanie Bishop Jr.",
+   "proTeamId": 3,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11860",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4367330,
+   "fullName": "Tyrek Funderburk",
+   "proTeamId": 29,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11993",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4368350,
+   "fullName": "Rico Payton",
+   "proTeamId": 19,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11899",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4372051,
+   "fullName": "Chance Campbell",
+   "proTeamId": 21,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "8369",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4373706,
+   "fullName": "Markees Watts",
+   "proTeamId": 5,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "11432",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4374280,
+   "fullName": "Edefuan Ulofoshio",
+   "proTeamId": 5,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "11757",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429097,
+   "fullName": "Curtis Jacobs",
+   "proTeamId": 28,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "12164",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429128,
+   "fullName": "Dwight McGlothern Jr.",
+   "proTeamId": 16,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11905",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429392,
+   "fullName": "Elijah Chatman",
+   "proTeamId": 5,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "12319",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429743,
+   "fullName": "Daequan Hardy",
+   "proTeamId": 23,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11781",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429891,
+   "fullName": "DJ James",
+   "proTeamId": 19,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "11801",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4429970,
+   "fullName": "Ruben Hyppolite II",
+   "proTeamId": 3,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": "12637",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4569016,
+   "fullName": "Eric Watts",
+   "proTeamId": 20,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "12238",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4692970,
+   "fullName": "Reuben Lowery III",
+   "proTeamId": 11,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "13157",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4700660,
+   "fullName": "Sam Webb",
+   "proTeamId": 19,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "8844",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4917592,
+   "fullName": "Dallis Flowers",
+   "proTeamId": 3,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": "8833",
+    "how": "name"
+   }
+  },
+  {
+   "id": 4035861,
+   "fullName": "Cam Bynum",
+   "proTeamId": 11,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "7715",
+    "how": "nickname"
+   }
+  },
+  {
+   "id": 4240619,
+   "fullName": "Zachary Carter",
+   "proTeamId": 22,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": "8295",
+    "how": "nickname"
+   }
+  },
+  {
+   "id": 4259558,
+   "fullName": "Robert Beal Jr.",
+   "proTeamId": 15,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "10966",
+    "how": "nickname"
+   }
+  },
+  {
+   "id": 4034959,
+   "fullName": "Jeremiah Moon",
+   "proTeamId": 29,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": null,
+    "how": "unmatched"
+   }
+  },
+  {
+   "id": 4240464,
+   "fullName": "Victor Dimukeje",
+   "proTeamId": 25,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": null,
+    "how": "unmatched"
+   }
+  },
+  {
+   "id": 4361508,
+   "fullName": "Keshawn Banks",
+   "proTeamId": 1,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": null,
+    "how": "unmatched"
+   }
+  },
+  {
+   "id": 4042119,
+   "fullName": "Richie Grant",
+   "proTeamId": 0,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4240900,
+   "fullName": "Buddy Johnson",
+   "proTeamId": 0,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4242333,
+   "fullName": "Faion Hicks",
+   "proTeamId": 0,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4242996,
+   "fullName": "Arron Mosby",
+   "proTeamId": 0,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4362117,
+   "fullName": "Keondre Coburn",
+   "proTeamId": 0,
+   "defaultPositionId": 9,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4372492,
+   "fullName": "Cory Trice Jr.",
+   "proTeamId": 0,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4374338,
+   "fullName": "Steven Gilmore",
+   "proTeamId": 0,
+   "defaultPositionId": 12,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 4427716,
+   "fullName": "Jack Kiser",
+   "proTeamId": 0,
+   "defaultPositionId": 11,
+   "expect": {
+    "pid": null,
+    "how": "no_team"
+   }
+  },
+  {
+   "id": 3045282,
+   "fullName": "T.J. Watt",
+   "proTeamId": 23,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "4070",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 3122793,
+   "fullName": "Harold Landry III",
+   "proTeamId": 17,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "5030",
+    "how": "source_id"
+   }
+  },
+  {
+   "id": 4426331,
+   "fullName": "Nolan Smith Jr.",
+   "proTeamId": 21,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "10873",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 4567962,
+   "fullName": "Jermaine Johnson II",
+   "proTeamId": 10,
+   "defaultPositionId": 10,
+   "expect": {
+    "pid": "8398",
+    "how": "name_team_slot"
+   }
+  },
+  {
+   "id": 15231,
+   "fullName": "Michael Thomas",
+   "proTeamId": 0,
+   "defaultPositionId": 13,
+   "expect": {
+    "pid": "1703",
+    "how": "source_id"
+   }
+  }
+ ],
+ "players": {
+  "13024": {
+   "full_name": "Jay Higgins",
+   "first_name": "Jay",
+   "last_name": "Higgins",
+   "team": "BAL",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26072
+  },
+  "11037": {
+   "full_name": "Cory Trice",
+   "first_name": "Cory",
+   "last_name": "Trice",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24443
+  },
+  "11122": {
+   "full_name": "Andrew Farmer",
+   "first_name": "Andrew",
+   "last_name": "Farmer",
+   "team": "SF",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24516
+  },
+  "6476": {
+   "full_name": "D'Angelo Ross",
+   "first_name": "D'Angelo",
+   "last_name": "Ross",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": 3139389,
+   "fantasy_data_id": 21463
+  },
+  "13566": {
+   "full_name": "Max Llewellyn",
+   "first_name": "Max",
+   "last_name": "Llewellyn",
+   "team": "MIA",
+   "position": "DE",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 27015
+  },
+  "7723": {
+   "full_name": "Elerson G. Smith",
+   "first_name": "Elerson G.",
+   "last_name": "Smith",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": null
+  },
+  "8375": {
+   "full_name": "Kalia Davis",
+   "first_name": "Kalia",
+   "last_name": "Davis",
+   "team": "CLE",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23577
+  },
+  "13137": {
+   "full_name": "Trace Ford",
+   "first_name": "Trace",
+   "last_name": "Ford",
+   "team": "NYG",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26558
+  },
+  "8321": {
+   "full_name": "Tariq Castro-Fields",
+   "first_name": "Tariq",
+   "last_name": "Castro-Fields",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23550
+  },
+  "11002": {
+   "full_name": "Keondre Coburn",
+   "first_name": "Keondre",
+   "last_name": "Coburn",
+   "team": null,
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": null
+  },
+  "6948": {
+   "full_name": "Leki Fotu",
+   "first_name": "Leki",
+   "last_name": "Fotu",
+   "team": null,
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": 4035666,
+   "fantasy_data_id": 22083
+  },
+  "7853": {
+   "full_name": "Naquan Jones",
+   "first_name": "Naquan",
+   "last_name": "Jones",
+   "team": "SF",
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22866
+  },
+  "8369": {
+   "full_name": "Chance Campbell",
+   "first_name": "Chance",
+   "last_name": "Campbell",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23536
+  },
+  "11757": {
+   "full_name": "Edefuan Ulofoshio",
+   "first_name": "Edefuan",
+   "last_name": "Ulofoshio",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25235
+  },
+  "8297": {
+   "full_name": "Jeremiah Moon",
+   "first_name": "Jeremiah",
+   "last_name": "Moon",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23390
+  },
+  "1703": {
+   "full_name": "Michael J. Thomas",
+   "first_name": "Michael J.",
+   "last_name": "Thomas",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": 15231,
+   "fantasy_data_id": 15589
+  },
+  "12618": {
+   "full_name": "Vernon Broughton",
+   "first_name": "Vernon",
+   "last_name": "Broughton",
+   "team": "NO",
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26122
+  },
+  "11827": {
+   "full_name": "Jonah Laulu",
+   "first_name": "Jonah",
+   "last_name": "Laulu",
+   "team": "LV",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25349
+  },
+  "7662": {
+   "full_name": "Richie Grant",
+   "first_name": "Richie",
+   "last_name": "Grant",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22824
+  },
+  "11487": {
+   "full_name": "Steven Gilmore",
+   "first_name": "Steven",
+   "last_name": "Gilmore",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24854
+  },
+  "4974": {
+   "full_name": "Terrell Edmunds",
+   "first_name": "Terrell",
+   "last_name": "Edmunds",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": 3124067,
+   "fantasy_data_id": 19849
+  },
+  "8274": {
+   "full_name": "LaBryan Ray",
+   "first_name": "LaBryan",
+   "last_name": "Ray",
+   "team": null,
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23527
+  },
+  "8295": {
+   "full_name": "Zach Carter",
+   "first_name": "Zach",
+   "last_name": "Carter",
+   "team": "ARI",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23375
+  },
+  "7113": {
+   "full_name": "Alex Highsmith",
+   "first_name": "Alex",
+   "last_name": "Highsmith",
+   "team": "PIT",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 4037333,
+   "fantasy_data_id": 21897
+  },
+  "11905": {
+   "full_name": "Dwight McGlothern",
+   "first_name": "Dwight",
+   "last_name": "McGlothern",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25168
+  },
+  "11441": {
+   "full_name": "Thomas Incoom",
+   "first_name": "Thomas",
+   "last_name": "Incoom",
+   "team": "CAR",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24250
+  },
+  "7625": {
+   "full_name": "Joe Tryon-Shoyinka",
+   "first_name": "Joe",
+   "last_name": "Tryon-Shoyinka",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22775
+  },
+  "12708": {
+   "full_name": "Jalen McLeod",
+   "first_name": "Jalen",
+   "last_name": "McLeod",
+   "team": "JAX",
+   "position": "DE",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26151
+  },
+  "4070": {
+   "full_name": "T.J. Watt",
+   "first_name": "T.J.",
+   "last_name": "Watt",
+   "team": "PIT",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3045282,
+   "fantasy_data_id": 18916
+  },
+  "13389": {
+   "full_name": "Avieon Terrell",
+   "first_name": "Avieon",
+   "last_name": "Terrell",
+   "team": "ATL",
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26775
+  },
+  "8262": {
+   "full_name": "DJ Davidson",
+   "first_name": "DJ",
+   "last_name": "Davidson",
+   "team": null,
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23514
+  },
+  "12653": {
+   "full_name": "Jack Kiser",
+   "first_name": "Jack",
+   "last_name": "Kiser",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26073
+  },
+  "10917": {
+   "full_name": "Byron Young",
+   "first_name": "Byron",
+   "last_name": "Young",
+   "team": "LAR",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24253
+  },
+  "6141": {
+   "full_name": "Drue Tranquill",
+   "first_name": "Drue",
+   "last_name": "Tranquill",
+   "team": "KC",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3129310,
+   "fantasy_data_id": 20968
+  },
+  "10966": {
+   "full_name": "Rob Beal",
+   "first_name": "Rob",
+   "last_name": "Beal",
+   "team": "MIA",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24394
+  },
+  "11860": {
+   "full_name": "Beanie Bishop",
+   "first_name": "Beanie",
+   "last_name": "Bishop",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25417
+  },
+  "11348": {
+   "full_name": "Trevor Nowaske",
+   "first_name": "Trevor",
+   "last_name": "Nowaske",
+   "team": "DET",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24782
+  },
+  "11193": {
+   "full_name": "Brenton Cox",
+   "first_name": "Brenton",
+   "last_name": "Cox",
+   "team": "GB",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24401
+  },
+  "8833": {
+   "full_name": "Dallis Flowers",
+   "first_name": "Dallis",
+   "last_name": "Flowers",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23677
+  },
+  "10992": {
+   "full_name": "Yasir Abdullah",
+   "first_name": "Yasir",
+   "last_name": "Abdullah",
+   "team": "ATL",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24386
+  },
+  "7329": {
+   "full_name": "Cole Christiansen",
+   "first_name": "Cole",
+   "last_name": "Christiansen",
+   "team": "KC",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 4036959,
+   "fantasy_data_id": 22321
+  },
+  "10919": {
+   "full_name": "Sydney Brown",
+   "first_name": "Sydney",
+   "last_name": "Brown",
+   "team": "ATL",
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24230
+  },
+  "12164": {
+   "full_name": "Curtis Jacobs",
+   "first_name": "Curtis",
+   "last_name": "Jacobs",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25247
+  },
+  "12530": {
+   "full_name": "Travis Hunter",
+   "first_name": "Travis",
+   "last_name": "Hunter",
+   "team": "JAX",
+   "position": "DB",
+   "fantasy_positions": [
+    "DB",
+    "WR"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26056
+  },
+  "8569": {
+   "full_name": "Arron Mosby",
+   "first_name": "Arron",
+   "last_name": "Mosby",
+   "team": "GB",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23776
+  },
+  "3256": {
+   "full_name": "Javon Hargrave",
+   "first_name": "Javon",
+   "last_name": "Hargrave",
+   "team": "GB",
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": 2983055,
+   "fantasy_data_id": 18017
+  },
+  "11801": {
+   "full_name": "DJ James",
+   "first_name": "DJ",
+   "last_name": "James",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25339
+  },
+  "5041": {
+   "full_name": "Fred Warner",
+   "first_name": "Fred",
+   "last_name": "Warner",
+   "team": "SF",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3138826,
+   "fantasy_data_id": 19891
+  },
+  "11679": {
+   "full_name": "Chris Braswell",
+   "first_name": "Chris",
+   "last_name": "Braswell",
+   "team": "HOU",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24988
+  },
+  "11018": {
+   "full_name": "Christian Braswell",
+   "first_name": "Christian",
+   "last_name": "Braswell",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24483
+  },
+  "3232": {
+   "full_name": "Adam Gotsis",
+   "first_name": "Adam",
+   "last_name": "Gotsis",
+   "team": null,
+   "position": "DE",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": 2971498,
+   "fantasy_data_id": 17993
+  },
+  "11739": {
+   "full_name": "Evan Williams",
+   "first_name": "Evan",
+   "last_name": "Williams",
+   "team": "GB",
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25125
+  },
+  "11899": {
+   "full_name": "Rico Payton",
+   "first_name": "Rico",
+   "last_name": "Payton",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25469
+  },
+  "11720": {
+   "full_name": "Marist Liufau",
+   "first_name": "Marist",
+   "last_name": "Liufau",
+   "team": "DAL",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25245
+  },
+  "7712": {
+   "full_name": "Robert Rochell",
+   "first_name": "Robert",
+   "last_name": "Rochell",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22848
+  },
+  "12238": {
+   "full_name": "Eric Watts",
+   "first_name": "Eric",
+   "last_name": "Watts",
+   "team": "MIA",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25267
+  },
+  "3652": {
+   "full_name": "Mike Thomas",
+   "first_name": "Mike",
+   "last_name": "Thomas",
+   "team": null,
+   "position": "WR",
+   "fantasy_positions": [
+    "WR"
+   ],
+   "active": true,
+   "espn_id": 3123986,
+   "fantasy_data_id": 18445
+  },
+  "6129": {
+   "full_name": "Jerry Tillery",
+   "first_name": "Jerry",
+   "last_name": "Tillery",
+   "team": "IND",
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": 3863182,
+   "fantasy_data_id": 20967
+  },
+  "8309": {
+   "full_name": "Damone Clark",
+   "first_name": "Damone",
+   "last_name": "Clark",
+   "team": "DET",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23442
+  },
+  "10873": {
+   "full_name": "Nolan Smith",
+   "first_name": "Nolan",
+   "last_name": "Smith",
+   "team": "PHI",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23261
+  },
+  "5030": {
+   "full_name": "Harold Landry",
+   "first_name": "Harold",
+   "last_name": "Landry",
+   "team": "NE",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3122793,
+   "fantasy_data_id": 19862
+  },
+  "11781": {
+   "full_name": "Daequan Hardy",
+   "first_name": "Daequan",
+   "last_name": "Hardy",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25182
+  },
+  "10925": {
+   "full_name": "Byron Young",
+   "first_name": "Byron",
+   "last_name": "Young",
+   "team": "PHI",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24248
+  },
+  "6860": {
+   "full_name": "Akeem Davis-Gaither",
+   "first_name": "Akeem",
+   "last_name": "Davis-Gaither",
+   "team": "IND",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3917142,
+   "fantasy_data_id": 21999
+  },
+  "8521": {
+   "full_name": "Faion Hicks",
+   "first_name": "Faion",
+   "last_name": "Hicks",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": null
+  },
+  "13157": {
+   "full_name": "Reuben Lowery",
+   "first_name": "Reuben",
+   "last_name": "Lowery",
+   "team": null,
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26652
+  },
+  "7788": {
+   "full_name": "Victor Dimukeje",
+   "first_name": "Victor",
+   "last_name": "Dimukeje",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22788
+  },
+  "5334": {
+   "full_name": "Josey Jewell",
+   "first_name": "Josey",
+   "last_name": "Jewell",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": 3040150,
+   "fantasy_data_id": 19933
+  },
+  "11336": {
+   "full_name": "Eku Leota",
+   "first_name": "Eku",
+   "last_name": "Leota",
+   "team": "ARI",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24273
+  },
+  "8398": {
+   "full_name": "Jermaine Johnson",
+   "first_name": "Jermaine",
+   "last_name": "Johnson",
+   "team": "TEN",
+   "position": "LB",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23382
+  },
+  "8520": {
+   "full_name": "Daniel Hardy",
+   "first_name": "Daniel",
+   "last_name": "Hardy",
+   "team": "CHI",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23625
+  },
+  "11194": {
+   "full_name": "Keshawn Banks",
+   "first_name": "Keshawn",
+   "last_name": "Banks",
+   "team": "MIN",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24619
+  },
+  "7715": {
+   "full_name": "Camryn Bynum",
+   "first_name": "Camryn",
+   "last_name": "Bynum",
+   "team": "IND",
+   "position": "DB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22729
+  },
+  "8273": {
+   "full_name": "Phidarian Mathis",
+   "first_name": "Phidarian",
+   "last_name": "Mathis",
+   "team": "BUF",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23276
+  },
+  "10973": {
+   "full_name": "Nick Hampton",
+   "first_name": "Nick",
+   "last_name": "Hampton",
+   "team": "CAR",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24266
+  },
+  "8752": {
+   "full_name": "Ja'Quan McMillian",
+   "first_name": "Ja'Quan",
+   "last_name": "McMillian",
+   "team": "DEN",
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23367
+  },
+  "3199": {
+   "full_name": "Michael Thomas",
+   "first_name": "Michael",
+   "last_name": "Thomas",
+   "team": null,
+   "position": "WR",
+   "fantasy_positions": [
+    "WR"
+   ],
+   "active": true,
+   "espn_id": 2976316,
+   "fantasy_data_id": 17960
+  },
+  "7704": {
+   "full_name": "Buddy Johnson",
+   "first_name": "Buddy",
+   "last_name": "Johnson",
+   "team": "CHI",
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 22861
+  },
+  "8343": {
+   "full_name": "Boye Mafe",
+   "first_name": "Boye",
+   "last_name": "Mafe",
+   "team": "CIN",
+   "position": "DL",
+   "fantasy_positions": [
+    "DL",
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23381
+  },
+  "11993": {
+   "full_name": "Tyrek Funderburk",
+   "first_name": "Tyrek",
+   "last_name": "Funderburk",
+   "team": "DAL",
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25362
+  },
+  "12637": {
+   "full_name": "Ruben Hyppolite",
+   "first_name": "Ruben",
+   "last_name": "Hyppolite",
+   "team": null,
+   "position": "LB",
+   "fantasy_positions": [
+    "LB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 26329
+  },
+  "12319": {
+   "full_name": "Elijah Chatman",
+   "first_name": "Elijah",
+   "last_name": "Chatman",
+   "team": null,
+   "position": "DT",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25738
+  },
+  "11432": {
+   "full_name": "Markees Watts",
+   "first_name": "Markees",
+   "last_name": "Watts",
+   "team": null,
+   "position": "DE",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 24864
+  },
+  "8844": {
+   "full_name": "Sam Webb",
+   "first_name": "Sam",
+   "last_name": "Webb",
+   "team": null,
+   "position": "CB",
+   "fantasy_positions": [
+    "DB"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 23563
+  },
+  "11767": {
+   "full_name": "Xavier Thomas",
+   "first_name": "Xavier",
+   "last_name": "Thomas",
+   "team": null,
+   "position": "DE",
+   "fantasy_positions": [
+    "DL"
+   ],
+   "active": true,
+   "espn_id": null,
+   "fantasy_data_id": 25272
+  }
+ }
+}

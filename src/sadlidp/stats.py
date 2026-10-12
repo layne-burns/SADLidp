@@ -1,10 +1,11 @@
 """Season accuracy for the Stats page (D20, SPEC §6.8), computed from the committed week files.
 
-Per week with final stats (actuals.json) and a projection snapshot:
-- prediction = the source's SADL points for each projected player (Sleeper is the only source so far,
-  so it is also the consensus), σ_pred = √(σ_μ² + σ_out²);
+Per week with final stats (actuals.json) and a projection snapshot (every saved projection source):
+- prediction = the equal-weight mean of the sources' SADL points for each projected player (the PR 3
+  consensus; with one source, that source), σ_pred = √(σ_μ² + σ_out²);
 - evaluation pool per position = the top `N_eval` by prediction among players who played (a player
   with no stat line didn't play: a late scratch, out or on bye, and is left out);
+- each source is scored on the pool players it covers, so no source picks its own pool (§6.8 per source);
 - the naive baseline is the player's average SADL points over his earlier games this season (2+).
 Suggestions come from the decision log (live weeks) or the rebuilt page (replayed weeks); tiers from
 each week's page. Nothing here feeds back into the numbers on the main page.
@@ -19,6 +20,7 @@ from pathlib import Path
 from . import metrics, scoring, storage, weeklog
 from .positions import IDP_SLOTS, slot_of
 from .schedule import Schedule
+from .sync import SOURCE_LABELS
 
 N_EVAL = 50
 MIN_CORR_N = 100  # correlations and R² only season to date, and only with this many player-games
@@ -45,6 +47,24 @@ def _positions(season_dir: Path) -> dict[str, str]:
                 if s:
                     slots[pid] = s
     return slots
+
+
+def _projection_sources(wd: Path) -> dict[str, dict]:
+    """name -> rows of every projection source saved for the week, in the sync's source order."""
+    order = list(SOURCE_LABELS)
+    out = {}
+    for path in sorted((wd / "sources").glob("*.json"), key=lambda p: (order.index(p.stem) if p.stem in order
+                                                                       else len(order), p.stem)):  # fmt: skip
+        doc = storage.read_json(path) or {}
+        if doc.get("kind", "projection") == "projection":
+            out[path.stem] = doc.get("rows") or {}
+    return out
+
+
+def _naive(history: dict[str, list[float]], pid: str) -> float | None:
+    """The naive baseline: his average SADL points over his earlier games this season (2+)."""
+    past = history.get(pid) or []
+    return sum(past) / len(past) if len(past) >= 2 else None
 
 
 def _summary(pred: list[float], act: list[float], sig: list[float], base: list[tuple[float, float]]) -> dict:
@@ -82,6 +102,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     history: dict[str, list[float]] = {}  # pid -> SADL points of earlier games this season
     resid: dict[str, dict[int, tuple[bool, list[float]]]] = {}  # slot -> week -> (provisional, actual − predicted)
     season_rows = {s: {"pred": [], "act": [], "sig": [], "base": [], "pairs": []} for s in IDP_SLOTS}
+    by_source: dict[str, dict[str, dict]] = {}  # source -> slot -> pooled pred/act/sig/base, covered, pool
     weekly, suggestions, tiers = [], [], {s: {} for s in IDP_SLOTS}
     for week, wd in weeks:
         act_doc = storage.read_json(wd / "actuals.json") or {}
@@ -89,12 +110,20 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         played = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
         settles, captured = sched.settles_at(week), act_doc.get("captured_at")
         provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
-        src = storage.read_json(wd / "sources" / "sleeper_proj.json") or {}
-        rows = src.get("rows") or {}
-        pred_all = {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
-        late = sum(1 for r in rows.values() if r.get("late"))
-        backfill = sum(1 for r in rows.values() if r.get("backfill"))
-        row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {}}
+        sources = _projection_sources(wd)
+        preds = {
+            name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
+            for name, rows in sources.items()
+        }
+        covering: dict[str, list[float]] = {}
+        for pred_s in preds.values():
+            for pid, v in pred_s.items():
+                covering.setdefault(pid, []).append(v)
+        pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
+        late = sum(1 for rows in sources.values() for r in rows.values() if r.get("late"))
+        backfill = sum(1 for rows in sources.values() for r in rows.values() if r.get("backfill"))
+        row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {},
+               "by_source": {}}  # fmt: skip
         page = storage.read_json(wd / "consensus.json") or {}
         so_week = {s: float((page.get("sigma_out") or {}).get(s) or so[s]) for s in IDP_SLOTS}  # as the page used
         for slot in IDP_SLOTS:
@@ -114,6 +143,25 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             summ = _summary(pred, act, sig, base)
             summ.update(top12=top, pearson=None, spearman=None, r2=None, partial=partial)  # weekly: no correlations
             row["by_slot"][slot] = summ
+            for name, pred_s in preds.items():  # each source on the pool players it covers
+                cov = [pid for pid in pool if pid in pred_s]
+                p_s, a_s = [pred_s[pid] for pid in cov], [played[pid] for pid in cov]
+                sig_s = [(s_mu[slot] ** 2 + so_week[slot] ** 2) ** 0.5] * len(cov)
+                base_s = [(pred_s[pid], played[pid], b) for pid in cov if (b := _naive(history, pid)) is not None]
+                summ_s = _summary(p_s, a_s, sig_s, base_s)
+                summ_s.update(covered=len(cov), pool=len(pool), pearson=None, spearman=None, r2=None)
+                row["by_source"].setdefault(name, {})[slot] = summ_s
+                if partial:
+                    continue
+                acc = by_source.setdefault(name, {}).setdefault(
+                    slot, {"pred": [], "act": [], "sig": [], "base": [], "covered": 0, "pool": 0}
+                )
+                acc["pred"] += p_s
+                acc["act"] += a_s
+                acc["sig"] += sig_s
+                acc["base"] += base_s
+                acc["covered"] += len(cov)
+                acc["pool"] += len(pool)
             if partial:
                 continue
             resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
@@ -166,6 +214,14 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         for pid, pts in played.items():
             history.setdefault(pid, []).append(pts)
 
+    season_by_source = {}
+    for name, slots_acc in by_source.items():
+        season_by_source[name] = {}
+        for slot, acc in slots_acc.items():
+            summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
+            summ.update(covered=acc["covered"], pool=acc["pool"])
+            season_by_source[name][slot] = summ
+
     season_out = {}
     for slot, agg in season_rows.items():
         summ = _summary(agg["pred"], agg["act"], agg["sig"], agg["base"])
@@ -192,7 +248,11 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "season_by_slot": season_out,
         "suggestions": {"live": tally("live"), "rebuilt": tally("rebuilt")},
         "tiers": tier_rows,
-        "sources": [{"name": "Sleeper", "share": 1.0}],
+        "season_by_source": season_by_source,
+        "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
+        # equal priors within the projection group (PR 3); PR 6 records the accuracy weights in force each week
+        "sources": [{"name": SOURCE_LABELS.get(n, n), "share": 1 / len(season_by_source)} for n in season_by_source]
+        or [{"name": "Sleeper", "share": 1.0}],
         "sigma_out": so,
         "n_eval": N_EVAL,
         "min_corr_n": MIN_CORR_N,

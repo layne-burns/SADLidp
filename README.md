@@ -61,6 +61,8 @@ uv run ruff check . && uv run ruff format --check .
 uv run sadlidp sync --force --data-dir /tmp/sadl       # live: needs network access to Sleeper
 uv run sadlidp build --data-dir /tmp/sadl --site-dir /tmp/site
 uv run sadlidp backfill --source espn_proj --weeks 1-5  # past weeks from a source's archive (--redo refetches)
+uv run sadlidp backtest run --season 2025                # last season's Sleeper archive (data/2025/archive): skill, form, swing, sacks
+uv run sadlidp tune --season 2026                        # re-tier this season's settled weeks under candidate z and splits
 uv run sadlidp gate
 ```
 Pushes to `claude/**` branches also run a live preview in CI: the branch's committed data is copied to a scratch directory, a forced sync runs on top of it, and the site is published to the `previews/<branch>` branch, which each run of that branch replaces.

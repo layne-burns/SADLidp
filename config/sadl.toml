@@ -36,6 +36,20 @@ DB = 5.0
 [weights]
 prior_split = 0.6           # projection : rank group prior (D11)
 
+[form]                      # the form term added to μ (SPEC §6.4): his earlier misses this season and his last game's snaps
+enabled = true
+k = 4                       # shrinkage: after n games a player's mean miss counts n/(n+k) of itself
+
+[form.miss]                 # points per point of shrunk mean miss; fitted on the 2025 archive (`sadlidp backtest run`)
+DL = 0.45
+LB = 0.40
+DB = 0.20
+
+[form.snap]                 # points per 100% of last game's defensive snap share, relative to the position's 60 best-projected
+DL = 7.5
+LB = 5.5
+DB = 4.0
+
 [sources]
 max_source_age_h = 96
 shrink_guard = 0.6          # a fetch with fewer rows than this share of the stored rows is skipped (SPEC §7)

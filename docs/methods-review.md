@@ -46,9 +46,11 @@ power; on 5,767 games sack excess does persist, with a slope of 0.37.
 ## Recommended order
 1. **A 2025 backtest harness** (`sadlidp backtest`, generalizing the one PR 6 plans): read the archive
    once into `data/2025/`, score it under SADL settings, and give every idea a 12,600-game test and a
-   walk-forward on 2026. One afternoon; every later step gets cheaper.
+   walk-forward on 2026. One afternoon; every later step gets cheaper. *Shipped 2026-10-12 (PR 10).*
 2. **A "form" term in μ**: snap share plus the shrunk player residual, fitted on 2025, applied walk-forward
    in 2026 with coefficients recorded per week like the source weights. This is where the tiers change.
+   *Shipped 2026-10-12 (SPEC §6.4, `[form]` in the config): fitted on each position's 60 best-projected
+   with the projection held at 1, miss β DL 0.45, LB 0.40, DB 0.20; snap β per 100% DL 7.5, LB 5.5, DB 4.0.*
 3. **Per-player swing** for START/UPGRADE odds and a floor/ceiling on each card.
 4. **DB handling**: say on the page that waiver DBs are not separable by projection, and lean on snap share
    and the form term there.

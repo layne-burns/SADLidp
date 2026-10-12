@@ -207,7 +207,8 @@ def test_fp_ranks_join_the_consensus_at_the_rank_groups_share(tmp_path):
         by = parts(c)
         assert by["FantasyPros"]["share"] == 0.4 and by["Sleeper"]["share"] == by["ESPN"]["share"] == 0.3
         assert by["FantasyPros"]["list"] == c["slot"] and by["FantasyPros"]["rank"] >= 1
-        assert abs(c["mu"] - sum(p["pts"] * p["share"] for p in by.values() if "pts" in p)) < 0.02
+        base = c["breakdown"].get("base", c["mu"])  # the blend; the form term (§6.4) sits on top of it
+        assert abs(base - sum(p["pts"] * p["share"] for p in by.values() if "pts" in p)) < 0.02
     # FP reverses Sleeper's order, so its #1 at a position maps to the best projection on that list
     fp_rows = storage.load_source(week / "sources" / "fp_ecr.json")
     frozen = json.loads((week / "frozen.json").read_text())["players"]

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from sadlidp import cli
+from sadlidp import cli, scoring
 from sadlidp.config import load_config
 from sadlidp.net import Response
 from sadlidp.positions import slot_of
@@ -19,6 +19,7 @@ from sadlidp.sync import run_sync
 ROOT = Path(__file__).parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 CFG = load_config(ROOT / "config" / "sadl.toml")
+CFG_PLAIN = {**CFG, "form": {**CFG["form"], "enabled": False}}  # the consensus alone: no form from the week-4 snaps
 NOW = datetime(2026, 10, 6, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: inside the week-5 pre-waiver window
 LEAGUE = json.loads((FIXTURES / "sleeper_league.json").read_text())
 LID = LEAGUE["league_id"]
@@ -293,7 +294,7 @@ def test_frozen_record_and_locked_suggestions_after_kickoff(tmp_path):
 
 def test_decision_logs(tmp_path):
     data = tmp_path / "d"
-    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # pre-waiver window
+    run_sync(CFG_PLAIN, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # pre-waiver
     week = data / "2026" / "week05"
     badges = json.loads((week / "badges.json").read_text())["badges"]
     assert [k for k in badges if k.startswith("4118|")] == ["4118|START|11742"]  # vs Cedric Gray
@@ -359,16 +360,16 @@ THU_NOON = datetime(2026, 10, 8, 16, 0, tzinfo=UTC)  # Thu noon ET: after waiver
 
 def test_a_followed_suggestion_is_judged_with_its_result(tmp_path):
     data, cache = tmp_path / "d", tmp_path / "c"
-    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # Tue: START Anzalone
+    run_sync(CFG_PLAIN, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # Tue: START Anzalone
     claimed = routes()
     mine = copy.deepcopy(ROSTERS)
     mine[0]["players"] = [*mine[0]["players"], "4118"]  # Wednesday waivers: you claimed him
     claimed[f"{V1}/league/{LID}/rosters"] = mine
-    run_sync(CFG, data, cache, THU_NOON, force=True, client=FakeClient(claimed), log=lambda m: None)
+    run_sync(CFG_PLAIN, data, cache, THU_NOON, force=True, client=FakeClient(claimed), log=lambda m: None)
     entry = json.loads((data / "2026" / "week05" / "badges.json").read_text())["badges"]["4118|START|11742"]
     assert entry["active"] is True and entry["claimed_by"] == "me"
     claimed[f"{V1}/stats/nfl/regular/2026/5"] = {"4118": {"gp": 1, "idp_tkl_solo": 6, "idp_tkl_ast": 2, "idp_sack": 1}}
-    run_sync(CFG, data, cache, FRIDAY, force=True, client=FakeClient(claimed), log=lambda m: None)
+    run_sync(CFG_PLAIN, data, cache, FRIDAY, force=True, client=FakeClient(claimed), log=lambda m: None)
     d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
     sugg = {s["player"]["id"]: s for s in d["my_idps"]["LB"]["played_suggestions"]}
     assert sugg["4118"]["player"]["result"] == {"pts": 20.0, "state": "final"}
@@ -424,7 +425,7 @@ WEEK6_TUE = datetime(2026, 10, 13, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: week-6 pre
 
 def test_last_week_recap_shows_final_scores_of_issued_suggestions(tmp_path):
     data, cache = tmp_path / "d", tmp_path / "c"
-    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # week 5: suggestions issued
+    run_sync(CFG_PLAIN, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # week 5: suggestions issued
     r = routes()
     r[f"{V1}/state/nfl"] = {"season": "2026", "season_type": "regular", "week": 6, "display_week": 6}
     r[f"{V1}/league/{LID}/matchups/6"] = []
@@ -433,7 +434,7 @@ def test_last_week_recap_shows_final_scores_of_issued_suggestions(tmp_path):
         "11742": {"gp": 1, "idp_tkl_solo": 4},  # Cedric Gray 8 pts
         "11017": {"gp": 1, "idp_tkl_solo": 1},  # Dee Winters 2 pts
     }
-    run_sync(CFG, data, cache, WEEK6_TUE, force=True, client=FakeClient(r), log=lambda m: None)
+    run_sync(CFG_PLAIN, data, cache, WEEK6_TUE, force=True, client=FakeClient(r), log=lambda m: None)
     d = json.loads((data / "2026" / "week06" / "consensus.json").read_text())
     lw = d["last_week"]
     assert lw["week"] == 5 and lw["provisional"]  # captured Tuesday, corrections until Friday night
@@ -501,9 +502,23 @@ def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
                     "last_success": NOW.isoformat(), "fetches": [NOW.isoformat()]}  # fmt: skip
     week4.parent.mkdir(parents=True, exist_ok=True)
     week4.write_text(json.dumps(storage_rows))
+    # week 3's result and record travel into the replay (§6.4 form term); the rebuilt μs become week 4's record
+    week3 = data / "2026" / "week03"
+    week3.mkdir(parents=True)
+    (week3 / "frozen.json").write_text(json.dumps({"schema_version": 1, "players": {"11705": {"mu": 4.0}}}))
+    line = {"gp": 1, "idp_tkl_solo": 7, "def_snp": 60, "tm_def_snp": 60}
+    (week3 / "actuals.json").write_text(json.dumps({"week": 3, "stats": {"11705": line}}))
     out = replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None)
     d = json.loads(out.read_text())
     assert d["week"] == 4 and d["replayed"]["as_of"] == "2026-10-01T20:14:00-04:00"  # just before week 4's TNF
+    tykee = _card(d, "11705")
+    assert tykee["breakdown"]["form"]["miss"]["games"] == 1 and tykee["breakdown"]["form"]["snap"]["week"] == 3
+    frozen = data / "2026" / "week04" / "frozen.json"
+    record = json.loads(frozen.read_text())["players"]
+    assert record["11705"]["mu"] == tykee["mu"] and len(record) > 20
+    frozen.write_text(json.dumps({"schema_version": 1, "players": {}}))  # a record already there is kept
+    replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None)
+    assert json.loads(frozen.read_text())["players"] == {}
     rostered = {p for m in truth["matchups"] for p in m["players"]}
     tiered = {p["id"] for s in d["positions"].values() for t in s["tiers"] for p in t["players"]}
     assert tiered and not tiered & rostered  # availability from that week's rosters
@@ -514,6 +529,54 @@ def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
     html = build_site(data, tmp_path / "site").read_text()  # index = week 5; week 4 page rebuilt
     page = (tmp_path / "site" / "week-2026-04.html").read_text()
     assert "Rebuilt after the fact" in page and "as they stood at the week" not in page and "week-2026-04.html" in html
+
+
+def _card(obj, pid):
+    """The first player card with this id anywhere in a week's page data."""
+    if isinstance(obj, dict):
+        if obj.get("id") == pid and "breakdown" in obj:
+            return obj
+        return next((c for v in obj.values() if (c := _card(v, pid))), None)
+    if isinstance(obj, list):
+        return next((c for v in obj if (c := _card(v, pid))), None)
+    return None
+
+
+def test_form_term_from_earlier_weeks(tmp_path):
+    """SPEC §6.4: Tykee's week-4 line (from the actuals the sync writes) and a frozen week-4 μ give him a form
+    term in week 5: his shrunk miss and his snap share against the DB average, shown in his breakdown."""
+    data = tmp_path / "d"
+    truth = json.loads((FIXTURES / "sleeper_week04_ground_truth.json").read_text())
+    week4 = data / "2026" / "week04"
+    week4.mkdir(parents=True)
+    (week4 / "frozen.json").write_text(json.dumps({"schema_version": 1, "players": {"11705": {"mu": 4.0}}}))
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)
+    run = json.loads((data / "2026" / "week05" / "run.json").read_text())["form"]
+    assert run["k"] == 4 and run["miss"]["DB"] == CFG["form"]["miss"]["DB"] and run["players"]["snap"] > 10
+    assert run["players"]["miss"] == 1 and 0.5 < run["snap_avg"]["DB"] < 1  # only Tykee had a frozen μ
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    tykee = _card(d["my_idps"], "11705")
+    f = tykee["breakdown"]["form"]
+    pts = scoring.points(truth["stats"]["11705"], LEAGUE["scoring_settings"])
+    assert f["miss"] == {"pts": round(CFG["form"]["miss"]["DB"] * (pts - 4.0) / 5, 3), "games": 1,
+                         "mean": round(pts - 4.0, 2), "shrunk": round((pts - 4.0) / 5, 2)}  # fmt: skip
+    assert f["snap"]["share"] == round(59 / 60, 3) and f["snap"]["week"] == 4
+    assert f["snap"]["avg"] == run["snap_avg"]["DB"]
+    assert f["snap"]["pts"] == round(CFG["form"]["snap"]["DB"] * (59 / 60 - f["snap"]["avg"]), 3)
+    assert f["pts"] == pytest.approx(f["miss"]["pts"] + f["snap"]["pts"], abs=0.002)
+    assert tykee["mu"] == round(tykee["breakdown"]["base"] + f["pts"], 2) == tykee["breakdown"]["mu"]
+    frozen = json.loads((data / "2026" / "week05" / "frozen.json").read_text())["players"]["11705"]
+    assert round(frozen["base"], 2) == tykee["breakdown"]["base"] and round(frozen["mu"], 2) == tykee["mu"]
+    assert frozen["form"] == f
+    other = _card(d["positions"]["LB"], "4118")  # Anzalone: no week-4 line, so no term and no form in his card
+    assert "form" not in other["breakdown"] and other["mu"] == other["breakdown"]["mu"]
+    html = build_site(data, tmp_path / "site", CFG).read_text()
+    assert "<b>Form</b>" in html and "with form" in html and "of his team's defensive snaps last game (week 4)" in html
+    # off: nothing changes and nothing is recorded
+    run_sync(CFG_PLAIN, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)
+    assert "form" not in json.loads((data / "2026" / "week05" / "run.json").read_text())
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    assert "form" not in _card(d["my_idps"], "11705")["breakdown"]
 
 
 def test_breakdown_and_stats_page(tmp_path):

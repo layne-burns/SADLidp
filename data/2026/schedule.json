@@ -735,7 +735,7 @@
    "home": "ATL",
    "kickoff": "2026-10-18T13:00:00-04:00",
    "spread_line": -3.0,
-   "total_line": 47.5,
+   "total_line": 48.5,
    "week": 6
   },
   {
@@ -743,7 +743,7 @@
    "game_id": "2026_06_BAL_CLE",
    "home": "CLE",
    "kickoff": "2026-10-18T13:00:00-04:00",
-   "spread_line": -3.5,
+   "spread_line": -4.5,
    "total_line": 40.5,
    "week": 6
   },
@@ -753,7 +753,7 @@
    "home": "IND",
    "kickoff": "2026-10-18T13:00:00-04:00",
    "spread_line": 7.0,
-   "total_line": 43.5,
+   "total_line": 44.5,
    "week": 6
   },
   {
@@ -780,7 +780,7 @@
    "home": "PHI",
    "kickoff": "2026-10-18T13:00:00-04:00",
    "spread_line": 1.5,
-   "total_line": 42.5,
+   "total_line": 41.5,
    "week": 6
   },
   {
@@ -807,7 +807,7 @@
    "home": "KC",
    "kickoff": "2026-10-18T16:25:00-04:00",
    "spread_line": 8.5,
-   "total_line": 43.5,
+   "total_line": 42.5,
    "week": 6
   },
   {

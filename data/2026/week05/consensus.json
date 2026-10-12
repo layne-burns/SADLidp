@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T05:51:00-04:00",
+ "generated_at": "2026-10-12T10:54:12-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -25,6 +25,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.92,
       "parts": [
        {
@@ -36,38 +37,50 @@
         "stats": [
          [
           "solo",
-          3.12
+          3.12,
+          false
          ],
          [
           "ast",
-          2.4
+          2.4,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.33
+          0.33,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -101,6 +114,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.06,
       "parts": [
        {
@@ -112,30 +126,40 @@
         "stats": [
          [
           "solo",
-          2.7
+          2.7,
+          false
          ],
          [
           "ast",
-          2.64
+          2.64,
+          false
          ],
          [
           "TFL",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -173,51 +197,95 @@
      "badge": "UPGRADE",
      "drop": "11739",
      "over": "11739",
-     "p": 0.612,
+     "p": 0.611,
      "player": {
       "also": [],
       "badge": null,
       "breakdown": {
-       "mu": 12.2,
+       "est": true,
+       "mu": 12.17,
        "parts": [
         {
          "kind": "projection",
          "late": false,
          "pts": 12.2,
-         "share": 1.0,
+         "share": 0.5,
          "source": "Sleeper",
          "stats": [
           [
            "solo",
-           3.27
+           3.27,
+           false
           ],
           [
            "ast",
-           2.05
+           2.05,
+           false
           ],
           [
            "TFL",
-           0.22
+           0.22,
+           false
           ],
           [
            "sack",
-           0.06
+           0.06,
+           false
           ],
           [
            "QB hit",
-           0.11
+           0.11,
+           false
           ],
           [
            "PD",
-           0.5
+           0.5,
+           false
           ],
           [
            "INT",
-           0.17
+           0.17,
+           false
           ],
           [
            "FF",
-           0.06
+           0.06,
+           false
+          ]
+         ],
+         "zero": false
+        },
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 12.14,
+         "share": 0.5,
+         "source": "ESPN",
+         "stats": [
+          [
+           "solo",
+           3.96,
+           false
+          ],
+          [
+           "ast",
+           2.3,
+           false
+          ],
+          [
+           "TFL",
+           0.18,
+           true
+          ],
+          [
+           "PD",
+           0.26,
+           false
+          ],
+          [
+           "INT",
+           0.09,
+           false
           ]
          ],
          "zero": false
@@ -229,14 +297,14 @@
       "kickoff": "2026-10-12T20:15:00-04:00",
       "late": false,
       "max": 12.2,
-      "min": 12.2,
+      "min": 12.14,
       "mine": false,
-      "mu": 12.2,
-      "n": 1,
+      "mu": 12.17,
+      "n": 2,
       "name": "Cole Bishop",
       "opp": "@LAR",
       "result": null,
-      "sigma": 1.0,
+      "sigma": 0.82,
       "slot": "DB",
       "team": "BUF",
       "tier": null,
@@ -265,42 +333,100 @@
      ],
      "badge": null,
      "breakdown": {
-      "mu": 13.97,
+      "est": true,
+      "mu": 14.54,
       "parts": [
        {
         "kind": "projection",
         "late": false,
         "pts": 13.97,
-        "share": 1.0,
+        "share": 0.5,
         "source": "Sleeper",
         "stats": [
          [
           "solo",
-          2.06
+          2.06,
+          false
          ],
          [
           "ast",
-          1.18
+          1.18,
+          false
          ],
          [
           "TFL",
-          0.88
+          0.88,
+          false
          ],
          [
           "sack",
-          0.74
+          0.74,
+          false
          ],
          [
           "QB hit",
-          1.42
+          1.42,
+          false
          ],
          [
           "FF",
-          0.29
+          0.29,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 15.11,
+        "share": 0.5,
+        "source": "ESPN",
+        "stats": [
+         [
+          "solo",
+          2.31,
+          false
+         ],
+         [
+          "ast",
+          1.7,
+          false
+         ],
+         [
+          "TFL",
+          0.94,
+          true
+         ],
+         [
+          "sack",
+          0.6,
+          false
+         ],
+         [
+          "QB hit",
+          1.67,
+          true
+         ],
+         [
+          "PD",
+          0.1,
+          false
+         ],
+         [
+          "FF",
+          0.24,
+          false
+         ],
+         [
+          "FR",
+          0.16,
+          false
          ]
         ],
         "zero": false
@@ -311,17 +437,17 @@
      "id": "7627",
      "kickoff": "2026-10-12T20:15:00-04:00",
      "late": false,
-     "max": 13.97,
+     "max": 15.11,
      "min": 13.97,
      "mine": true,
-     "mu": 13.97,
-     "n": 1,
+     "mu": 14.54,
+     "n": 2,
      "name": "Greg Rousseau",
      "opp": "@LAR",
      "reserve": false,
      "result": null,
      "role": "starter",
-     "sigma": 1.0,
+     "sigma": 0.88,
      "slot": "DL",
      "taxi": false,
      "team": "BUF",
@@ -348,6 +474,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.04,
       "parts": [
        {
@@ -359,34 +486,45 @@
         "stats": [
          [
           "solo",
-          1.7
+          1.7,
+          false
          ],
          [
           "ast",
-          0.8
+          0.8,
+          false
          ],
          [
           "TFL",
-          0.8
+          0.8,
+          false
          ],
          [
           "sack",
-          0.69
+          0.69,
+          false
          ],
          [
           "QB hit",
-          1.44
+          1.44,
+          false
          ],
          [
           "PD",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.11
+          0.11,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -420,6 +558,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 14.38,
       "parts": [
        {
@@ -431,38 +570,50 @@
         "stats": [
          [
           "solo",
-          4.19
+          4.19,
+          false
          ],
          [
           "ast",
-          3.39
+          3.39,
+          false
          ],
          [
           "TFL",
-          0.22
+          0.22,
+          false
          ],
          [
           "sack",
-          0.08
+          0.08,
+          false
          ],
          [
           "QB hit",
-          0.22
+          0.22,
+          false
          ],
          [
           "PD",
-          0.22
+          0.22,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -500,55 +651,115 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.634,
+     "p": 0.649,
      "player": {
       "also": [],
       "badge": null,
       "breakdown": {
-       "mu": 14.81,
+       "est": true,
+       "mu": 15.13,
        "parts": [
         {
          "kind": "projection",
          "late": false,
          "pts": 14.81,
-         "share": 1.0,
+         "share": 0.5,
          "source": "Sleeper",
          "stats": [
           [
            "solo",
-           4.0
+           4.0,
+           false
           ],
           [
            "ast",
-           2.68
+           2.68,
+           false
           ],
           [
            "TFL",
-           0.44
+           0.44,
+           false
           ],
           [
            "sack",
-           0.12
+           0.12,
+           false
           ],
           [
            "QB hit",
-           0.31
+           0.31,
+           false
           ],
           [
            "PD",
-           0.37
+           0.37,
+           false
           ],
           [
            "INT",
-           0.06
+           0.06,
+           false
           ],
           [
            "FF",
-           0.19
+           0.19,
+           false
           ],
           [
            "FR",
-           0.06
+           0.06,
+           false
+          ]
+         ],
+         "zero": false
+        },
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 15.45,
+         "share": 0.5,
+         "source": "ESPN",
+         "stats": [
+          [
+           "solo",
+           4.27,
+           false
+          ],
+          [
+           "ast",
+           3.38,
+           false
+          ],
+          [
+           "TFL",
+           0.42,
+           true
+          ],
+          [
+           "sack",
+           0.1,
+           false
+          ],
+          [
+           "QB hit",
+           0.23,
+           true
+          ],
+          [
+           "PD",
+           0.27,
+           false
+          ],
+          [
+           "FF",
+           0.15,
+           false
+          ],
+          [
+           "FR",
+           0.1,
+           false
           ]
          ],
          "zero": false
@@ -559,15 +770,15 @@
       "id": "8659",
       "kickoff": "2026-10-12T20:15:00-04:00",
       "late": false,
-      "max": 14.81,
+      "max": 15.45,
       "min": 14.81,
       "mine": false,
-      "mu": 14.81,
-      "n": 1,
+      "mu": 15.13,
+      "n": 2,
       "name": "Nate Landman",
       "opp": "BUF",
       "result": null,
-      "sigma": 1.0,
+      "sigma": 0.84,
       "slot": "LB",
       "team": "LAR",
       "tier": null,
@@ -584,51 +795,105 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.615,
+     "p": 0.642,
      "player": {
       "also": [],
       "badge": null,
       "breakdown": {
-       "mu": 14.41,
+       "est": true,
+       "mu": 14.98,
        "parts": [
         {
          "kind": "projection",
          "late": false,
          "pts": 14.41,
-         "share": 1.0,
+         "share": 0.5,
          "source": "Sleeper",
          "stats": [
           [
            "solo",
-           4.42
+           4.42,
+           false
           ],
           [
            "ast",
-           2.65
+           2.65,
+           false
           ],
           [
            "TFL",
-           0.41
+           0.41,
+           false
           ],
           [
            "sack",
-           0.06
+           0.06,
+           false
           ],
           [
            "QB hit",
-           0.12
+           0.12,
+           false
           ],
           [
            "PD",
-           0.18
+           0.18,
+           false
           ],
           [
            "INT",
-           0.12
+           0.12,
+           false
           ],
           [
            "FR",
-           0.12
+           0.12,
+           false
+          ]
+         ],
+         "zero": false
+        },
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 15.56,
+         "share": 0.5,
+         "source": "ESPN",
+         "stats": [
+          [
+           "solo",
+           4.36,
+           false
+          ],
+          [
+           "ast",
+           3.46,
+           false
+          ],
+          [
+           "TFL",
+           0.66,
+           true
+          ],
+          [
+           "sack",
+           0.08,
+           false
+          ],
+          [
+           "QB hit",
+           0.09,
+           true
+          ],
+          [
+           "PD",
+           0.29,
+           false
+          ],
+          [
+           "INT",
+           0.06,
+           false
           ]
          ],
          "zero": false
@@ -639,15 +904,15 @@
       "id": "8311",
       "kickoff": "2026-10-12T20:15:00-04:00",
       "late": false,
-      "max": 14.41,
+      "max": 15.56,
       "min": 14.41,
       "mine": false,
-      "mu": 14.41,
-      "n": 1,
+      "mu": 14.98,
+      "n": 2,
       "name": "Terrel Bernard",
       "opp": "@LAR",
       "result": null,
-      "sigma": 1.0,
+      "sigma": 0.88,
       "slot": "LB",
       "team": "BUF",
       "tier": null,
@@ -665,12 +930,13 @@
  "positions": {
   "DB": {
    "hidden": 0,
-   "no_projection": 12,
+   "no_projection": 11,
    "played": [
     {
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.1,
       "parts": [
        {
@@ -682,26 +948,35 @@
         "stats": [
          [
           "solo",
-          4.04
+          4.04,
+          false
          ],
          [
           "ast",
-          2.29
+          2.29,
+          false
          ],
          [
           "TFL",
-          0.22
+          0.22,
+          false
          ],
          [
           "PD",
-          0.33
+          0.33,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -732,6 +1007,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.13,
       "parts": [
        {
@@ -743,34 +1019,45 @@
         "stats": [
          [
           "solo",
-          3.62
+          3.62,
+          false
          ],
          [
           "ast",
-          2.23
+          2.23,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "QB hit",
-          0.06
+          0.06,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -801,6 +1088,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.09,
       "parts": [
        {
@@ -812,34 +1100,45 @@
         "stats": [
          [
           "solo",
-          3.18
+          3.18,
+          false
          ],
          [
           "ast",
-          2.21
+          2.21,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.38
+          0.38,
+          false
          ],
          [
           "INT",
-          0.16
+          0.16,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -870,6 +1169,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.09,
       "parts": [
        {
@@ -881,42 +1181,55 @@
         "stats": [
          [
           "solo",
-          2.75
+          2.75,
+          false
          ],
          [
           "ast",
-          2.59
+          2.59,
+          false
          ],
          [
           "TFL",
-          0.05
+          0.05,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.53
+          0.53,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -949,6 +1262,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.03,
       "parts": [
        {
@@ -960,38 +1274,50 @@
         "stats": [
          [
           "solo",
-          3.22
+          3.22,
+          false
          ],
          [
           "ast",
-          2.67
+          2.67,
+          false
          ],
          [
           "TFL",
-          0.16
+          0.16,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.16
+          0.16,
+          false
          ],
          [
           "PD",
-          0.22
+          0.22,
+          false
          ],
          [
           "FF",
-          0.11
+          0.11,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1022,6 +1348,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.93,
       "parts": [
        {
@@ -1033,26 +1360,35 @@
         "stats": [
          [
           "solo",
-          3.72
+          3.72,
+          false
          ],
          [
           "ast",
-          1.55
+          1.55,
+          false
          ],
          [
           "TFL",
-          0.22
+          0.22,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1083,6 +1419,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.81,
       "parts": [
        {
@@ -1094,30 +1431,40 @@
         "stats": [
          [
           "solo",
-          3.73
+          3.73,
+          false
          ],
          [
           "ast",
-          0.75
+          0.75,
+          false
          ],
          [
           "TFL",
-          0.1
+          0.1,
+          false
          ],
          [
           "PD",
-          0.45
+          0.45,
+          false
          ],
          [
           "INT",
-          0.15
+          0.15,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1148,6 +1495,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.6,
       "parts": [
        {
@@ -1159,26 +1507,35 @@
         "stats": [
          [
           "solo",
-          2.81
+          2.81,
+          false
          ],
          [
           "ast",
-          0.8
+          0.8,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "PD",
-          0.9
+          0.9,
+          false
          ],
          [
           "INT",
-          0.21
+          0.21,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1209,6 +1566,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.59,
       "parts": [
        {
@@ -1220,30 +1578,40 @@
         "stats": [
          [
           "solo",
-          3.31
+          3.31,
+          false
          ],
          [
           "ast",
-          1.46
+          1.46,
+          false
          ],
          [
           "TFL",
-          0.13
+          0.13,
+          false
          ],
          [
           "PD",
-          0.57
+          0.57,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1274,6 +1642,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.18,
       "parts": [
        {
@@ -1285,30 +1654,40 @@
         "stats": [
          [
           "solo",
-          3.12
+          3.12,
+          false
          ],
          [
           "ast",
-          1.62
+          1.62,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "QB hit",
-          0.06
+          0.06,
+          false
          ],
          [
           "PD",
-          0.56
+          0.56,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1339,6 +1718,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.12,
       "parts": [
        {
@@ -1350,38 +1730,50 @@
         "stats": [
          [
           "solo",
-          3.12
+          3.12,
+          false
          ],
          [
           "ast",
-          1.11
+          1.11,
+          false
          ],
          [
           "TFL",
-          0.16
+          0.16,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.48
+          0.48,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1414,6 +1806,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.0,
       "parts": [
        {
@@ -1425,34 +1818,45 @@
         "stats": [
          [
           "solo",
-          2.66
+          2.66,
+          false
          ],
          [
           "ast",
-          2.44
+          2.44,
+          false
          ],
          [
           "TFL",
-          0.06
+          0.06,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.11
+          0.11,
+          false
          ],
          [
           "PD",
-          0.33
+          0.33,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1483,6 +1887,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.96,
       "parts": [
        {
@@ -1494,34 +1899,45 @@
         "stats": [
          [
           "solo",
-          2.87
+          2.87,
+          false
          ],
          [
           "ast",
-          2.55
+          2.55,
+          false
          ],
          [
           "TFL",
-          0.13
+          0.13,
+          false
          ],
          [
           "QB hit",
-          0.06
+          0.06,
+          false
          ],
          [
           "PD",
-          0.13
+          0.13,
+          false
          ],
          [
           "INT",
-          0.13
+          0.13,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1552,6 +1968,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.81,
       "parts": [
        {
@@ -1563,38 +1980,50 @@
         "stats": [
          [
           "solo",
-          2.54
+          2.54,
+          false
          ],
          [
           "ast",
-          1.06
+          1.06,
+          false
          ],
          [
           "TFL",
-          0.28
+          0.28,
+          false
          ],
          [
           "sack",
-          0.09
+          0.09,
+          false
          ],
          [
           "QB hit",
-          0.23
+          0.23,
+          false
          ],
          [
           "PD",
-          0.55
+          0.55,
+          false
          ],
          [
           "INT",
-          0.09
+          0.09,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1625,6 +2054,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.74,
       "parts": [
        {
@@ -1636,30 +2066,40 @@
         "stats": [
          [
           "solo",
-          2.58
+          2.58,
+          false
          ],
          [
           "ast",
-          1.48
+          1.48,
+          false
          ],
          [
           "TFL",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.63
+          0.63,
+          false
          ],
          [
           "INT",
-          0.16
+          0.16,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1690,6 +2130,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.73,
       "parts": [
        {
@@ -1701,26 +2142,35 @@
         "stats": [
          [
           "solo",
-          2.8
+          2.8,
+          false
          ],
          [
           "ast",
-          0.97
+          0.97,
+          false
          ],
          [
           "TFL",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.7
+          0.7,
+          false
          ],
          [
           "INT",
-          0.16
+          0.16,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1751,6 +2201,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.68,
       "parts": [
        {
@@ -1762,26 +2213,35 @@
         "stats": [
          [
           "solo",
-          2.62
+          2.62,
+          false
          ],
          [
           "ast",
-          1.62
+          1.62,
+          false
          ],
          [
           "TFL",
-          0.12
+          0.12,
+          false
          ],
          [
           "PD",
-          0.62
+          0.62,
+          false
          ],
          [
           "INT",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1812,6 +2272,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.67,
       "parts": [
        {
@@ -1823,34 +2284,45 @@
         "stats": [
          [
           "solo",
-          3.12
+          3.12,
+          false
          ],
          [
           "ast",
-          1.21
+          1.21,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.33
+          0.33,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1881,6 +2353,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.52,
       "parts": [
        {
@@ -1892,42 +2365,55 @@
         "stats": [
          [
           "solo",
-          2.49
+          2.49,
+          false
          ],
          [
           "ast",
-          0.64
+          0.64,
+          false
          ],
          [
           "TFL",
-          0.12
+          0.12,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.12
+          0.12,
+          false
          ],
          [
           "PD",
-          0.58
+          0.58,
+          false
          ],
          [
           "INT",
-          0.12
+          0.12,
+          false
          ],
          [
           "FF",
-          0.12
+          0.12,
+          false
          ],
          [
           "FR",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -1958,6 +2444,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.39,
       "parts": [
        {
@@ -1969,34 +2456,45 @@
         "stats": [
          [
           "solo",
-          1.78
+          1.78,
+          false
          ],
          [
           "ast",
-          1.48
+          1.48,
+          false
          ],
          [
           "TFL",
-          0.12
+          0.12,
+          false
          ],
          [
           "PD",
-          0.89
+          0.89,
+          false
          ],
          [
           "INT",
-          0.18
+          0.18,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2027,6 +2525,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.37,
       "parts": [
        {
@@ -2038,30 +2537,40 @@
         "stats": [
          [
           "solo",
-          2.55
+          2.55,
+          false
          ],
          [
           "ast",
-          1.05
+          1.05,
+          false
          ],
          [
           "TFL",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.56
+          0.56,
+          false
          ],
          [
           "INT",
-          0.17
+          0.17,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2092,6 +2601,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.35,
       "parts": [
        {
@@ -2103,26 +2613,35 @@
         "stats": [
          [
           "solo",
-          3.0
+          3.0,
+          false
          ],
          [
           "ast",
-          1.67
+          1.67,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2153,6 +2672,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.33,
       "parts": [
        {
@@ -2164,34 +2684,45 @@
         "stats": [
          [
           "solo",
-          2.33
+          2.33,
+          false
          ],
          [
           "ast",
-          2.11
+          2.11,
+          false
          ],
          [
           "TFL",
-          0.17
+          0.17,
+          false
          ],
          [
           "QB hit",
-          0.06
+          0.06,
+          false
          ],
          [
           "PD",
-          0.44
+          0.44,
+          false
          ],
          [
           "INT",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2224,6 +2755,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.29,
       "parts": [
        {
@@ -2235,30 +2767,40 @@
         "stats": [
          [
           "solo",
-          2.51
+          2.51,
+          false
          ],
          [
           "ast",
-          1.15
+          1.15,
+          false
          ],
          [
           "PD",
-          0.52
+          0.52,
+          false
          ],
          [
           "INT",
-          0.21
+          0.21,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2289,6 +2831,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.29,
       "parts": [
        {
@@ -2300,26 +2843,35 @@
         "stats": [
          [
           "solo",
-          3.01
+          3.01,
+          false
          ],
          [
           "ast",
-          1.95
+          1.95,
+          false
          ],
          [
           "TFL",
-          0.06
+          0.06,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -2348,10 +2900,10 @@
     }
    ],
    "played_hidden": 168,
-   "tier_count": 6,
+   "tier_count": 5,
    "tiers": [
     {
-     "anchor_mu": 12.2,
+     "anchor_mu": 12.17,
      "players": [
       {
        "also": [],
@@ -2360,7 +2912,7 @@
         "badge": "UPGRADE",
         "drop": "11739",
         "over": "11739",
-        "p": 0.612,
+        "p": 0.611,
         "reference": true,
         "why": [
          "starter_locked",
@@ -2368,46 +2920,90 @@
         ]
        },
        "breakdown": {
-        "mu": 12.2,
+        "est": true,
+        "mu": 12.17,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 12.2,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            3.27
+            3.27,
+            false
            ],
            [
             "ast",
-            2.05
+            2.05,
+            false
            ],
            [
             "TFL",
-            0.22
+            0.22,
+            false
            ],
            [
             "sack",
-            0.06
+            0.06,
+            false
            ],
            [
             "QB hit",
-            0.11
+            0.11,
+            false
            ],
            [
             "PD",
-            0.5
+            0.5,
+            false
            ],
            [
             "INT",
-            0.17
+            0.17,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.14,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.96,
+            false
+           ],
+           [
+            "ast",
+            2.3,
+            false
+           ],
+           [
+            "TFL",
+            0.18,
+            true
+           ],
+           [
+            "PD",
+            0.26,
+            false
+           ],
+           [
+            "INT",
+            0.09,
+            false
            ]
           ],
           "zero": false
@@ -2419,277 +3015,107 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 12.2,
-       "min": 12.2,
+       "min": 12.14,
        "mine": false,
-       "mu": 12.2,
-       "n": 1,
+       "mu": 12.17,
+       "n": 2,
        "name": "Cole Bishop",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.82,
        "slot": "DB",
        "team": "BUF",
        "tier": 1,
        "unavailable": []
-      }
-     ],
-     "tier": 1
-    },
-    {
-     "anchor_mu": 10.49,
-     "players": [
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 10.49,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 10.49,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.81
-           ],
-           [
-            "ast",
-            2.5
-           ],
-           [
-            "TFL",
-            0.12
-           ],
-           [
-            "sack",
-            0.06
-           ],
-           [
-            "QB hit",
-            0.12
-           ],
-           [
-            "PD",
-            0.31
-           ],
-           [
-            "INT",
-            0.06
-           ],
-           [
-            "FF",
-            0.06
-           ],
-           [
-            "FR",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "7136",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 10.49,
-       "min": 10.49,
-       "mine": false,
-       "mu": 10.49,
-       "n": 1,
-       "name": "Kam Curl",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "LAR",
-       "tier": 2,
-       "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 9.5,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 9.5,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.65
-           ],
-           [
-            "ast",
-            1.47
-           ],
-           [
-            "TFL",
-            0.18
-           ],
-           [
-            "sack",
-            0.09
-           ],
-           [
-            "QB hit",
-            0.24
-           ],
-           [
-            "PD",
-            0.35
-           ],
-           [
-            "INT",
-            0.06
-           ],
-           [
-            "FF",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "5893",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 9.5,
-       "min": 9.5,
-       "mine": false,
-       "mu": 9.5,
-       "n": 1,
-       "name": "C.J. Gardner-Johnson",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "BUF",
-       "tier": 2,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 9.48,
+        "est": true,
+        "mu": 11.27,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 9.48,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            2.7
+            2.62,
+            false
            ],
            [
             "ast",
-            1.47
+            0.81,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.12,
+            false
            ],
            [
             "sack",
-            0.06
+            0.12,
+            false
            ],
            [
             "QB hit",
-            0.18
+            0.25,
+            false
            ],
            [
             "PD",
-            0.35
+            0.56,
+            false
            ],
            [
             "INT",
-            0.12
-           ],
-           [
-            "FR",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "11726",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 9.48,
-       "min": 9.48,
-       "mine": false,
-       "mu": 9.48,
-       "n": 1,
-       "name": "Kamren Kinchens",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "LAR",
-       "tier": 2,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 9.48,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 9.48,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.62
-           ],
-           [
-            "ast",
-            0.81
-           ],
-           [
-            "TFL",
-            0.12
-           ],
-           [
-            "sack",
-            0.12
-           ],
-           [
-            "QB hit",
-            0.25
-           ],
-           [
-            "PD",
-            0.56
-           ],
-           [
-            "INT",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 13.06,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.16,
+            false
+           ],
+           [
+            "ast",
+            1.21,
+            false
+           ],
+           [
+            "TFL",
+            0.19,
+            true
+           ],
+           [
+            "PD",
+            1.23,
+            false
+           ],
+           [
+            "INT",
+            0.15,
+            false
            ]
           ],
           "zero": false
@@ -2700,15 +3126,606 @@
        "id": "8364",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 9.48,
+       "max": 13.06,
        "min": 9.48,
        "mine": false,
-       "mu": 9.48,
-       "n": 1,
+       "mu": 11.27,
+       "n": 2,
        "name": "Trent McDuffie",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.32,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 10.95,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.95,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.49,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.81,
+            false
+           ],
+           [
+            "ast",
+            2.5,
+            false
+           ],
+           [
+            "TFL",
+            0.12,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            false
+           ],
+           [
+            "PD",
+            0.31,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ],
+           [
+            "FR",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.41,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.32,
+            false
+           ],
+           [
+            "ast",
+            1.94,
+            false
+           ],
+           [
+            "TFL",
+            0.09,
+            true
+           ],
+           [
+            "QB hit",
+            0.06,
+            true
+           ],
+           [
+            "PD",
+            0.46,
+            false
+           ],
+           [
+            "INT",
+            0.11,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7136",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 11.41,
+       "min": 10.49,
+       "mine": false,
+       "mu": 10.95,
+       "n": 2,
+       "name": "Kam Curl",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 0.86,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.41,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.5,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.65,
+            false
+           ],
+           [
+            "ast",
+            1.47,
+            false
+           ],
+           [
+            "TFL",
+            0.18,
+            false
+           ],
+           [
+            "sack",
+            0.09,
+            false
+           ],
+           [
+            "QB hit",
+            0.24,
+            false
+           ],
+           [
+            "PD",
+            0.35,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.32,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.09,
+            false
+           ],
+           [
+            "ast",
+            1.8,
+            false
+           ],
+           [
+            "TFL",
+            0.21,
+            true
+           ],
+           [
+            "PD",
+            0.51,
+            false
+           ],
+           [
+            "INT",
+            0.17,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5893",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 11.32,
+       "min": 9.5,
+       "mine": false,
+       "mu": 10.41,
+       "n": 2,
+       "name": "C.J. Gardner-Johnson",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 0.97,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.11,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.28,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.0,
+            false
+           ],
+           [
+            "ast",
+            0.77,
+            false
+           ],
+           [
+            "TFL",
+            0.18,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            false
+           ],
+           [
+            "PD",
+            0.47,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ],
+           [
+            "FR",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.95,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.31,
+            false
+           ],
+           [
+            "ast",
+            1.27,
+            false
+           ],
+           [
+            "TFL",
+            0.22,
+            true
+           ],
+           [
+            "PD",
+            0.78,
+            false
+           ],
+           [
+            "INT",
+            0.14,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8487",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 11.95,
+       "min": 8.28,
+       "mine": false,
+       "mu": 10.11,
+       "n": 2,
+       "name": "Christian Benford",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.34,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.06,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.48,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.7,
+            false
+           ],
+           [
+            "ast",
+            1.47,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.18,
+            false
+           ],
+           [
+            "PD",
+            0.35,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
+           ],
+           [
+            "FR",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.63,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.2,
+            false
+           ],
+           [
+            "ast",
+            1.86,
+            false
+           ],
+           [
+            "TFL",
+            0.05,
+            true
+           ],
+           [
+            "QB hit",
+            0.13,
+            true
+           ],
+           [
+            "PD",
+            0.38,
+            false
+           ],
+           [
+            "INT",
+            0.09,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11726",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 10.63,
+       "min": 9.48,
+       "mine": false,
+       "mu": 10.06,
+       "n": 2,
+       "name": "Kamren Kinchens",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 0.88,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 9.69,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.96,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.0,
+            false
+           ],
+           [
+            "ast",
+            0.56,
+            false
+           ],
+           [
+            "TFL",
+            0.12,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            false
+           ],
+           [
+            "PD",
+            0.44,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.43,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.47,
+            false
+           ],
+           [
+            "ast",
+            1.33,
+            false
+           ],
+           [
+            "TFL",
+            0.25,
+            true
+           ],
+           [
+            "sack",
+            0.05,
+            false
+           ],
+           [
+            "QB hit",
+            0.08,
+            true
+           ],
+           [
+            "PD",
+            0.84,
+            false
+           ],
+           [
+            "INT",
+            0.1,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8373",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 12.43,
+       "min": 6.96,
+       "mine": false,
+       "mu": 9.69,
+       "n": 2,
+       "name": "Jaylen Watson",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.78,
        "slot": "DB",
        "team": "LAR",
        "tier": 2,
@@ -2724,6 +3741,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 8.53,
         "parts": [
          {
@@ -2735,42 +3753,55 @@
           "stats": [
            [
             "solo",
-            1.71
+            1.71,
+            false
            ],
            [
             "ast",
-            1.12
+            1.12,
+            false
            ],
            [
             "TFL",
-            0.12
+            0.12,
+            false
            ],
            [
             "sack",
-            0.06
+            0.06,
+            false
            ],
            [
             "QB hit",
-            0.18
+            0.18,
+            false
            ],
            [
             "PD",
-            0.71
+            0.71,
+            false
            ],
            [
             "INT",
-            0.12
+            0.12,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -2798,176 +3829,75 @@
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 8.28,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 8.28,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.0
-           ],
-           [
-            "ast",
-            0.77
-           ],
-           [
-            "TFL",
-            0.18
-           ],
-           [
-            "sack",
-            0.06
-           ],
-           [
-            "QB hit",
-            0.12
-           ],
-           [
-            "PD",
-            0.47
-           ],
-           [
-            "INT",
-            0.12
-           ],
-           [
-            "FF",
-            0.06
-           ],
-           [
-            "FR",
-            0.12
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "8487",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 8.28,
-       "min": 8.28,
-       "mine": false,
-       "mu": 8.28,
-       "n": 1,
-       "name": "Christian Benford",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "BUF",
-       "tier": 3,
-       "unavailable": []
-      }
-     ],
-     "tier": 3
-    },
-    {
-     "anchor_mu": 6.96,
-     "players": [
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 6.96,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 6.96,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.0
-           ],
-           [
-            "ast",
-            0.56
-           ],
-           [
-            "TFL",
-            0.12
-           ],
-           [
-            "sack",
-            0.06
-           ],
-           [
-            "QB hit",
-            0.12
-           ],
-           [
-            "PD",
-            0.44
-           ],
-           [
-            "INT",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "8373",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 6.96,
-       "min": 6.96,
-       "mine": false,
-       "mu": 6.96,
-       "n": 1,
-       "name": "Jaylen Watson",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "LAR",
-       "tier": 4,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 6.5,
+        "est": true,
+        "mu": 8.05,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 6.5,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.47
+            1.47,
+            false
            ],
            [
             "ast",
-            0.77
+            0.77,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ],
            [
             "PD",
-            0.65
+            0.65,
+            false
            ],
            [
             "INT",
-            0.12
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.6,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            2.67,
+            false
+           ],
+           [
+            "ast",
+            1.02,
+            false
+           ],
+           [
+            "TFL",
+            0.09,
+            true
+           ],
+           [
+            "PD",
+            0.71,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
            ]
           ],
           "zero": false
@@ -2978,22 +3908,109 @@
        "id": "12596",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 6.5,
+       "max": 9.6,
        "min": 6.5,
        "mine": false,
-       "mu": 6.5,
-       "n": 1,
+       "mu": 8.05,
+       "n": 2,
        "name": "Maxwell Hairston",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.21,
        "slot": "DB",
        "team": "BUF",
-       "tier": 4,
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 6.76,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.73,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.24,
+            false
+           ],
+           [
+            "ast",
+            0.71,
+            false
+           ],
+           [
+            "PD",
+            0.18,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.79,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            2.65,
+            false
+           ],
+           [
+            "ast",
+            1.01,
+            false
+           ],
+           [
+            "TFL",
+            0.11,
+            true
+           ],
+           [
+            "PD",
+            0.75,
+            false
+           ],
+           [
+            "INT",
+            0.13,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "13454",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 9.79,
+       "min": 3.73,
+       "mine": false,
+       "mu": 6.76,
+       "n": 2,
+       "name": "Davison Igbinosun",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.93,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 3,
        "unavailable": []
       }
      ],
-     "tier": 4
+     "tier": 3
     },
     {
      "anchor_mu": 3.9,
@@ -3002,6 +4019,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 3.9,
         "parts": [
          {
@@ -3013,22 +4031,30 @@
           "stats": [
            [
             "solo",
-            1.24
+            1.24,
+            false
            ],
            [
             "ast",
-            0.94
+            0.94,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ],
            [
             "PD",
-            0.12
+            0.12,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -3047,33 +4073,67 @@
        "sigma": 1.0,
        "slot": "DB",
        "team": "BUF",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 3.73,
+        "est": true,
+        "mu": 2.59,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 3.73,
-          "share": 1.0,
+          "pts": 0.9,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.24
+            0.24,
+            false
            ],
            [
             "ast",
-            0.71
+            0.24,
+            false
            ],
            [
             "PD",
-            0.18
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 4.29,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.27,
+            false
+           ],
+           [
+            "ast",
+            0.74,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            true
+           ],
+           [
+            "PD",
+            0.12,
+            false
            ]
           ],
           "zero": false
@@ -3081,57 +4141,55 @@
         ]
        },
        "flags": [],
-       "id": "13454",
+       "id": "7787",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 3.73,
-       "min": 3.73,
+       "max": 4.29,
+       "min": 0.9,
        "mine": false,
-       "mu": 3.73,
-       "n": 1,
-       "name": "Davison Igbinosun",
+       "mu": 2.59,
+       "n": 2,
+       "name": "Damar Hamlin",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.27,
        "slot": "DB",
        "team": "BUF",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
-      }
-     ],
-     "tier": 5
-    },
-    {
-     "anchor_mu": 1.47,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 1.47,
+        "est": false,
+        "mu": 2.55,
         "parts": [
+         {
+          "missing": "no projection for him",
+          "source": "Sleeper"
+         },
          {
           "kind": "projection",
           "late": false,
-          "pts": 1.47,
+          "pts": 2.55,
           "share": 1.0,
-          "source": "Sleeper",
+          "source": "ESPN",
           "stats": [
            [
             "solo",
-            0.31
+            0.71,
+            false
            ],
            [
             "ast",
-            0.31
+            0.27,
+            false
            ],
            [
             "PD",
-            0.06
-           ],
-           [
-            "INT",
-            0.06
+            0.18,
+            false
            ]
           ],
           "zero": false
@@ -3139,47 +4197,82 @@
         ]
        },
        "flags": [],
-       "id": "10882",
+       "id": "12132",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 1.47,
-       "min": 1.47,
+       "max": 2.55,
+       "min": 2.55,
        "mine": false,
-       "mu": 1.47,
+       "mu": 2.55,
        "n": 1,
-       "name": "Emmanuel Forbes",
+       "name": "Josh Wallace",
        "opp": "BUF",
        "result": null,
        "sigma": 1.0,
        "slot": "DB",
        "team": "LAR",
-       "tier": 6,
+       "tier": 4,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 2.0,
+     "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 1.11,
+        "est": false,
+        "mu": 2.0,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.11,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.31
+            0.31,
+            false
            ],
            [
             "ast",
-            0.31
+            0.31,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.89,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.82,
+            false
+           ],
+           [
+            "ast",
+            0.48,
+            false
+           ],
+           [
+            "PD",
+            0.11,
+            false
            ]
           ],
           "zero": false
@@ -3190,24 +4283,107 @@
        "id": "12142",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 1.11,
+       "max": 2.89,
        "min": 1.11,
        "mine": false,
-       "mu": 1.11,
-       "n": 1,
+       "mu": 2.0,
+       "n": 2,
        "name": "Jaylen McCollough",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.96,
        "slot": "DB",
        "team": "LAR",
-       "tier": 6,
+       "tier": 5,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
+        "mu": 1.69,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.47,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.31,
+            false
+           ],
+           [
+            "ast",
+            0.31,
+            false
+           ],
+           [
+            "PD",
+            0.06,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.9,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.45,
+            false
+           ],
+           [
+            "ast",
+            0.17,
+            false
+           ],
+           [
+            "PD",
+            0.19,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10882",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 1.9,
+       "min": 1.47,
+       "mine": false,
+       "mu": 1.69,
+       "n": 2,
+       "name": "Emmanuel Forbes",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 0.83,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
         "mu": 1.05,
         "parts": [
          {
@@ -3219,18 +4395,25 @@
           "stats": [
            [
             "solo",
-            0.31
+            0.31,
+            false
            ],
            [
             "ast",
-            0.25
+            0.25,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -3249,13 +4432,14 @@
        "sigma": 1.0,
        "slot": "DB",
        "team": "LAR",
-       "tier": 6,
+       "tier": 5,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 0.9,
         "parts": [
          {
@@ -3267,18 +4451,25 @@
           "stats": [
            [
             "solo",
-            0.24
+            0.24,
+            false
            ],
            [
             "ast",
-            0.24
+            0.24,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -3297,70 +4488,23 @@
        "sigma": 1.0,
        "slot": "DB",
        "team": "BUF",
-       "tier": 6,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 0.9,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 0.9,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.24
-           ],
-           [
-            "ast",
-            0.24
-           ],
-           [
-            "PD",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "7787",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 0.9,
-       "min": 0.9,
-       "mine": false,
-       "mu": 0.9,
-       "n": 1,
-       "name": "Damar Hamlin",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DB",
-       "team": "BUF",
-       "tier": 6,
+       "tier": 5,
        "unavailable": []
       }
      ],
-     "tier": 6
+     "tier": 5
     }
    ]
   },
   "DL": {
    "hidden": 0,
-   "no_projection": 7,
+   "no_projection": 5,
    "played": [
     {
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.94,
       "parts": [
        {
@@ -3372,30 +4516,40 @@
         "stats": [
          [
           "solo",
-          1.24
+          1.24,
+          false
          ],
          [
           "ast",
-          1.36
+          1.36,
+          false
          ],
          [
           "TFL",
-          0.34
+          0.34,
+          false
          ],
          [
           "sack",
-          0.45
+          0.45,
+          false
          ],
          [
           "QB hit",
-          2.03
+          2.03,
+          false
          ],
          [
           "PD",
-          0.23
+          0.23,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3426,6 +4580,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.57,
       "parts": [
        {
@@ -3437,34 +4592,45 @@
         "stats": [
          [
           "solo",
-          1.51
+          1.51,
+          false
          ],
          [
           "ast",
-          1.4
+          1.4,
+          false
          ],
          [
           "TFL",
-          0.58
+          0.58,
+          false
          ],
          [
           "sack",
-          0.41
+          0.41,
+          false
          ],
          [
           "QB hit",
-          0.99
+          0.99,
+          false
          ],
          [
           "PD",
-          0.12
+          0.12,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3495,6 +4661,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.51,
       "parts": [
        {
@@ -3506,30 +4673,40 @@
         "stats": [
          [
           "solo",
-          1.76
+          1.76,
+          false
          ],
          [
           "ast",
-          1.6
+          1.6,
+          false
          ],
          [
           "TFL",
-          0.5
+          0.5,
+          false
          ],
          [
           "sack",
-          0.36
+          0.36,
+          false
          ],
          [
           "QB hit",
-          1.05
+          1.05,
+          false
          ],
          [
           "PD",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3560,6 +4737,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.43,
       "parts": [
        {
@@ -3571,26 +4749,35 @@
         "stats": [
          [
           "solo",
-          2.01
+          2.01,
+          false
          ],
          [
           "ast",
-          1.6
+          1.6,
+          false
          ],
          [
           "TFL",
-          0.47
+          0.47,
+          false
          ],
          [
           "sack",
-          0.36
+          0.36,
+          false
          ],
          [
           "QB hit",
-          0.71
+          0.71,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3623,6 +4810,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.42,
       "parts": [
        {
@@ -3634,38 +4822,50 @@
         "stats": [
          [
           "solo",
-          1.51
+          1.51,
+          false
          ],
          [
           "ast",
-          1.11
+          1.11,
+          false
          ],
          [
           "TFL",
-          0.6
+          0.6,
+          false
          ],
          [
           "sack",
-          0.43
+          0.43,
+          false
          ],
          [
           "QB hit",
-          1.06
+          1.06,
+          false
          ],
          [
           "PD",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3696,6 +4896,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 9.14,
       "parts": [
        {
@@ -3707,34 +4908,45 @@
         "stats": [
          [
           "solo",
-          1.5
+          1.5,
+          false
          ],
          [
           "ast",
-          1.5
+          1.5,
+          false
          ],
          [
           "TFL",
-          0.5
+          0.5,
+          false
          ],
          [
           "sack",
-          0.34
+          0.34,
+          false
          ],
          [
           "QB hit",
-          1.06
+          1.06,
+          false
          ],
          [
           "PD",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3765,6 +4977,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.93,
       "parts": [
        {
@@ -3776,30 +4989,40 @@
         "stats": [
          [
           "solo",
-          1.78
+          1.78,
+          false
          ],
          [
           "ast",
-          1.54
+          1.54,
+          false
          ],
          [
           "TFL",
-          0.36
+          0.36,
+          false
          ],
          [
           "sack",
-          0.3
+          0.3,
+          false
          ],
          [
           "QB hit",
-          0.95
+          0.95,
+          false
          ],
          [
           "PD",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3830,6 +5053,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.78,
       "parts": [
        {
@@ -3841,30 +5065,40 @@
         "stats": [
          [
           "solo",
-          1.95
+          1.95,
+          false
          ],
          [
           "ast",
-          1.84
+          1.84,
+          false
          ],
          [
           "TFL",
-          0.45
+          0.45,
+          false
          ],
          [
           "sack",
-          0.17
+          0.17,
+          false
          ],
          [
           "QB hit",
-          0.28
+          0.28,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3895,6 +5129,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.73,
       "parts": [
        {
@@ -3906,34 +5141,45 @@
         "stats": [
          [
           "solo",
-          1.45
+          1.45,
+          false
          ],
          [
           "ast",
-          1.39
+          1.39,
+          false
          ],
          [
           "TFL",
-          0.64
+          0.64,
+          false
          ],
          [
           "sack",
-          0.35
+          0.35,
+          false
          ],
          [
           "QB hit",
-          0.7
+          0.7,
+          false
          ],
          [
           "PD",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -3964,6 +5210,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.64,
       "parts": [
        {
@@ -3975,26 +5222,35 @@
         "stats": [
          [
           "solo",
-          1.34
+          1.34,
+          false
          ],
          [
           "ast",
-          2.4
+          2.4,
+          false
          ],
          [
           "TFL",
-          0.47
+          0.47,
+          false
          ],
          [
           "sack",
-          0.32
+          0.32,
+          false
          ],
          [
           "QB hit",
-          0.7
+          0.7,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4025,6 +5281,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.5,
       "parts": [
        {
@@ -4036,38 +5293,50 @@
         "stats": [
          [
           "solo",
-          1.29
+          1.29,
+          false
          ],
          [
           "ast",
-          1.46
+          1.46,
+          false
          ],
          [
           "TFL",
-          0.47
+          0.47,
+          false
          ],
          [
           "sack",
-          0.29
+          0.29,
+          false
          ],
          [
           "QB hit",
-          0.88
+          0.88,
+          false
          ],
          [
           "PD",
-          0.12
+          0.12,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4098,6 +5367,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.45,
       "parts": [
        {
@@ -4109,38 +5379,50 @@
         "stats": [
          [
           "solo",
-          1.43
+          1.43,
+          false
          ],
          [
           "ast",
-          1.13
+          1.13,
+          false
          ],
          [
           "TFL",
-          0.54
+          0.54,
+          false
          ],
          [
           "sack",
-          0.34
+          0.34,
+          false
          ],
          [
           "QB hit",
-          0.74
+          0.74,
+          false
          ],
          [
           "PD",
-          0.1
+          0.1,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4171,6 +5453,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.43,
       "parts": [
        {
@@ -4182,34 +5465,45 @@
         "stats": [
          [
           "solo",
-          1.46
+          1.46,
+          false
          ],
          [
           "ast",
-          0.89
+          0.89,
+          false
          ],
          [
           "TFL",
-          0.45
+          0.45,
+          false
          ],
          [
           "sack",
-          0.38
+          0.38,
+          false
          ],
          [
           "QB hit",
-          1.08
+          1.08,
+          false
          ],
          [
           "PD",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4240,6 +5534,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.37,
       "parts": [
        {
@@ -4251,34 +5546,45 @@
         "stats": [
          [
           "solo",
-          1.22
+          1.22,
+          false
          ],
          [
           "ast",
-          0.74
+          0.74,
+          false
          ],
          [
           "TFL",
-          0.53
+          0.53,
+          false
          ],
          [
           "sack",
-          0.45
+          0.45,
+          false
          ],
          [
           "QB hit",
-          0.95
+          0.95,
+          false
          ],
          [
           "PD",
-          0.11
+          0.11,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4309,6 +5615,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.21,
       "parts": [
        {
@@ -4320,38 +5627,50 @@
         "stats": [
          [
           "solo",
-          1.26
+          1.26,
+          false
          ],
          [
           "ast",
-          1.15
+          1.15,
+          false
          ],
          [
           "TFL",
-          0.33
+          0.33,
+          false
          ],
          [
           "sack",
-          0.38
+          0.38,
+          false
          ],
          [
           "QB hit",
-          1.15
+          1.15,
+          false
          ],
          [
           "PD",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4386,6 +5705,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.18,
       "parts": [
        {
@@ -4397,42 +5717,55 @@
         "stats": [
          [
           "solo",
-          1.18
+          1.18,
+          false
          ],
          [
           "ast",
-          1.04
+          1.04,
+          false
          ],
          [
           "TFL",
-          0.33
+          0.33,
+          false
          ],
          [
           "sack",
-          0.33
+          0.33,
+          false
          ],
          [
           "QB hit",
-          0.85
+          0.85,
+          false
          ],
          [
           "PD",
-          0.19
+          0.19,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.09
+          0.09,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4465,6 +5798,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.17,
       "parts": [
        {
@@ -4476,30 +5810,40 @@
         "stats": [
          [
           "solo",
-          1.53
+          1.53,
+          false
          ],
          [
           "ast",
-          1.16
+          1.16,
+          false
          ],
          [
           "TFL",
-          0.42
+          0.42,
+          false
          ],
          [
           "sack",
-          0.34
+          0.34,
+          false
          ],
          [
           "QB hit",
-          0.74
+          0.74,
+          false
          ],
          [
           "PD",
-          0.11
+          0.11,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4530,6 +5874,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.11,
       "parts": [
        {
@@ -4541,34 +5886,45 @@
         "stats": [
          [
           "solo",
-          1.64
+          1.64,
+          false
          ],
          [
           "ast",
-          0.82
+          0.82,
+          false
          ],
          [
           "TFL",
-          0.38
+          0.38,
+          false
          ],
          [
           "sack",
-          0.41
+          0.41,
+          false
          ],
          [
           "QB hit",
-          0.49
+          0.49,
+          false
          ],
          [
           "PD",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4599,6 +5955,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 8.07,
       "parts": [
        {
@@ -4610,30 +5967,40 @@
         "stats": [
          [
           "solo",
-          1.05
+          1.05,
+          false
          ],
          [
           "ast",
-          0.76
+          0.76,
+          false
          ],
          [
           "TFL",
-          0.7
+          0.7,
+          false
          ],
          [
           "sack",
-          0.52
+          0.52,
+          false
          ],
          [
           "FF",
-          0.17
+          0.17,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4666,6 +6033,7 @@
      ],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.92,
       "parts": [
        {
@@ -4677,34 +6045,45 @@
         "stats": [
          [
           "solo",
-          1.4
+          1.4,
+          false
          ],
          [
           "ast",
-          1.66
+          1.66,
+          false
          ],
          [
           "TFL",
-          0.32
+          0.32,
+          false
          ],
          [
           "sack",
-          0.25
+          0.25,
+          false
          ],
          [
           "QB hit",
-          0.57
+          0.57,
+          false
          ],
          [
           "PD",
-          0.19
+          0.19,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4735,6 +6114,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.73,
       "parts": [
        {
@@ -4746,34 +6126,45 @@
         "stats": [
          [
           "solo",
-          1.18
+          1.18,
+          false
          ],
          [
           "ast",
-          1.01
+          1.01,
+          false
          ],
          [
           "TFL",
-          0.45
+          0.45,
+          false
          ],
          [
           "sack",
-          0.34
+          0.34,
+          false
          ],
          [
           "QB hit",
-          0.73
+          0.73,
+          false
          ],
          [
           "PD",
-          0.17
+          0.17,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4804,6 +6195,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.69,
       "parts": [
        {
@@ -4815,34 +6207,45 @@
         "stats": [
          [
           "solo",
-          1.67
+          1.67,
+          false
          ],
          [
           "ast",
-          1.39
+          1.39,
+          false
          ],
          [
           "sack",
-          0.22
+          0.22,
+          false
          ],
          [
           "QB hit",
-          0.44
+          0.44,
+          false
          ],
          [
           "PD",
-          0.28
+          0.28,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4873,6 +6276,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.67,
       "parts": [
        {
@@ -4884,34 +6288,45 @@
         "stats": [
          [
           "solo",
-          1.32
+          1.32,
+          false
          ],
          [
           "ast",
-          0.8
+          0.8,
+          false
          ],
          [
           "TFL",
-          0.29
+          0.29,
+          false
          ],
          [
           "sack",
-          0.37
+          0.37,
+          false
          ],
          [
           "QB hit",
-          0.92
+          0.92,
+          false
          ],
          [
           "FF",
-          0.11
+          0.11,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -4944,6 +6359,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.46,
       "parts": [
        {
@@ -4955,26 +6371,35 @@
         "stats": [
          [
           "solo",
-          0.11
+          0.11,
+          false
          ],
          [
           "ast",
-          0.22
+          0.22,
+          false
          ],
          [
           "TFL",
-          2.0
+          2.0,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          2.66
+          2.66,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -5005,6 +6430,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 7.37,
       "parts": [
        {
@@ -5016,34 +6442,45 @@
         "stats": [
          [
           "solo",
-          1.26
+          1.26,
+          false
          ],
          [
           "ast",
-          1.37
+          1.37,
+          false
          ],
          [
           "TFL",
-          0.29
+          0.29,
+          false
          ],
          [
           "sack",
-          0.29
+          0.29,
+          false
          ],
          [
           "QB hit",
-          0.8
+          0.8,
+          false
          ],
          [
           "PD",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -5075,48 +6512,96 @@
    "tier_count": 5,
    "tiers": [
     {
-     "anchor_mu": 10.47,
+     "anchor_mu": 9.16,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 10.47,
+        "est": true,
+        "mu": 9.16,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 10.47,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.7
+            1.7,
+            false
            ],
            [
             "ast",
-            1.53
+            1.53,
+            false
            ],
            [
             "TFL",
-            0.53
+            0.53,
+            false
            ],
            [
             "sack",
-            0.47
+            0.47,
+            false
            ],
            [
             "QB hit",
-            0.94
+            0.94,
+            false
            ],
            [
             "PD",
-            0.18
+            0.18,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.86,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.43,
+            false
+           ],
+           [
+            "ast",
+            1.52,
+            false
+           ],
+           [
+            "TFL",
+            0.33,
+            true
+           ],
+           [
+            "sack",
+            0.23,
+            false
+           ],
+           [
+            "QB hit",
+            0.53,
+            true
+           ],
+           [
+            "PD",
+            0.23,
+            false
            ]
           ],
           "zero": false
@@ -5128,69 +6613,107 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 10.47,
-       "min": 10.47,
+       "min": 7.86,
        "mine": false,
-       "mu": 10.47,
-       "n": 1,
+       "mu": 9.16,
+       "n": 2,
        "name": "Kobie Turner",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.11,
        "slot": "DL",
        "team": "LAR",
        "tier": 1,
        "unavailable": []
-      }
-     ],
-     "tier": 1
-    },
-    {
-     "anchor_mu": 7.63,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 7.63,
+        "est": true,
+        "mu": 8.3,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 7.63,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.22
+            1.22,
+            false
            ],
            [
             "ast",
-            1.28
+            1.28,
+            false
            ],
            [
             "TFL",
-            0.5
+            0.5,
+            false
            ],
            [
             "sack",
-            0.22
+            0.22,
+            false
            ],
            [
             "QB hit",
-            0.39
+            0.39,
+            false
            ],
            [
             "PD",
-            0.28
+            0.28,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.96,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.74,
+            false
+           ],
+           [
+            "ast",
+            1.85,
+            false
+           ],
+           [
+            "TFL",
+            0.62,
+            true
+           ],
+           [
+            "sack",
+            0.25,
+            false
+           ],
+           [
+            "QB hit",
+            0.7,
+            true
            ]
           ],
           "zero": false
@@ -5201,134 +6724,119 @@
        "id": "12652",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 7.63,
+       "max": 8.96,
        "min": 7.63,
        "mine": false,
-       "mu": 7.63,
-       "n": 1,
+       "mu": 8.3,
+       "n": 2,
        "name": "Deone Walker",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.9,
        "slot": "DL",
        "team": "BUF",
-       "tier": 2,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 7.4,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 7.4,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            1.18
-           ],
-           [
-            "ast",
-            1.06
-           ],
-           [
-            "TFL",
-            0.24
-           ],
-           [
-            "sack",
-            0.12
-           ],
-           [
-            "QB hit",
-            0.29
-           ],
-           [
-            "PD",
-            0.12
-           ],
-           [
-            "blocked kick",
-            0.71
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "5226",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 7.4,
-       "min": 7.4,
-       "mine": false,
-       "mu": 7.4,
-       "n": 1,
-       "name": "Poona Ford",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DL",
-       "team": "LAR",
-       "tier": 2,
+       "tier": 1,
        "unavailable": []
       }
      ],
-     "tier": 2
+     "tier": 1
     },
     {
-     "anchor_mu": 6.09,
+     "anchor_mu": 5.72,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 6.09,
+        "est": true,
+        "mu": 5.72,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 6.09,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.82
+            0.82,
+            false
            ],
            [
             "ast",
-            0.76
+            0.76,
+            false
            ],
            [
             "TFL",
-            0.29
+            0.29,
+            false
            ],
            [
             "sack",
-            0.32
+            0.32,
+            false
            ],
            [
             "QB hit",
-            0.65
+            0.65,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.34,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.86,
+            false
+           ],
+           [
+            "ast",
+            0.92,
+            false
+           ],
+           [
+            "TFL",
+            0.27,
+            true
+           ],
+           [
+            "sack",
+            0.19,
+            false
+           ],
+           [
+            "QB hit",
+            0.6,
+            true
+           ],
+           [
+            "PD",
+            0.07,
+            false
            ]
           ],
           "zero": false
@@ -5340,17 +6848,216 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 6.09,
-       "min": 6.09,
+       "min": 5.34,
        "mine": false,
-       "mu": 6.09,
-       "n": 1,
+       "mu": 5.72,
+       "n": 2,
        "name": "Braden Fiske",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.84,
        "slot": "DL",
        "team": "LAR",
-       "tier": 3,
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 5.47,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.4,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.18,
+            false
+           ],
+           [
+            "ast",
+            1.06,
+            false
+           ],
+           [
+            "TFL",
+            0.24,
+            false
+           ],
+           [
+            "sack",
+            0.12,
+            false
+           ],
+           [
+            "QB hit",
+            0.29,
+            false
+           ],
+           [
+            "PD",
+            0.12,
+            false
+           ],
+           [
+            "blocked kick",
+            0.71,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.54,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.85,
+            false
+           ],
+           [
+            "ast",
+            0.91,
+            false
+           ],
+           [
+            "TFL",
+            0.18,
+            true
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.15,
+            true
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5226",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 7.4,
+       "min": 3.54,
+       "mine": false,
+       "mu": 5.47,
+       "n": 2,
+       "name": "Poona Ford",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.38,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 4.85,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.49,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.62,
+            false
+           ],
+           [
+            "ast",
+            1.25,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.21,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.3,
+            false
+           ],
+           [
+            "ast",
+            0.95,
+            false
+           ],
+           [
+            "TFL",
+            0.33,
+            true
+           ],
+           [
+            "sack",
+            0.25,
+            false
+           ],
+           [
+            "QB hit",
+            0.59,
+            true
+           ],
+           [
+            "PD",
+            0.17,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12621",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 7.21,
+       "min": 2.49,
+       "mine": false,
+       "mu": 4.85,
+       "n": 2,
+       "name": "Josaiah Stewart",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.59,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 2,
        "unavailable": []
       },
       {
@@ -5359,38 +7066,85 @@
        ],
        "badge": null,
        "breakdown": {
-        "mu": 5.4,
+        "est": true,
+        "mu": 4.49,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 5.4,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.3
+            1.3,
+            false
            ],
            [
             "ast",
-            0.71
+            0.71,
+            false
            ],
            [
             "TFL",
-            0.12
+            0.12,
+            false
            ],
            [
             "sack",
-            0.18
+            0.18,
+            false
            ],
            [
             "QB hit",
-            0.41
+            0.41,
+            false
            ],
            [
             "PD",
-            0.12
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.59,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.72,
+            false
+           ],
+           [
+            "ast",
+            0.53,
+            false
+           ],
+           [
+            "TFL",
+            0.14,
+            true
+           ],
+           [
+            "sack",
+            0.13,
+            false
+           ],
+           [
+            "QB hit",
+            0.24,
+            true
+           ],
+           [
+            "PD",
+            0.05,
+            false
            ]
           ],
           "zero": false
@@ -5402,11 +7156,83 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 5.4,
-       "min": 5.4,
+       "min": 3.59,
        "mine": false,
-       "mu": 5.4,
-       "n": 1,
+       "mu": 4.49,
+       "n": 2,
        "name": "Michael Hoecht",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 0.97,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 3.76,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 3.76,
+        "parts": [
+         {
+          "missing": "no projection for him",
+          "source": "Sleeper"
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.76,
+          "share": 1.0,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.88,
+            false
+           ],
+           [
+            "ast",
+            0.93,
+            false
+           ],
+           [
+            "TFL",
+            0.19,
+            true
+           ],
+           [
+            "sack",
+            0.07,
+            false
+           ],
+           [
+            "QB hit",
+            0.14,
+            true
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5981",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 3.76,
+       "min": 3.76,
+       "mine": false,
+       "mu": 3.76,
+       "n": 1,
+       "name": "Greg Gaines",
        "opp": "@LAR",
        "result": null,
        "sigma": 1.0,
@@ -5414,17 +7240,165 @@
        "team": "BUF",
        "tier": 3,
        "unavailable": []
-      }
-     ],
-     "tier": 3
-    },
-    {
-     "anchor_mu": 3.33,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": true,
+        "mu": 3.72,
+        "parts": [
+         {
+          "missing": "no projection for him",
+          "source": "Sleeper"
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.72,
+          "share": 1.0,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.94,
+            false
+           ],
+           [
+            "ast",
+            1.0,
+            false
+           ],
+           [
+            "TFL",
+            0.15,
+            true
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11799",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 3.72,
+       "min": 3.72,
+       "mine": false,
+       "mu": 3.72,
+       "n": 1,
+       "name": "Tyler Davis",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 3.6,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.62,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.5,
+            false
+           ],
+           [
+            "ast",
+            0.62,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.58,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.15,
+            false
+           ],
+           [
+            "ast",
+            0.85,
+            false
+           ],
+           [
+            "TFL",
+            0.35,
+            true
+           ],
+           [
+            "sack",
+            0.12,
+            false
+           ],
+           [
+            "QB hit",
+            0.19,
+            true
+           ],
+           [
+            "PD",
+            0.17,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "13808",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 5.58,
+       "min": 1.62,
+       "mine": false,
+       "mu": 3.6,
+       "n": 2,
+       "name": "Wesley Bailey",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.4,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
         "mu": 3.33,
         "parts": [
          {
@@ -5436,30 +7410,40 @@
           "stats": [
            [
             "solo",
-            0.71
+            0.71,
+            false
            ],
            [
             "ast",
-            0.65
+            0.65,
+            false
            ],
            [
             "TFL",
-            0.18
+            0.18,
+            false
            ],
            [
             "sack",
-            0.06
+            0.06,
+            false
            ],
            [
             "QB hit",
-            0.18
+            0.18,
+            false
            ],
            [
             "PD",
-            0.12
+            0.12,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -5478,29 +7462,82 @@
        "sigma": 1.0,
        "slot": "DL",
        "team": "BUF",
-       "tier": 4,
+       "tier": 3,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 2.49,
+        "est": true,
+        "mu": 3.19,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 2.49,
-          "share": 1.0,
+          "pts": 0.9,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.62
+            0.12,
+            false
            ],
            [
             "ast",
-            1.25
+            0.12,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.48,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.31,
+            false
+           ],
+           [
+            "ast",
+            1.4,
+            false
+           ],
+           [
+            "TFL",
+            0.31,
+            true
+           ],
+           [
+            "sack",
+            0.09,
+            false
+           ],
+           [
+            "QB hit",
+            0.11,
+            true
            ]
           ],
           "zero": false
@@ -5508,49 +7545,268 @@
         ]
        },
        "flags": [],
-       "id": "12621",
+       "id": "11706",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 2.49,
-       "min": 2.49,
+       "max": 5.48,
+       "min": 0.9,
        "mine": false,
-       "mu": 2.49,
-       "n": 1,
-       "name": "Josaiah Stewart",
-       "opp": "BUF",
+       "mu": 3.19,
+       "n": 2,
+       "name": "DeWayne Carter",
+       "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.55,
        "slot": "DL",
-       "team": "LAR",
-       "tier": 4,
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 2.93,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41,
+            false
+           ],
+           [
+            "ast",
+            0.29,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 4.62,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.02,
+            false
+           ],
+           [
+            "ast",
+            1.09,
+            false
+           ],
+           [
+            "TFL",
+            0.34,
+            true
+           ],
+           [
+            "sack",
+            0.09,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            true
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [
+        "Q"
+       ],
+       "id": "12580",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 4.62,
+       "min": 1.23,
+       "mine": false,
+       "mu": 2.93,
+       "n": 2,
+       "name": "Landon Jackson",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.27,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 3,
        "unavailable": []
       }
      ],
-     "tier": 4
+     "tier": 3
     },
     {
-     "anchor_mu": 1.62,
+     "anchor_mu": 2.11,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 1.62,
+        "est": true,
+        "mu": 2.11,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 0.5,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41,
+            false
+           ],
+           [
+            "ast",
+            0.29,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.99,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.58,
+            false
+           ],
+           [
+            "ast",
+            0.43,
+            false
+           ],
+           [
+            "TFL",
+            0.17,
+            true
+           ],
+           [
+            "sack",
+            0.08,
+            false
+           ],
+           [
+            "QB hit",
+            0.14,
+            true
+           ],
+           [
+            "PD",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "13455",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 2.99,
+       "min": 1.23,
+       "mine": false,
+       "mu": 2.11,
+       "n": 2,
+       "name": "TJ Parker",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 0.96,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 4,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 1.73,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.62,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.5
+            0.5,
+            false
            ],
            [
             "ast",
-            0.62
+            0.62,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.83,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.36,
+            false
+           ],
+           [
+            "ast",
+            0.27,
+            false
+           ],
+           [
+            "TFL",
+            0.07,
+            true
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.17,
+            true
            ]
           ],
           "zero": false
@@ -5561,68 +7817,25 @@
        "id": "11021",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 1.62,
+       "max": 1.83,
        "min": 1.62,
        "mine": false,
-       "mu": 1.62,
-       "n": 1,
+       "mu": 1.73,
+       "n": 2,
        "name": "Desjuan Johnson",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.82,
        "slot": "DL",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 1.62,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 1.62,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.5
-           ],
-           [
-            "ast",
-            0.62
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "13808",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 1.62,
-       "min": 1.62,
-       "mine": false,
-       "mu": 1.62,
-       "n": 1,
-       "name": "Wesley Bailey",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DL",
-       "team": "LAR",
-       "tier": 5,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
+        "est": false,
         "mu": 1.23,
         "parts": [
          {
@@ -5634,18 +7847,25 @@
           "stats": [
            [
             "solo",
-            0.41
+            0.41,
+            false
            ],
            [
             "ast",
-            0.29
+            0.29,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -5664,13 +7884,14 @@
        "sigma": 1.0,
        "slot": "DL",
        "team": "BUF",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 1.23,
         "parts": [
          {
@@ -5682,116 +7903,25 @@
           "stats": [
            [
             "solo",
-            0.41
+            0.41,
+            false
            ],
            [
             "ast",
-            0.29
+            0.29,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
-         }
-        ]
-       },
-       "flags": [
-        "Q"
-       ],
-       "id": "12580",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 1.23,
-       "min": 1.23,
-       "mine": false,
-       "mu": 1.23,
-       "n": 1,
-       "name": "Landon Jackson",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 5,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 1.23,
-        "parts": [
+         },
          {
-          "kind": "projection",
-          "late": false,
-          "pts": 1.23,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.41
-           ],
-           [
-            "ast",
-            0.29
-           ],
-           [
-            "TFL",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "13455",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 1.23,
-       "min": 1.23,
-       "mine": false,
-       "mu": 1.23,
-       "n": 1,
-       "name": "TJ Parker",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 5,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 1.23,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 1.23,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.41
-           ],
-           [
-            "ast",
-            0.29
-           ],
-           [
-            "TFL",
-            0.06
-           ]
-          ],
-          "zero": false
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -5810,85 +7940,62 @@
        "sigma": 1.0,
        "slot": "DL",
        "team": "BUF",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 0.9,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 0.9,
-          "share": 1.0,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.12
-           ],
-           [
-            "ast",
-            0.12
-           ],
-           [
-            "TFL",
-            0.06
-           ],
-           [
-            "sack",
-            0.06
-           ],
-           [
-            "QB hit",
-            0.06
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "11706",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 0.9,
-       "min": 0.9,
-       "mine": false,
-       "mu": 0.9,
-       "n": 1,
-       "name": "DeWayne Carter",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 5,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "mu": 0.57,
+        "est": true,
+        "mu": 0.97,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 0.57,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.19
+            0.19,
+            false
            ],
            [
             "ast",
-            0.19
+            0.19,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.38,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.32,
+            false
+           ],
+           [
+            "ast",
+            0.34,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            true
+           ],
+           [
+            "QB hit",
+            0.09,
+            true
            ]
           ],
           "zero": false
@@ -5899,24 +8006,31 @@
        "id": "12676",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 0.57,
+       "max": 1.38,
        "min": 0.57,
        "mine": false,
-       "mu": 0.57,
-       "n": 1,
+       "mu": 0.97,
+       "n": 2,
        "name": "Ty Hamilton",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.85,
        "slot": "DL",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 0.57,
+     "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 0.57,
         "parts": [
          {
@@ -5928,14 +8042,20 @@
           "stats": [
            [
             "solo",
-            0.19
+            0.19,
+            false
            ],
            [
             "ast",
-            0.19
+            0.19,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -5970,6 +8090,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 14.64,
       "parts": [
        {
@@ -5981,42 +8102,55 @@
         "stats": [
          [
           "solo",
-          4.0
+          4.0,
+          false
          ],
          [
           "ast",
-          3.89
+          3.89,
+          false
          ],
          [
           "TFL",
-          0.33
+          0.33,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.38
+          0.38,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6047,6 +8181,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 14.37,
       "parts": [
        {
@@ -6058,38 +8193,50 @@
         "stats": [
          [
           "solo",
-          4.44
+          4.44,
+          false
          ],
          [
           "ast",
-          3.05
+          3.05,
+          false
          ],
          [
           "TFL",
-          0.28
+          0.28,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.33
+          0.33,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6120,6 +8267,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 13.96,
       "parts": [
        {
@@ -6131,34 +8279,45 @@
         "stats": [
          [
           "solo",
-          3.61
+          3.61,
+          false
          ],
          [
           "ast",
-          3.55
+          3.55,
+          false
          ],
          [
           "TFL",
-          0.35
+          0.35,
+          false
          ],
          [
           "sack",
-          0.15
+          0.15,
+          false
          ],
          [
           "PD",
-          0.29
+          0.29,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6189,6 +8348,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 13.1,
       "parts": [
        {
@@ -6200,34 +8360,45 @@
         "stats": [
          [
           "solo",
-          3.42
+          3.42,
+          false
          ],
          [
           "ast",
-          3.25
+          3.25,
+          false
          ],
          [
           "TFL",
-          0.29
+          0.29,
+          false
          ],
          [
           "sack",
-          0.12
+          0.12,
+          false
          ],
          [
           "QB hit",
-          0.12
+          0.12,
+          false
          ],
          [
           "PD",
-          0.29
+          0.29,
+          false
          ],
          [
           "INT",
-          0.12
+          0.12,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6258,6 +8429,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.91,
       "parts": [
        {
@@ -6269,30 +8441,40 @@
         "stats": [
          [
           "solo",
-          3.33
+          3.33,
+          false
          ],
          [
           "ast",
-          3.22
+          3.22,
+          false
          ],
          [
           "TFL",
-          0.44
+          0.44,
+          false
          ],
          [
           "sack",
-          0.16
+          0.16,
+          false
          ],
          [
           "QB hit",
-          0.38
+          0.38,
+          false
          ],
          [
           "PD",
-          0.27
+          0.27,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6323,6 +8505,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.85,
       "parts": [
        {
@@ -6334,42 +8517,55 @@
         "stats": [
          [
           "solo",
-          3.49
+          3.49,
+          false
          ],
          [
           "ast",
-          2.8
+          2.8,
+          false
          ],
          [
           "TFL",
-          0.4
+          0.4,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.34
+          0.34,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6400,6 +8596,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.69,
       "parts": [
        {
@@ -6411,42 +8608,55 @@
         "stats": [
          [
           "solo",
-          3.27
+          3.27,
+          false
          ],
          [
           "ast",
-          2.97
+          2.97,
+          false
          ],
          [
           "TFL",
-          0.4
+          0.4,
+          false
          ],
          [
           "sack",
-          0.13
+          0.13,
+          false
          ],
          [
           "QB hit",
-          0.25
+          0.25,
+          false
          ],
          [
           "PD",
-          0.2
+          0.2,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.1
+          0.1,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6477,6 +8687,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.58,
       "parts": [
        {
@@ -6488,34 +8699,45 @@
         "stats": [
          [
           "solo",
-          3.5
+          3.5,
+          false
          ],
          [
           "ast",
-          2.55
+          2.55,
+          false
          ],
          [
           "TFL",
-          0.28
+          0.28,
+          false
          ],
          [
           "sack",
-          0.25
+          0.25,
+          false
          ],
          [
           "QB hit",
-          0.28
+          0.28,
+          false
          ],
          [
           "PD",
-          0.17
+          0.17,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6546,6 +8768,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.43,
       "parts": [
        {
@@ -6557,34 +8780,45 @@
         "stats": [
          [
           "solo",
-          3.45
+          3.45,
+          false
          ],
          [
           "ast",
-          3.73
+          3.73,
+          false
          ],
          [
           "TFL",
-          0.23
+          0.23,
+          false
          ],
          [
           "QB hit",
-          0.11
+          0.11,
+          false
          ],
          [
           "PD",
-          0.23
+          0.23,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6615,6 +8849,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.37,
       "parts": [
        {
@@ -6626,42 +8861,55 @@
         "stats": [
          [
           "solo",
-          3.69
+          3.69,
+          false
          ],
          [
           "ast",
-          2.21
+          2.21,
+          false
          ],
          [
           "TFL",
-          0.39
+          0.39,
+          false
          ],
          [
           "sack",
-          0.1
+          0.1,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.05
+          0.05,
+          false
          ],
          [
           "INT",
-          0.1
+          0.1,
+          false
          ],
          [
           "FF",
-          0.1
+          0.1,
+          false
          ],
          [
           "FR",
-          0.1
+          0.1,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6692,6 +8940,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.36,
       "parts": [
        {
@@ -6703,38 +8952,50 @@
         "stats": [
          [
           "solo",
-          3.66
+          3.66,
+          false
          ],
          [
           "ast",
-          1.91
+          1.91,
+          false
          ],
          [
           "TFL",
-          0.52
+          0.52,
+          false
          ],
          [
           "sack",
-          0.1
+          0.1,
+          false
          ],
          [
           "QB hit",
-          0.26
+          0.26,
+          false
          ],
          [
           "PD",
-          0.31
+          0.31,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6765,6 +9026,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 12.1,
       "parts": [
        {
@@ -6776,38 +9038,50 @@
         "stats": [
          [
           "solo",
-          3.02
+          3.02,
+          false
          ],
          [
           "ast",
-          2.91
+          2.91,
+          false
          ],
          [
           "TFL",
-          0.32
+          0.32,
+          false
          ],
          [
           "sack",
-          0.16
+          0.16,
+          false
          ],
          [
           "QB hit",
-          0.32
+          0.32,
+          false
          ],
          [
           "PD",
-          0.26
+          0.26,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6838,6 +9112,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.87,
       "parts": [
        {
@@ -6849,38 +9124,50 @@
         "stats": [
          [
           "solo",
-          3.97
+          3.97,
+          false
          ],
          [
           "ast",
-          2.48
+          2.48,
+          false
          ],
          [
           "TFL",
-          0.1
+          0.1,
+          false
          ],
          [
           "QB hit",
-          0.05
+          0.05,
+          false
          ],
          [
           "PD",
-          0.2
+          0.2,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6911,6 +9198,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.76,
       "parts": [
        {
@@ -6922,38 +9210,50 @@
         "stats": [
          [
           "solo",
-          3.94
+          3.94,
+          false
          ],
          [
           "ast",
-          1.57
+          1.57,
+          false
          ],
          [
           "TFL",
-          0.26
+          0.26,
+          false
          ],
          [
           "sack",
-          0.1
+          0.1,
+          false
          ],
          [
           "QB hit",
-          0.26
+          0.26,
+          false
          ],
          [
           "PD",
-          0.16
+          0.16,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -6984,6 +9284,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.76,
       "parts": [
        {
@@ -6995,38 +9296,50 @@
         "stats": [
          [
           "solo",
-          2.74
+          2.74,
+          false
          ],
          [
           "ast",
-          2.5
+          2.5,
+          false
          ],
          [
           "TFL",
-          0.23
+          0.23,
+          false
          ],
          [
           "sack",
-          0.12
+          0.12,
+          false
          ],
          [
           "QB hit",
-          0.29
+          0.29,
+          false
          ],
          [
           "PD",
-          0.47
+          0.47,
+          false
          ],
          [
           "INT",
-          0.12
+          0.12,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7057,6 +9370,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.64,
       "parts": [
        {
@@ -7068,34 +9382,45 @@
         "stats": [
          [
           "solo",
-          3.29
+          3.29,
+          false
          ],
          [
           "ast",
-          2.44
+          2.44,
+          false
          ],
          [
           "TFL",
-          0.32
+          0.32,
+          false
          ],
          [
           "sack",
-          0.11
+          0.11,
+          false
          ],
          [
           "QB hit",
-          0.21
+          0.21,
+          false
          ],
          [
           "PD",
-          0.27
+          0.27,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7126,6 +9451,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.56,
       "parts": [
        {
@@ -7137,42 +9463,55 @@
         "stats": [
          [
           "solo",
-          2.99
+          2.99,
+          false
          ],
          [
           "ast",
-          3.1
+          3.1,
+          false
          ],
          [
           "TFL",
-          0.37
+          0.37,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.21
+          0.21,
+          false
          ],
          [
           "PD",
-          0.21
+          0.21,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7203,6 +9542,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.47,
       "parts": [
        {
@@ -7214,34 +9554,45 @@
         "stats": [
          [
           "solo",
-          3.05
+          3.05,
+          false
          ],
          [
           "ast",
-          2.62
+          2.62,
+          false
          ],
          [
           "TFL",
-          0.27
+          0.27,
+          false
          ],
          [
           "sack",
-          0.13
+          0.13,
+          false
          ],
          [
           "QB hit",
-          0.32
+          0.32,
+          false
          ],
          [
           "PD",
-          0.27
+          0.27,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7272,6 +9623,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.42,
       "parts": [
        {
@@ -7283,38 +9635,50 @@
         "stats": [
          [
           "solo",
-          3.31
+          3.31,
+          false
          ],
          [
           "ast",
-          2.31
+          2.31,
+          false
          ],
          [
           "TFL",
-          0.16
+          0.16,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.16
+          0.16,
+          false
          ],
          [
           "PD",
-          0.42
+          0.42,
+          false
          ],
          [
           "INT",
-          0.05
+          0.05,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7345,6 +9709,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.41,
       "parts": [
        {
@@ -7356,34 +9721,45 @@
         "stats": [
          [
           "solo",
-          3.51
+          3.51,
+          false
          ],
          [
           "ast",
-          3.01
+          3.01,
+          false
          ],
          [
           "TFL",
-          0.11
+          0.11,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.11
+          0.11,
+          false
          ],
          [
           "PD",
-          0.11
+          0.11,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7414,6 +9790,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.3,
       "parts": [
        {
@@ -7425,38 +9802,50 @@
         "stats": [
          [
           "solo",
-          2.53
+          2.53,
+          false
          ],
          [
           "ast",
-          2.48
+          2.48,
+          false
          ],
          [
           "TFL",
-          0.44
+          0.44,
+          false
          ],
          [
           "sack",
-          0.14
+          0.14,
+          false
          ],
          [
           "QB hit",
-          0.33
+          0.33,
+          false
          ],
          [
           "PD",
-          0.39
+          0.39,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7489,6 +9878,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 11.05,
       "parts": [
        {
@@ -7500,42 +9890,55 @@
         "stats": [
          [
           "solo",
-          2.58
+          2.58,
+          false
          ],
          [
           "ast",
-          2.58
+          2.58,
+          false
          ],
          [
           "TFL",
-          0.34
+          0.34,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.17
+          0.17,
+          false
          ],
          [
           "PD",
-          0.46
+          0.46,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ],
          [
           "FF",
-          0.06
+          0.06,
+          false
          ],
          [
           "FR",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7566,6 +9969,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.81,
       "parts": [
        {
@@ -7577,30 +9981,40 @@
         "stats": [
          [
           "solo",
-          2.72
+          2.72,
+          false
          ],
          [
           "ast",
-          2.56
+          2.56,
+          false
          ],
          [
           "TFL",
-          0.57
+          0.57,
+          false
          ],
          [
           "sack",
-          0.21
+          0.21,
+          false
          ],
          [
           "QB hit",
-          0.26
+          0.26,
+          false
          ],
          [
           "FF",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7631,6 +10045,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.66,
       "parts": [
        {
@@ -7642,34 +10057,45 @@
         "stats": [
          [
           "solo",
-          2.97
+          2.97,
+          false
          ],
          [
           "ast",
-          3.19
+          3.19,
+          false
          ],
          [
           "TFL",
-          0.32
+          0.32,
+          false
          ],
          [
           "sack",
-          0.05
+          0.05,
+          false
          ],
          [
           "QB hit",
-          0.11
+          0.11,
+          false
          ],
          [
           "PD",
-          0.11
+          0.11,
+          false
          ],
          [
           "FR",
-          0.05
+          0.05,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7700,6 +10126,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
+      "est": false,
       "mu": 10.57,
       "parts": [
        {
@@ -7711,34 +10138,45 @@
         "stats": [
          [
           "solo",
-          3.53
+          3.53,
+          false
          ],
          [
           "ast",
-          1.47
+          1.47,
+          false
          ],
          [
           "TFL",
-          0.18
+          0.18,
+          false
          ],
          [
           "sack",
-          0.06
+          0.06,
+          false
          ],
          [
           "QB hit",
-          0.24
+          0.24,
+          false
          ],
          [
           "PD",
-          0.24
+          0.24,
+          false
          ],
          [
           "INT",
-          0.06
+          0.06,
+          false
          ]
         ],
         "zero": false
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "ESPN"
        }
       ]
      },
@@ -7770,7 +10208,7 @@
    "tier_count": 5,
    "tiers": [
     {
-     "anchor_mu": 14.81,
+     "anchor_mu": 15.13,
      "players": [
       {
        "also": [],
@@ -7779,7 +10217,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.634,
+        "p": 0.649,
         "reference": true,
         "why": [
          "starter_locked",
@@ -7787,50 +10225,110 @@
         ]
        },
        "breakdown": {
-        "mu": 14.81,
+        "est": true,
+        "mu": 15.13,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 14.81,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            4.0
+            4.0,
+            false
            ],
            [
             "ast",
-            2.68
+            2.68,
+            false
            ],
            [
             "TFL",
-            0.44
+            0.44,
+            false
            ],
            [
             "sack",
-            0.12
+            0.12,
+            false
            ],
            [
             "QB hit",
-            0.31
+            0.31,
+            false
            ],
            [
             "PD",
-            0.37
+            0.37,
+            false
            ],
            [
             "INT",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.19
+            0.19,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 15.45,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            4.27,
+            false
+           ],
+           [
+            "ast",
+            3.38,
+            false
+           ],
+           [
+            "TFL",
+            0.42,
+            true
+           ],
+           [
+            "sack",
+            0.1,
+            false
+           ],
+           [
+            "QB hit",
+            0.23,
+            true
+           ],
+           [
+            "PD",
+            0.27,
+            false
+           ],
+           [
+            "FF",
+            0.15,
+            false
+           ],
+           [
+            "FR",
+            0.1,
+            false
            ]
           ],
           "zero": false
@@ -7841,15 +10339,15 @@
        "id": "8659",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 14.81,
+       "max": 15.45,
        "min": 14.81,
        "mine": false,
-       "mu": 14.81,
-       "n": 1,
+       "mu": 15.13,
+       "n": 2,
        "name": "Nate Landman",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.84,
        "slot": "LB",
        "team": "LAR",
        "tier": 1,
@@ -7862,7 +10360,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.615,
+        "p": 0.642,
         "reference": true,
         "why": [
          "starter_locked",
@@ -7870,46 +10368,100 @@
         ]
        },
        "breakdown": {
-        "mu": 14.41,
+        "est": true,
+        "mu": 14.98,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 14.41,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            4.42
+            4.42,
+            false
            ],
            [
             "ast",
-            2.65
+            2.65,
+            false
            ],
            [
             "TFL",
-            0.41
+            0.41,
+            false
            ],
            [
             "sack",
-            0.06
+            0.06,
+            false
            ],
            [
             "QB hit",
-            0.12
+            0.12,
+            false
            ],
            [
             "PD",
-            0.18
+            0.18,
+            false
            ],
            [
             "INT",
-            0.12
+            0.12,
+            false
            ],
            [
             "FR",
-            0.12
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 15.56,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            4.36,
+            false
+           ],
+           [
+            "ast",
+            3.46,
+            false
+           ],
+           [
+            "TFL",
+            0.66,
+            true
+           ],
+           [
+            "sack",
+            0.08,
+            false
+           ],
+           [
+            "QB hit",
+            0.09,
+            true
+           ],
+           [
+            "PD",
+            0.29,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
            ]
           ],
           "zero": false
@@ -7920,15 +10472,15 @@
        "id": "8311",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 14.41,
+       "max": 15.56,
        "min": 14.41,
        "mine": false,
-       "mu": 14.41,
-       "n": 1,
+       "mu": 14.98,
+       "n": 2,
        "name": "Terrel Bernard",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.88,
        "slot": "LB",
        "team": "BUF",
        "tier": 1,
@@ -7938,7 +10490,7 @@
      "tier": 1
     },
     {
-     "anchor_mu": 10.21,
+     "anchor_mu": 10.61,
      "players": [
       {
        "also": [
@@ -7946,46 +10498,105 @@
        ],
        "badge": null,
        "breakdown": {
-        "mu": 10.21,
+        "est": true,
+        "mu": 10.61,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 10.21,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.39
+            1.39,
+            false
            ],
            [
             "ast",
-            1.39
+            1.39,
+            false
            ],
            [
             "TFL",
-            0.5
+            0.5,
+            false
            ],
            [
             "sack",
-            0.53
+            0.53,
+            false
            ],
            [
             "QB hit",
-            1.17
+            1.17,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.11
+            0.11,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.01,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.96,
+            false
+           ],
+           [
+            "ast",
+            1.44,
+            false
+           ],
+           [
+            "TFL",
+            0.42,
+            true
+           ],
+           [
+            "sack",
+            0.42,
+            false
+           ],
+           [
+            "QB hit",
+            1.17,
+            true
+           ],
+           [
+            "PD",
+            0.17,
+            false
+           ],
+           [
+            "FF",
+            0.09,
+            false
+           ],
+           [
+            "FR",
+            0.06,
+            false
            ]
           ],
           "zero": false
@@ -7996,15 +10607,15 @@
        "id": "4967",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 10.21,
+       "max": 11.01,
        "min": 10.21,
        "mine": false,
-       "mu": 10.21,
-       "n": 1,
+       "mu": 10.61,
+       "n": 2,
        "name": "Bradley Chubb",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.85,
        "slot": "LB",
        "team": "BUF",
        "tier": 2,
@@ -8014,42 +10625,85 @@
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 8.86,
+        "est": true,
+        "mu": 10.11,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 8.86,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            2.95
+            2.95,
+            false
            ],
            [
             "ast",
-            2.06
+            2.06,
+            false
            ],
            [
             "TFL",
-            0.12
+            0.12,
+            false
            ],
            [
             "QB hit",
-            0.12
+            0.12,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.35,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.39,
+            false
+           ],
+           [
+            "ast",
+            2.69,
+            false
+           ],
+           [
+            "TFL",
+            0.4,
+            true
+           ],
+           [
+            "QB hit",
+            0.11,
+            true
+           ],
+           [
+            "PD",
+            0.14,
+            false
            ]
           ],
           "zero": false
@@ -8060,15 +10714,15 @@
        "id": "10923",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 8.86,
+       "max": 11.35,
        "min": 8.86,
        "mine": false,
-       "mu": 8.86,
-       "n": 1,
+       "mu": 10.11,
+       "n": 2,
        "name": "Dorian Williams",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.09,
        "slot": "LB",
        "team": "BUF",
        "tier": 2,
@@ -8078,36 +10732,86 @@
      "tier": 2
     },
     {
-     "anchor_mu": 7.61,
+     "anchor_mu": 8.1,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 7.61,
+        "est": true,
+        "mu": 8.1,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 7.61,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            2.56
+            2.56,
+            false
            ],
            [
             "ast",
-            2.19
+            2.19,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.59,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            2.39,
+            false
+           ],
+           [
+            "ast",
+            1.9,
+            false
+           ],
+           [
+            "TFL",
+            0.16,
+            true
+           ],
+           [
+            "sack",
+            0.1,
+            false
+           ],
+           [
+            "QB hit",
+            0.18,
+            true
+           ],
+           [
+            "PD",
+            0.13,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
            ]
           ],
           "zero": false
@@ -8118,15 +10822,15 @@
        "id": "12140",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 7.61,
+       "max": 8.59,
        "min": 7.61,
        "mine": false,
-       "mu": 7.61,
-       "n": 1,
+       "mu": 8.1,
+       "n": 2,
        "name": "Omar Speights",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.86,
        "slot": "LB",
        "team": "LAR",
        "tier": 3,
@@ -8136,48 +10840,91 @@
      "tier": 3
     },
     {
-     "anchor_mu": 4.21,
+     "anchor_mu": 3.76,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
-        "mu": 4.21,
+        "est": true,
+        "mu": 3.76,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 4.21,
-          "share": 1.0,
+          "share": 0.5,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.18
+            1.18,
+            false
            ],
            [
             "ast",
-            0.59
+            0.59,
+            false
            ],
            [
             "TFL",
-            0.18
+            0.18,
+            false
            ],
            [
             "sack",
-            0.06
+            0.06,
+            false
            ],
            [
             "QB hit",
-            0.18
+            0.18,
+            false
            ],
            [
             "PD",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.31,
+          "share": 0.5,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.93,
+            false
+           ],
+           [
+            "ast",
+            0.74,
+            false
+           ],
+           [
+            "TFL",
+            0.11,
+            true
+           ],
+           [
+            "QB hit",
+            0.06,
+            true
+           ],
+           [
+            "PD",
+            0.06,
+            false
            ]
           ],
           "zero": false
@@ -8189,14 +10936,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 4.21,
-       "min": 4.21,
+       "min": 3.31,
        "mine": false,
-       "mu": 4.21,
-       "n": 1,
+       "mu": 3.76,
+       "n": 2,
        "name": "Kaleb Elarms-Orr",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.86,
        "slot": "LB",
        "team": "BUF",
        "tier": 4,
@@ -8212,6 +10959,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 1.98,
         "parts": [
          {
@@ -8223,22 +10971,30 @@
           "stats": [
            [
             "solo",
-            0.5
+            0.5,
+            false
            ],
            [
             "ast",
-            0.62
+            0.62,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -8264,6 +11020,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 1.98,
         "parts": [
          {
@@ -8275,22 +11032,30 @@
           "stats": [
            [
             "solo",
-            0.5
+            0.5,
+            false
            ],
            [
             "ast",
-            0.62
+            0.62,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ],
            [
             "FR",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -8316,6 +11081,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": false,
         "mu": 1.41,
         "parts": [
          {
@@ -8327,22 +11093,30 @@
           "stats": [
            [
             "solo",
-            0.41
+            0.41,
+            false
            ],
            [
             "ast",
-            0.29
+            0.29,
+            false
            ],
            [
             "TFL",
-            0.06
+            0.06,
+            false
            ],
            [
             "FF",
-            0.06
+            0.06,
+            false
            ]
           ],
           "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
          }
         ]
        },
@@ -8377,11 +11151,45 @@
   "LB": 5.625
  },
  "sources": {
+  "espn_proj": {
+   "error": null,
+   "fetched_at": "2026-10-12T10:54:12-04:00",
+   "kind": "projection",
+   "label": "ESPN",
+   "last_success": "2026-10-12T10:54:12-04:00",
+   "match": {
+    "names": [
+     "Jeremiah Moon CAR DL",
+     "Keshawn Banks ATL DL",
+     "Victor Dimukeje SF DL"
+    ],
+    "rate": 0.9970355731225297,
+    "unmatched": 3
+   },
+   "merge": {
+    "added": 37,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 509,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 689,
+   "observed_after": "2026-10-12T10:54:12-04:00",
+   "published_at": null,
+   "rows": 546,
+   "rows_used": 37,
+   "status": "ok",
+   "week": 5,
+   "zero_filled": 5
+  },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T05:51:00-04:00",
+   "fetched_at": "2026-10-12T10:54:12-04:00",
    "kind": "projection",
-   "last_success": "2026-10-12T05:51:00-04:00",
+   "label": "Sleeper",
+   "last_success": "2026-10-12T10:54:12-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -8392,6 +11200,8 @@
     "updated": 0
    },
    "no_projection": 3729,
+   "observed_after": "2026-10-12T05:19:54-04:00",
+   "published_at": null,
    "rows": 628,
    "rows_used": 628,
    "status": "ok",

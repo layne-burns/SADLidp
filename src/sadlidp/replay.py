@@ -4,16 +4,19 @@ Runs the normal sync pipeline offline, as of one minute before the week's first 
 - every source file saved for the week (SPEC §5.3: no refetch; each source's live fetch fails, so the
   sync uses the saved rows, and a source with no file that week is left out);
 - the rosters and lineups of that week (Sleeper's matchups for the week);
-- the saved league settings, schedule and last season's σ_out.
+- the saved league settings, schedule and last season's σ_out;
+- the earlier weeks' results and frozen records, so the form term (SPEC §6.4) sees what it would have.
 
 Each projected player takes his team from a projection row (Sleeper's first) and is treated as healthy
 (that week's injury news isn't known). The result is written as the week's consensus.json, marked
-`replayed`; the site build then re-scores it with the week's final stats like any past week.
+`replayed`; the site build then re-scores it with the week's final stats like any past week. The rebuilt
+μs are also written as the week's frozen record when it has none, so later weeks' form term can read them.
 """
 
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import tempfile
 from collections.abc import Callable
@@ -118,8 +121,16 @@ def replay_week(
         (storage.week_dir(tmp, season, week) / "sources").mkdir(parents=True)
         for name, path in saved.items():
             shutil.copy(path, storage.week_dir(tmp, season, week) / "sources" / f"{name}.json")
+        for d in (data_dir / str(season)).glob("week*"):  # earlier weeks' results feed the form term (§6.4)
+            m = re.fullmatch(r"week(\d+)", d.name)
+            if m and int(m.group(1)) < week:
+                for name in ("actuals.json", "frozen.json"):
+                    if (d / name).exists():
+                        storage.week_dir(tmp, season, int(m.group(1))).mkdir(parents=True, exist_ok=True)
+                        shutil.copy(d / name, storage.week_dir(tmp, season, int(m.group(1))) / name)
         run_sync(run_cfg, tmp, tmp / "cache", now=now, force=True, client=ReplayClient(routes), log=log)
         data = json.loads((storage.week_dir(tmp, season, week) / "consensus.json").read_text())
+        frozen = storage.read_json(storage.week_dir(tmp, season, week) / "frozen.json")
     data["replayed"] = {"as_of": now.isoformat(), "note": NOTE}
     # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows
     noise = ("σ_out", "live stats", *(f"{name}: failed" for name in SOURCES))
@@ -130,4 +141,6 @@ def replay_week(
             src.update(status="saved", error=None)
     out = wdir / "consensus.json"
     storage.write_json(out, data)
+    if frozen and not (wdir / "frozen.json").exists():  # a live week's record is never replaced (§6.5)
+        storage.write_json(wdir / "frozen.json", frozen)
     return out

@@ -14,6 +14,7 @@ from pathlib import Path
 
 from . import backfill as backfillmod
 from . import crosswalk as crosswalkmod
+from . import form as formmod
 from . import gate as gatemod
 from . import scoring, storage, weeklog
 from .backfill import imputer_for, source_cfg
@@ -314,7 +315,7 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
               placeholders: dict | None = None, ranks: dict | None = None) -> dict:  # fmt: skip
     """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
     them (each [label, value, imputed], §6.2) or the rank behind them (rank sources: list, rank, censored), the
-    share of μ, or why an enabled source has nothing for him."""
+    share of μ, or why an enabled source has nothing for him; plus the form term's parts when it applies."""
     eff = (cons_row or {}).get("eff") or {}
     frozen_pts = (cons_row or {}).get("parts") or {}  # a locked player: each source's points at his kickoff
     parts = []
@@ -358,7 +359,11 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
         else:
             parts.append({"source": label, "missing": "no projection for him"})
     est = any(st[2] for part in parts for st in part.get("stats") or ())
-    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None, "est": est}
+    out = {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None, "est": est}
+    if cons_row and cons_row.get("form"):  # the form term (§6.4): the consensus it was added to, and its parts
+        base = cons_row["base"] if cons_row.get("base") is not None else cons_row["mu"] - cons_row["form"]["pts"]
+        out.update(base=round(base, 2), form=cons_row["form"])
+    return out
 
 
 def footer_info(info: dict) -> dict:
@@ -634,7 +639,11 @@ def run_sync(
         run["sources"][name].update(censored=censored, mapped=len(values[name]) - censored)
     if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
-    cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
+    slots = {pid: slot_of(idp[pid]) for pid in idp}
+    cons = consensus(values, groups, slots, cfg)
+    coef = formmod.coefficients(cfg)
+    if coef:  # the form term (SPEC §6.4): his earlier misses this season and his last game's snap share
+        run["form"] = {**coef, **formmod.apply(cons, slots, formmod.history(data_dir, season, week, sc), coef)}
     late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
     for pid in late & cons.keys():
         cons[pid]["late"] = True  # projection first captured after his kickoff (SPEC §6.5)
@@ -645,6 +654,8 @@ def run_sync(
     records = {
         pid: {
             "mu": round(c["mu"], 4),
+            "base": round(c.get("base", c["mu"]), 4),  # the consensus before the form term
+            **({"form": c["form"]} if c.get("form") else {}),
             "sigma": round(c["sigma"], 4),
             "min": c["min"],
             "max": c["max"],
@@ -661,7 +672,8 @@ def run_sync(
     for pid, rec in frozen.items():
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
-            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff", "parts", "ranks")}
+            cons[pid] = {k: rec.get(k) for k in ("mu", "base", "form", "sigma", "min", "max", "n_sources", "eff",
+                                                 "parts", "ranks")}  # fmt: skip
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)

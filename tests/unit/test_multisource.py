@@ -132,7 +132,8 @@ def test_two_sources_blend_equally_and_espn_estimates_are_marked(tmp_path):
     assert [p["source"] for p in tykee["breakdown"]["parts"]] == ["Sleeper", "ESPN", "FantasyPros"]
     assert by["FantasyPros"]["missing"] == "couldn't be read this sync"  # not served offline
     assert by["Sleeper"]["share"] == by["ESPN"]["share"] == 0.5
-    assert tykee["mu"] == round((by["Sleeper"]["pts"] + by["ESPN"]["pts"]) / 2, 2)
+    base = tykee["breakdown"].get("base", tykee["mu"])  # the blend; his week-4 snaps add a form term on top
+    assert base == round((by["Sleeper"]["pts"] + by["ESPN"]["pts"]) / 2, 2)
     espn_stats = {label: est for label, _, est in by["ESPN"]["stats"]}
     assert espn_stats["TFL"] is True and espn_stats["solo"] is False and tykee["breakdown"]["est"]
     assert not any(est for _, _, est in by["Sleeper"]["stats"])  # Sleeper projects every key itself

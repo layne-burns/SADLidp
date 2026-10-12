@@ -77,8 +77,9 @@ def test_report_sweeps_and_formats():
     assert rep["weeks"] == [1, 2, 3] and rep["z"] == 0.75
     assert [row["z"] for row in rep["z_sweep"]][:2] == [0.25, 0.5]
     assert [row["split"] for row in rep["split_sweep"]] == [0.4, 0.5, 0.6, 0.7, 0.8]
+    assert rep["form_on"] is True and rep["form"][False]["order_r"]["LB"] == rep["form"][True]["order_r"]["LB"]
     text = format_report(rep)
-    assert "Tier averages" in text and "z sweep" in text and "LB" in text
+    assert "Tier averages" in text and "z sweep" in text and "LB" in text and "Form term" in text
 
 
 def test_load_weeks_reads_saved_sources_and_final_stats(tmp_path):

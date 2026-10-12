@@ -11,7 +11,8 @@ scores both under the current SADL settings and runs the standard checks on ~12,
   share add to the projection, fitted on odd weeks and scored on even weeks;
 - **swing**: a per-player outcome SD from the projected stat mix (Poisson) against one SD per position:
   calibration by fifth and the pairwise "who outscores whom" Brier score;
-- **sacks**: whether a player's sack excess persists, and the sack projections' calibration.
+- **sacks**: whether a player's sack excess persists, and the sack projections' calibration;
+- **coefficients**: the `[form]` settings the page applies (SPEC §6.4), refitted on the whole archive.
 
 Every number is within-week (the week's average is removed from both sides first). Nothing here feeds
 the live page; it is where an idea earns its place before it goes into the consensus.
@@ -33,6 +34,7 @@ from .sleeper import Sleeper
 
 WEEKS = range(1, 19)
 BANDS = (("top 50", 0, 50), ("ranks 15-60", 15, 60), ("all", 0, None))
+FIT_TOP = 60  # the form coefficients are fitted on each position's 60 best-projected players (form.TOP)
 SNAP_KEYS = ("def_snp", "tm_def_snp")
 
 
@@ -220,6 +222,20 @@ def add_history(rows: list[dict], k: float = 4.0) -> None:
                 snaps[r["pid"]] = r["snap"]
 
 
+def fit_form(rows: list[dict], k: float = 4.0) -> dict[str, dict]:
+    """Per position, the `[form]` coefficients: least squares of (points − projection) on the shrunk earlier
+    miss and the last snap share, both within week, over the top `FIT_TOP` by projection in every week, the
+    projection's own coefficient held at 1 as the page applies it. Call `add_history(rows, k)` first."""
+    out = {}
+    for slot in IDP_SLOTS:
+        g = [r for r in band(rows, slot, 0, FIT_TOP) if r["lsnap"] is not None]
+        d = demean(g, {"f": lambda r: r["form"], "s": lambda r: r["lsnap"], "y": lambda r: r["act"] - r["proj"]})
+        X = [[f, s] for f, s in zip(d["f"], d["s"], strict=True)]
+        beta = lstsq(X, d["y"]) if len(X) >= 10 else [0.0, 0.0]
+        out[slot] = {"miss": beta[0], "snap": beta[1], "n": len(X)}
+    return out
+
+
 def poisson_var(ps: dict, sc: dict) -> float:
     """Outcome variance if every projected stat were an independent Poisson count: Σ coef² · λ."""
     return sum(scoring.num(sc.get(k)) ** 2 * scoring.num(v) for k, v in ps.items() if k in sc)
@@ -290,6 +306,7 @@ def report(rows: list[dict], sc: dict, k: float = 4.0) -> dict:
                 {"lo": lo, "hi": hi, "n": len(gb), "proj": proj, "act": statistics.fmean(r["sack"] for r in gb)}
             )
     out["sacks"] = {"n": len(gh), "r": corr(x, y), "slope": _slope(x, y), "bins": bins}
+    out["coef"] = fit_form(rows, k)
     return out
 
 
@@ -349,4 +366,7 @@ def format_report(rep: dict, season: int) -> str:
         "  projected vs actual sacks per game: "
         + " | ".join(f"[{b['lo']}, {b['hi']}) {b['proj']:.2f} → {b['act']:.2f} (n {b['n']})" for b in s["bins"])
     )
+    out += ["", f"Form coefficients for config [form] (top {FIT_TOP} by projection, every week, projection held at 1):",
+            "  " + " | ".join(f"{slot} miss {c['miss']:+.2f}, snap {c['snap']:+.1f} per 100% (n {c['n']})"
+                              for slot, c in rep["coef"].items())]  # fmt: skip
     return "\n".join(out)

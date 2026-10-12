@@ -20,10 +20,10 @@ import copy
 import math
 import random
 import statistics
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import scoring, storage, weeklog
+from . import form, scoring, storage, weeklog
 from .consensus import consensus
 from .positions import IDP_SLOTS
 from .stats import _positions, _weeks, source_points
@@ -41,6 +41,7 @@ class Week:
     slots: dict[str, str]  # pid -> DL | LB | DB
     actual: dict[str, float]  # pid -> SADL points, players who played only
     rostered: set[str]
+    history: dict[str, dict] = field(default_factory=dict)  # form.history as of the week (earlier weeks only)
 
 
 def load_weeks(data_dir: Path | str, season: int, rostered: dict[int, set[str]]) -> list[Week]:
@@ -58,7 +59,7 @@ def load_weeks(data_dir: Path | str, season: int, rostered: dict[int, set[str]])
         lines = (storage.read_json(wd / "actuals.json") or {}).get("stats") or {}
         actual = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
         idp = {pid: slots[pid] for vals in values.values() for pid in vals if slots.get(pid) in IDP_SLOTS}
-        out.append(Week(week, values, kinds, idp, actual, rostered[week]))
+        out.append(Week(week, values, kinds, idp, actual, rostered[week], form.history(data_dir, season, week, sc)))
     return out
 
 
@@ -68,6 +69,9 @@ def shown(week: Week, cfg: dict) -> list[dict]:
     depth = int((cfg.get("display") or {}).get("depth", 25))
     z = float((cfg.get("tiers") or {}).get("z", 1.0))
     cons = consensus(week.values, week.kinds, week.slots, cfg)
+    coef = form.coefficients(cfg)
+    if coef and week.history:  # walk-forward: only earlier weeks' results, as the sync would have had
+        form.apply(cons, week.slots, week.history, coef)
     rows = []
     for slot in IDP_SLOTS:
         pool = {
@@ -151,12 +155,14 @@ def chance_out_of_order(rows: list[dict], sims: int = 2000, seed: int = 0) -> di
     return out
 
 
-def _with(cfg: dict, z: float | None = None, split: float | None = None) -> dict:
+def _with(cfg: dict, z: float | None = None, split: float | None = None, form_on: bool | None = None) -> dict:
     c = copy.deepcopy(cfg)
     if z is not None:
         c.setdefault("tiers", {})["z"] = z
     if split is not None:
         c.setdefault("weights", {})["prior_split"] = split
+    if form_on is not None:
+        c.setdefault("form", {})["enabled"] = form_on
     return c
 
 
@@ -186,6 +192,13 @@ def report(weeks: list[Week], cfg: dict) -> dict:
     split_sweep = [
         {"split": s, "order_r": within_r(rows_for(_with(cfg, split=s)), lambda r: r["mu"])} for s in SPLIT_GRID
     ]
+    form_sweep = {
+        on: {
+            "order_r": within_r(rows_for(_with(cfg, form_on=on)), lambda r: r["mu"]),
+            "tier_r": within_r(rows_for(_with(cfg, form_on=on)), lambda r: -r["tier"]),
+        }
+        for on in (False, True)
+    }
     return {
         "weeks": [w.week for w in weeks],
         "z": float((cfg.get("tiers") or {}).get("z", 1.0)),
@@ -196,6 +209,8 @@ def report(weeks: list[Week], cfg: dict) -> dict:
         "chance_out_of_order": chance_out_of_order(current),
         "z_sweep": z_sweep,
         "split_sweep": split_sweep,
+        "form": form_sweep,
+        "form_on": bool((cfg.get("form") or {}).get("enabled")),
     }
 
 
@@ -243,4 +258,13 @@ def format_report(rep: dict) -> str:
     out += ["", "Projection:rank split (changes the μ order):"]
     for row in rep["split_sweep"]:
         out.append(f"  {row['split']:<4}" + "  ".join(f"{slot} {_r(row['order_r'][slot])}" for slot in IDP_SLOTS))
+    f = rep["form"]
+    out += [
+        "",
+        f"Form term (walk-forward from earlier weeks' results; config: {'on' if rep['form_on'] else 'off'}):",
+        "  μ order off → on  "
+        + "  ".join(f"{slot} {_r(f[False]['order_r'][slot])} → {_r(f[True]['order_r'][slot])}" for slot in IDP_SLOTS),
+        "  tier    off → on  "
+        + "  ".join(f"{slot} {_r(f[False]['tier_r'][slot])} → {_r(f[True]['tier_r'][slot])}" for slot in IDP_SLOTS),
+    ]
     return "\n".join(out)

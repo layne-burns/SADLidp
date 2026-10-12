@@ -103,5 +103,6 @@ def test_report_runs_end_to_end_on_a_small_season(tmp_path):
     assert rep["skill"]["LB"]["all"]["r"] > 0.3 and rep["skill"]["LB"]["top 50"]["n"] == 300
     assert rep["form"]["DL"]["top 50"]["both"]["beta"] and rep["swing"]["DL"]["fifths"][-1]["predicted"] > 0
     assert rep["sacks"]["n"] > 0 and len(rep["sacks"]["bins"]) >= 2
+    assert set(rep["coef"]) == {"DL", "LB", "DB"} and rep["coef"]["LB"]["n"] > 0 and rep["coef"]["LB"]["snap"]
     text = backtest.format_report(rep, 2025)
-    assert "Skill" in text and "Form" in text and "Swing" in text and "Sacks" in text
+    assert "Skill" in text and "Form" in text and "Swing" in text and "Sacks" in text and "[form]" in text

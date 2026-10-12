@@ -137,7 +137,9 @@
        }
       ]
      },
+     "ceiling": 17.8,
      "flags": [],
+     "floor": 7.4,
      "id": "7136",
      "kickoff": "2026-09-10T20:35:00-04:00",
      "late": false,
@@ -153,6 +155,7 @@
      "role": "starter",
      "sigma": 0.88,
      "slot": "DB",
+     "swing": 6.71,
      "taxi": false,
      "team": "LAR",
      "tier": 1,
@@ -274,7 +277,9 @@
        }
       ]
      },
+     "ceiling": 16.9,
      "flags": [],
+     "floor": 6.6,
      "id": "8323",
      "kickoff": "2026-09-13T13:00:00-04:00",
      "late": false,
@@ -290,6 +295,7 @@
      "role": "other",
      "sigma": 0.89,
      "slot": "DB",
+     "swing": 6.68,
      "taxi": false,
      "team": "PIT",
      "tier": 1,
@@ -416,7 +422,9 @@
        }
       ]
      },
+     "ceiling": 16.3,
      "flags": [],
+     "floor": 3.4,
      "id": "7627",
      "kickoff": "2026-09-13T13:00:00-04:00",
      "late": false,
@@ -432,6 +440,7 @@
      "role": "starter",
      "sigma": 0.75,
      "slot": "DL",
+     "swing": 8.33,
      "taxi": false,
      "team": "BUF",
      "tier": 1,
@@ -562,7 +571,9 @@
        }
       ]
      },
+     "ceiling": 21.7,
      "flags": [],
+     "floor": 9.6,
      "id": "4960",
      "kickoff": "2026-09-13T13:00:00-04:00",
      "late": false,
@@ -578,6 +589,7 @@
      "role": "starter",
      "sigma": 0.96,
      "slot": "LB",
+     "swing": 7.81,
      "taxi": false,
      "team": "BAL",
      "tier": 1,
@@ -701,7 +713,9 @@
        }
       ]
      },
+     "ceiling": 16.8,
      "flags": [],
+     "floor": 4.1,
      "id": "8280",
      "kickoff": "2026-09-14T20:15:00-04:00",
      "late": false,
@@ -717,6 +731,7 @@
      "role": "other",
      "sigma": 1.1,
      "slot": "LB",
+     "swing": 8.17,
      "taxi": false,
      "team": "DEN",
      "tier": 4,
@@ -730,7 +745,7 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.741,
+     "p": 0.679,
      "player": {
       "also": [],
       "badge": null,
@@ -842,7 +857,9 @@
         }
        ]
       },
+      "ceiling": 22.0,
       "flags": [],
+      "floor": 9.8,
       "id": "6217",
       "kickoff": "2026-09-13T16:25:00-04:00",
       "late": false,
@@ -856,6 +873,7 @@
       "result": null,
       "sigma": 2.36,
       "slot": "LB",
+      "swing": 7.87,
       "team": "MIN",
       "tier": null,
       "unavailable": []
@@ -868,7 +886,7 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.718,
+     "p": 0.657,
      "player": {
       "also": [],
       "badge": null,
@@ -990,7 +1008,9 @@
         }
        ]
       },
+      "ceiling": 21.4,
       "flags": [],
+      "floor": 8.9,
       "id": "8267",
       "kickoff": "2026-09-13T16:25:00-04:00",
       "late": false,
@@ -1004,6 +1024,7 @@
       "result": null,
       "sigma": 1.33,
       "slot": "LB",
+      "swing": 8.09,
       "team": "LV",
       "tier": null,
       "unavailable": []
@@ -1016,7 +1037,7 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.716,
+     "p": 0.656,
      "player": {
       "also": [],
       "badge": null,
@@ -1143,7 +1164,9 @@
         }
        ]
       },
+      "ceiling": 21.2,
       "flags": [],
+      "floor": 9.0,
       "id": "6815",
       "kickoff": "2026-09-13T16:25:00-04:00",
       "late": false,
@@ -1157,6 +1180,7 @@
       "result": null,
       "sigma": 0.97,
       "slot": "LB",
+      "swing": 7.92,
       "team": "PHI",
       "tier": null,
       "unavailable": []
@@ -1169,7 +1193,7 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.711,
+     "p": 0.653,
      "player": {
       "also": [],
       "badge": null,
@@ -1301,7 +1325,9 @@
         }
        ]
       },
+      "ceiling": 21.2,
       "flags": [],
+      "floor": 8.8,
       "id": "8659",
       "kickoff": "2026-09-10T20:35:00-04:00",
       "late": false,
@@ -1315,6 +1341,7 @@
       "result": null,
       "sigma": 1.15,
       "slot": "LB",
+      "swing": 7.96,
       "team": "LAR",
       "tier": null,
       "unavailable": []
@@ -1327,7 +1354,7 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.699,
+     "p": 0.645,
      "player": {
       "also": [],
       "badge": null,
@@ -1434,7 +1461,9 @@
         }
        ]
       },
+      "ceiling": 20.8,
       "flags": [],
+      "floor": 8.6,
       "id": "8266",
       "kickoff": "2026-09-13T16:25:00-04:00",
       "late": false,
@@ -1448,6 +1477,7 @@
       "result": null,
       "sigma": 1.44,
       "slot": "LB",
+      "swing": 7.87,
       "team": "LV",
       "tier": null,
       "unavailable": []
@@ -1580,7 +1610,9 @@
          }
         ]
        },
+       "ceiling": 17.8,
        "flags": [],
+       "floor": 7.3,
        "id": "7811",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -1594,6 +1626,7 @@
        "result": null,
        "sigma": 1.07,
        "slot": "DB",
+       "swing": 6.79,
        "team": "DEN",
        "tier": 1,
        "unavailable": []
@@ -1726,7 +1759,9 @@
          }
         ]
        },
+       "ceiling": 17.3,
        "flags": [],
+       "floor": 7.1,
        "id": "7016",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -1740,6 +1775,7 @@
        "result": null,
        "sigma": 0.95,
        "slot": "DB",
+       "swing": 6.58,
        "team": "LV",
        "tier": 1,
        "unavailable": []
@@ -1865,7 +1901,9 @@
          }
         ]
        },
+       "ceiling": 17.1,
        "flags": [],
+       "floor": 6.7,
        "id": "6788",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -1879,6 +1917,7 @@
        "result": null,
        "sigma": 0.99,
        "slot": "DB",
+       "swing": 6.72,
        "team": "GB",
        "tier": 1,
        "unavailable": []
@@ -1994,7 +2033,9 @@
          }
         ]
        },
+       "ceiling": 16.9,
        "flags": [],
+       "floor": 6.8,
        "id": "10927",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -2008,6 +2049,7 @@
        "result": null,
        "sigma": 1.14,
        "slot": "DB",
+       "swing": 6.54,
        "team": "CIN",
        "tier": 1,
        "unavailable": []
@@ -2128,7 +2170,9 @@
          }
         ]
        },
+       "ceiling": 16.9,
        "flags": [],
+       "floor": 6.5,
        "id": "11682",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -2142,6 +2186,7 @@
        "result": null,
        "sigma": 0.83,
        "slot": "DB",
+       "swing": 6.74,
        "team": "BUF",
        "tier": 1,
        "unavailable": []
@@ -2262,7 +2307,9 @@
          }
         ]
        },
+       "ceiling": 16.8,
        "flags": [],
+       "floor": 6.4,
        "id": "8330",
        "kickoff": "2026-09-10T20:35:00-04:00",
        "late": false,
@@ -2276,6 +2323,7 @@
        "result": null,
        "sigma": 2.0,
        "slot": "DB",
+       "swing": 6.71,
        "team": "LAR",
        "tier": 1,
        "unavailable": []
@@ -2397,7 +2445,9 @@
          }
         ]
        },
+       "ceiling": 16.6,
        "flags": [],
+       "floor": 6.3,
        "id": "6711",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -2411,6 +2461,7 @@
        "result": null,
        "sigma": 0.85,
        "slot": "DB",
+       "swing": 6.61,
        "team": "DAL",
        "tier": 2,
        "unavailable": []
@@ -2506,7 +2557,9 @@
          }
         ]
        },
+       "ceiling": 16.4,
        "flags": [],
+       "floor": 6.3,
        "id": "3233",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -2520,6 +2573,7 @@
        "result": null,
        "sigma": 0.81,
        "slot": "DB",
+       "swing": 6.51,
        "team": "NE",
        "tier": 2,
        "unavailable": []
@@ -2635,7 +2689,9 @@
          }
         ]
        },
+       "ceiling": 16.3,
        "flags": [],
+       "floor": 6.2,
        "id": "5017",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -2649,6 +2705,7 @@
        "result": null,
        "sigma": 1.07,
        "slot": "DB",
+       "swing": 6.52,
        "team": "ATL",
        "tier": 2,
        "unavailable": []
@@ -2769,7 +2826,9 @@
          }
         ]
        },
+       "ceiling": 16.4,
        "flags": [],
+       "floor": 6.0,
        "id": "8333",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -2783,6 +2842,7 @@
        "result": null,
        "sigma": 0.91,
        "slot": "DB",
+       "swing": 6.75,
        "team": "TEN",
        "tier": 2,
        "unavailable": []
@@ -2893,7 +2953,9 @@
          }
         ]
        },
+       "ceiling": 16.3,
        "flags": [],
+       "floor": 6.0,
        "id": "8314",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -2907,6 +2969,7 @@
        "result": null,
        "sigma": 1.48,
        "slot": "DB",
+       "swing": 6.61,
        "team": "HOU",
        "tier": 2,
        "unavailable": []
@@ -3002,7 +3065,9 @@
          }
         ]
        },
+       "ceiling": 16.0,
        "flags": [],
+       "floor": 5.8,
        "id": "7669",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -3016,6 +3081,7 @@
        "result": null,
        "sigma": 1.39,
        "slot": "DB",
+       "swing": 6.61,
        "team": "NYG",
        "tier": 2,
        "unavailable": []
@@ -3131,7 +3197,9 @@
          }
         ]
        },
+       "ceiling": 16.0,
        "flags": [],
+       "floor": 5.8,
        "id": "12588",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -3145,6 +3213,7 @@
        "result": null,
        "sigma": 0.91,
        "slot": "DB",
+       "swing": 6.57,
        "team": "TEN",
        "tier": 2,
        "unavailable": []
@@ -3214,7 +3283,9 @@
          }
         ]
        },
+       "ceiling": 16.0,
        "flags": [],
+       "floor": 5.7,
        "id": "5036",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -3228,6 +3299,7 @@
        "result": null,
        "sigma": 0.93,
        "slot": "DB",
+       "swing": 6.61,
        "team": "NO",
        "tier": 2,
        "unavailable": []
@@ -3343,7 +3415,9 @@
          }
         ]
        },
+       "ceiling": 15.9,
        "flags": [],
+       "floor": 5.8,
        "id": "4963",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -3357,6 +3431,7 @@
        "result": null,
        "sigma": 1.23,
        "slot": "DB",
+       "swing": 6.51,
        "team": "NYJ",
        "tier": 2,
        "unavailable": []
@@ -3477,7 +3552,9 @@
          }
         ]
        },
+       "ceiling": 15.9,
        "flags": [],
+       "floor": 5.7,
        "id": "6911",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -3491,6 +3568,7 @@
        "result": null,
        "sigma": 0.86,
        "slot": "DB",
+       "swing": 6.57,
        "team": "DEN",
        "tier": 2,
        "unavailable": []
@@ -3601,7 +3679,9 @@
          }
         ]
        },
+       "ceiling": 15.9,
        "flags": [],
+       "floor": 5.6,
        "id": "7667",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -3615,6 +3695,7 @@
        "result": null,
        "sigma": 1.47,
        "slot": "DB",
+       "swing": 6.68,
        "team": "CLE",
        "tier": 2,
        "unavailable": []
@@ -3710,7 +3791,9 @@
          }
         ]
        },
+       "ceiling": 15.9,
        "flags": [],
+       "floor": 5.6,
        "id": "8476",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -3724,6 +3807,7 @@
        "result": null,
        "sigma": 1.3,
        "slot": "DB",
+       "swing": 6.58,
        "team": "DAL",
        "tier": 2,
        "unavailable": []
@@ -3819,7 +3903,9 @@
          }
         ]
        },
+       "ceiling": 15.7,
        "flags": [],
+       "floor": 5.8,
        "id": "6301",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -3833,6 +3919,7 @@
        "result": null,
        "sigma": 0.92,
        "slot": "DB",
+       "swing": 6.44,
        "team": "CAR",
        "tier": 2,
        "unavailable": []
@@ -3933,7 +4020,9 @@
          }
         ]
        },
+       "ceiling": 15.6,
        "flags": [],
+       "floor": 5.6,
        "id": "11739",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -3947,6 +4036,7 @@
        "result": null,
        "sigma": 0.88,
        "slot": "DB",
+       "swing": 6.47,
        "team": "GB",
        "tier": 2,
        "unavailable": []
@@ -4057,7 +4147,9 @@
          }
         ]
        },
+       "ceiling": 15.7,
        "flags": [],
+       "floor": 5.5,
        "id": "5908",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4071,6 +4163,7 @@
        "result": null,
        "sigma": 1.12,
        "slot": "DB",
+       "swing": 6.54,
        "team": "TEN",
        "tier": 2,
        "unavailable": []
@@ -4186,7 +4279,9 @@
          }
         ]
        },
+       "ceiling": 15.7,
        "flags": [],
+       "floor": 5.5,
        "id": "7069",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -4200,6 +4295,7 @@
        "result": null,
        "sigma": 0.97,
        "slot": "DB",
+       "swing": 6.6,
        "team": "KC",
        "tier": 2,
        "unavailable": []
@@ -4306,7 +4402,9 @@
          }
         ]
        },
+       "ceiling": 15.6,
        "flags": [],
+       "floor": 5.5,
        "id": "8286",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4320,6 +4418,7 @@
        "result": null,
        "sigma": 0.84,
        "slot": "DB",
+       "swing": 6.56,
        "team": "CIN",
        "tier": 3,
        "unavailable": []
@@ -4425,7 +4524,9 @@
          }
         ]
        },
+       "ceiling": 15.5,
        "flags": [],
+       "floor": 5.4,
        "id": "7715",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4439,6 +4540,7 @@
        "result": null,
        "sigma": 0.82,
        "slot": "DB",
+       "swing": 6.54,
        "team": "IND",
        "tier": 3,
        "unavailable": []
@@ -4569,7 +4671,9 @@
          }
         ]
        },
+       "ceiling": 15.6,
        "flags": [],
+       "floor": 5.3,
        "id": "4071",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4583,6 +4687,7 @@
        "result": null,
        "sigma": 1.0,
        "slot": "DB",
+       "swing": 6.65,
        "team": "BAL",
        "tier": 3,
        "unavailable": []
@@ -4708,7 +4813,9 @@
          }
         ]
        },
+       "ceiling": 16.9,
        "flags": [],
+       "floor": 3.5,
        "id": "8265",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4722,6 +4829,7 @@
        "result": null,
        "sigma": 0.79,
        "slot": "DL",
+       "swing": 8.7,
        "team": "JAX",
        "tier": 1,
        "unavailable": []
@@ -4827,7 +4935,9 @@
          }
         ]
        },
+       "ceiling": 16.1,
        "flags": [],
+       "floor": 4.0,
        "id": "3172",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4841,6 +4951,7 @@
        "result": null,
        "sigma": 1.15,
        "slot": "DL",
+       "swing": 7.84,
        "team": "IND",
        "tier": 1,
        "unavailable": []
@@ -4961,7 +5072,9 @@
          }
         ]
        },
+       "ceiling": 16.9,
        "flags": [],
+       "floor": 3.1,
        "id": "6782",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -4975,6 +5088,7 @@
        "result": null,
        "sigma": 0.92,
        "slot": "DL",
+       "swing": 8.89,
        "team": "NO",
        "tier": 1,
        "unavailable": []
@@ -5097,7 +5211,9 @@
          }
         ]
        },
+       "ceiling": 16.4,
        "flags": [],
+       "floor": 3.0,
        "id": "10921",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -5111,6 +5227,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 8.66,
        "team": "TB",
        "tier": 1,
        "unavailable": []
@@ -5216,7 +5333,9 @@
          }
         ]
        },
+       "ceiling": 15.6,
        "flags": [],
+       "floor": 3.4,
        "id": "2311",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -5230,6 +5349,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.87,
        "team": "SEA",
        "tier": 1,
        "unavailable": []
@@ -5355,7 +5475,9 @@
          }
         ]
        },
+       "ceiling": 16.1,
        "flags": [],
+       "floor": 2.9,
        "id": "2064",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -5369,6 +5491,7 @@
        "result": null,
        "sigma": 1.22,
        "slot": "DL",
+       "swing": 8.49,
        "team": "SEA",
        "tier": 1,
        "unavailable": []
@@ -5479,7 +5602,9 @@
          }
         ]
        },
+       "ceiling": 16.1,
        "flags": [],
+       "floor": 2.8,
        "id": "11760",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -5493,6 +5618,7 @@
        "result": null,
        "sigma": 1.1,
        "slot": "DL",
+       "swing": 8.63,
        "team": "CHI",
        "tier": 1,
        "unavailable": []
@@ -5614,7 +5740,9 @@
          }
         ]
        },
+       "ceiling": 15.4,
        "flags": [],
+       "floor": 3.3,
        "id": "6118",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -5628,6 +5756,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.83,
        "team": "DAL",
        "tier": 2,
        "unavailable": []
@@ -5760,7 +5889,9 @@
          }
         ]
        },
+       "ceiling": 15.8,
        "flags": [],
+       "floor": 2.6,
        "id": "11703",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -5774,6 +5905,7 @@
        "result": null,
        "sigma": 0.81,
        "slot": "DL",
+       "swing": 8.55,
        "team": "PHI",
        "tier": 2,
        "unavailable": []
@@ -5879,7 +6011,9 @@
          }
         ]
        },
+       "ceiling": 14.7,
        "flags": [],
+       "floor": 3.7,
        "id": "6784",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -5893,6 +6027,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.12,
        "team": "CAR",
        "tier": 2,
        "unavailable": []
@@ -5998,7 +6133,9 @@
          }
         ]
        },
+       "ceiling": 14.3,
        "flags": [],
+       "floor": 3.5,
        "id": "843",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -6012,6 +6149,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 6.99,
        "team": "PIT",
        "tier": 2,
        "unavailable": []
@@ -6123,7 +6261,9 @@
          }
         ]
        },
+       "ceiling": 14.5,
        "flags": [],
+       "floor": 2.6,
        "id": "5871",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -6137,6 +6277,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.7,
        "team": "DEN",
        "tier": 3,
        "unavailable": []
@@ -6249,7 +6390,9 @@
          }
         ]
        },
+       "ceiling": 14.5,
        "flags": [],
+       "floor": 2.5,
        "id": "12556",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -6263,6 +6406,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.77,
        "team": "DAL",
        "tier": 3,
        "unavailable": []
@@ -6378,7 +6522,9 @@
          }
         ]
        },
+       "ceiling": 14.9,
        "flags": [],
+       "floor": 1.9,
        "id": "4999",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -6392,6 +6538,7 @@
        "result": null,
        "sigma": 0.8,
        "slot": "DL",
+       "swing": 8.37,
        "team": "ARI",
        "tier": 3,
        "unavailable": []
@@ -6492,7 +6639,9 @@
          }
         ]
        },
+       "ceiling": 14.2,
        "flags": [],
+       "floor": 2.5,
        "id": "11668",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -6506,6 +6655,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.55,
        "team": "SEA",
        "tier": 3,
        "unavailable": []
@@ -6621,7 +6771,9 @@
          }
         ]
        },
+       "ceiling": 14.0,
        "flags": [],
+       "floor": 2.5,
        "id": "5297",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -6635,6 +6787,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.47,
        "team": "MIA",
        "tier": 3,
        "unavailable": []
@@ -6745,7 +6898,9 @@
          }
         ]
        },
+       "ceiling": 13.7,
        "flags": [],
+       "floor": 2.6,
        "id": "11328",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -6759,6 +6914,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.18,
        "team": "MIN",
        "tier": 3,
        "unavailable": []
@@ -6861,7 +7017,9 @@
          }
         ]
        },
+       "ceiling": 14.1,
        "flags": [],
+       "floor": 2.2,
        "id": "7696",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -6875,6 +7033,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.65,
        "team": "NE",
        "tier": 3,
        "unavailable": []
@@ -6990,7 +7149,9 @@
          }
         ]
        },
+       "ceiling": 13.8,
        "flags": [],
+       "floor": 2.4,
        "id": "5841",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -7004,6 +7165,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.39,
        "team": "BUF",
        "tier": 3,
        "unavailable": []
@@ -7126,7 +7288,9 @@
          }
         ]
        },
+       "ceiling": 13.9,
        "flags": [],
+       "floor": 2.0,
        "id": "11663",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -7140,6 +7304,7 @@
        "result": null,
        "sigma": 1.2,
        "slot": "DL",
+       "swing": 7.67,
        "team": "MIA",
        "tier": 3,
        "unavailable": []
@@ -7250,7 +7415,9 @@
          }
         ]
        },
+       "ceiling": 14.0,
        "flags": [],
+       "floor": 2.0,
        "id": "10916",
        "kickoff": "2026-09-10T20:35:00-04:00",
        "late": false,
@@ -7264,6 +7431,7 @@
        "result": null,
        "sigma": 0.94,
        "slot": "DL",
+       "swing": 7.73,
        "team": "LAR",
        "tier": 3,
        "unavailable": []
@@ -7369,7 +7537,9 @@
          }
         ]
        },
+       "ceiling": 13.9,
        "flags": [],
+       "floor": 1.9,
        "id": "3558",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -7383,6 +7553,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.71,
        "team": "KC",
        "tier": 3,
        "unavailable": []
@@ -7449,7 +7620,9 @@
          }
         ]
        },
+       "ceiling": 13.7,
        "flags": [],
+       "floor": 2.0,
        "id": "10911",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -7463,6 +7636,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.59,
        "team": "SEA",
        "tier": 3,
        "unavailable": []
@@ -7575,7 +7749,9 @@
          }
         ]
        },
+       "ceiling": 14.0,
        "flags": [],
+       "floor": 1.6,
        "id": "10883",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -7589,6 +7765,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 7.98,
        "team": "NYJ",
        "tier": 3,
        "unavailable": []
@@ -7695,7 +7872,9 @@
          }
         ]
        },
+       "ceiling": 12.9,
        "flags": [],
+       "floor": 2.5,
        "id": "8269",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -7709,6 +7888,7 @@
        "result": null,
        "sigma": 0.75,
        "slot": "DL",
+       "swing": 6.71,
        "team": "PHI",
        "tier": 4,
        "unavailable": []
@@ -7735,7 +7915,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.741,
+        "p": 0.679,
         "reference": false,
         "why": []
        },
@@ -7847,7 +8027,9 @@
          }
         ]
        },
+       "ceiling": 22.0,
        "flags": [],
+       "floor": 9.8,
        "id": "6217",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -7861,6 +8043,7 @@
        "result": null,
        "sigma": 2.36,
        "slot": "LB",
+       "swing": 7.87,
        "team": "MIN",
        "tier": 1,
        "unavailable": []
@@ -7872,7 +8055,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.718,
+        "p": 0.657,
         "reference": false,
         "why": []
        },
@@ -7994,7 +8177,9 @@
          }
         ]
        },
+       "ceiling": 21.4,
        "flags": [],
+       "floor": 8.9,
        "id": "8267",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -8008,6 +8193,7 @@
        "result": null,
        "sigma": 1.33,
        "slot": "LB",
+       "swing": 8.09,
        "team": "LV",
        "tier": 1,
        "unavailable": []
@@ -8019,7 +8205,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.716,
+        "p": 0.656,
         "reference": false,
         "why": []
        },
@@ -8146,7 +8332,9 @@
          }
         ]
        },
+       "ceiling": 21.2,
        "flags": [],
+       "floor": 9.0,
        "id": "6815",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -8160,6 +8348,7 @@
        "result": null,
        "sigma": 0.97,
        "slot": "LB",
+       "swing": 7.92,
        "team": "PHI",
        "tier": 1,
        "unavailable": []
@@ -8171,7 +8360,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.711,
+        "p": 0.653,
         "reference": false,
         "why": []
        },
@@ -8303,7 +8492,9 @@
          }
         ]
        },
+       "ceiling": 21.2,
        "flags": [],
+       "floor": 8.8,
        "id": "8659",
        "kickoff": "2026-09-10T20:35:00-04:00",
        "late": false,
@@ -8317,6 +8508,7 @@
        "result": null,
        "sigma": 1.15,
        "slot": "LB",
+       "swing": 7.96,
        "team": "LAR",
        "tier": 1,
        "unavailable": []
@@ -8328,7 +8520,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.699,
+        "p": 0.645,
         "reference": false,
         "why": []
        },
@@ -8435,7 +8627,9 @@
          }
         ]
        },
+       "ceiling": 20.8,
        "flags": [],
+       "floor": 8.6,
        "id": "8266",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -8449,6 +8643,7 @@
        "result": null,
        "sigma": 1.44,
        "slot": "LB",
+       "swing": 7.87,
        "team": "LV",
        "tier": 1,
        "unavailable": []
@@ -8460,7 +8655,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.676,
+        "p": 0.628,
         "reference": false,
         "why": []
        },
@@ -8577,7 +8772,9 @@
          }
         ]
        },
+       "ceiling": 20.2,
        "flags": [],
+       "floor": 8.2,
        "id": "4968",
        "kickoff": "2026-09-13T20:20:00-04:00",
        "late": false,
@@ -8591,6 +8788,7 @@
        "result": null,
        "sigma": 1.45,
        "slot": "LB",
+       "swing": 7.72,
        "team": "NYG",
        "tier": 1,
        "unavailable": []
@@ -8602,7 +8800,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.677,
+        "p": 0.626,
         "reference": false,
         "why": []
        },
@@ -8719,7 +8917,9 @@
          }
         ]
        },
+       "ceiling": 20.4,
        "flags": [],
+       "floor": 8.0,
        "id": "8329",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -8733,6 +8933,7 @@
        "result": null,
        "sigma": 0.95,
        "slot": "LB",
+       "swing": 7.98,
        "team": "CAR",
        "tier": 1,
        "unavailable": []
@@ -8744,7 +8945,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.671,
+        "p": 0.625,
         "reference": false,
         "why": []
        },
@@ -8876,7 +9077,9 @@
          }
         ]
        },
+       "ceiling": 20.0,
        "flags": [],
+       "floor": 8.1,
        "id": "5843",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -8890,6 +9093,7 @@
        "result": null,
        "sigma": 1.03,
        "slot": "LB",
+       "swing": 7.67,
        "team": "CHI",
        "tier": 1,
        "unavailable": []
@@ -8901,7 +9105,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.671,
+        "p": 0.623,
         "reference": false,
         "why": []
        },
@@ -9023,7 +9227,9 @@
          }
         ]
        },
+       "ceiling": 20.2,
        "flags": [],
+       "floor": 7.9,
        "id": "6302",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -9037,6 +9243,7 @@
        "result": null,
        "sigma": 1.06,
        "slot": "LB",
+       "swing": 7.88,
        "team": "NO",
        "tier": 1,
        "unavailable": []
@@ -9048,7 +9255,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.666,
+        "p": 0.623,
         "reference": false,
         "why": []
        },
@@ -9165,7 +9372,9 @@
          }
         ]
        },
+       "ceiling": 19.7,
        "flags": [],
+       "floor": 8.2,
        "id": "2617",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -9179,6 +9388,7 @@
        "result": null,
        "sigma": 1.51,
        "slot": "LB",
+       "swing": 7.42,
        "team": "DEN",
        "tier": 1,
        "unavailable": []
@@ -9196,7 +9406,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.663,
+        "p": 0.618,
         "reference": false,
         "why": []
        },
@@ -9308,7 +9518,9 @@
          }
         ]
        },
+       "ceiling": 19.9,
        "flags": [],
+       "floor": 7.9,
        "id": "10914",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -9322,6 +9534,7 @@
        "result": null,
        "sigma": 1.04,
        "slot": "LB",
+       "swing": 7.73,
        "team": "LAC",
        "tier": 2,
        "unavailable": []
@@ -9333,7 +9546,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.661,
+        "p": 0.616,
         "reference": false,
         "why": []
        },
@@ -9445,7 +9658,9 @@
          }
         ]
        },
+       "ceiling": 19.8,
        "flags": [],
+       "floor": 7.9,
        "id": "5726",
        "kickoff": "2026-09-09T20:20:00-04:00",
        "late": false,
@@ -9459,21 +9674,14 @@
        "result": null,
        "sigma": 1.31,
        "slot": "LB",
+       "swing": 7.73,
        "team": "NE",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.626,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.27,
@@ -9587,7 +9795,9 @@
          }
         ]
        },
+       "ceiling": 18.9,
        "flags": [],
+       "floor": 7.3,
        "id": "5346",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -9601,21 +9811,14 @@
        "result": null,
        "sigma": 1.13,
        "slot": "LB",
+       "swing": 7.51,
        "team": "GB",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.623,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.22,
@@ -9729,7 +9932,9 @@
          }
         ]
        },
+       "ceiling": 18.9,
        "flags": [],
+       "floor": 7.2,
        "id": "8311",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -9743,21 +9948,14 @@
        "result": null,
        "sigma": 1.04,
        "slot": "LB",
+       "swing": 7.54,
        "team": "BUF",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.622,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.2,
@@ -9861,7 +10059,9 @@
          }
         ]
        },
+       "ceiling": 18.7,
        "flags": [],
+       "floor": 7.4,
        "id": "12646",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -9875,21 +10075,14 @@
        "result": null,
        "sigma": 1.37,
        "slot": "LB",
+       "swing": 7.3,
        "team": "CIN",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.622,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.18,
@@ -10013,7 +10206,9 @@
          }
         ]
        },
+       "ceiling": 19.0,
        "flags": [],
+       "floor": 6.9,
        "id": "12617",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10027,21 +10222,14 @@
        "result": null,
        "sigma": 1.06,
        "slot": "LB",
+       "swing": 7.81,
        "team": "CIN",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.62,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.15,
@@ -10155,7 +10343,9 @@
          }
         ]
        },
+       "ceiling": 18.8,
        "flags": [],
+       "floor": 7.1,
        "id": "6214",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10169,21 +10359,14 @@
        "result": null,
        "sigma": 1.2,
        "slot": "LB",
+       "swing": 7.57,
        "team": "CLE",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.615,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.05,
@@ -10297,7 +10480,9 @@
          }
         ]
        },
+       "ceiling": 18.5,
        "flags": [],
+       "floor": 7.2,
        "id": "6485",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10311,21 +10496,14 @@
        "result": null,
        "sigma": 1.55,
        "slot": "LB",
+       "swing": 7.29,
        "team": "HOU",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.613,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 13.0,
@@ -10444,7 +10622,9 @@
          }
         ]
        },
+       "ceiling": 18.5,
        "flags": [],
+       "floor": 7.1,
        "id": "6807",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10458,21 +10638,14 @@
        "result": null,
        "sigma": 1.12,
        "slot": "LB",
+       "swing": 7.32,
        "team": "PIT",
        "tier": 2,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.606,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 12.88,
@@ -10586,7 +10759,9 @@
          }
         ]
        },
+       "ceiling": 18.3,
        "flags": [],
+       "floor": 7.1,
        "id": "1052",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10600,6 +10775,7 @@
        "result": null,
        "sigma": 1.59,
        "slot": "LB",
+       "swing": 7.21,
        "team": "NYJ",
        "tier": 2,
        "unavailable": []
@@ -10612,15 +10788,7 @@
      "players": [
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.605,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 12.83,
@@ -10734,7 +10902,9 @@
          }
         ]
        },
+       "ceiling": 18.4,
        "flags": [],
+       "floor": 6.9,
        "id": "6141",
        "kickoff": "2026-09-14T20:15:00-04:00",
        "late": false,
@@ -10748,6 +10918,7 @@
        "result": null,
        "sigma": 1.0,
        "slot": "LB",
+       "swing": 7.43,
        "team": "KC",
        "tier": 3,
        "unavailable": []
@@ -10868,7 +11039,9 @@
          }
         ]
        },
+       "ceiling": 18.3,
        "flags": [],
+       "floor": 6.8,
        "id": "5960",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -10882,21 +11055,14 @@
        "result": null,
        "sigma": 2.06,
        "slot": "LB",
+       "swing": 7.38,
        "team": "CHI",
        "tier": 3,
        "unavailable": []
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.601,
-        "reference": false,
-        "why": []
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
         "mu": 12.73,
@@ -11005,7 +11171,9 @@
          }
         ]
        },
+       "ceiling": 18.4,
        "flags": [],
+       "floor": 6.7,
        "id": "4118",
        "kickoff": "2026-09-13T13:00:00-04:00",
        "late": false,
@@ -11019,6 +11187,7 @@
        "result": null,
        "sigma": 0.99,
        "slot": "LB",
+       "swing": 7.52,
        "team": "TB",
        "tier": 3,
        "unavailable": []
@@ -11149,7 +11318,9 @@
          }
         ]
        },
+       "ceiling": 18.3,
        "flags": [],
+       "floor": 6.6,
        "id": "6131",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -11163,6 +11334,7 @@
        "result": null,
        "sigma": 1.66,
        "slot": "LB",
+       "swing": 7.54,
        "team": "ARI",
        "tier": 3,
        "unavailable": []
@@ -11273,7 +11445,9 @@
          }
         ]
        },
+       "ceiling": 17.8,
        "flags": [],
+       "floor": 6.6,
        "id": "4413",
        "kickoff": "2026-09-13T16:25:00-04:00",
        "late": false,
@@ -11287,6 +11461,7 @@
        "result": null,
        "sigma": 1.32,
        "slot": "LB",
+       "swing": 7.25,
        "team": "MIN",
        "tier": 3,
        "unavailable": []
@@ -11359,6 +11534,20 @@
    "week": 1,
    "zero_filled": 0
   }
+ },
+ "swing": {
+  "a": {
+   "DB": 27.0,
+   "DL": 0.0,
+   "LB": 18.0
+  },
+  "b": {
+   "DB": 0.65,
+   "DL": 2.5,
+   "LB": 1.35
+  },
+  "hi": 0.75,
+  "lo": -0.8
  },
  "warnings": [],
  "week": 1

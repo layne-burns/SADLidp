@@ -29,6 +29,7 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 | D15 | Swap badges | **Both**: `START over X`, meaning the waiver player likely outscores your projected starter this week, and `UPGRADE over Y`, meaning he likely outscores your other eligible player at that position (§6.7). |
 | D16 | FP data privacy | FP rows are committed **encrypted only** (key in Actions secrets). The site shows FP **only through the blend**: no FP column, and FP is excluded from the displayed min–max range. FP's aggregate accuracy metrics may be shown. *Open before Phase 3:* whether the free ECR rows still need this treatment (§13). |
 | D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one. FantasyPros ECR, RotoBaller and the ESPN league come next (Phase 3), then accuracy weighting. Weeks 1–5 are backfilled if Sleeper serves past weekly projections. |
+| D18 | Vegas odds (docket) | Owner request: Vegas odds feed tier creation and analysis, in a **post-MVP phase** (§8 Phase 5). Two candidate signals, to be designed when that phase starts: **game lines** (spread, total, moneylines → implied team totals and expected game script), which the nflverse schedule already provides free for every game (week 6 lines present on 2026-10-12); and **player props** (tackles + assists, solo tackles, sacks) from The Odds API as a market-implied projection source (§6.2). This amends D10, which kept matchup modelling out of v1. |
 
 ## 2. Defaults (engineer-chosen; changeable via config or a spec amendment)
 - **Stack:** Python 3.12, `uv`, `httpx`, `selectolax`, `pydantic`, `jinja2`, `pytest`, `ruff`, and `age` for encryption. No database. Normalized JSON snapshots are committed under `data/`.
@@ -132,7 +133,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 | ~~FantasyPros IDP projections~~ | | Logged-in only | ❌ Dropped (owner decision; the login sits behind Cloudflare Turnstile). |
 | RotoBaller weekly IDP rankings article | Rank | ✅ Free | ✅ Three tables (DL/edge, LB, DB), top 50 each, `Rank/Player/Team/Opponent`. Article URL found weekly from its search page. |
 | ESPN league 942104146 (owner's public league, IDP enabled) | Projection (ESPN stat ids; mapping in §13) | Free, no secrets | ✅ Phase 3 source, pending probe run 4. ESPN's default feed omits IDP players, so projections are read through this league (§5 ESPN adapter). |
-| The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | ⏸ Deferred until after the MVP (owner decision). Rules in §6.2. |
+| The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | ⏸ Docketed for Phase 5 (Vegas odds, D18). Rules in §6.2. |
 | ~~FantasyNerds, IDP Guru~~ | | Paywalled | ❌ Dropped (no free rows). |
 | ~~Razzball IDP~~ | | Free but rest-of-season only | ❌ Dropped (weekly rankings page is JS-rendered; projections are ROS). |
 | ~~ESPN article, Dynasty Nerds, The Huddle~~ | | | ❌ Dropped (JS-rendered / start-sit only / blocks automated requests). |
@@ -266,7 +267,8 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 2. **MVP (live ASAP):** skeleton, config, Sleeper client, scoring engine plus the ground-truth test, Sleeper projections adapter, snapshot/freeze storage, consensus, tiers, My IDPs, site, sync.yml (gate, concurrency, Pages), README setup. Then backfill weeks 1–5 if possible.
 3. **More sources:** FantasyPros ECR (storage per the owner's D16 decision), RotoBaller, the ESPN league (stat-id mapping from §13), matching/crosswalk, imputation, rank mapping and censoring.
 4. **Accuracy:** evaluation and adaptive weights, using data collected since the MVP went live plus the backfill. Accuracy table on the page.
-5. **Polish:** props adapter (if a key exists), accuracy and `z` tuning, UI refinements.
+5. **Vegas odds (D18):** design, then build, the odds signal for tiers: a game-line adjustment from the nflverse spread/total (free) and/or a props projection source (needs `ODDS_API_KEY`). Accuracy tracking (Phase 4) decides whether each signal earns weight: it must lower projection error, not just move numbers.
+6. **Polish:** accuracy and `z` tuning, UI refinements.
 
 ## 9. Config tunables (`config/sadl.toml`)
 `league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
@@ -309,6 +311,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · D9 amended (user decision):** FantasyPros access via auto-login with `FP_EMAIL`/`FP_PASSWORD`, tested in Phase 1, with a one-command local cookie refresh as the fallback. The manual cookie copy-paste is no longer the plan.
 - **2026-10-12 · Phase 1 amendment:** verified facts in §13; final source list in §5.2; D14 resolved to Sleeper's `position` field.
 - **2026-10-12 · Owner decisions closing Phase 1:** FantasyPros = free ECR only (D9 superseded; no FP credentials); The Odds API deferred past the MVP; ESPN projections through the owner's public IDP league 942104146 (§5.2), pending probe run 4.
+- **2026-10-12 · D18 added (owner request):** Vegas odds docketed for tier creation and analysis as Phase 5 (game lines from the nflverse schedule and/or Odds API props); polish moves to Phase 6.
 
 ## 13. Phase 1 findings (probe runs 1–3, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
@@ -336,5 +339,7 @@ Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 3. The Odds API: deferred until after the MVP.
 
 **Still open (before Phase 3):** do the free FantasyPros ECR rows still need D16's encrypted storage and blend-only display, or can they be committed like other public sources?
+
+**Still open (before Phase 5, D18):** which odds signal(s): game lines, props, or both; how they enter the tiers (an adjustment to μ, a separate projection source, or display only); and whether to get an Odds API key for props.
 
 **Source plan:** the MVP uses Sleeper projections only (D17). Phase 3 adds FantasyPros ECR and RotoBaller (rank group) and the ESPN league (projection group), with the 60:40 group prior.

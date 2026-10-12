@@ -1,20 +1,7 @@
 {
  "actuals_written": [],
- "backfilled": {
-  "fp_dst": [
-   1,
-   2,
-   3,
-   4
-  ],
-  "fp_ecr": [
-   1,
-   2,
-   3,
-   4
-  ]
- },
- "generated_at": "2026-10-12T15:05:20-04:00",
+ "backfilled": {},
+ "generated_at": "2026-10-12T15:23:07-04:00",
  "impute_priors": 2025,
  "schedule": "nflverse",
  "season": 2026,
@@ -26,10 +13,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -106,17 +93,17 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "merge": {
-    "added": 2,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 28,
-    "unchanged": 0,
+    "unchanged": 2,
     "updated": 0
    },
    "no_projection": 0,
@@ -129,18 +116,18 @@
   "fp_ecr": {
    "censored": 12,
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "mapped": 34,
    "merge": {
-    "added": 34,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 438,
-    "unchanged": 0,
+    "unchanged": 34,
     "updated": 0
    },
    "no_projection": 0,
@@ -196,10 +183,10 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T15:05:20-04:00",
+ "generated_at": "2026-10-12T15:23:07-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -192,7 +192,7 @@
      "slot": "DB",
      "taxi": false,
      "team": "GB",
-     "tier": 1,
+     "tier": 2,
      "unavailable": [
       "locked"
      ]
@@ -2781,7 +2781,7 @@
     }
    ],
    "played_hidden": 168,
-   "tier_count": 4,
+   "tier_count": 5,
    "tiers": [
     {
      "anchor_mu": 11.68,
@@ -3167,7 +3167,13 @@
        "team": "LAR",
        "tier": 1,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 10.27,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -3289,15 +3295,9 @@
        "sigma": 1.22,
        "slot": "DB",
        "team": "BUF",
-       "tier": 1,
+       "tier": 2,
        "unavailable": []
-      }
-     ],
-     "tier": 1
-    },
-    {
-     "anchor_mu": 9.59,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
@@ -3555,7 +3555,13 @@
        "team": "BUF",
        "tier": 2,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 7.36,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -3682,15 +3688,9 @@
        "sigma": 2.74,
        "slot": "DB",
        "team": "LAR",
-       "tier": 2,
+       "tier": 3,
        "unavailable": []
-      }
-     ],
-     "tier": 2
-    },
-    {
-     "anchor_mu": 6.8,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
@@ -4482,7 +4482,13 @@
        "team": "LAR",
        "tier": 4,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 0.9,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -4540,11 +4546,11 @@
        "sigma": 1.56,
        "slot": "DB",
        "team": "BUF",
-       "tier": 4,
+       "tier": 5,
        "unavailable": []
       }
      ],
-     "tier": 4
+     "tier": 5
     }
    ]
   },
@@ -6661,7 +6667,7 @@
     }
    ],
    "played_hidden": 171,
-   "tier_count": 4,
+   "tier_count": 5,
    "tiers": [
     {
      "anchor_mu": 8.73,
@@ -7271,7 +7277,13 @@
        "team": "LAR",
        "tier": 2,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 3.59,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -7378,15 +7390,9 @@
        "sigma": 1.57,
        "slot": "DL",
        "team": "BUF",
-       "tier": 2,
+       "tier": 3,
        "unavailable": []
-      }
-     ],
-     "tier": 2
-    },
-    {
-     "anchor_mu": 3.54,
-     "players": [
+      },
       {
        "also": [
         "LB"
@@ -7946,7 +7952,13 @@
        "team": "BUF",
        "tier": 3,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 1.9,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -8048,15 +8060,9 @@
        "sigma": 1.02,
        "slot": "DL",
        "team": "BUF",
-       "tier": 3,
+       "tier": 4,
        "unavailable": []
-      }
-     ],
-     "tier": 3
-    },
-    {
-     "anchor_mu": 1.16,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
@@ -8286,7 +8292,13 @@
        "team": "BUF",
        "tier": 4,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 0.7,
+     "players": [
       {
        "also": [],
        "badge": null,
@@ -8373,7 +8385,7 @@
        "sigma": 0.93,
        "slot": "DL",
        "team": "LAR",
-       "tier": 4,
+       "tier": 5,
        "unavailable": []
       },
       {
@@ -8436,11 +8448,11 @@
        "sigma": 1.02,
        "slot": "DL",
        "team": "LAR",
-       "tier": 4,
+       "tier": 5,
        "unavailable": []
       }
      ],
-     "tier": 4
+     "tier": 5
     }
    ]
   },
@@ -11712,10 +11724,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "match": {
     "names": [
      "Jeremiah Moon CAR DL",
@@ -11745,17 +11757,17 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "merge": {
-    "added": 2,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 28,
-    "unchanged": 0,
+    "unchanged": 2,
     "updated": 0
    },
    "no_projection": 0,
@@ -11768,10 +11780,10 @@
   "fp_ecr": {
    "censored": 12,
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "mapped": 34,
    "match": {
     "names": [],
@@ -11779,12 +11791,12 @@
     "unmatched": 0
    },
    "merge": {
-    "added": 34,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 438,
-    "unchanged": 0,
+    "unchanged": 34,
     "updated": 0
    },
    "no_projection": 0,
@@ -11797,10 +11809,10 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "fetched_at": "2026-10-12T15:23:07-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-12T15:05:20-04:00",
+   "last_success": "2026-10-12T15:23:07-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,

@@ -1,0 +1,758 @@
+{
+ "players": [
+  {
+   "draftAuctionValue": 0,
+   "droppedByEliminatedTeam": false,
+   "id": 4685415,
+   "keeperValue": 0,
+   "keeperValueFuture": 0,
+   "lineupLocked": false,
+   "onTeamId": 0,
+   "player": {
+    "active": true,
+    "defaultPositionId": 3,
+    "draftRanksByRankType": {
+     "ELIMINATION": {
+      "auctionValue": 1,
+      "published": false,
+      "rank": 830,
+      "rankSourceId": 0,
+      "rankType": "ELIMINATION",
+      "slotId": 0
+     },
+     "PPR": {
+      "auctionValue": 3,
+      "published": false,
+      "rank": 187,
+      "rankSourceId": 0,
+      "rankType": "PPR",
+      "slotId": 0
+     },
+     "STANDARD": {
+      "auctionValue": 0,
+      "published": false,
+      "rank": 187,
+      "rankSourceId": 0,
+      "rankType": "STANDARD",
+      "slotId": 0
+     },
+     "SUPERFLEX": {
+      "auctionValue": 3,
+      "published": false,
+      "rank": 201,
+      "rankSourceId": 0,
+      "rankType": "SUPERFLEX",
+      "slotId": 0
+     }
+    },
+    "droppable": true,
+    "eligibleSlots": [
+     3,
+     4,
+     5,
+     23,
+     7,
+     20,
+     21,
+     12,
+     14,
+     15
+    ],
+    "firstName": "Travis",
+    "fullName": "Travis Hunter",
+    "id": 4685415,
+    "injured": false,
+    "injuryStatus": "ACTIVE",
+    "jersey": "12",
+    "lastName": "Hunter",
+    "lastNewsDate": 1791339214000,
+    "outlooks": {
+     "outlooksByWeek": {
+      "2": "Travis Hunter is unlikely to get enough touches on offense to be worth considering in fantasy against Denver's stout defense in Week 2. He had one target and one carry in Jacksonville's season opener, which he turned into 11 scrimmage yards across four snaps on offense while playing primarily on defense. Hunter played both wide receiver and cornerback at Colorado before being drafted second overall by the Jaguars in 2025. With WRs Parker Washington, Brian Thomas, and Jakobi Meyers ahead of him, the versatile Hunter is currently more useful to the Jaguars on defense, much to the chagrin of his fantasy managers.",
+      "3": "Travis Hunter didn't have a target or carry in Week 2 and has played only a handful of snaps on offense for the Jaguars this season. He's off the fantasy radar heading into a Week 3 home game against the Patriots, outside of IDP formats that reward Hunter's contributions as a cornerback. Parker Washington, Brian Thomas, and Jakobi Meyers should continue to lead Jacksonville's wide receiver room.",
+      "4": "Travis Hunter hasn't touched the ball on offense in either of Jacksonville's last two games heading into a Week 4 trip to Cincinnati. The 2025 second overall pick has been playing almost exclusively on defense, so Hunter's off the fantasy radar in formats that don't count individual defensive statistics. He's trending up as a cornerback after intercepting Drake Maye in Jacksonville's Week 3 win over the Patriots.",
+      "5": "Travis Hunter hasn't touched the ball on offense for the Jaguars since Week 1. He played every defensive snap in Week 4 and is focusing primarily on playing cornerback rather than wide receiver. Hunter is a fantasy non-factor except in formats that reward his defensive contributions. Jacksonville will face the Eagles in Week 5 in London, where Hunter showcased his upside on offense last season with eight catches for 101 yards and a TD against the Rams. Don't expect a repeat performance anytime soon, if ever."
+     }
+    },
+    "ownership": {
+     "activityLevel": null,
+     "auctionValueAverage": 0.84,
+     "auctionValueAverageChange": -0.03,
+     "averageDraftPosition": 154.53,
+     "averageDraftPositionPercentChange": 0.9,
+     "date": 1791783017422,
+     "leagueType": 0,
+     "percentChange": -0.2,
+     "percentOwned": 32.42,
+     "percentStarted": 2.52
+    },
+    "proTeamId": 30,
+    "rankings": {
+     "0": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 99,
+       "rankSourceId": 9,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 94,
+       "rankSourceId": 6,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 68,
+       "rankSourceId": 3,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 97,
+       "rankSourceId": 12,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 65,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 92,
+       "rankSourceId": 10,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "averageRank": 1.0,
+       "published": true,
+       "rank": 0,
+       "rankSourceId": 0,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "averageRank": 1.0,
+       "published": true,
+       "rank": 0,
+       "rankSourceId": 0,
+       "rankType": "STANDARD",
+       "slotId": 14
+      }
+     ],
+     "1": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 66,
+       "rankSourceId": 9,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 67,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 68,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 68,
+       "rankSourceId": 6,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 72,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 67,
+       "rankSourceId": 3,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 67,
+       "rankSourceId": 12,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": true,
+       "rank": 1,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 66,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 67,
+       "rankSourceId": 10,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "averageRank": 1.0,
+       "published": true,
+       "rank": 0,
+       "rankSourceId": 0,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "averageRank": 1.0,
+       "published": true,
+       "rank": 0,
+       "rankSourceId": 0,
+       "rankType": "STANDARD",
+       "slotId": 14
+      }
+     ],
+     "2": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 98,
+       "rankSourceId": 9,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 117,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 118,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 102,
+       "rankSourceId": 6,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 100,
+       "rankSourceId": 3,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 102,
+       "rankSourceId": 12,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 98,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 98,
+       "rankSourceId": 10,
+       "rankType": "PPR",
+       "slotId": 4
+      }
+     ],
+     "3": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 97,
+       "rankSourceId": 9,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 120,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 118,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 76,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 97,
+       "rankSourceId": 6,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 103,
+       "rankSourceId": 3,
+       "rankType": "STANDARD",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 99,
+       "rankSourceId": 3,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 96,
+       "rankSourceId": 12,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 79,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 103,
+       "rankSourceId": 3,
+       "rankType": "SUPERFLEX",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 94,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 97,
+       "rankSourceId": 10,
+       "rankType": "PPR",
+       "slotId": 4
+      }
+     ],
+     "4": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 119,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 80,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 80,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 41,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 14
+      }
+     ],
+     "5": [
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 99,
+       "rankSourceId": 5,
+       "rankType": "PPR",
+       "slotId": 4
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 51,
+       "rankSourceId": 7,
+       "rankType": "PPR",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 51,
+       "rankSourceId": 7,
+       "rankType": "STANDARD",
+       "slotId": 14
+      },
+      {
+       "auctionValue": 0,
+       "published": false,
+       "rank": 41,
+       "rankSourceId": 11,
+       "rankType": "PPR",
+       "slotId": 14
+      }
+     ]
+    },
+    "seasonOutlook": "Full-time focus on defense should unlock rewarding production from a unique talent. Not only can Hunter mirror receivers, he frequently turns his head to track the ball, leading to big plays in coverage.",
+    "stats": [
+     {
+      "appliedTotal": 1.9,
+      "externalId": "401872981",
+      "id": "01401872981",
+      "proTeamId": 30,
+      "scoringPeriodId": 5,
+      "seasonId": 2026,
+      "statSourceId": 0,
+      "statSplitTypeId": 1,
+      "stats": {
+       "107": 2.0,
+       "108": 4.0,
+       "109": 6.0,
+       "110": 2.0,
+       "111": 1.0,
+       "112": 1.0,
+       "113": 1.0,
+       "155": 1.0,
+       "210": 1.0,
+       "213": 1.0,
+       "41": 1.0,
+       "42": 9.0,
+       "47": 1.0,
+       "53": 1.0,
+       "58": 1.0,
+       "59": 4.0,
+       "60": 9.0,
+       "61": 9.0
+      }
+     },
+     {
+      "appliedTotal": 0.0,
+      "externalId": "401872969",
+      "id": "01401872969",
+      "proTeamId": 30,
+      "scoringPeriodId": 4,
+      "seasonId": 2026,
+      "statSourceId": 0,
+      "statSplitTypeId": 1,
+      "stats": {
+       "107": 1.0,
+       "108": 3.0,
+       "109": 4.0,
+       "110": 1.0,
+       "113": 2.0,
+       "155": 1.0,
+       "210": 1.0
+      }
+     },
+     {
+      "appliedTotal": 0.0,
+      "externalId": "401872957",
+      "id": "01401872957",
+      "proTeamId": 30,
+      "scoringPeriodId": 3,
+      "seasonId": 2026,
+      "statSourceId": 0,
+      "statSplitTypeId": 1,
+      "stats": {
+       "107": 3.0,
+       "108": 1.0,
+       "109": 4.0,
+       "110": 1.0,
+       "113": 1.0,
+       "155": 1.0,
+       "210": 1.0,
+       "95": 1.0
+      }
+     },
+     {
+      "appliedTotal": 0.05836428,
+      "externalId": "20265",
+      "id": "1120265",
+      "proTeamId": 0,
+      "scoringPeriodId": 5,
+      "seasonId": 2026,
+      "statSourceId": 1,
+      "statSplitTypeId": 1,
+      "stats": {
+       "100": 0.016066843,
+       "103": 0.00803938,
+       "104": 0.00126,
+       "105": 0.009728325,
+       "106": 0.021449056,
+       "107": 0.976484066,
+       "108": 2.544101438,
+       "109": 3.520585504,
+       "110": 1.0,
+       "112": 0.080809639,
+       "113": 0.765631106,
+       "93": 0.000428,
+       "94": 0.009300459,
+       "95": 0.092558432,
+       "96": 0.013941887,
+       "97": 0.003,
+       "98": 0.000315,
+       "99": 0.008033421
+      }
+     },
+     {
+      "appliedAverage": 1.1666001183333337,
+      "appliedTotal": 13.99920142,
+      "externalId": "2026",
+      "id": "102026",
+      "proTeamId": 0,
+      "scoringPeriodId": 0,
+      "seasonId": 2026,
+      "statSourceId": 1,
+      "statSplitTypeId": 0,
+      "stats": {
+       "100": 0.226902854,
+       "103": 0.129,
+       "104": 0.020270456,
+       "105": 0.156372091,
+       "106": 0.344769913,
+       "107": 15.69590378,
+       "108": 40.89362313,
+       "109": 56.5895269,
+       "110": 18.0,
+       "111": 11.0,
+       "112": 1.314602723,
+       "113": 12.30667513,
+       "210": 12.0,
+       "213": 1.995240563,
+       "42": 57.50331381,
+       "43": 0.476063886,
+       "44": 0.021273232,
+       "45": 0.128245649,
+       "46": 0.083808532,
+       "47": 11.0,
+       "48": 5.0,
+       "49": 2.0,
+       "50": 2.0,
+       "51": 1.0,
+       "53": 4.503143443,
+       "56": 0.026316596,
+       "57": 0.000813915,
+       "58": 7.238454673,
+       "60": 12.76959407,
+       "61": 4.791942817,
+       "62": 0.021273232,
+       "63": 0.000362533,
+       "67": 0.082393855,
+       "68": 0.082393855,
+       "71": 0.046140559,
+       "72": 0.046140559,
+       "73": 0.046140559,
+       "93": 0.00688,
+       "94": 0.149494615,
+       "95": 1.385996695,
+       "96": 0.224100443,
+       "97": 0.0481,
+       "98": 0.00507,
+       "99": 0.113451427
+      }
+     },
+     {
+      "appliedAverage": 0.8,
+      "appliedTotal": 4.0,
+      "externalId": "2026",
+      "id": "002026",
+      "proTeamId": 0,
+      "scoringPeriodId": 0,
+      "seasonId": 2026,
+      "statSourceId": 0,
+      "statSplitTypeId": 0,
+      "stats": {
+       "107": 6.0,
+       "108": 13.0,
+       "109": 19.0,
+       "110": 5.0,
+       "111": 1.0,
+       "112": 1.0,
+       "113": 5.0,
+       "155": 4.0,
+       "156": 1.0,
+       "210": 5.0,
+       "213": 1.0,
+       "23": 1.0,
+       "24": 3.0,
+       "39": 3.0,
+       "40": 0.6,
+       "41": 2.0,
+       "42": 17.0,
+       "47": 2.0,
+       "53": 2.0,
+       "58": 2.0,
+       "59": 15.0,
+       "60": 8.5,
+       "61": 3.4,
+       "95": 1.0
+      }
+     }
+    ]
+   },
+   "ratings": {
+    "0": {
+     "positionalRanking": 146,
+     "totalRanking": 426,
+     "totalRating": 2.1
+    }
+   },
+   "rosterLocked": false,
+   "status": "WAIVERS",
+   "tradeLocked": false,
+   "waiverProcessDate": 1791874800000
+  }
+ ]
+}

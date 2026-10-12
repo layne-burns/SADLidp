@@ -1,0 +1,113 @@
+[
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 51,
+  "rows": [
+   [
+    "Rank",
+    "Player",
+    "Team",
+    "Opponent"
+   ],
+   [
+    "1",
+    "Dallas Turner",
+    "Vikings",
+    "Saints"
+   ],
+   [
+    "2",
+    "Andrew Van Ginkel",
+    "Vikings",
+    "Saints"
+   ],
+   [
+    "3",
+    "Will Anderson Jr.",
+    "Texans",
+    "Titans"
+   ],
+   [
+    "4",
+    "T.J. Watt",
+    "Steelers",
+    "Colts"
+   ]
+  ]
+ },
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 51,
+  "rows": [
+   [
+    "Rank",
+    "Player",
+    "Team",
+    "Opponent"
+   ],
+   [
+    "1",
+    "Fred Warner",
+    "49ers",
+    "Seahawks"
+   ],
+   [
+    "2",
+    "Arvell Reese",
+    "Giants",
+    "Commanders"
+   ],
+   [
+    "3",
+    "Nakobe Dean",
+    "Raiders",
+    "Patriots"
+   ],
+   [
+    "4",
+    "Jacob Rodriguez",
+    "Dolphins",
+    "Bengals"
+   ]
+  ]
+ },
+ {
+  "headers": [],
+  "id": null,
+  "row_count": 51,
+  "rows": [
+   [
+    "Rank",
+    "Player",
+    "Team",
+    "Opponent"
+   ],
+   [
+    "1",
+    "Nick Emmanwori",
+    "Seahawks",
+    "49ers"
+   ],
+   [
+    "2",
+    "Quentin Lake",
+    "Rams",
+    "Bills"
+   ],
+   [
+    "3",
+    "Kyle Hamilton (Q)",
+    "Ravens",
+    "Falcons"
+   ],
+   [
+    "4",
+    "Evan Williams",
+    "Packers",
+    "Bears"
+   ]
+  ]
+ }
+]

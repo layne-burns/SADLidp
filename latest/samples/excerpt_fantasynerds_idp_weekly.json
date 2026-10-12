@@ -1,0 +1,18 @@
+[
+ {
+  "headers": [
+   "PLAYER",
+   "TEAM",
+   "POS",
+   "TKLS",
+   "ASS TKLS",
+   "SACKS",
+   "PASS DEF",
+   "INT",
+   "PTS"
+  ],
+  "id": "projections",
+  "row_count": 0,
+  "rows": []
+ }
+]

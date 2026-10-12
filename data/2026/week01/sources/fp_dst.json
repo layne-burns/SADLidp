@@ -1,0 +1,53 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-10-12T14:35:12-04:00"
+ ],
+ "kind": "signal",
+ "last_success": "2026-10-12T14:35:12-04:00",
+ "no_projection_ids": [],
+ "published_at": "2026-09-13T16:58:56+00:00",
+ "rows": {
+  "ARI": {"backfill":true,"home":false,"opponent":"LAC","rank":32},
+  "ATL": {"backfill":true,"home":false,"opponent":"PIT","rank":24},
+  "BAL": {"backfill":true,"home":false,"opponent":"IND","rank":11},
+  "BUF": {"backfill":true,"home":false,"opponent":"HOU","rank":14},
+  "CAR": {"backfill":true,"home":true,"opponent":"CHI","rank":30},
+  "CHI": {"backfill":true,"home":false,"opponent":"CAR","rank":18},
+  "CIN": {"backfill":true,"home":true,"opponent":"TB","rank":23},
+  "CLE": {"backfill":true,"home":false,"opponent":"JAX","rank":21},
+  "DAL": {"backfill":true,"home":false,"opponent":"NYG","rank":13},
+  "DEN": {"backfill":true,"home":false,"opponent":"KC","rank":7},
+  "DET": {"backfill":true,"home":true,"opponent":"NO","rank":9},
+  "GB": {"backfill":true,"home":false,"opponent":"MIN","rank":16},
+  "HOU": {"backfill":true,"home":true,"opponent":"BUF","rank":8},
+  "IND": {"backfill":true,"home":true,"opponent":"BAL","rank":25},
+  "JAX": {"backfill":true,"home":true,"opponent":"CLE","rank":1},
+  "KC": {"backfill":true,"home":true,"opponent":"DEN","rank":20},
+  "LAC": {"backfill":true,"home":true,"opponent":"ARI","rank":2},
+  "LAR": {"backfill":true,"home":true,"opponent":"SF","rank":4},
+  "LV": {"backfill":true,"home":true,"opponent":"MIA","rank":17},
+  "MIA": {"backfill":true,"home":false,"opponent":"LV","rank":22},
+  "MIN": {"backfill":true,"home":true,"opponent":"GB","rank":12},
+  "NE": {"backfill":true,"home":false,"opponent":"SEA","rank":19},
+  "NO": {"backfill":true,"home":false,"opponent":"DET","rank":28},
+  "NYG": {"backfill":true,"home":true,"opponent":"DAL","rank":29},
+  "NYJ": {"backfill":true,"home":false,"opponent":"TEN","rank":15},
+  "PHI": {"backfill":true,"home":true,"opponent":"WAS","rank":5},
+  "PIT": {"backfill":true,"home":true,"opponent":"ATL","rank":3},
+  "SEA": {"backfill":true,"home":true,"opponent":"NE","rank":6},
+  "SF": {"backfill":true,"home":false,"opponent":"LAR","rank":27},
+  "TB": {"backfill":true,"home":false,"opponent":"CIN","rank":26},
+  "TEN": {"backfill":true,"home":true,"opponent":"NYJ","rank":10},
+  "WAS": {"backfill":true,"home":false,"opponent":"PHI","rank":31}
+ },
+ "schema_version": 2,
+ "source": "fp_dst",
+ "universe": {
+  "DST": {
+   "complete": false,
+   "depth": 32
+  }
+ },
+ "week": 1
+}

@@ -1,0 +1,6215 @@
+{
+ "generated_at": "2026-09-24T20:14:00-04:00",
+ "last_week": null,
+ "league": {
+  "limits": {
+   "DB": 2,
+   "DL": 2,
+   "LB": 2
+  },
+  "name": "Slow Ass Draft League",
+  "waiver_type": "FAAB"
+ },
+ "my_idps": {
+  "DB": {
+   "count": 2,
+   "limit": 2,
+   "names": {
+    "11739": "Evan Williams",
+    "8323": "Jaquan Brisker"
+   },
+   "played_suggestions": [],
+   "played_suggestions_hidden": 0,
+   "players": [
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "mu": 10.24,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 10.24,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.75
+         ],
+         [
+          "ast",
+          2.69
+         ],
+         [
+          "TFL",
+          0.17
+         ],
+         [
+          "PD",
+          0.29
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
+     "flags": [],
+     "id": "11739",
+     "kickoff": "2026-09-24T20:15:00-04:00",
+     "late": false,
+     "max": 10.24,
+     "min": 10.24,
+     "mine": true,
+     "mu": 10.24,
+     "n": 1,
+     "name": "Evan Williams",
+     "opp": "ATL",
+     "reserve": false,
+     "result": {
+      "pts": 14.0,
+      "state": "final"
+     },
+     "role": "other",
+     "sigma": 1.0,
+     "slot": "DB",
+     "taxi": false,
+     "team": "GB",
+     "tier": 2,
+     "unavailable": []
+    },
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "mu": 10.34,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 10.34,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.98
+         ],
+         [
+          "ast",
+          2.29
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.16
+         ],
+         [
+          "PD",
+          0.32
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
+     "flags": [],
+     "id": "8323",
+     "kickoff": "2026-09-27T13:00:00-04:00",
+     "late": false,
+     "max": 10.34,
+     "min": 10.34,
+     "mine": true,
+     "mu": 10.34,
+     "n": 1,
+     "name": "Jaquan Brisker",
+     "opp": "CIN",
+     "reserve": false,
+     "result": {
+      "pts": 11.0,
+      "state": "final"
+     },
+     "role": "starter",
+     "sigma": 1.0,
+     "slot": "DB",
+     "taxi": false,
+     "team": "PIT",
+     "tier": 2,
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": [
+    {
+     "action": "add_drop",
+     "badge": "START",
+     "drop": "11739",
+     "outcome": "miss",
+     "over": "8323",
+     "over_result": {
+      "pts": 11.0,
+      "state": "final"
+     },
+     "p": 0.631,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 12.86,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 12.86,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           3.45
+          ],
+          [
+           "ast",
+           2.17
+          ],
+          [
+           "TFL",
+           0.23
+          ],
+          [
+           "sack",
+           0.06
+          ],
+          [
+           "QB hit",
+           0.12
+          ],
+          [
+           "PD",
+           0.53
+          ],
+          [
+           "INT",
+           0.18
+          ],
+          [
+           "FF",
+           0.06
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "11682",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 12.86,
+      "min": 12.86,
+      "mine": false,
+      "mu": 12.86,
+      "n": 1,
+      "name": "Cole Bishop",
+      "opp": "LAC",
+      "result": {
+       "pts": 9.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "DB",
+      "team": "BUF",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    }
+   ]
+  },
+  "DL": {
+   "count": 1,
+   "limit": 2,
+   "names": {
+    "7627": "Greg Rousseau"
+   },
+   "played_suggestions": [],
+   "played_suggestions_hidden": 0,
+   "players": [
+    {
+     "also": [
+      "LB"
+     ],
+     "badge": null,
+     "breakdown": {
+      "mu": 13.28,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 13.28,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.87
+         ],
+         [
+          "ast",
+          1.12
+         ],
+         [
+          "TFL",
+          0.75
+         ],
+         [
+          "sack",
+          0.72
+         ],
+         [
+          "QB hit",
+          1.49
+         ],
+         [
+          "FF",
+          0.31
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
+     "flags": [],
+     "id": "7627",
+     "kickoff": "2026-09-27T13:00:00-04:00",
+     "late": false,
+     "max": 13.28,
+     "min": 13.28,
+     "mine": true,
+     "mu": 13.28,
+     "n": 1,
+     "name": "Greg Rousseau",
+     "opp": "LAC",
+     "reserve": false,
+     "result": {
+      "pts": 36.0,
+      "state": "final"
+     },
+     "role": "starter",
+     "sigma": 1.0,
+     "slot": "DL",
+     "taxi": false,
+     "team": "BUF",
+     "tier": "above",
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": []
+  },
+  "LB": {
+   "count": 2,
+   "limit": 2,
+   "names": {
+    "4960": "Roquan Smith",
+    "8280": "Nik Bonitto"
+   },
+   "played_suggestions": [],
+   "played_suggestions_hidden": 0,
+   "players": [
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "mu": 16.5,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 16.5,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          4.83
+         ],
+         [
+          "ast",
+          3.9
+         ],
+         [
+          "TFL",
+          0.25
+         ],
+         [
+          "sack",
+          0.09
+         ],
+         [
+          "QB hit",
+          0.25
+         ],
+         [
+          "PD",
+          0.25
+         ],
+         [
+          "INT",
+          0.12
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
+     "flags": [],
+     "id": "4960",
+     "kickoff": "2026-09-27T16:25:00-04:00",
+     "late": false,
+     "max": 16.5,
+     "min": 16.5,
+     "mine": true,
+     "mu": 16.5,
+     "n": 1,
+     "name": "Roquan Smith",
+     "opp": "@DAL",
+     "reserve": false,
+     "result": {
+      "pts": 24.0,
+      "state": "final"
+     },
+     "role": "starter",
+     "sigma": 1.0,
+     "slot": "LB",
+     "taxi": false,
+     "team": "BAL",
+     "tier": 1,
+     "unavailable": []
+    },
+    {
+     "also": [
+      "DL"
+     ],
+     "badge": null,
+     "breakdown": {
+      "mu": 11.68,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 11.68,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.66
+         ],
+         [
+          "ast",
+          0.78
+         ],
+         [
+          "TFL",
+          0.78
+         ],
+         [
+          "sack",
+          0.67
+         ],
+         [
+          "QB hit",
+          1.4
+         ],
+         [
+          "PD",
+          0.1
+         ],
+         [
+          "FF",
+          0.1
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
+     "flags": [],
+     "id": "8280",
+     "kickoff": "2026-09-27T20:20:00-04:00",
+     "late": false,
+     "max": 11.68,
+     "min": 11.68,
+     "mine": true,
+     "mu": 11.68,
+     "n": 1,
+     "name": "Nik Bonitto",
+     "opp": "LAR",
+     "reserve": false,
+     "result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "role": "other",
+     "sigma": 1.0,
+     "slot": "LB",
+     "taxi": false,
+     "team": "DEN",
+     "tier": 3,
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": [
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "8280",
+     "outcome": "miss",
+     "over": "8280",
+     "over_result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "p": 0.673,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 15.31,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 15.31,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.5
+          ],
+          [
+           "ast",
+           2.12
+          ],
+          [
+           "TFL",
+           0.32
+          ],
+          [
+           "sack",
+           0.16
+          ],
+          [
+           "QB hit",
+           0.37
+          ],
+          [
+           "PD",
+           0.42
+          ],
+          [
+           "INT",
+           0.11
+          ],
+          [
+           "FF",
+           0.05
+          ],
+          [
+           "FR",
+           0.05
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "12617",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 15.31,
+      "min": 15.31,
+      "mine": false,
+      "mu": 15.31,
+      "n": 1,
+      "name": "Demetrius Knight",
+      "opp": "@PIT",
+      "result": {
+       "pts": 11.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "LB",
+      "team": "CIN",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    },
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "8280",
+     "outcome": "miss",
+     "over": "8280",
+     "over_result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "p": 0.665,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 15.13,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 15.13,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.66
+          ],
+          [
+           "ast",
+           2.8
+          ],
+          [
+           "TFL",
+           0.44
+          ],
+          [
+           "sack",
+           0.06
+          ],
+          [
+           "QB hit",
+           0.12
+          ],
+          [
+           "PD",
+           0.19
+          ],
+          [
+           "INT",
+           0.12
+          ],
+          [
+           "FR",
+           0.12
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "8311",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 15.13,
+      "min": 15.13,
+      "mine": false,
+      "mu": 15.13,
+      "n": 1,
+      "name": "Terrel Bernard",
+      "opp": "LAC",
+      "result": {
+       "pts": 8.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "LB",
+      "team": "BUF",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    },
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "8280",
+     "outcome": "miss",
+     "over": "8280",
+     "over_result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "p": 0.643,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 14.64,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 14.64,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.0
+          ],
+          [
+           "ast",
+           3.89
+          ],
+          [
+           "TFL",
+           0.33
+          ],
+          [
+           "sack",
+           0.05
+          ],
+          [
+           "QB hit",
+           0.05
+          ],
+          [
+           "PD",
+           0.38
+          ],
+          [
+           "INT",
+           0.05
+          ],
+          [
+           "FF",
+           0.05
+          ],
+          [
+           "FR",
+           0.05
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "5332",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 14.64,
+      "min": 14.64,
+      "mine": false,
+      "mu": 14.64,
+      "n": 1,
+      "name": "Foyesade Oluokun",
+      "opp": "NE",
+      "result": {
+       "pts": 10.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "LB",
+      "team": "JAX",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    },
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "8280",
+     "outcome": "miss",
+     "over": "8280",
+     "over_result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "p": 0.633,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 14.43,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 14.43,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           3.7
+          ],
+          [
+           "ast",
+           3.16
+          ],
+          [
+           "TFL",
+           0.73
+          ],
+          [
+           "sack",
+           0.18
+          ],
+          [
+           "QB hit",
+           0.61
+          ],
+          [
+           "PD",
+           0.12
+          ],
+          [
+           "FF",
+           0.06
+          ],
+          [
+           "FR",
+           0.06
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "6141",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 14.43,
+      "min": 14.43,
+      "mine": false,
+      "mu": 14.43,
+      "n": 1,
+      "name": "Drue Tranquill",
+      "opp": "@MIA",
+      "result": {
+       "pts": 12.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "LB",
+      "team": "KC",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    },
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "8280",
+     "outcome": "push",
+     "over": "8280",
+     "over_result": {
+      "pts": 13.0,
+      "state": "final"
+     },
+     "p": 0.63,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "mu": 14.37,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 14.37,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.44
+          ],
+          [
+           "ast",
+           3.05
+          ],
+          [
+           "TFL",
+           0.28
+          ],
+          [
+           "sack",
+           0.06
+          ],
+          [
+           "QB hit",
+           0.17
+          ],
+          [
+           "PD",
+           0.33
+          ],
+          [
+           "FF",
+           0.06
+          ],
+          [
+           "FR",
+           0.06
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
+      "flags": [],
+      "id": "6485",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "late": false,
+      "max": 14.37,
+      "min": 14.37,
+      "mine": false,
+      "mu": 14.37,
+      "n": 1,
+      "name": "Azeez Al-Shaair",
+      "opp": "@IND",
+      "result": {
+       "pts": 13.0,
+       "state": "final"
+      },
+      "sigma": 1.0,
+      "slot": "LB",
+      "team": "HOU",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    }
+   ]
+  }
+ },
+ "positions": {
+  "DB": {
+   "hidden": 215,
+   "no_projection": 197,
+   "played": [],
+   "played_hidden": 0,
+   "tier_count": 9,
+   "tiers": [
+    {
+     "anchor_mu": 12.86,
+     "players": [
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "START",
+        "drop": "11739",
+        "over": "8323",
+        "p": 0.631,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 12.86,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.86,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.45
+           ],
+           [
+            "ast",
+            2.17
+           ],
+           [
+            "TFL",
+            0.23
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.53
+           ],
+           [
+            "INT",
+            0.18
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11682",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.86,
+       "min": 12.86,
+       "mine": false,
+       "mu": 12.86,
+       "n": 1,
+       "name": "Cole Bishop",
+       "opp": "LAC",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.11,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.11,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.12
+           ],
+           [
+            "ast",
+            1.72
+           ],
+           [
+            "TFL",
+            0.25
+           ],
+           [
+            "PD",
+            0.31
+           ],
+           [
+            "INT",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11731",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 12.11,
+       "min": 12.11,
+       "mine": false,
+       "mu": 12.11,
+       "n": 1,
+       "name": "Malik Mustapha",
+       "opp": "ARI",
+       "result": {
+        "pts": 5.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "SF",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.68,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.68,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.25
+           ],
+           [
+            "ast",
+            1.93
+           ],
+           [
+            "TFL",
+            0.22
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.5
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7811",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 11.68,
+       "min": 11.68,
+       "mine": false,
+       "mu": 11.68,
+       "n": 1,
+       "name": "Talanoa Hufanga",
+       "opp": "LAR",
+       "result": {
+        "pts": 43.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "DEN",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.53,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.53,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.85
+           ],
+           [
+            "ast",
+            2.18
+           ],
+           [
+            "TFL",
+            0.21
+           ],
+           [
+            "PD",
+            0.31
+           ],
+           [
+            "INT",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "3233",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.53,
+       "min": 11.53,
+       "mine": false,
+       "mu": 11.53,
+       "n": 1,
+       "name": "Kevin Byard",
+       "opp": "@JAX",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "NE",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 11.43,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.43,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.43,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.45
+           ],
+           [
+            "ast",
+            2.16
+           ],
+           [
+            "TFL",
+            0.18
+           ],
+           [
+            "QB hit",
+            0.06
+           ],
+           [
+            "PD",
+            0.41
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6711",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 11.43,
+       "min": 11.43,
+       "mine": false,
+       "mu": 11.43,
+       "n": 1,
+       "name": "Jalen Thompson",
+       "opp": "BAL",
+       "result": {
+        "pts": 5.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "DAL",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.4,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.4,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.02
+           ],
+           [
+            "ast",
+            0.85
+           ],
+           [
+            "TFL",
+            0.11
+           ],
+           [
+            "PD",
+            0.97
+           ],
+           [
+            "INT",
+            0.23
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11675",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 11.4,
+       "min": 11.4,
+       "mine": false,
+       "mu": 11.4,
+       "n": 1,
+       "name": "Kool-Aid McKinstry",
+       "opp": "LV",
+       "result": {
+        "pts": 14.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "NO",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.28,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.28,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.97
+           ],
+           [
+            "ast",
+            2.31
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "PD",
+            0.55
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7069",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.28,
+       "min": 11.28,
+       "mine": false,
+       "mu": 11.28,
+       "n": 1,
+       "name": "Alohi Gilman",
+       "opp": "@MIA",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "KC",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.27,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.27,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.8
+           ],
+           [
+            "ast",
+            2.64
+           ],
+           [
+            "TFL",
+            0.05
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.54
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6788",
+       "kickoff": "2026-09-24T20:15:00-04:00",
+       "late": false,
+       "max": 11.27,
+       "min": 11.27,
+       "mine": false,
+       "mu": 11.27,
+       "n": 1,
+       "name": "Xavier McKinney",
+       "opp": "ATL",
+       "result": {
+        "pts": 18.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "GB",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.24,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.24,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.22
+           ],
+           [
+            "ast",
+            1.11
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "PD",
+            0.81
+           ],
+           [
+            "INT",
+            0.19
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11656",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 11.24,
+       "min": 11.24,
+       "mine": false,
+       "mu": 11.24,
+       "n": 1,
+       "name": "Nate Wiggins",
+       "opp": "@DAL",
+       "result": {
+        "pts": 10.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BAL",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.01,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.01,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.43
+           ],
+           [
+            "ast",
+            0.31
+           ],
+           [
+            "PD",
+            2.9
+           ],
+           [
+            "INT",
+            0.19
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "13397",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.01,
+       "min": 11.01,
+       "mine": false,
+       "mu": 11.01,
+       "n": 1,
+       "name": "Keith Abney",
+       "opp": "NYJ",
+       "result": {
+        "pts": 0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "DET",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.01,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.01,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.81
+           ],
+           [
+            "ast",
+            0.76
+           ],
+           [
+            "TFL",
+            0.1
+           ],
+           [
+            "PD",
+            0.46
+           ],
+           [
+            "INT",
+            0.15
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7715",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.01,
+       "min": 11.01,
+       "mine": false,
+       "mu": 11.01,
+       "n": 1,
+       "name": "Camryn Bynum",
+       "opp": "HOU",
+       "result": {
+        "pts": 3.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "IND",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.83,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.83,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.16
+           ],
+           [
+            "ast",
+            2.62
+           ],
+           [
+            "TFL",
+            0.16
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.16
+           ],
+           [
+            "PD",
+            0.21
+           ],
+           [
+            "FF",
+            0.11
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7016",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 10.83,
+       "min": 10.83,
+       "mine": false,
+       "mu": 10.83,
+       "n": 1,
+       "name": "Jeremy Chinn",
+       "opp": "@NO",
+       "result": {
+        "pts": 27.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LV",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.52,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.52,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.71
+           ],
+           [
+            "ast",
+            1.68
+           ],
+           [
+            "TFL",
+            0.22
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.22
+           ],
+           [
+            "PD",
+            0.38
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6888",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 10.52,
+       "min": 10.52,
+       "mine": false,
+       "mu": 10.52,
+       "n": 1,
+       "name": "Antoine Winfield",
+       "opp": "MIN",
+       "result": {
+        "pts": 6.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "TB",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.5,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.5,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.44
+           ],
+           [
+            "ast",
+            2.12
+           ],
+           [
+            "TFL",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.26
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10927",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 10.5,
+       "min": 10.5,
+       "mine": false,
+       "mu": 10.5,
+       "n": 1,
+       "name": "Jordan Battle",
+       "opp": "@PIT",
+       "result": {
+        "pts": 16.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "CIN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.47,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.47,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.86
+           ],
+           [
+            "ast",
+            0.83
+           ],
+           [
+            "TFL",
+            0.16
+           ],
+           [
+            "PD",
+            0.88
+           ],
+           [
+            "INT",
+            0.16
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6025",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 10.47,
+       "min": 10.47,
+       "mine": false,
+       "mu": 10.47,
+       "n": 1,
+       "name": "Mike Jackson",
+       "opp": "@CLE",
+       "result": {
+        "pts": 2.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "CAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.41,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.41,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.59
+           ],
+           [
+            "ast",
+            2.2
+           ],
+           [
+            "TFL",
+            0.11
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.44
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6911",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 10.41,
+       "min": 10.41,
+       "mine": false,
+       "mu": 10.41,
+       "n": 1,
+       "name": "Brandon Jones",
+       "opp": "LAR",
+       "result": {
+        "pts": 28.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "DEN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.3,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.3,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.21
+           ],
+           [
+            "ast",
+            1.42
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "PD",
+            0.56
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5372",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 10.3,
+       "min": 10.3,
+       "mine": false,
+       "mu": 10.3,
+       "n": 1,
+       "name": "D.J. Reed",
+       "opp": "NYJ",
+       "result": {
+        "pts": 16.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "DET",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.3,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.3,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.64
+           ],
+           [
+            "ast",
+            1.11
+           ],
+           [
+            "TFL",
+            0.29
+           ],
+           [
+            "sack",
+            0.1
+           ],
+           [
+            "QB hit",
+            0.24
+           ],
+           [
+            "PD",
+            0.58
+           ],
+           [
+            "INT",
+            0.1
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8333",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 10.3,
+       "min": 10.3,
+       "mine": false,
+       "mu": 10.3,
+       "n": 1,
+       "name": "Alontae Taylor",
+       "opp": "@NYG",
+       "result": {
+        "pts": 17.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "TEN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.26,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.26,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.18
+           ],
+           [
+            "ast",
+            1.13
+           ],
+           [
+            "TFL",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.48
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6333",
+       "kickoff": "2026-09-24T20:15:00-04:00",
+       "late": false,
+       "max": 10.26,
+       "min": 10.26,
+       "mine": false,
+       "mu": 10.26,
+       "n": 1,
+       "name": "Keisean Nixon",
+       "opp": "ATL",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "GB",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.25,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.25,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.93
+           ],
+           [
+            "ast",
+            2.04
+           ],
+           [
+            "TFL",
+            0.1
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.35
+           ],
+           [
+            "INT",
+            0.15
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5017",
+       "kickoff": "2026-09-24T20:15:00-04:00",
+       "late": false,
+       "max": 10.25,
+       "min": 10.25,
+       "mine": false,
+       "mu": 10.25,
+       "n": 1,
+       "name": "Jessie Bates",
+       "opp": "@GB",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "ATL",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 9.97,
+     "players": [
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.97,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.97,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.65
+           ],
+           [
+            "ast",
+            2.43
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.33
+           ],
+           [
+            "INT",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6901",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 9.97,
+       "min": 9.97,
+       "mine": false,
+       "mu": 9.97,
+       "n": 1,
+       "name": "Joshua Metellus",
+       "opp": "@TB",
+       "result": {
+        "pts": 20.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "MIN",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.97,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.97,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.8
+           ],
+           [
+            "ast",
+            1.55
+           ],
+           [
+            "TFL",
+            0.19
+           ],
+           [
+            "sack",
+            0.09
+           ],
+           [
+            "QB hit",
+            0.25
+           ],
+           [
+            "PD",
+            0.37
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5893",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.97,
+       "min": 9.97,
+       "mine": false,
+       "mu": 9.97,
+       "n": 1,
+       "name": "C.J. Gardner-Johnson",
+       "opp": "LAC",
+       "result": {
+        "pts": 20.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.81,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.81,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.51
+           ],
+           [
+            "ast",
+            1.31
+           ],
+           [
+            "TFL",
+            0.23
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.63
+           ],
+           [
+            "INT",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12622",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.81,
+       "min": 9.81,
+       "mine": false,
+       "mu": 9.81,
+       "n": 1,
+       "name": "Nohl Williams",
+       "opp": "@MIA",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "KC",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.67,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.67,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.12
+           ],
+           [
+            "ast",
+            1.21
+           ],
+           [
+            "TFL",
+            0.11
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.33
+           ],
+           [
+            "INT",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10974",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.67,
+       "min": 9.67,
+       "mine": false,
+       "mu": 9.67,
+       "n": 1,
+       "name": "Antonio Johnson",
+       "opp": "NE",
+       "result": {
+        "pts": 7.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "JAX",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.62,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.62,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.96
+           ],
+           [
+            "ast",
+            1.54
+           ],
+           [
+            "TFL",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.53
+           ],
+           [
+            "INT",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8286",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.62,
+       "min": 9.62,
+       "mine": false,
+       "mu": 9.62,
+       "n": 1,
+       "name": "Dax Hill",
+       "opp": "@PIT",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "CIN",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    }
+   ]
+  },
+  "DL": {
+   "hidden": 206,
+   "no_projection": 158,
+   "played": [],
+   "played_hidden": 0,
+   "tier_count": 8,
+   "tiers": [
+    {
+     "anchor_mu": 10.74,
+     "players": [
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.74,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.74,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.03
+           ],
+           [
+            "ast",
+            1.01
+           ],
+           [
+            "TFL",
+            0.45
+           ],
+           [
+            "sack",
+            0.45
+           ],
+           [
+            "QB hit",
+            0.9
+           ],
+           [
+            "PD",
+            0.28
+           ],
+           [
+            "FF",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8343",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 10.74,
+       "min": 10.74,
+       "mine": false,
+       "mu": 10.74,
+       "n": 1,
+       "name": "Boye Mafe",
+       "opp": "@PIT",
+       "result": {
+        "pts": 1.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CIN",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 10.67,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.67,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.38
+           ],
+           [
+            "ast",
+            1.22
+           ],
+           [
+            "TFL",
+            0.37
+           ],
+           [
+            "sack",
+            0.4
+           ],
+           [
+            "QB hit",
+            0.85
+           ],
+           [
+            "PD",
+            0.85
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11760",
+       "kickoff": "2026-09-28T20:15:00-04:00",
+       "late": false,
+       "max": 10.67,
+       "min": 10.67,
+       "mine": false,
+       "mu": 10.67,
+       "n": 1,
+       "name": "Austin Booker",
+       "opp": "PHI",
+       "result": {
+        "pts": 11.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CHI",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.87,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.87,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.64
+           ],
+           [
+            "ast",
+            0.96
+           ],
+           [
+            "TFL",
+            0.73
+           ],
+           [
+            "sack",
+            0.42
+           ],
+           [
+            "QB hit",
+            0.96
+           ],
+           [
+            "PD",
+            0.17
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6900",
+       "kickoff": "2026-09-28T20:15:00-04:00",
+       "late": false,
+       "max": 9.87,
+       "min": 9.87,
+       "mine": false,
+       "mu": 9.87,
+       "n": 1,
+       "name": "Jonathan Greenard",
+       "opp": "@CHI",
+       "result": {
+        "pts": 6.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "PHI",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.68,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.68,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.21
+           ],
+           [
+            "ast",
+            1.32
+           ],
+           [
+            "TFL",
+            0.33
+           ],
+           [
+            "sack",
+            0.44
+           ],
+           [
+            "QB hit",
+            1.98
+           ],
+           [
+            "PD",
+            0.22
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5871",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 9.68,
+       "min": 9.68,
+       "mine": false,
+       "mu": 9.68,
+       "n": 1,
+       "name": "Zach Allen",
+       "opp": "LAR",
+       "result": {
+        "pts": 16.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "DEN",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.57,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.57,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.51
+           ],
+           [
+            "ast",
+            1.4
+           ],
+           [
+            "TFL",
+            0.58
+           ],
+           [
+            "sack",
+            0.41
+           ],
+           [
+            "QB hit",
+            0.99
+           ],
+           [
+            "PD",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8265",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.57,
+       "min": 9.57,
+       "mine": false,
+       "mu": 9.57,
+       "n": 1,
+       "name": "Travon Walker",
+       "opp": "NE",
+       "result": {
+        "pts": 4.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "JAX",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.5,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.5,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.53
+           ],
+           [
+            "ast",
+            1.12
+           ],
+           [
+            "TFL",
+            0.61
+           ],
+           [
+            "sack",
+            0.43
+           ],
+           [
+            "QB hit",
+            1.07
+           ],
+           [
+            "PD",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10921",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 9.5,
+       "min": 9.5,
+       "mine": false,
+       "mu": 9.5,
+       "n": 1,
+       "name": "Yaya Diaby",
+       "opp": "MIN",
+       "result": {
+        "pts": 4.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "TB",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.36,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.36,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.53
+           ],
+           [
+            "ast",
+            1.37
+           ],
+           [
+            "TFL",
+            0.47
+           ],
+           [
+            "sack",
+            0.42
+           ],
+           [
+            "QB hit",
+            0.84
+           ],
+           [
+            "PD",
+            0.16
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10916",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 9.36,
+       "min": 9.36,
+       "mine": false,
+       "mu": 9.36,
+       "n": 1,
+       "name": "Kobie Turner",
+       "opp": "@DEN",
+       "result": {
+        "pts": 11.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 9.19,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.19,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.19,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.03
+           ],
+           [
+            "ast",
+            0.85
+           ],
+           [
+            "TFL",
+            0.67
+           ],
+           [
+            "sack",
+            0.46
+           ],
+           [
+            "QB hit",
+            1.46
+           ],
+           [
+            "PD",
+            0.18
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "3558",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.19,
+       "min": 9.19,
+       "mine": false,
+       "mu": 9.19,
+       "n": 1,
+       "name": "Chris Jones",
+       "opp": "@MIA",
+       "result": {
+        "pts": 6.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "KC",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 9.0,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.0,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.91
+           ],
+           [
+            "ast",
+            1.1
+           ],
+           [
+            "TFL",
+            0.45
+           ],
+           [
+            "sack",
+            0.33
+           ],
+           [
+            "QB hit",
+            0.3
+           ],
+           [
+            "PD",
+            0.3
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12573",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 9.0,
+       "min": 9.0,
+       "mine": false,
+       "mu": 9.0,
+       "n": 1,
+       "name": "Mason Graham",
+       "opp": "CAR",
+       "result": {
+        "pts": 31.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CLE",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.98,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.98,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.31
+           ],
+           [
+            "ast",
+            0.8
+           ],
+           [
+            "TFL",
+            0.57
+           ],
+           [
+            "sack",
+            0.48
+           ],
+           [
+            "QB hit",
+            1.03
+           ],
+           [
+            "PD",
+            0.11
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6782",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 8.98,
+       "min": 8.98,
+       "mine": false,
+       "mu": 8.98,
+       "n": 1,
+       "name": "Chase Young",
+       "opp": "LV",
+       "result": {
+        "pts": 25.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "NO",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.59,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.59,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.4
+           ],
+           [
+            "ast",
+            1.4
+           ],
+           [
+            "TFL",
+            0.47
+           ],
+           [
+            "sack",
+            0.32
+           ],
+           [
+            "QB hit",
+            0.99
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6118",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 8.59,
+       "min": 8.59,
+       "mine": false,
+       "mu": 8.59,
+       "n": 1,
+       "name": "Quinnen Williams",
+       "opp": "BAL",
+       "result": {
+        "pts": 6.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "DAL",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.56,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.56,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.33
+           ],
+           [
+            "ast",
+            2.37
+           ],
+           [
+            "TFL",
+            0.46
+           ],
+           [
+            "sack",
+            0.32
+           ],
+           [
+            "QB hit",
+            0.69
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11668",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.56,
+       "min": 8.56,
+       "mine": false,
+       "mu": 8.56,
+       "n": 1,
+       "name": "Byron Murphy",
+       "opp": "@WAS",
+       "result": {
+        "pts": 10.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "SEA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.43,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.43,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.69
+           ],
+           [
+            "ast",
+            1.46
+           ],
+           [
+            "TFL",
+            0.34
+           ],
+           [
+            "sack",
+            0.28
+           ],
+           [
+            "QB hit",
+            0.9
+           ],
+           [
+            "PD",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5847",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.43,
+       "min": 8.43,
+       "mine": false,
+       "mu": 8.43,
+       "n": 1,
+       "name": "Dexter Lawrence",
+       "opp": "@PIT",
+       "result": {
+        "pts": 27.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CIN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.41,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.41,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.27
+           ],
+           [
+            "ast",
+            1.44
+           ],
+           [
+            "TFL",
+            0.46
+           ],
+           [
+            "sack",
+            0.29
+           ],
+           [
+            "QB hit",
+            0.87
+           ],
+           [
+            "PD",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "2064",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.41,
+       "min": 8.41,
+       "mine": false,
+       "mu": 8.41,
+       "n": 1,
+       "name": "DeMarcus Lawrence",
+       "opp": "@WAS",
+       "result": {
+        "pts": 12.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "SEA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.38,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.38,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.86
+           ],
+           [
+            "ast",
+            1.76
+           ],
+           [
+            "TFL",
+            0.43
+           ],
+           [
+            "sack",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.27
+           ],
+           [
+            "PD",
+            0.27
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "843",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.38,
+       "min": 8.38,
+       "mine": false,
+       "mu": 8.38,
+       "n": 1,
+       "name": "Cameron Heyward",
+       "opp": "CIN",
+       "result": {
+        "pts": 4.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "PIT",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.33,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.33,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.4
+           ],
+           [
+            "ast",
+            1.11
+           ],
+           [
+            "TFL",
+            0.53
+           ],
+           [
+            "sack",
+            0.34
+           ],
+           [
+            "QB hit",
+            0.72
+           ],
+           [
+            "PD",
+            0.1
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5297",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.33,
+       "min": 8.33,
+       "mine": false,
+       "mu": 8.33,
+       "n": 1,
+       "name": "Zach Sieler",
+       "opp": "KC",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "MIA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.31,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.31,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.38
+           ],
+           [
+            "ast",
+            1.33
+           ],
+           [
+            "TFL",
+            0.61
+           ],
+           [
+            "sack",
+            0.33
+           ],
+           [
+            "QB hit",
+            0.66
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7696",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.31,
+       "min": 8.31,
+       "mine": false,
+       "mu": 8.31,
+       "n": 1,
+       "name": "Milton Williams",
+       "opp": "@JAX",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "NE",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.3,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.3,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.91
+           ],
+           [
+            "ast",
+            1.52
+           ],
+           [
+            "TFL",
+            0.45
+           ],
+           [
+            "sack",
+            0.23
+           ],
+           [
+            "QB hit",
+            0.68
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "4032",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.3,
+       "min": 8.3,
+       "mine": false,
+       "mu": 8.3,
+       "n": 1,
+       "name": "Jonathan Allen",
+       "opp": "@PIT",
+       "result": {
+        "pts": 5.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CIN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.22,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.22,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.66
+           ],
+           [
+            "ast",
+            1.92
+           ],
+           [
+            "TFL",
+            0.26
+           ],
+           [
+            "sack",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.57
+           ],
+           [
+            "PD",
+            0.31
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6784",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.22,
+       "min": 8.22,
+       "mine": false,
+       "mu": 8.22,
+       "n": 1,
+       "name": "Derrick Brown",
+       "opp": "@CLE",
+       "result": {
+        "pts": 13.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "CAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.19,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.19,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.42
+           ],
+           [
+            "ast",
+            0.86
+           ],
+           [
+            "TFL",
+            0.43
+           ],
+           [
+            "sack",
+            0.37
+           ],
+           [
+            "QB hit",
+            1.05
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "13458",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.19,
+       "min": 8.19,
+       "mine": false,
+       "mu": 8.19,
+       "n": 1,
+       "name": "Derrick Moore",
+       "opp": "NYJ",
+       "result": {
+        "pts": 0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "DET",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.12,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.12,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.99
+           ],
+           [
+            "ast",
+            0.6
+           ],
+           [
+            "TFL",
+            0.55
+           ],
+           [
+            "sack",
+            0.49
+           ],
+           [
+            "QB hit",
+            1.2
+           ],
+           [
+            "PD",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10883",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.12,
+       "min": 8.12,
+       "mine": false,
+       "mu": 8.12,
+       "n": 1,
+       "name": "Will McDonald",
+       "opp": "@DET",
+       "result": {
+        "pts": 2.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "NYJ",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 8.01,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.01,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.29
+           ],
+           [
+            "ast",
+            1.35
+           ],
+           [
+            "TFL",
+            0.53
+           ],
+           [
+            "sack",
+            0.23
+           ],
+           [
+            "QB hit",
+            0.41
+           ],
+           [
+            "PD",
+            0.29
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12652",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 8.01,
+       "min": 8.01,
+       "mine": false,
+       "mu": 8.01,
+       "n": 1,
+       "name": "Deone Walker",
+       "opp": "LAC",
+       "result": {
+        "pts": 7.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 7.94,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.94,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.61
+           ],
+           [
+            "ast",
+            0.8
+           ],
+           [
+            "TFL",
+            0.37
+           ],
+           [
+            "sack",
+            0.4
+           ],
+           [
+            "QB hit",
+            0.48
+           ],
+           [
+            "PD",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "7633",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 7.94,
+       "min": 7.94,
+       "mine": false,
+       "mu": 7.94,
+       "n": 1,
+       "name": "Kwity Paye",
+       "opp": "@NO",
+       "result": {
+        "pts": 3.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LV",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 7.82,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.82,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.43
+           ],
+           [
+            "ast",
+            0.93
+           ],
+           [
+            "TFL",
+            0.62
+           ],
+           [
+            "sack",
+            0.25
+           ],
+           [
+            "QB hit",
+            0.75
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5841",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 7.82,
+       "min": 7.82,
+       "mine": false,
+       "mu": 7.82,
+       "n": 1,
+       "name": "Ed Oliver",
+       "opp": "LAC",
+       "result": {
+        "pts": 5.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 7.82,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.82,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.2
+           ],
+           [
+            "ast",
+            1.03
+           ],
+           [
+            "TFL",
+            0.46
+           ],
+           [
+            "sack",
+            0.34
+           ],
+           [
+            "QB hit",
+            0.74
+           ],
+           [
+            "PD",
+            0.17
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8270",
+       "kickoff": "2026-09-24T20:15:00-04:00",
+       "late": false,
+       "max": 7.82,
+       "min": 7.82,
+       "mine": false,
+       "mu": 7.82,
+       "n": 1,
+       "name": "Devonte Wyatt",
+       "opp": "ATL",
+       "result": {
+        "pts": 6.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "GB",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    }
+   ]
+  },
+  "LB": {
+   "hidden": 129,
+   "no_projection": 88,
+   "played": [],
+   "played_hidden": 0,
+   "tier_count": 10,
+   "tiers": [
+    {
+     "anchor_mu": 15.31,
+     "players": [
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.673,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 15.31,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 15.31,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.5
+           ],
+           [
+            "ast",
+            2.12
+           ],
+           [
+            "TFL",
+            0.32
+           ],
+           [
+            "sack",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.37
+           ],
+           [
+            "PD",
+            0.42
+           ],
+           [
+            "INT",
+            0.11
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12617",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 15.31,
+       "min": 15.31,
+       "mine": false,
+       "mu": 15.31,
+       "n": 1,
+       "name": "Demetrius Knight",
+       "opp": "@PIT",
+       "result": {
+        "pts": 11.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "CIN",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.665,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 15.13,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 15.13,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.66
+           ],
+           [
+            "ast",
+            2.8
+           ],
+           [
+            "TFL",
+            0.44
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.19
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FR",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8311",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 15.13,
+       "min": 15.13,
+       "mine": false,
+       "mu": 15.13,
+       "n": 1,
+       "name": "Terrel Bernard",
+       "opp": "LAC",
+       "result": {
+        "pts": 8.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.643,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 14.64,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.64,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.0
+           ],
+           [
+            "ast",
+            3.89
+           ],
+           [
+            "TFL",
+            0.33
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.38
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5332",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 14.64,
+       "min": 14.64,
+       "mine": false,
+       "mu": 14.64,
+       "n": 1,
+       "name": "Foyesade Oluokun",
+       "opp": "NE",
+       "result": {
+        "pts": 10.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "JAX",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.633,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 14.43,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.43,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.7
+           ],
+           [
+            "ast",
+            3.16
+           ],
+           [
+            "TFL",
+            0.73
+           ],
+           [
+            "sack",
+            0.18
+           ],
+           [
+            "QB hit",
+            0.61
+           ],
+           [
+            "PD",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6141",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 14.43,
+       "min": 14.43,
+       "mine": false,
+       "mu": 14.43,
+       "n": 1,
+       "name": "Drue Tranquill",
+       "opp": "@MIA",
+       "result": {
+        "pts": 12.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "KC",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.63,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 14.37,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.37,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.44
+           ],
+           [
+            "ast",
+            3.05
+           ],
+           [
+            "TFL",
+            0.28
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.17
+           ],
+           [
+            "PD",
+            0.33
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6485",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 14.37,
+       "min": 14.37,
+       "mine": false,
+       "mu": 14.37,
+       "n": 1,
+       "name": "Azeez Al-Shaair",
+       "opp": "@IND",
+       "result": {
+        "pts": 13.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "HOU",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.625,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 14.25,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.25,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.67
+           ],
+           [
+            "ast",
+            3.33
+           ],
+           [
+            "TFL",
+            0.45
+           ],
+           [
+            "sack",
+            0.14
+           ],
+           [
+            "QB hit",
+            0.28
+           ],
+           [
+            "PD",
+            0.23
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.11
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6815",
+       "kickoff": "2026-09-28T20:15:00-04:00",
+       "late": false,
+       "max": 14.25,
+       "min": 14.25,
+       "mine": false,
+       "mu": 14.25,
+       "n": 1,
+       "name": "Zack Baun",
+       "opp": "@CHI",
+       "result": {
+        "pts": 21.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "PHI",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "8280",
+        "over": "8280",
+        "p": 0.611,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "mu": 13.96,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 13.96,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.61
+           ],
+           [
+            "ast",
+            3.55
+           ],
+           [
+            "TFL",
+            0.35
+           ],
+           [
+            "sack",
+            0.15
+           ],
+           [
+            "PD",
+            0.29
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10947",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 13.96,
+       "min": 13.96,
+       "mine": false,
+       "mu": 13.96,
+       "n": 1,
+       "name": "Ventrell Miller",
+       "opp": "NE",
+       "result": {
+        "pts": 14.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "JAX",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 13.64,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 13.64,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 13.64,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.38
+           ],
+           [
+            "ast",
+            2.74
+           ],
+           [
+            "TFL",
+            0.54
+           ],
+           [
+            "sack",
+            0.21
+           ],
+           [
+            "QB hit",
+            0.54
+           ],
+           [
+            "PD",
+            0.27
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6302",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 13.64,
+       "min": 13.64,
+       "mine": false,
+       "mu": 13.64,
+       "n": 1,
+       "name": "Kaden Elliss",
+       "opp": "LV",
+       "result": {
+        "pts": 15.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "NO",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 13.36,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 13.36,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.58
+           ],
+           [
+            "ast",
+            2.41
+           ],
+           [
+            "TFL",
+            0.39
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.28
+           ],
+           [
+            "PD",
+            0.34
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.17
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8659",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 13.36,
+       "min": 13.36,
+       "mine": false,
+       "mu": 13.36,
+       "n": 1,
+       "name": "Nate Landman",
+       "opp": "@DEN",
+       "result": {
+        "pts": 4.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.78,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.78,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.78
+           ],
+           [
+            "ast",
+            1.97
+           ],
+           [
+            "TFL",
+            0.53
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.27
+           ],
+           [
+            "PD",
+            0.32
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6214",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.78,
+       "min": 12.78,
+       "mine": false,
+       "mu": 12.78,
+       "n": 1,
+       "name": "Quincy Williams",
+       "opp": "CAR",
+       "result": {
+        "pts": 17.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "CLE",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.7,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.7,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.27
+           ],
+           [
+            "ast",
+            3.16
+           ],
+           [
+            "TFL",
+            0.43
+           ],
+           [
+            "sack",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.37
+           ],
+           [
+            "PD",
+            0.27
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8266",
+       "kickoff": "2026-09-27T16:25:00-04:00",
+       "late": false,
+       "max": 12.7,
+       "min": 12.7,
+       "mine": false,
+       "mu": 12.7,
+       "n": 1,
+       "name": "Quay Walker",
+       "opp": "@NO",
+       "result": {
+        "pts": 12.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LV",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.44,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.44,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.26
+           ],
+           [
+            "ast",
+            3.09
+           ],
+           [
+            "TFL",
+            0.28
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.28
+           ],
+           [
+            "INT",
+            0.11
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5726",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.44,
+       "min": 12.44,
+       "mine": false,
+       "mu": 12.44,
+       "n": 1,
+       "name": "Robert Spillane",
+       "opp": "@JAX",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "NE",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.28,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.28,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.07
+           ],
+           [
+            "ast",
+            2.96
+           ],
+           [
+            "TFL",
+            0.32
+           ],
+           [
+            "sack",
+            0.16
+           ],
+           [
+            "QB hit",
+            0.32
+           ],
+           [
+            "PD",
+            0.27
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5346",
+       "kickoff": "2026-09-24T20:15:00-04:00",
+       "late": false,
+       "max": 12.28,
+       "min": 12.28,
+       "mine": false,
+       "mu": 12.28,
+       "n": 1,
+       "name": "Zaire Franklin",
+       "opp": "ATL",
+       "result": {
+        "pts": 15.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "GB",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 12.16,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.16,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.16,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.24
+           ],
+           [
+            "ast",
+            2.92
+           ],
+           [
+            "TFL",
+            0.37
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.16
+           ],
+           [
+            "PD",
+            0.32
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5843",
+       "kickoff": "2026-09-28T20:15:00-04:00",
+       "late": false,
+       "max": 12.16,
+       "min": 12.16,
+       "mine": false,
+       "mu": 12.16,
+       "n": 1,
+       "name": "Devin Bush",
+       "opp": "PHI",
+       "result": {
+        "pts": 10.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "CHI",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.14,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.14,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.43
+           ],
+           [
+            "ast",
+            2.54
+           ],
+           [
+            "TFL",
+            0.33
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.22
+           ],
+           [
+            "PD",
+            0.28
+           ],
+           [
+            "INT",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10914",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.14,
+       "min": 12.14,
+       "mine": false,
+       "mu": 12.14,
+       "n": 1,
+       "name": "Daiyan Henley",
+       "opp": "@BUF",
+       "result": {
+        "pts": 23.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAC",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.13,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.13,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.07
+           ],
+           [
+            "ast",
+            2.54
+           ],
+           [
+            "TFL",
+            0.1
+           ],
+           [
+            "QB hit",
+            0.05
+           ],
+           [
+            "PD",
+            0.2
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6860",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.13,
+       "min": 12.13,
+       "mine": false,
+       "mu": 12.13,
+       "n": 1,
+       "name": "Akeem Davis-Gaither",
+       "opp": "HOU",
+       "result": {
+        "pts": 13.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "IND",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.1,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.1,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.36
+           ],
+           [
+            "ast",
+            3.63
+           ],
+           [
+            "TFL",
+            0.22
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.22
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "2617",
+       "kickoff": "2026-09-27T20:20:00-04:00",
+       "late": false,
+       "max": 12.1,
+       "min": 12.1,
+       "mine": false,
+       "mu": 12.1,
+       "n": 1,
+       "name": "Alex Singleton",
+       "opp": "LAR",
+       "result": {
+        "pts": 14.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "DEN",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 12.03,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.03,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.32
+           ],
+           [
+            "ast",
+            2.87
+           ],
+           [
+            "TFL",
+            0.17
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.28
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.11
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5944",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 12.03,
+       "min": 12.03,
+       "mine": false,
+       "mu": 12.03,
+       "n": 1,
+       "name": "Bobby Okereke",
+       "opp": "@CLE",
+       "result": {
+        "pts": 5.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "CAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.69,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.69,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.48
+           ],
+           [
+            "ast",
+            2.54
+           ],
+           [
+            "TFL",
+            0.28
+           ],
+           [
+            "sack",
+            0.11
+           ],
+           [
+            "QB hit",
+            0.28
+           ],
+           [
+            "PD",
+            0.17
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6217",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 11.69,
+       "min": 11.69,
+       "mine": false,
+       "mu": 11.69,
+       "n": 1,
+       "name": "Blake Cashman",
+       "opp": "@TB",
+       "result": {
+        "pts": 24.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "MIN",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.66,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.66,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.09
+           ],
+           [
+            "ast",
+            2.66
+           ],
+           [
+            "TFL",
+            0.27
+           ],
+           [
+            "sack",
+            0.14
+           ],
+           [
+            "QB hit",
+            0.33
+           ],
+           [
+            "PD",
+            0.27
+           ],
+           [
+            "INT",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "4118",
+       "kickoff": "2026-09-27T16:05:00-04:00",
+       "late": false,
+       "max": 11.66,
+       "min": 11.66,
+       "mine": false,
+       "mu": 11.66,
+       "n": 1,
+       "name": "Alex Anzalone",
+       "opp": "MIN",
+       "result": {
+        "pts": 16.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "TB",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.62,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.62,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.37
+           ],
+           [
+            "ast",
+            2.36
+           ],
+           [
+            "TFL",
+            0.16
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.16
+           ],
+           [
+            "PD",
+            0.43
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "4968",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.62,
+       "min": 11.62,
+       "mine": false,
+       "mu": 11.62,
+       "n": 1,
+       "name": "Tremaine Edmunds",
+       "opp": "TEN",
+       "result": {
+        "pts": 20.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "NYG",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.4,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.4,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.99
+           ],
+           [
+            "ast",
+            2.54
+           ],
+           [
+            "TFL",
+            0.23
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.17
+           ],
+           [
+            "PD",
+            0.34
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.11
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12566",
+       "kickoff": "2026-09-28T20:15:00-04:00",
+       "late": false,
+       "max": 11.4,
+       "min": 11.4,
+       "mine": false,
+       "mu": 11.4,
+       "n": 1,
+       "name": "Jihaad Campbell",
+       "opp": "@CHI",
+       "result": {
+        "pts": 13.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "PHI",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.27,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.27,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.76
+           ],
+           [
+            "ast",
+            1.5
+           ],
+           [
+            "TFL",
+            0.25
+           ],
+           [
+            "sack",
+            0.1
+           ],
+           [
+            "QB hit",
+            0.25
+           ],
+           [
+            "PD",
+            0.15
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11727",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.27,
+       "min": 11.27,
+       "mine": false,
+       "mu": 11.27,
+       "n": 1,
+       "name": "Payton Wilson",
+       "opp": "CIN",
+       "result": {
+        "pts": 9.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "PIT",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.08,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.08,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.86
+           ],
+           [
+            "ast",
+            2.96
+           ],
+           [
+            "TFL",
+            0.35
+           ],
+           [
+            "sack",
+            0.05
+           ],
+           [
+            "QB hit",
+            0.2
+           ],
+           [
+            "PD",
+            0.2
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FF",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "6807",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.08,
+       "min": 11.08,
+       "mine": false,
+       "mu": 11.08,
+       "n": 1,
+       "name": "Patrick Queen",
+       "opp": "CIN",
+       "result": {
+        "pts": 22.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "PIT",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "mu": 11.07,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.07,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.5
+           ],
+           [
+            "ast",
+            2.45
+           ],
+           [
+            "TFL",
+            0.43
+           ],
+           [
+            "sack",
+            0.14
+           ],
+           [
+            "QB hit",
+            0.33
+           ],
+           [
+            "PD",
+            0.38
+           ],
+           [
+            "INT",
+            0.05
+           ],
+           [
+            "FR",
+            0.05
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11470",
+       "kickoff": "2026-09-27T13:00:00-04:00",
+       "late": false,
+       "max": 11.07,
+       "min": 11.07,
+       "mine": false,
+       "mu": 11.07,
+       "n": 1,
+       "name": "Drake Thomas",
+       "opp": "@WAS",
+       "result": {
+        "pts": 16.0,
+        "state": "final"
+       },
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "SEA",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    }
+   ]
+  }
+ },
+ "replayed": {
+  "as_of": "2026-09-24T20:14:00-04:00",
+  "note": "Rebuilt after the fact: tiers and suggestions as they would have looked before the week's first game, from Sleeper's archived projections and that week's rosters. That week's injury news isn't known, so everyone projected to play is treated as available."
+ },
+ "season": 2026,
+ "sigma_out": {
+  "DB": 5.228,
+  "DL": 5.681,
+  "LB": 5.625
+ },
+ "sources": {
+  "sleeper_proj": {
+   "error": null,
+   "fetched_at": "2026-09-24T20:14:00-04:00",
+   "kind": "projection",
+   "last_success": "2026-09-24T20:14:00-04:00",
+   "merge": {
+    "added": 690,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 3667,
+   "rows": 690,
+   "rows_used": 690,
+   "status": "ok",
+   "week": 3,
+   "zero_filled": 0
+  }
+ },
+ "warnings": [],
+ "week": 3
+}

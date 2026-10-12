@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SADL IDP · How the numbers did</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+  --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
+    --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 18px; }
+h1 { font-size: 1.35rem; margin: 0 0 2px; }
+h2 { font-size: 1.1rem; margin: 22px 0 8px; }
+h3 { font-size: 1rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.meta, .count, .sub, small, .note, .hidden-note { color: var(--muted); }
+.count { font-size: .85rem; font-weight: normal; }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.card, .slot { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 0; }
+li.item { border-top: 1px solid var(--line); }
+li.item:first-child { border-top: 0; }
+.bd > summary { list-style: none; cursor: pointer; }
+.bd > summary::-webkit-details-marker { display: none; }
+.bd > summary .name::before { content: "▸ "; color: var(--muted); font-weight: normal; }
+.bd[open] > summary .name::before { content: "▾ "; }
+.bdbody { padding: 2px 0 10px 14px; font-size: .88rem; }
+.part { padding: 3px 0; }
+.part.missing { color: var(--muted); }
+.mini > summary { list-style: none; cursor: pointer; color: var(--accent); font-size: .85rem; }
+.mini > summary::-webkit-details-marker { display: none; }
+.name { font-weight: 600; }
+.sub { font-size: .85rem; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pts small { font-weight: normal; margin-left: 2px; }
+.tag, .chip { display: inline-block; font-size: .72rem; border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+  border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.tag.q { color: var(--warn); border-color: var(--warn); }
+.tag.bad { color: var(--bad); border-color: var(--bad); }
+.chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
+.chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
+.sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
+.res { display: block; font-size: .8rem; font-weight: 600; color: var(--text); }
+.res.live { color: var(--warn); }
+.res.dnp { color: var(--muted); font-weight: normal; }
+.out { font-weight: 700; }
+.out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
+.card.played { opacity: .95; border-style: dashed; }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
+.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .85rem; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabpanel { display: none; margin-top: 12px; }
+#tab-DL:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DL:checked ~ #panel-DL { display: block; }
+#tab-LB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-LB:checked ~ #panel-LB { display: block; }
+#tab-DB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DB:checked ~ #panel-DB { display: block; }
+
+.tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+footer { padding-bottom: 30px; font-size: .85rem; }
+a { color: var(--accent); }
+.scroll { overflow-x: auto; }
+table.sources td, table.sources th { overflow-wrap: normal; word-break: normal; }
+.scroll { overflow-x: auto; }
+th { overflow-wrap: normal; word-break: normal; }
+td:first-child, th:first-child { white-space: nowrap; }
+.glossary { padding-left: 4px; } .glossary li { margin: 6px 0; }
+.scroll table { min-width: 520px; }
+.scroll td:first-child, .scroll th:first-child { position: sticky; left: 0; background: var(--card); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <h1>How the numbers did</h1>
+  <p class="meta">Slow Ass Draft League · 2026 season · <a href="index.html">← back to this week</a></p>
+</header>
+<main>
+
+  
+  <section aria-labelledby="close-h">
+    <h2 id="close-h">How close were the projections?</h2>
+    <div class="slot">
+      <p>Weeks 1–4: for the 50 best-projected players at each position each week, our number missed by
+        6.1 (DL), 6.0 (LB) and 5.0 (DB) points on average.
+        
+        A simple guess, each player's own average so far, missed by 7.1 / 7.6 / 6.8 on the same players (ours: 6.2 / 6.1 / 5.4).</p>
+      <table>
+        <tr><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th>Ranks players right</th></tr>
+        
+        <tr><td>DL</td><td class="num">6.1</td><td>about right</td><td>weakly (0.14)</td></tr>
+        
+        <tr><td>LB</td><td class="num">6.0</td><td>1.3 pts low</td><td>weakly (0.14)</td></tr>
+        
+        <tr><td>DB</td><td class="num">5.0</td><td>about right</td><td>barely (-0.00)</td></tr>
+        
+      </table>
+      
+      <p class="note">LB numbers run about 1.3 pts low on average. Suggestions only compare LBs with other LBs, so a shift shared by all of them changes no suggestion; it isn't corrected. How far individual players miss is the "avg miss" above.</p>
+      
+      <details><summary>More stats</summary>
+        <div class="scroll"><table>
+          <tr><th>Pos</th><th class="num">Player-games</th><th class="num">Typical miss (RMSE)</th><th class="num">Inside ±1 range (aim 68%)</th><th class="num">Inside ±2 (aim 95%)</th><th class="num">Top-12 hits</th><th class="num">R²</th><th class="num">Correlation</th></tr>
+          
+          <tr><td>DL</td><td class="num">200</td><td class="num">7.9</td><td class="num">56%</td><td class="num">88%</td>
+            <td class="num">16 of 48</td><td class="num">0.04</td><td class="num">0.19</td></tr>
+          
+          <tr><td>LB</td><td class="num">200</td><td class="num">8.0</td><td class="num">57%</td><td class="num">90%</td>
+            <td class="num">11 of 48</td><td class="num">-0.02</td><td class="num">0.12</td></tr>
+          
+          <tr><td>DB</td><td class="num">200</td><td class="num">6.6</td><td class="num">60%</td><td class="num">92%</td>
+            <td class="num">5 of 48</td><td class="num">-0.01</td><td class="num">0.06</td></tr>
+          
+        </table></div>
+      </details>
+    </div>
+  </section>
+
+  
+  
+  <section aria-labelledby="src-h">
+    <h2 id="src-h">Each source on the same players</h2>
+    <div class="slot">
+      <p>Each week's players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.</p>
+      <div class="scroll"><table>
+        <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
+        
+        
+        <tr><td>Sleeper</td><td>DL</td><td class="num">6.1</td><td>0.6 pts low</td>
+          <td class="num">96% <small>(193)</small></td></tr>
+        
+        <tr><td>ESPN</td><td>DL</td><td class="num">6.3</td><td>about right</td>
+          <td class="num">100% <small>(200)</small></td></tr>
+        
+        <tr><td>FantasyPros</td><td>DL</td><td class="num">6.3</td><td>about right</td>
+          <td class="num">99% <small>(198)</small></td></tr>
+        
+        <tr><td><b>All together</b></td><td>DL</td><td class="num"><b>6.1</b></td><td>about right</td><td class="num">100% <small>(200)</small></td></tr>
+        
+        
+        <tr><td>Sleeper</td><td>LB</td><td class="num">6.3</td><td>3.1 pts low</td>
+          <td class="num">100% <small>(199)</small></td></tr>
+        
+        <tr><td>ESPN</td><td>LB</td><td class="num">6.3</td><td>0.5 pts high</td>
+          <td class="num">100% <small>(200)</small></td></tr>
+        
+        <tr><td>FantasyPros</td><td>LB</td><td class="num">6.1</td><td>1.4 pts low</td>
+          <td class="num">100% <small>(199)</small></td></tr>
+        
+        <tr><td><b>All together</b></td><td>LB</td><td class="num"><b>6.0</b></td><td>1.3 pts low</td><td class="num">100% <small>(200)</small></td></tr>
+        
+        
+        <tr><td>Sleeper</td><td>DB</td><td class="num">5.1</td><td>1.2 pts low</td>
+          <td class="num">94% <small>(188)</small></td></tr>
+        
+        <tr><td>ESPN</td><td>DB</td><td class="num">5.3</td><td>1.0 pts high</td>
+          <td class="num">100% <small>(200)</small></td></tr>
+        
+        <tr><td>FantasyPros</td><td>DB</td><td class="num">5.2</td><td>0.7 pts low</td>
+          <td class="num">100% <small>(200)</small></td></tr>
+        
+        <tr><td><b>All together</b></td><td>DB</td><td class="num"><b>5.0</b></td><td>about right</td><td class="num">100% <small>(200)</small></td></tr>
+        
+      </table></div>
+      <details><summary>Each source, week by week</summary>
+        <div class="scroll"><table>
+          <tr><th>Wk</th><th>Source</th><th class="num">DL</th><th class="num">LB</th><th class="num">DB</th></tr>
+          
+          <tr><td>1</td><td>Sleeper</td><td class="num">5.9 <small>(46)</small></td><td class="num">6.7 <small>(49)</small></td><td class="num">5.0 <small>(46)</small></td></tr>
+          
+          <tr><td>1</td><td>ESPN</td><td class="num">5.9 <small>(50)</small></td><td class="num">6.2 <small>(50)</small></td><td class="num">4.9 <small>(50)</small></td></tr>
+          
+          <tr><td>1</td><td>FantasyPros</td><td class="num">6.1 <small>(48)</small></td><td class="num">6.3 <small>(50)</small></td><td class="num">5.0 <small>(50)</small></td></tr>
+          
+          <tr><td>2</td><td>Sleeper</td><td class="num">6.4 <small>(50)</small></td><td class="num">5.8 <small>(50)</small></td><td class="num">4.7 <small>(48)</small></td></tr>
+          
+          <tr><td>2</td><td>ESPN</td><td class="num">6.3 <small>(50)</small></td><td class="num">6.5 <small>(50)</small></td><td class="num">4.9 <small>(50)</small></td></tr>
+          
+          <tr><td>2</td><td>FantasyPros</td><td class="num">6.5 <small>(50)</small></td><td class="num">6.0 <small>(50)</small></td><td class="num">4.6 <small>(50)</small></td></tr>
+          
+          <tr><td>3</td><td>Sleeper</td><td class="num">7.1 <small>(49)</small></td><td class="num">6.2 <small>(50)</small></td><td class="num">5.3 <small>(48)</small></td></tr>
+          
+          <tr><td>3</td><td>ESPN</td><td class="num">7.3 <small>(50)</small></td><td class="num">6.2 <small>(50)</small></td><td class="num">5.8 <small>(50)</small></td></tr>
+          
+          <tr><td>3</td><td>FantasyPros</td><td class="num">7.0 <small>(50)</small></td><td class="num">5.9 <small>(50)</small></td><td class="num">5.4 <small>(50)</small></td></tr>
+          
+          <tr><td>4</td><td>Sleeper</td><td class="num">5.1 <small>(48)</small></td><td class="num">6.7 <small>(50)</small></td><td class="num">5.5 <small>(46)</small></td></tr>
+          
+          <tr><td>4</td><td>ESPN</td><td class="num">5.5 <small>(50)</small></td><td class="num">6.4 <small>(50)</small></td><td class="num">5.6 <small>(50)</small></td></tr>
+          
+          <tr><td>4</td><td>FantasyPros</td><td class="num">5.5 <small>(50)</small></td><td class="num">6.2 <small>(49)</small></td><td class="num">5.6 <small>(50)</small></td></tr>
+          
+        </table></div>
+        <p class="note">Average miss in points, with the number of players each source covered in brackets.</p>
+      </details>
+    </div>
+  </section>
+  
+
+  <section aria-labelledby="weeks-h">
+    <h2 id="weeks-h">Week by week</h2>
+    <div class="slot">
+      <p class="note">Average miss in points. "archive" = projections fetched after the week from the sources' archives; "late" = some captured after kickoff.</p>
+      <table>
+        <tr><th>Wk</th><th class="num">DL</th><th class="num">LB</th><th class="num">DB</th><th></th></tr>
+        
+        <tr><td>1</td><td class="num">5.8</td><td class="num">6.2</td><td class="num">4.7</td>
+          <td><small>archive</small></td></tr>
+        
+        <tr><td>2</td><td class="num">6.3</td><td class="num">5.7</td><td class="num">4.7</td>
+          <td><small>archive</small></td></tr>
+        
+        <tr><td>3</td><td class="num">7.1</td><td class="num">5.9</td><td class="num">5.4</td>
+          <td><small>archive</small></td></tr>
+        
+        <tr><td>4</td><td class="num">5.3</td><td class="num">6.3</td><td class="num">5.4</td>
+          <td><small>archive</small></td></tr>
+        
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="odds-h">
+    <h2 id="odds-h">Are the START/UPGRADE odds honest?</h2>
+    <div class="slot">
+      <p>For every pair of pool players at a position, we checked how often the one we favoured actually scored more.
+        Odds score (a coin flip is 0.250; lower is better): DL 0.250, LB 0.249, DB 0.254.
+        
+        About as good as a coin flip at DL, LB, DB. Treat a 60–75% badge as a slight lean, not a sure thing.</p>
+      <details><summary>When we said X%, how often did it happen?</summary>
+        <table>
+          <tr><th>Pos</th><th class="num">We said</th><th class="num">Happened</th><th class="num">Pairs</th></tr>
+          
+          <tr><td>DL</td><td class="num">55%</td><td class="num">53%</td><td class="num">2812</td></tr>
+          
+          <tr><td>DL</td><td class="num">64%</td><td class="num">57%</td><td class="num">1303</td></tr>
+          
+          <tr><td>DL</td><td class="num">74%</td><td class="num">62%</td><td class="num">546</td></tr>
+          
+          <tr><td>DL</td><td class="num">81%</td><td class="num">60%</td><td class="num">15</td></tr>
+          
+          <tr><td>LB</td><td class="num">55%</td><td class="num">53%</td><td class="num">2948</td></tr>
+          
+          <tr><td>LB</td><td class="num">64%</td><td class="num">57%</td><td class="num">1537</td></tr>
+          
+          <tr><td>LB</td><td class="num">73%</td><td class="num">65%</td><td class="num">227</td></tr>
+          
+          <tr><td>LB</td><td class="num">81%</td><td class="num">100%</td><td class="num">1</td></tr>
+          
+          <tr><td>DB</td><td class="num">54%</td><td class="num">50%</td><td class="num">3854</td></tr>
+          
+          <tr><td>DB</td><td class="num">64%</td><td class="num">49%</td><td class="num">763</td></tr>
+          
+          <tr><td>DB</td><td class="num">71%</td><td class="num">92%</td><td class="num">40</td></tr>
+          
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <section aria-labelledby="sugg-h">
+    <h2 id="sugg-h">Did the suggestions pay off?</h2>
+    <div class="slot">
+      
+      <p>No live suggestions have been decided yet; they're tracked from week 6 on.
+        On the rebuilt weeks, 14 of 27 would have paid off.
+        Suggestions shown only for reference aren't counted, and a void one (a player who didn't play) isn't either.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="tiers-h">
+    <h2 id="tiers-h">Do the tiers mean anything?</h2>
+    <div class="slot">
+      <p>Average score of the players in each tier as shown when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), all weeks together, with the number of player-games. Higher tiers should score more.</p>
+      <div class="scroll"><table>
+        <tr><th>Tier</th><th class="num">DL</th><th class="num">LB</th><th class="num">DB</th></tr>
+        
+        
+        <tr><td>Tier 1</td><td class="num">8.4 <small>(11)</small></td><td class="num">18.8 <small>(14)</small></td><td class="num">9.4 <small>(26)</small></td></tr>
+        
+        <tr><td>Tier 2</td><td class="num">10.1 <small>(47)</small></td><td class="num">14.6 <small>(23)</small></td><td class="num">10.5 <small>(53)</small></td></tr>
+        
+        <tr><td>Tier 3</td><td class="num">7.2 <small>(42)</small></td><td class="num">15.0 <small>(45)</small></td><td class="num">11.1 <small>(19)</small></td></tr>
+        
+        <tr><td>Tier 4</td><td class="num">—</td><td class="num">15.9 <small>(18)</small></td><td class="num">—</td></tr>
+        
+      </table></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="weights-h">
+    <h2 id="weights-h">Who gets how much say</h2>
+    <div class="slot">
+      <p>Projections (Sleeper and ESPN) get 60% of a player's number and rankings (FantasyPros) 40%, split evenly within each: Sleeper 30%, ESPN 30%, FantasyPros 40% when every source has him. A ranking becomes points by giving rank N the Nth-best projection among the players it ranks. Where a source has nothing for a player, the others' shares grow to fill its place. Once enough weeks are scored, each source's share will follow its accuracy.</p>
+    </div>
+  </section>
+
+  <details class="slot"><summary><b>What these mean</b></summary>
+    <ul class="glossary">
+      <li><b>Avg miss</b>: the average gap between our number and what the player scored. Lower is better.</li>
+      <li><b>Simple guess</b>: the player's own average so far this season (players with 2+ games). If we don't beat it, the projections add nothing.</li>
+      <li><b>Runs high/low</b>: whether our numbers are too high or too low on average.</li>
+      <li><b>Ranks players right</b>: how well the order of our numbers matches the order of the scores (0 = no better than random, 1 = perfect). Shown only once there are 100+ player-games.</li>
+      <li><b>Inside ±1 / ±2 range</b>: how often the score landed within one or two "typical swings" of our number. About 68% and 95% means the ranges are honest.</li>
+      <li><b>Typical miss (RMSE)</b>: like the average miss, but big misses count extra.</li>
+      <li><b>Top-12 hits</b>: of our 12 best-projected, how many finished in the actual top 12 at the position (ties at 12th count). Picking 12 of the 50 at random would land about 3.</li>
+      <li><b>Correlation</b>: how closely our numbers and the scores rise and fall together (0 = not at all, 1 = perfectly).</li>
+      <li><b>Odds score</b> (Brier): how good our win probabilities are. A coin flip scores 0.250; lower is better.</li>
+      <li><b>R²</b>: below 0 means a flat guess of the average would have done better.</li>
+    </ul>
+  </details>
+
+</main>
+<footer><p>Computed from the weeks saved in the repo; nothing here changes the numbers on the main page yet. Weeks marked "archive" use projections fetched after the fact from each source's archive.</p></footer>
+</body>
+</html>

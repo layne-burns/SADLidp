@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T10:54:12-04:00",
+ "generated_at": "2026-10-12T15:05:20-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -81,6 +81,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -101,7 +105,7 @@
       "state": "final"
      },
      "role": "starter",
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "taxi": false,
      "team": "PIT",
@@ -160,6 +164,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -180,143 +188,18 @@
       "state": "final"
      },
      "role": "other",
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "taxi": false,
      "team": "GB",
-     "tier": 2,
+     "tier": 1,
      "unavailable": [
       "locked"
      ]
     }
    ],
    "starter_locked": true,
-   "suggestions": [
-    {
-     "action": "add_drop",
-     "badge": "UPGRADE",
-     "drop": "11739",
-     "over": "11739",
-     "p": 0.611,
-     "player": {
-      "also": [],
-      "badge": null,
-      "breakdown": {
-       "est": true,
-       "mu": 12.17,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 12.2,
-         "share": 0.5,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           3.27,
-           false
-          ],
-          [
-           "ast",
-           2.05,
-           false
-          ],
-          [
-           "TFL",
-           0.22,
-           false
-          ],
-          [
-           "sack",
-           0.06,
-           false
-          ],
-          [
-           "QB hit",
-           0.11,
-           false
-          ],
-          [
-           "PD",
-           0.5,
-           false
-          ],
-          [
-           "INT",
-           0.17,
-           false
-          ],
-          [
-           "FF",
-           0.06,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 12.14,
-         "share": 0.5,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           3.96,
-           false
-          ],
-          [
-           "ast",
-           2.3,
-           false
-          ],
-          [
-           "TFL",
-           0.18,
-           true
-          ],
-          [
-           "PD",
-           0.26,
-           false
-          ],
-          [
-           "INT",
-           0.09,
-           false
-          ]
-         ],
-         "zero": false
-        }
-       ]
-      },
-      "flags": [],
-      "id": "11682",
-      "kickoff": "2026-10-12T20:15:00-04:00",
-      "late": false,
-      "max": 12.2,
-      "min": 12.14,
-      "mine": false,
-      "mu": 12.17,
-      "n": 2,
-      "name": "Cole Bishop",
-      "opp": "@LAR",
-      "result": null,
-      "sigma": 0.82,
-      "slot": "DB",
-      "team": "BUF",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": true,
-     "why": [
-      "starter_locked",
-      "drop_locked"
-     ]
-    }
-   ]
+   "suggestions": []
   },
   "DL": {
    "count": 1,
@@ -334,13 +217,13 @@
      "badge": null,
      "breakdown": {
       "est": true,
-      "mu": 14.54,
+      "mu": 13.48,
       "parts": [
        {
         "kind": "projection",
         "late": false,
         "pts": 13.97,
-        "share": 0.5,
+        "share": 0.3,
         "source": "Sleeper",
         "stats": [
          [
@@ -385,7 +268,7 @@
         "kind": "projection",
         "late": false,
         "pts": 15.11,
-        "share": 0.5,
+        "share": 0.3,
         "source": "ESPN",
         "stats": [
          [
@@ -430,6 +313,18 @@
          ]
         ],
         "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "DL",
+        "pts": 11.9,
+        "rank": 9,
+        "share": 0.4,
+        "source": "FantasyPros",
+        "stats": [],
+        "zero": false
        }
       ]
      },
@@ -438,16 +333,16 @@
      "kickoff": "2026-10-12T20:15:00-04:00",
      "late": false,
      "max": 15.11,
-     "min": 13.97,
+     "min": 11.9,
      "mine": true,
-     "mu": 14.54,
-     "n": 2,
+     "mu": 13.48,
+     "n": 3,
      "name": "Greg Rousseau",
      "opp": "@LAR",
      "reserve": false,
      "result": null,
      "role": "starter",
-     "sigma": 0.88,
+     "sigma": 1.31,
      "slot": "DL",
      "taxi": false,
      "team": "BUF",
@@ -525,6 +420,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -545,7 +444,7 @@
       "state": "final"
      },
      "role": "other",
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "taxi": false,
      "team": "DEN",
@@ -614,6 +513,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -634,7 +537,7 @@
       "state": "final"
      },
      "role": "starter",
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "taxi": false,
      "team": "BAL",
@@ -651,19 +554,19 @@
      "badge": "UPGRADE",
      "drop": "8280",
      "over": "8280",
-     "p": 0.649,
+     "p": 0.606,
      "player": {
       "also": [],
       "badge": null,
       "breakdown": {
        "est": true,
-       "mu": 15.13,
+       "mu": 14.22,
        "parts": [
         {
          "kind": "projection",
          "late": false,
          "pts": 14.81,
-         "share": 0.5,
+         "share": 0.3,
          "source": "Sleeper",
          "stats": [
           [
@@ -718,7 +621,7 @@
          "kind": "projection",
          "late": false,
          "pts": 15.45,
-         "share": 0.5,
+         "share": 0.3,
          "source": "ESPN",
          "stats": [
           [
@@ -763,6 +666,18 @@
           ]
          ],
          "zero": false
+        },
+        {
+         "censored": false,
+         "kind": "rank",
+         "late": false,
+         "list": "LB",
+         "pts": 12.85,
+         "rank": 19,
+         "share": 0.4,
+         "source": "FantasyPros",
+         "stats": [],
+         "zero": false
         }
        ]
       },
@@ -771,150 +686,16 @@
       "kickoff": "2026-10-12T20:15:00-04:00",
       "late": false,
       "max": 15.45,
-      "min": 14.81,
+      "min": 12.85,
       "mine": false,
-      "mu": 15.13,
-      "n": 2,
+      "mu": 14.22,
+      "n": 3,
       "name": "Nate Landman",
       "opp": "BUF",
       "result": null,
-      "sigma": 0.84,
+      "sigma": 1.11,
       "slot": "LB",
       "team": "LAR",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": true,
-     "why": [
-      "starter_locked",
-      "drop_locked"
-     ]
-    },
-    {
-     "action": "add_drop",
-     "badge": "UPGRADE",
-     "drop": "8280",
-     "over": "8280",
-     "p": 0.642,
-     "player": {
-      "also": [],
-      "badge": null,
-      "breakdown": {
-       "est": true,
-       "mu": 14.98,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 14.41,
-         "share": 0.5,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           4.42,
-           false
-          ],
-          [
-           "ast",
-           2.65,
-           false
-          ],
-          [
-           "TFL",
-           0.41,
-           false
-          ],
-          [
-           "sack",
-           0.06,
-           false
-          ],
-          [
-           "QB hit",
-           0.12,
-           false
-          ],
-          [
-           "PD",
-           0.18,
-           false
-          ],
-          [
-           "INT",
-           0.12,
-           false
-          ],
-          [
-           "FR",
-           0.12,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 15.56,
-         "share": 0.5,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           4.36,
-           false
-          ],
-          [
-           "ast",
-           3.46,
-           false
-          ],
-          [
-           "TFL",
-           0.66,
-           true
-          ],
-          [
-           "sack",
-           0.08,
-           false
-          ],
-          [
-           "QB hit",
-           0.09,
-           true
-          ],
-          [
-           "PD",
-           0.29,
-           false
-          ],
-          [
-           "INT",
-           0.06,
-           false
-          ]
-         ],
-         "zero": false
-        }
-       ]
-      },
-      "flags": [],
-      "id": "8311",
-      "kickoff": "2026-10-12T20:15:00-04:00",
-      "late": false,
-      "max": 15.56,
-      "min": 14.41,
-      "mine": false,
-      "mu": 14.98,
-      "n": 2,
-      "name": "Terrel Bernard",
-      "opp": "@LAR",
-      "result": null,
-      "sigma": 0.88,
-      "slot": "LB",
-      "team": "BUF",
       "tier": null,
       "unavailable": []
      },
@@ -977,6 +758,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -995,7 +780,7 @@
       "pts": 4.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "NE",
      "tier": null,
@@ -1058,6 +843,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1076,7 +865,7 @@
       "pts": 30.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "CIN",
      "tier": null,
@@ -1139,6 +928,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1157,7 +950,7 @@
       "pts": 19.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "ATL",
      "tier": null,
@@ -1230,6 +1023,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1248,7 +1045,7 @@
       "pts": 20.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "GB",
      "tier": null,
@@ -1318,6 +1115,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1336,7 +1137,7 @@
       "pts": 16.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "LV",
      "tier": null,
@@ -1389,6 +1190,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1407,7 +1212,7 @@
       "pts": 18.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "SF",
      "tier": null,
@@ -1465,6 +1270,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1483,7 +1292,7 @@
       "pts": 5.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "IND",
      "tier": null,
@@ -1536,6 +1345,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1554,7 +1367,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "NO",
      "tier": null,
@@ -1612,6 +1425,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1630,7 +1447,7 @@
       "pts": 23.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "DET",
      "tier": null,
@@ -1688,6 +1505,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1706,7 +1527,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "CIN",
      "tier": null,
@@ -1774,6 +1595,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1792,7 +1617,7 @@
       "pts": 15.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "GB",
      "tier": null,
@@ -1857,6 +1682,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1875,7 +1704,7 @@
       "pts": 9.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "MIN",
      "tier": null,
@@ -1938,6 +1767,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -1956,7 +1789,7 @@
       "pts": 13.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "DET",
      "tier": null,
@@ -2024,6 +1857,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2042,7 +1879,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "TEN",
      "tier": null,
@@ -2100,6 +1937,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2118,7 +1959,7 @@
       "pts": 5.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "WAS",
      "tier": null,
@@ -2171,6 +2012,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2189,7 +2034,7 @@
       "pts": 6.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "BAL",
      "tier": null,
@@ -2242,6 +2087,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2260,7 +2109,7 @@
       "pts": 13.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "DAL",
      "tier": null,
@@ -2323,6 +2172,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2341,7 +2194,7 @@
       "pts": 11.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "JAX",
      "tier": null,
@@ -2414,6 +2267,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2432,7 +2289,7 @@
       "pts": 6.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "NE",
      "tier": null,
@@ -2495,6 +2352,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2513,7 +2374,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "CIN",
      "tier": null,
@@ -2571,6 +2432,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2589,7 +2454,7 @@
       "pts": 26.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "MIN",
      "tier": null,
@@ -2642,6 +2507,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2660,7 +2529,7 @@
       "pts": 18.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "HOU",
      "tier": null,
@@ -2723,6 +2592,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2743,7 +2616,7 @@
       "pts": 10.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "HOU",
      "tier": null,
@@ -2801,6 +2674,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2819,7 +2696,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "HOU",
      "tier": null,
@@ -2872,6 +2749,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -2890,7 +2771,7 @@
       "pts": 8.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.56,
      "slot": "DB",
      "team": "CIN",
      "tier": null,
@@ -2900,34 +2781,23 @@
     }
    ],
    "played_hidden": 168,
-   "tier_count": 5,
+   "tier_count": 4,
    "tiers": [
     {
-     "anchor_mu": 12.17,
+     "anchor_mu": 11.68,
      "players": [
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "11739",
-        "over": "11739",
-        "p": 0.611,
-        "reference": true,
-        "why": [
-         "starter_locked",
-         "drop_locked"
-        ]
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 12.17,
+        "mu": 11.68,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 12.2,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -2977,7 +2847,7 @@
           "kind": "projection",
           "late": false,
           "pts": 12.14,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3007,6 +2877,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 10.95,
+          "rank": 20,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3015,14 +2897,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 12.2,
-       "min": 12.14,
+       "min": 10.95,
        "mine": false,
-       "mu": 12.17,
-       "n": 2,
+       "mu": 11.68,
+       "n": 3,
        "name": "Cole Bishop",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.82,
+       "sigma": 1.18,
        "slot": "DB",
        "team": "BUF",
        "tier": 1,
@@ -3033,131 +2915,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 11.27,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 9.48,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.62,
-            false
-           ],
-           [
-            "ast",
-            0.81,
-            false
-           ],
-           [
-            "TFL",
-            0.12,
-            false
-           ],
-           [
-            "sack",
-            0.12,
-            false
-           ],
-           [
-            "QB hit",
-            0.25,
-            false
-           ],
-           [
-            "PD",
-            0.56,
-            false
-           ],
-           [
-            "INT",
-            0.06,
-            false
-           ],
-           [
-            "FF",
-            0.06,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 13.06,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            3.16,
-            false
-           ],
-           [
-            "ast",
-            1.21,
-            false
-           ],
-           [
-            "TFL",
-            0.19,
-            true
-           ],
-           [
-            "PD",
-            1.23,
-            false
-           ],
-           [
-            "INT",
-            0.15,
-            false
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "8364",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 13.06,
-       "min": 9.48,
-       "mine": false,
-       "mu": 11.27,
-       "n": 2,
-       "name": "Trent McDuffie",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 1.32,
-       "slot": "DB",
-       "team": "LAR",
-       "tier": 1,
-       "unavailable": []
-      }
-     ],
-     "tier": 1
-    },
-    {
-     "anchor_mu": 10.95,
-     "players": [
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 10.95,
+        "mu": 11.02,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 10.49,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -3212,7 +2976,7 @@
           "kind": "projection",
           "late": false,
           "pts": 11.41,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3247,6 +3011,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 11.13,
+          "rank": 16,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3257,15 +3033,15 @@
        "max": 11.41,
        "min": 10.49,
        "mine": false,
-       "mu": 10.95,
-       "n": 2,
+       "mu": 11.02,
+       "n": 3,
        "name": "Kam Curl",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.86,
+       "sigma": 1.13,
        "slot": "DB",
        "team": "LAR",
-       "tier": 2,
+       "tier": 1,
        "unavailable": []
       },
       {
@@ -3273,13 +3049,137 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 10.41,
+        "mu": 10.47,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.48,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.62,
+            false
+           ],
+           [
+            "ast",
+            0.81,
+            false
+           ],
+           [
+            "TFL",
+            0.12,
+            false
+           ],
+           [
+            "sack",
+            0.12,
+            false
+           ],
+           [
+            "QB hit",
+            0.25,
+            false
+           ],
+           [
+            "PD",
+            0.56,
+            false
+           ],
+           [
+            "INT",
+            0.06,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 13.06,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.16,
+            false
+           ],
+           [
+            "ast",
+            1.21,
+            false
+           ],
+           [
+            "TFL",
+            0.19,
+            true
+           ],
+           [
+            "PD",
+            1.23,
+            false
+           ],
+           [
+            "INT",
+            0.15,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 9.28,
+          "rank": 50,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "8364",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 13.06,
+       "min": 9.28,
+       "mine": false,
+       "mu": 10.47,
+       "n": 3,
+       "name": "Trent McDuffie",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.63,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.27,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 9.5,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -3329,7 +3229,7 @@
           "kind": "projection",
           "late": false,
           "pts": 11.32,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3359,6 +3259,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 10.05,
+          "rank": 34,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3369,14 +3281,149 @@
        "max": 11.32,
        "min": 9.5,
        "mine": false,
-       "mu": 10.41,
-       "n": 2,
+       "mu": 10.27,
+       "n": 3,
        "name": "C.J. Gardner-Johnson",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.97,
+       "sigma": 1.22,
        "slot": "DB",
        "team": "BUF",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 9.59,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 9.59,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.48,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.7,
+            false
+           ],
+           [
+            "ast",
+            1.47,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.18,
+            false
+           ],
+           [
+            "PD",
+            0.35,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
+           ],
+           [
+            "FR",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.63,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.2,
+            false
+           ],
+           [
+            "ast",
+            1.86,
+            false
+           ],
+           [
+            "TFL",
+            0.05,
+            true
+           ],
+           [
+            "QB hit",
+            0.13,
+            true
+           ],
+           [
+            "PD",
+            0.38,
+            false
+           ],
+           [
+            "INT",
+            0.09,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 8.89,
+          "rank": 57,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "11726",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 10.63,
+       "min": 8.89,
+       "mine": false,
+       "mu": 9.59,
+       "n": 3,
+       "name": "Kamren Kinchens",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.22,
+       "slot": "DB",
+       "team": "LAR",
        "tier": 2,
        "unavailable": []
       },
@@ -3385,13 +3432,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 10.11,
+        "mu": 9.18,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 8.28,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -3446,7 +3493,7 @@
           "kind": "projection",
           "late": false,
           "pts": 11.95,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3476,6 +3523,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 7.79,
+          "rank": 82,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3484,14 +3543,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 11.95,
-       "min": 8.28,
+       "min": 7.79,
        "mine": false,
-       "mu": 10.11,
-       "n": 2,
+       "mu": 9.18,
+       "n": 3,
        "name": "Christian Benford",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.34,
+       "sigma": 1.7,
        "slot": "DB",
        "team": "BUF",
        "tier": 2,
@@ -3502,130 +3561,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 10.06,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 9.48,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.7,
-            false
-           ],
-           [
-            "ast",
-            1.47,
-            false
-           ],
-           [
-            "TFL",
-            0.06,
-            false
-           ],
-           [
-            "sack",
-            0.06,
-            false
-           ],
-           [
-            "QB hit",
-            0.18,
-            false
-           ],
-           [
-            "PD",
-            0.35,
-            false
-           ],
-           [
-            "INT",
-            0.12,
-            false
-           ],
-           [
-            "FR",
-            0.06,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 10.63,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            3.2,
-            false
-           ],
-           [
-            "ast",
-            1.86,
-            false
-           ],
-           [
-            "TFL",
-            0.05,
-            true
-           ],
-           [
-            "QB hit",
-            0.13,
-            true
-           ],
-           [
-            "PD",
-            0.38,
-            false
-           ],
-           [
-            "INT",
-            0.09,
-            false
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "11726",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 10.63,
-       "min": 9.48,
-       "mine": false,
-       "mu": 10.06,
-       "n": 2,
-       "name": "Kamren Kinchens",
-       "opp": "BUF",
-       "result": null,
-       "sigma": 0.88,
-       "slot": "DB",
-       "team": "LAR",
-       "tier": 2,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 9.69,
+        "mu": 7.36,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 6.96,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -3670,7 +3612,7 @@
           "kind": "projection",
           "late": false,
           "pts": 12.43,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3710,6 +3652,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 3.87,
+          "rank": 138,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3718,14 +3672,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 12.43,
-       "min": 6.96,
+       "min": 3.87,
        "mine": false,
-       "mu": 9.69,
-       "n": 2,
+       "mu": 7.36,
+       "n": 3,
        "name": "Jaylen Watson",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.78,
+       "sigma": 2.74,
        "slot": "DB",
        "team": "LAR",
        "tier": 2,
@@ -3735,20 +3689,129 @@
      "tier": 2
     },
     {
-     "anchor_mu": 8.53,
+     "anchor_mu": 6.8,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": true,
+        "mu": 6.8,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.5,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.47,
+            false
+           ],
+           [
+            "ast",
+            0.77,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ],
+           [
+            "PD",
+            0.65,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.6,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            2.67,
+            false
+           ],
+           [
+            "ast",
+            1.02,
+            false
+           ],
+           [
+            "TFL",
+            0.09,
+            true
+           ],
+           [
+            "PD",
+            0.71,
+            false
+           ],
+           [
+            "INT",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 4.92,
+          "rank": 127,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12596",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 9.6,
+       "min": 4.92,
+       "mine": false,
+       "mu": 6.8,
+       "n": 3,
+       "name": "Maxwell Hairston",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.76,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
         "est": false,
-        "mu": 8.53,
+        "mu": 5.54,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 8.53,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -3802,6 +3865,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 1.05,
+          "rank": 151,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3812,14 +3887,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 8.53,
-       "min": 8.53,
+       "min": 1.05,
        "mine": false,
-       "mu": 8.53,
-       "n": 1,
+       "mu": 5.54,
+       "n": 2,
        "name": "Dee Alford",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 2.47,
        "slot": "DB",
        "team": "BUF",
        "tier": 3,
@@ -3830,110 +3905,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 8.05,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 6.5,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            1.47,
-            false
-           ],
-           [
-            "ast",
-            0.77,
-            false
-           ],
-           [
-            "TFL",
-            0.06,
-            false
-           ],
-           [
-            "PD",
-            0.65,
-            false
-           ],
-           [
-            "INT",
-            0.12,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 9.6,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            2.67,
-            false
-           ],
-           [
-            "ast",
-            1.02,
-            false
-           ],
-           [
-            "TFL",
-            0.09,
-            true
-           ],
-           [
-            "PD",
-            0.71,
-            false
-           ],
-           [
-            "INT",
-            0.12,
-            false
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "12596",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 9.6,
-       "min": 6.5,
-       "mine": false,
-       "mu": 8.05,
-       "n": 2,
-       "name": "Maxwell Hairston",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.21,
-       "slot": "DB",
-       "team": "BUF",
-       "tier": 3,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 6.76,
+        "mu": 4.4,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 3.73,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -3958,7 +3936,7 @@
           "kind": "projection",
           "late": false,
           "pts": 9.79,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -3988,6 +3966,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 156,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -3996,14 +3986,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 9.79,
-       "min": 3.73,
+       "min": 0.87,
        "mine": false,
-       "mu": 6.76,
-       "n": 2,
+       "mu": 4.4,
+       "n": 3,
        "name": "Davison Igbinosun",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.93,
+       "sigma": 2.85,
        "slot": "DB",
        "team": "BUF",
        "tier": 3,
@@ -4013,20 +4003,20 @@
      "tier": 3
     },
     {
-     "anchor_mu": 3.9,
+     "anchor_mu": 2.69,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 3.9,
+        "mu": 2.69,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 3.9,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -4055,6 +4045,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 165,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -4063,14 +4065,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 3.9,
-       "min": 3.9,
+       "min": 0.87,
        "mine": false,
-       "mu": 3.9,
-       "n": 1,
+       "mu": 2.69,
+       "n": 2,
        "name": "Jalon Kilgore",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.54,
        "slot": "DB",
        "team": "BUF",
        "tier": 4,
@@ -4081,13 +4083,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 2.59,
+        "mu": 1.9,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 0.9,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -4112,7 +4114,7 @@
           "kind": "projection",
           "late": false,
           "pts": 4.29,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -4137,6 +4139,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 165,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -4145,14 +4159,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 4.29,
-       "min": 0.9,
+       "min": 0.87,
        "mine": false,
-       "mu": 2.59,
-       "n": 2,
+       "mu": 1.9,
+       "n": 3,
        "name": "Damar Hamlin",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.27,
+       "sigma": 1.56,
        "slot": "DB",
        "team": "BUF",
        "tier": 4,
@@ -4163,7 +4177,7 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 2.55,
+        "mu": 1.88,
         "parts": [
          {
           "missing": "no projection for him",
@@ -4173,7 +4187,7 @@
           "kind": "projection",
           "late": false,
           "pts": 2.55,
-          "share": 1.0,
+          "share": 0.6,
           "source": "ESPN",
           "stats": [
            [
@@ -4193,6 +4207,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 165,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -4201,37 +4227,31 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 2.55,
-       "min": 2.55,
+       "min": 0.87,
        "mine": false,
-       "mu": 2.55,
-       "n": 1,
+       "mu": 1.88,
+       "n": 2,
        "name": "Josh Wallace",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.36,
        "slot": "DB",
        "team": "LAR",
        "tier": 4,
        "unavailable": []
-      }
-     ],
-     "tier": 4
-    },
-    {
-     "anchor_mu": 2.0,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 2.0,
+        "mu": 1.55,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.11,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -4256,7 +4276,7 @@
           "kind": "projection",
           "late": false,
           "pts": 2.89,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -4276,6 +4296,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 167,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -4284,17 +4316,17 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 2.89,
-       "min": 1.11,
+       "min": 0.87,
        "mine": false,
-       "mu": 2.0,
-       "n": 2,
+       "mu": 1.55,
+       "n": 3,
        "name": "Jaylen McCollough",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.96,
+       "sigma": 1.27,
        "slot": "DB",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
@@ -4302,13 +4334,13 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.69,
+        "mu": 1.36,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.47,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -4338,7 +4370,7 @@
           "kind": "projection",
           "late": false,
           "pts": 1.9,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -4358,6 +4390,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DB",
+          "pts": 0.87,
+          "rank": 171,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -4366,17 +4410,17 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.9,
-       "min": 1.47,
+       "min": 0.87,
        "mine": false,
-       "mu": 1.69,
-       "n": 2,
+       "mu": 1.36,
+       "n": 3,
        "name": "Emmanuel Forbes",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.83,
+       "sigma": 1.15,
        "slot": "DB",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
@@ -4414,6 +4458,10 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "missing": "not on its rankings, and not projected near their end",
+          "source": "FantasyPros"
          }
         ]
        },
@@ -4429,10 +4477,10 @@
        "name": "Maximus Pulley",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.56,
        "slot": "DB",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       },
       {
@@ -4470,6 +4518,10 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "missing": "not on its rankings, and not projected near their end",
+          "source": "FantasyPros"
          }
         ]
        },
@@ -4485,14 +4537,14 @@
        "name": "Sam Franklin",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.56,
        "slot": "DB",
        "team": "BUF",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       }
      ],
-     "tier": 5
+     "tier": 4
     }
    ]
   },
@@ -4550,6 +4602,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4568,7 +4624,7 @@
       "pts": 16.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "DEN",
      "tier": null,
@@ -4631,6 +4687,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4649,7 +4709,7 @@
       "pts": 10.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "JAX",
      "tier": null,
@@ -4707,6 +4767,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4725,7 +4789,7 @@
       "pts": 2.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "SEA",
      "tier": null,
@@ -4778,6 +4842,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4796,7 +4864,7 @@
       "pts": 21.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "CIN",
      "tier": null,
@@ -4866,6 +4934,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4884,7 +4956,7 @@
       "pts": 10.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "TB",
      "tier": null,
@@ -4947,6 +5019,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -4965,7 +5041,7 @@
       "pts": 2.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "DAL",
      "tier": null,
@@ -5023,6 +5099,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5041,7 +5121,7 @@
       "pts": 9.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "CIN",
      "tier": null,
@@ -5099,6 +5179,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5117,7 +5201,7 @@
       "pts": 13.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "PIT",
      "tier": null,
@@ -5180,6 +5264,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5198,7 +5286,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "NE",
      "tier": null,
@@ -5251,6 +5339,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5269,7 +5361,7 @@
       "pts": 32.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "SEA",
      "tier": null,
@@ -5337,6 +5429,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5355,7 +5451,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "SEA",
      "tier": null,
@@ -5423,6 +5519,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5441,7 +5541,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "MIA",
      "tier": null,
@@ -5504,6 +5604,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5522,7 +5626,7 @@
       "pts": 4.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "DET",
      "tier": null,
@@ -5585,6 +5689,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5603,7 +5711,7 @@
       "pts": 8.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "NO",
      "tier": null,
@@ -5671,6 +5779,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5691,7 +5803,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "NE",
      "tier": null,
@@ -5766,6 +5878,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5786,7 +5902,7 @@
       "pts": 9.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "PHI",
      "tier": null,
@@ -5844,6 +5960,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5862,7 +5982,7 @@
       "pts": 18.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "IND",
      "tier": null,
@@ -5925,6 +6045,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -5943,7 +6067,7 @@
       "pts": 2.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "LV",
      "tier": null,
@@ -6001,6 +6125,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6019,7 +6147,7 @@
       "pts": 5.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "ARI",
      "tier": null,
@@ -6084,6 +6212,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6102,7 +6234,7 @@
       "pts": 23.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "DET",
      "tier": null,
@@ -6165,6 +6297,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6183,7 +6319,7 @@
       "pts": 27.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "GB",
      "tier": null,
@@ -6246,6 +6382,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6264,7 +6404,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "MIN",
      "tier": null,
@@ -6327,6 +6467,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6347,7 +6491,7 @@
       "pts": 6.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "CHI",
      "tier": null,
@@ -6400,6 +6544,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6418,7 +6566,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "MIN",
      "tier": null,
@@ -6481,6 +6629,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -6499,7 +6651,7 @@
       "pts": 12.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.24,
      "slot": "DL",
      "team": "ATL",
      "tier": null,
@@ -6509,23 +6661,23 @@
     }
    ],
    "played_hidden": 171,
-   "tier_count": 5,
+   "tier_count": 4,
    "tiers": [
     {
-     "anchor_mu": 9.16,
+     "anchor_mu": 8.73,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 9.16,
+        "mu": 8.73,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 10.47,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -6570,7 +6722,7 @@
           "kind": "projection",
           "late": false,
           "pts": 7.86,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -6605,6 +6757,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 8.07,
+          "rank": 49,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -6615,12 +6779,12 @@
        "max": 10.47,
        "min": 7.86,
        "mine": false,
-       "mu": 9.16,
-       "n": 2,
+       "mu": 8.73,
+       "n": 3,
        "name": "Kobie Turner",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.11,
+       "sigma": 1.19,
        "slot": "DL",
        "team": "LAR",
        "tier": 1,
@@ -6631,13 +6795,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 8.3,
+        "mu": 8.1,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 7.63,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -6687,7 +6851,7 @@
           "kind": "projection",
           "late": false,
           "pts": 8.96,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -6717,6 +6881,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 7.81,
+          "rank": 53,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -6727,12 +6903,12 @@
        "max": 8.96,
        "min": 7.63,
        "mine": false,
-       "mu": 8.3,
-       "n": 2,
+       "mu": 8.1,
+       "n": 3,
        "name": "Deone Walker",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.9,
+       "sigma": 0.97,
        "slot": "DL",
        "team": "BUF",
        "tier": 1,
@@ -6742,20 +6918,20 @@
      "tier": 1
     },
     {
-     "anchor_mu": 5.72,
+     "anchor_mu": 5.36,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 5.72,
+        "mu": 5.36,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 6.09,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -6805,7 +6981,7 @@
           "kind": "projection",
           "late": false,
           "pts": 5.34,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -6840,6 +7016,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 4.82,
+          "rank": 114,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -6848,14 +7036,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 6.09,
-       "min": 5.34,
+       "min": 4.82,
        "mine": false,
-       "mu": 5.72,
-       "n": 2,
+       "mu": 5.36,
+       "n": 3,
        "name": "Braden Fiske",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.84,
+       "sigma": 0.95,
        "slot": "DL",
        "team": "LAR",
        "tier": 2,
@@ -6866,13 +7054,117 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 5.47,
+        "mu": 5.11,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.49,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.62,
+            false
+           ],
+           [
+            "ast",
+            1.25,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.21,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.3,
+            false
+           ],
+           [
+            "ast",
+            0.95,
+            false
+           ],
+           [
+            "TFL",
+            0.33,
+            true
+           ],
+           [
+            "sack",
+            0.25,
+            false
+           ],
+           [
+            "QB hit",
+            0.59,
+            true
+           ],
+           [
+            "PD",
+            0.17,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 5.49,
+          "rank": 94,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "12621",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 7.21,
+       "min": 2.49,
+       "mine": false,
+       "mu": 5.11,
+       "n": 3,
+       "name": "Josaiah Stewart",
+       "opp": "BUF",
+       "result": null,
+       "sigma": 1.58,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 4.21,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 7.4,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -6917,7 +7209,7 @@
           "kind": "projection",
           "late": false,
           "pts": 3.54,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -6947,6 +7239,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 2.31,
+          "rank": 164,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -6955,14 +7259,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 7.4,
-       "min": 3.54,
+       "min": 2.31,
        "mine": false,
-       "mu": 5.47,
-       "n": 2,
+       "mu": 4.21,
+       "n": 3,
        "name": "Poona Ford",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.38,
+       "sigma": 1.76,
        "slot": "DL",
        "team": "LAR",
        "tier": 2,
@@ -6973,23 +7277,38 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 4.85,
+        "mu": 3.59,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 2.49,
-          "share": 0.5,
+          "pts": 0.9,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            0.62,
+            0.12,
             false
            ],
            [
             "ast",
-            1.25,
+            0.12,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ],
+           [
+            "sack",
+            0.06,
+            false
+           ],
+           [
+            "QB hit",
+            0.06,
             false
            ]
           ],
@@ -6998,68 +7317,76 @@
          {
           "kind": "projection",
           "late": false,
-          "pts": 7.21,
-          "share": 0.5,
+          "pts": 5.48,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
             "solo",
-            1.3,
+            1.31,
             false
            ],
            [
             "ast",
-            0.95,
+            1.4,
             false
            ],
            [
             "TFL",
-            0.33,
+            0.31,
             true
            ],
            [
             "sack",
-            0.25,
+            0.09,
             false
            ],
            [
             "QB hit",
-            0.59,
+            0.11,
             true
-           ],
-           [
-            "PD",
-            0.17,
-            false
-           ],
-           [
-            "FF",
-            0.06,
-            false
            ]
           ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 4.18,
+          "rank": 128,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
           "zero": false
          }
         ]
        },
        "flags": [],
-       "id": "12621",
+       "id": "11706",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 7.21,
-       "min": 2.49,
+       "max": 5.48,
+       "min": 0.9,
        "mine": false,
-       "mu": 4.85,
-       "n": 2,
-       "name": "Josaiah Stewart",
-       "opp": "BUF",
+       "mu": 3.59,
+       "n": 3,
+       "name": "DeWayne Carter",
+       "opp": "@LAR",
        "result": null,
-       "sigma": 1.59,
+       "sigma": 1.57,
        "slot": "DL",
-       "team": "LAR",
+       "team": "BUF",
        "tier": 2,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 3.54,
+     "players": [
       {
        "also": [
         "LB"
@@ -7067,13 +7394,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 4.49,
+        "mu": 3.54,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 5.4,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -7113,7 +7440,7 @@
           "kind": "projection",
           "late": false,
           "pts": 3.59,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -7148,6 +7475,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 2.11,
+          "rank": 175,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7156,86 +7495,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 5.4,
-       "min": 3.59,
+       "min": 2.11,
        "mine": false,
-       "mu": 4.49,
-       "n": 2,
+       "mu": 3.54,
+       "n": 3,
        "name": "Michael Hoecht",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.97,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 2,
-       "unavailable": []
-      }
-     ],
-     "tier": 2
-    },
-    {
-     "anchor_mu": 3.76,
-     "players": [
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 3.76,
-        "parts": [
-         {
-          "missing": "no projection for him",
-          "source": "Sleeper"
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 3.76,
-          "share": 1.0,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            0.88,
-            false
-           ],
-           [
-            "ast",
-            0.93,
-            false
-           ],
-           [
-            "TFL",
-            0.19,
-            true
-           ],
-           [
-            "sack",
-            0.07,
-            false
-           ],
-           [
-            "QB hit",
-            0.14,
-            true
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "5981",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 3.76,
-       "min": 3.76,
-       "mine": false,
-       "mu": 3.76,
-       "n": 1,
-       "name": "Greg Gaines",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.0,
+       "sigma": 1.3,
        "slot": "DL",
        "team": "BUF",
        "tier": 3,
@@ -7246,7 +7513,108 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 3.72,
+        "mu": 2.75,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41,
+            false
+           ],
+           [
+            "ast",
+            0.29,
+            false
+           ],
+           [
+            "TFL",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 4.62,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            1.02,
+            false
+           ],
+           [
+            "ast",
+            1.09,
+            false
+           ],
+           [
+            "TFL",
+            0.34,
+            true
+           ],
+           [
+            "sack",
+            0.09,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 2.49,
+          "rank": 161,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [
+        "Q"
+       ],
+       "id": "12580",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 4.62,
+       "min": 1.23,
+       "mine": false,
+       "mu": 2.75,
+       "n": 3,
+       "name": "Landon Jackson",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.29,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 2.63,
         "parts": [
          {
           "missing": "no projection for him",
@@ -7256,7 +7624,7 @@
           "kind": "projection",
           "late": false,
           "pts": 3.72,
-          "share": 1.0,
+          "share": 0.6,
           "source": "ESPN",
           "stats": [
            [
@@ -7286,6 +7654,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.99,
+          "rank": 201,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7294,14 +7674,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 3.72,
-       "min": 3.72,
+       "min": 0.99,
        "mine": false,
-       "mu": 3.72,
-       "n": 1,
+       "mu": 2.63,
+       "n": 2,
        "name": "Tyler Davis",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.27,
        "slot": "DL",
        "team": "LAR",
        "tier": 3,
@@ -7312,13 +7692,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 3.6,
+        "mu": 2.61,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.62,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -7338,7 +7718,7 @@
           "kind": "projection",
           "late": false,
           "pts": 5.58,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -7373,6 +7753,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 1.12,
+          "rank": 194,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7381,14 +7773,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 5.58,
-       "min": 1.62,
+       "min": 1.12,
        "mine": false,
-       "mu": 3.6,
-       "n": 2,
+       "mu": 2.61,
+       "n": 3,
        "name": "Wesley Bailey",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.4,
+       "sigma": 1.64,
        "slot": "DL",
        "team": "LAR",
        "tier": 3,
@@ -7398,14 +7790,92 @@
        "also": [],
        "badge": null,
        "breakdown": {
+        "est": true,
+        "mu": 2.58,
+        "parts": [
+         {
+          "missing": "no projection for him",
+          "source": "Sleeper"
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.76,
+          "share": 0.6,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            0.88,
+            false
+           ],
+           [
+            "ast",
+            0.93,
+            false
+           ],
+           [
+            "TFL",
+            0.19,
+            true
+           ],
+           [
+            "sack",
+            0.07,
+            false
+           ],
+           [
+            "QB hit",
+            0.14,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.82,
+          "rank": 208,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "5981",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 3.76,
+       "min": 0.82,
+       "mine": false,
+       "mu": 2.58,
+       "n": 2,
+       "name": "Greg Gaines",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.31,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
         "est": false,
-        "mu": 3.33,
+        "mu": 2.12,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 3.33,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -7444,6 +7914,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 232,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7452,14 +7934,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 3.33,
-       "min": 3.33,
+       "min": 0.3,
        "mine": false,
-       "mu": 3.33,
-       "n": 1,
+       "mu": 2.12,
+       "n": 2,
        "name": "T.J. Sanders",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.33,
        "slot": "DL",
        "team": "BUF",
        "tier": 3,
@@ -7470,205 +7952,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 3.19,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 0.9,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.12,
-            false
-           ],
-           [
-            "ast",
-            0.12,
-            false
-           ],
-           [
-            "TFL",
-            0.06,
-            false
-           ],
-           [
-            "sack",
-            0.06,
-            false
-           ],
-           [
-            "QB hit",
-            0.06,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 5.48,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            1.31,
-            false
-           ],
-           [
-            "ast",
-            1.4,
-            false
-           ],
-           [
-            "TFL",
-            0.31,
-            true
-           ],
-           [
-            "sack",
-            0.09,
-            false
-           ],
-           [
-            "QB hit",
-            0.11,
-            true
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "11706",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 5.48,
-       "min": 0.9,
-       "mine": false,
-       "mu": 3.19,
-       "n": 2,
-       "name": "DeWayne Carter",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.55,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 3,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 2.93,
+        "mu": 1.9,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.23,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            0.41,
-            false
-           ],
-           [
-            "ast",
-            0.29,
-            false
-           ],
-           [
-            "TFL",
-            0.06,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 4.62,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            1.02,
-            false
-           ],
-           [
-            "ast",
-            1.09,
-            false
-           ],
-           [
-            "TFL",
-            0.34,
-            true
-           ],
-           [
-            "sack",
-            0.09,
-            false
-           ],
-           [
-            "QB hit",
-            0.12,
-            true
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [
-        "Q"
-       ],
-       "id": "12580",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 4.62,
-       "min": 1.23,
-       "mine": false,
-       "mu": 2.93,
-       "n": 2,
-       "name": "Landon Jackson",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.27,
-       "slot": "DL",
-       "team": "BUF",
-       "tier": 3,
-       "unavailable": []
-      }
-     ],
-     "tier": 3
-    },
-    {
-     "anchor_mu": 2.11,
-     "players": [
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 2.11,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 1.23,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -7693,7 +7983,7 @@
           "kind": "projection",
           "late": false,
           "pts": 2.99,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -7728,6 +8018,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 1.58,
+          "rank": 185,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7738,29 +8040,35 @@
        "max": 2.99,
        "min": 1.23,
        "mine": false,
-       "mu": 2.11,
-       "n": 2,
+       "mu": 1.9,
+       "n": 3,
        "name": "TJ Parker",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.96,
+       "sigma": 1.02,
        "slot": "DL",
        "team": "BUF",
-       "tier": 4,
+       "tier": 3,
        "unavailable": []
-      },
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 1.16,
+     "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 1.73,
+        "mu": 1.16,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.62,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -7780,7 +8088,7 @@
           "kind": "projection",
           "late": false,
           "pts": 1.83,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -7810,6 +8118,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 229,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7818,14 +8138,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.83,
-       "min": 1.62,
+       "min": 0.3,
        "mine": false,
-       "mu": 1.73,
-       "n": 2,
+       "mu": 1.16,
+       "n": 3,
        "name": "Desjuan Johnson",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.82,
+       "sigma": 1.01,
        "slot": "DL",
        "team": "LAR",
        "tier": 4,
@@ -7836,13 +8156,13 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.23,
+        "mu": 0.86,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.23,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -7866,6 +8186,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 232,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7874,14 +8206,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.23,
-       "min": 1.23,
+       "min": 0.3,
        "mine": false,
-       "mu": 1.23,
-       "n": 1,
+       "mu": 0.86,
+       "n": 2,
        "name": "Javon Solomon",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.05,
        "slot": "DL",
        "team": "BUF",
        "tier": 4,
@@ -7892,13 +8224,13 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.23,
+        "mu": 0.86,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.23,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -7922,6 +8254,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 232,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -7930,14 +8274,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.23,
-       "min": 1.23,
+       "min": 0.3,
        "mine": false,
-       "mu": 1.23,
-       "n": 1,
+       "mu": 0.86,
+       "n": 2,
        "name": "Mike Danna",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.05,
        "slot": "DL",
        "team": "BUF",
        "tier": 4,
@@ -7948,13 +8292,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 0.97,
+        "mu": 0.7,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 0.57,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -7974,7 +8318,7 @@
           "kind": "projection",
           "late": false,
           "pts": 1.38,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -7999,6 +8343,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 232,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -8007,37 +8363,31 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.38,
-       "min": 0.57,
+       "min": 0.3,
        "mine": false,
-       "mu": 0.97,
-       "n": 2,
+       "mu": 0.7,
+       "n": 3,
        "name": "Ty Hamilton",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.85,
+       "sigma": 0.93,
        "slot": "DL",
        "team": "LAR",
        "tier": 4,
        "unavailable": []
-      }
-     ],
-     "tier": 4
-    },
-    {
-     "anchor_mu": 0.57,
-     "players": [
+      },
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 0.57,
+        "mu": 0.46,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 0.57,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -8056,6 +8406,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DL",
+          "pts": 0.3,
+          "rank": 231,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -8064,21 +8426,21 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 0.57,
-       "min": 0.57,
+       "min": 0.3,
        "mine": false,
-       "mu": 0.57,
-       "n": 1,
+       "mu": 0.46,
+       "n": 2,
        "name": "Larrell Murchison",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 1.02,
        "slot": "DL",
        "team": "LAR",
-       "tier": 5,
+       "tier": 4,
        "unavailable": []
       }
      ],
-     "tier": 5
+     "tier": 4
     }
    ]
   },
@@ -8151,6 +8513,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8169,7 +8535,7 @@
       "pts": 18.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "JAX",
      "tier": null,
@@ -8237,6 +8603,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8255,7 +8625,7 @@
       "pts": 20.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "HOU",
      "tier": null,
@@ -8318,6 +8688,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8336,7 +8710,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "JAX",
      "tier": null,
@@ -8399,6 +8773,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8417,7 +8795,7 @@
       "pts": 6.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "NE",
      "tier": null,
@@ -8475,6 +8853,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8493,7 +8875,7 @@
       "pts": 5.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "LV",
      "tier": null,
@@ -8566,6 +8948,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8584,7 +8970,7 @@
       "pts": 15.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "CHI",
      "tier": null,
@@ -8657,6 +9043,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8675,7 +9065,7 @@
       "pts": 21.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "PHI",
      "tier": null,
@@ -8738,6 +9128,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8756,7 +9150,7 @@
       "pts": 17.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "MIN",
      "tier": null,
@@ -8819,6 +9213,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8837,7 +9235,7 @@
       "pts": 14.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "DEN",
      "tier": null,
@@ -8910,6 +9308,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -8928,7 +9330,7 @@
       "pts": 15.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "MIA",
      "tier": null,
@@ -8996,6 +9398,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9014,7 +9420,7 @@
       "pts": 32.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "CLE",
      "tier": null,
@@ -9082,6 +9488,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9100,7 +9510,7 @@
       "pts": 23.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "GB",
      "tier": null,
@@ -9168,6 +9578,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9186,7 +9600,7 @@
       "pts": 12.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "IND",
      "tier": null,
@@ -9254,6 +9668,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9272,7 +9690,7 @@
       "pts": 26.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "PIT",
      "tier": null,
@@ -9340,6 +9758,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9358,7 +9780,7 @@
       "pts": 10.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "ARI",
      "tier": null,
@@ -9421,6 +9843,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9439,7 +9865,7 @@
       "pts": 11.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "LAC",
      "tier": null,
@@ -9512,6 +9938,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9530,7 +9960,7 @@
       "pts": 7.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "PIT",
      "tier": null,
@@ -9593,6 +10023,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9611,7 +10045,7 @@
       "pts": 15.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "TB",
      "tier": null,
@@ -9679,6 +10113,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9697,7 +10135,7 @@
       "pts": 24.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "NYG",
      "tier": null,
@@ -9760,6 +10198,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9778,7 +10220,7 @@
       "pts": 25.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "CIN",
      "tier": null,
@@ -9846,6 +10288,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9866,7 +10312,7 @@
       "pts": 10.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "SEA",
      "tier": null,
@@ -9939,6 +10385,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -9957,7 +10407,7 @@
       "pts": 17.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "ATL",
      "tier": null,
@@ -10015,6 +10465,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -10033,7 +10487,7 @@
       "pts": 3.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "MIN",
      "tier": null,
@@ -10096,6 +10550,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -10114,7 +10572,7 @@
       "pts": 6.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "NYJ",
      "tier": null,
@@ -10177,6 +10635,10 @@
        {
         "missing": "first read this week after his game started",
         "source": "ESPN"
+       },
+       {
+        "missing": "first read this week after his game started",
+        "source": "FantasyPros"
        }
       ]
      },
@@ -10195,7 +10657,7 @@
       "pts": 18.0,
       "state": "final"
      },
-     "sigma": 1.0,
+     "sigma": 1.07,
      "slot": "LB",
      "team": "DAL",
      "tier": null,
@@ -10208,7 +10670,7 @@
    "tier_count": 5,
    "tiers": [
     {
-     "anchor_mu": 15.13,
+     "anchor_mu": 14.22,
      "players": [
       {
        "also": [],
@@ -10217,7 +10679,7 @@
         "badge": "UPGRADE",
         "drop": "8280",
         "over": "8280",
-        "p": 0.649,
+        "p": 0.606,
         "reference": true,
         "why": [
          "starter_locked",
@@ -10226,13 +10688,13 @@
        },
        "breakdown": {
         "est": true,
-        "mu": 15.13,
+        "mu": 14.22,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 14.81,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -10287,7 +10749,7 @@
           "kind": "projection",
           "late": false,
           "pts": 15.45,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -10332,6 +10794,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 12.85,
+          "rank": 19,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -10340,14 +10814,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 15.45,
-       "min": 14.81,
+       "min": 12.85,
        "mine": false,
-       "mu": 15.13,
-       "n": 2,
+       "mu": 14.22,
+       "n": 3,
        "name": "Nate Landman",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.84,
+       "sigma": 1.11,
        "slot": "LB",
        "team": "LAR",
        "tier": 1,
@@ -10355,27 +10829,16 @@
       },
       {
        "also": [],
-       "badge": {
-        "action": "add_drop",
-        "badge": "UPGRADE",
-        "drop": "8280",
-        "over": "8280",
-        "p": 0.642,
-        "reference": true,
-        "why": [
-         "starter_locked",
-         "drop_locked"
-        ]
-       },
+       "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 14.98,
+        "mu": 14.02,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 14.41,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -10425,7 +10888,7 @@
           "kind": "projection",
           "late": false,
           "pts": 15.56,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -10465,6 +10928,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 12.58,
+          "rank": 23,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -10473,14 +10948,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 15.56,
-       "min": 14.41,
+       "min": 12.58,
        "mine": false,
-       "mu": 14.98,
-       "n": 2,
+       "mu": 14.02,
+       "n": 3,
        "name": "Terrel Bernard",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.88,
+       "sigma": 1.17,
        "slot": "LB",
        "team": "BUF",
        "tier": 1,
@@ -10490,8 +10965,127 @@
      "tier": 1
     },
     {
-     "anchor_mu": 10.61,
+     "anchor_mu": 10.1,
      "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 10.1,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.86,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.95,
+            false
+           ],
+           [
+            "ast",
+            2.06,
+            false
+           ],
+           [
+            "TFL",
+            0.12,
+            false
+           ],
+           [
+            "QB hit",
+            0.12,
+            false
+           ],
+           [
+            "PD",
+            0.06,
+            false
+           ],
+           [
+            "FF",
+            0.06,
+            false
+           ],
+           [
+            "FR",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.35,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "solo",
+            3.39,
+            false
+           ],
+           [
+            "ast",
+            2.69,
+            false
+           ],
+           [
+            "TFL",
+            0.4,
+            true
+           ],
+           [
+            "QB hit",
+            0.11,
+            true
+           ],
+           [
+            "PD",
+            0.14,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 10.1,
+          "rank": 56,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "flags": [],
+       "id": "10923",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "late": false,
+       "max": 11.35,
+       "min": 8.86,
+       "mine": false,
+       "mu": 10.1,
+       "n": 3,
+       "name": "Dorian Williams",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 1.02,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
       {
        "also": [
         "DL"
@@ -10499,13 +11093,13 @@
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 10.61,
+        "mu": 9.77,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 10.21,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -10555,7 +11149,7 @@
           "kind": "projection",
           "late": false,
           "pts": 11.01,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -10600,6 +11194,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 8.52,
+          "rank": 70,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -10608,121 +11214,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 11.01,
-       "min": 10.21,
+       "min": 8.52,
        "mine": false,
-       "mu": 10.61,
-       "n": 2,
+       "mu": 9.77,
+       "n": 3,
        "name": "Bradley Chubb",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.85,
-       "slot": "LB",
-       "team": "BUF",
-       "tier": 2,
-       "unavailable": []
-      },
-      {
-       "also": [],
-       "badge": null,
-       "breakdown": {
-        "est": true,
-        "mu": 10.11,
-        "parts": [
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 8.86,
-          "share": 0.5,
-          "source": "Sleeper",
-          "stats": [
-           [
-            "solo",
-            2.95,
-            false
-           ],
-           [
-            "ast",
-            2.06,
-            false
-           ],
-           [
-            "TFL",
-            0.12,
-            false
-           ],
-           [
-            "QB hit",
-            0.12,
-            false
-           ],
-           [
-            "PD",
-            0.06,
-            false
-           ],
-           [
-            "FF",
-            0.06,
-            false
-           ],
-           [
-            "FR",
-            0.06,
-            false
-           ]
-          ],
-          "zero": false
-         },
-         {
-          "kind": "projection",
-          "late": false,
-          "pts": 11.35,
-          "share": 0.5,
-          "source": "ESPN",
-          "stats": [
-           [
-            "solo",
-            3.39,
-            false
-           ],
-           [
-            "ast",
-            2.69,
-            false
-           ],
-           [
-            "TFL",
-            0.4,
-            true
-           ],
-           [
-            "QB hit",
-            0.11,
-            true
-           ],
-           [
-            "PD",
-            0.14,
-            false
-           ]
-          ],
-          "zero": false
-         }
-        ]
-       },
-       "flags": [],
-       "id": "10923",
-       "kickoff": "2026-10-12T20:15:00-04:00",
-       "late": false,
-       "max": 11.35,
-       "min": 8.86,
-       "mine": false,
-       "mu": 10.11,
-       "n": 2,
-       "name": "Dorian Williams",
-       "opp": "@LAR",
-       "result": null,
-       "sigma": 1.09,
+       "sigma": 1.07,
        "slot": "LB",
        "team": "BUF",
        "tier": 2,
@@ -10732,20 +11231,20 @@
      "tier": 2
     },
     {
-     "anchor_mu": 8.1,
+     "anchor_mu": 8.53,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 8.1,
+        "mu": 8.53,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 7.61,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -10775,7 +11274,7 @@
           "kind": "projection",
           "late": false,
           "pts": 8.59,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -10815,6 +11314,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 9.17,
+          "rank": 66,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -10822,15 +11333,15 @@
        "id": "12140",
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
-       "max": 8.59,
+       "max": 9.17,
        "min": 7.61,
        "mine": false,
-       "mu": 8.1,
-       "n": 2,
+       "mu": 8.53,
+       "n": 3,
        "name": "Omar Speights",
        "opp": "BUF",
        "result": null,
-       "sigma": 0.86,
+       "sigma": 0.88,
        "slot": "LB",
        "team": "LAR",
        "tier": 3,
@@ -10840,20 +11351,20 @@
      "tier": 3
     },
     {
-     "anchor_mu": 3.76,
+     "anchor_mu": 3.22,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": true,
-        "mu": 3.76,
+        "mu": 3.22,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 4.21,
-          "share": 0.5,
+          "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
@@ -10898,7 +11409,7 @@
           "kind": "projection",
           "late": false,
           "pts": 3.31,
-          "share": 0.5,
+          "share": 0.3,
           "source": "ESPN",
           "stats": [
            [
@@ -10928,6 +11439,18 @@
            ]
           ],
           "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 2.42,
+          "rank": 135,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -10936,14 +11459,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 4.21,
-       "min": 3.31,
+       "min": 2.42,
        "mine": false,
-       "mu": 3.76,
-       "n": 2,
+       "mu": 3.22,
+       "n": 3,
        "name": "Kaleb Elarms-Orr",
        "opp": "@LAR",
        "result": null,
-       "sigma": 0.86,
+       "sigma": 0.92,
        "slot": "LB",
        "team": "BUF",
        "tier": 4,
@@ -10953,20 +11476,20 @@
      "tier": 4
     },
     {
-     "anchor_mu": 1.98,
+     "anchor_mu": 1.47,
      "players": [
       {
        "also": [],
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.98,
+        "mu": 1.47,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.98,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -10995,6 +11518,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 0.7,
+          "rank": 168,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -11003,14 +11538,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.98,
-       "min": 1.98,
+       "min": 0.7,
        "mine": false,
-       "mu": 1.98,
-       "n": 1,
+       "mu": 1.47,
+       "n": 2,
        "name": "Shaun Dolac",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.94,
        "slot": "LB",
        "team": "LAR",
        "tier": 5,
@@ -11021,13 +11556,13 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.98,
+        "mu": 1.47,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.98,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -11056,6 +11591,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 0.7,
+          "rank": 168,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -11064,14 +11611,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.98,
-       "min": 1.98,
+       "min": 0.7,
        "mine": false,
-       "mu": 1.98,
-       "n": 1,
+       "mu": 1.47,
+       "n": 2,
        "name": "Grant Stuard",
        "opp": "BUF",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.94,
        "slot": "LB",
        "team": "LAR",
        "tier": 5,
@@ -11082,13 +11629,13 @@
        "badge": null,
        "breakdown": {
         "est": false,
-        "mu": 1.41,
+        "mu": 1.13,
         "parts": [
          {
           "kind": "projection",
           "late": false,
           "pts": 1.41,
-          "share": 1.0,
+          "share": 0.6,
           "source": "Sleeper",
           "stats": [
            [
@@ -11117,6 +11664,18 @@
          {
           "missing": "no projection for him",
           "source": "ESPN"
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "LB",
+          "pts": 0.7,
+          "rank": 168,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
          }
         ]
        },
@@ -11125,14 +11684,14 @@
        "kickoff": "2026-10-12T20:15:00-04:00",
        "late": false,
        "max": 1.41,
-       "min": 1.41,
+       "min": 0.7,
        "mine": false,
-       "mu": 1.41,
-       "n": 1,
+       "mu": 1.13,
+       "n": 2,
        "name": "Joe Andreessen",
        "opp": "@LAR",
        "result": null,
-       "sigma": 1.0,
+       "sigma": 0.9,
        "slot": "LB",
        "team": "BUF",
        "tier": 5,
@@ -11153,10 +11712,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T10:54:12-04:00",
+   "fetched_at": "2026-10-12T15:05:20-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-12T10:54:12-04:00",
+   "last_success": "2026-10-12T15:05:20-04:00",
    "match": {
     "names": [
      "Jeremiah Moon CAR DL",
@@ -11167,12 +11726,12 @@
     "unmatched": 3
    },
    "merge": {
-    "added": 37,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 509,
-    "unchanged": 0,
+    "unchanged": 37,
     "updated": 0
    },
    "no_projection": 689,
@@ -11184,12 +11743,64 @@
    "week": 5,
    "zero_filled": 5
   },
+  "fp_dst": {
+   "error": null,
+   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "kind": "signal",
+   "label": "FantasyPros D/ST",
+   "last_success": "2026-10-12T15:05:20-04:00",
+   "merge": {
+    "added": 2,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 28,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 0,
+   "rows": 30,
+   "rows_used": 2,
+   "signal": true,
+   "status": "ok",
+   "week": 5
+  },
+  "fp_ecr": {
+   "censored": 12,
+   "error": null,
+   "fetched_at": "2026-10-12T15:05:20-04:00",
+   "kind": "rank",
+   "label": "FantasyPros",
+   "last_success": "2026-10-12T15:05:20-04:00",
+   "mapped": 34,
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 34,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 438,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 0,
+   "observed_after": "2026-10-12T15:05:20-04:00",
+   "published_at": "2026-10-11T16:59:42+00:00",
+   "rows": 472,
+   "rows_used": 34,
+   "status": "ok",
+   "week": 5
+  },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T10:54:12-04:00",
+   "fetched_at": "2026-10-12T15:05:20-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-12T10:54:12-04:00",
+   "last_success": "2026-10-12T15:05:20-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,

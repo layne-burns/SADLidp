@@ -717,7 +717,7 @@
    "home": "DEN",
    "kickoff": "2026-10-15T20:15:00-04:00",
    "spread_line": -3.0,
-   "total_line": 41.5,
+   "total_line": 40.5,
    "week": 6
   },
   {
@@ -726,7 +726,7 @@
    "home": "JAX",
    "kickoff": "2026-10-18T09:30:00-04:00",
    "spread_line": 3.0,
-   "total_line": 43.5,
+   "total_line": 42.5,
    "week": 6
   },
   {
@@ -762,7 +762,7 @@
    "home": "NE",
    "kickoff": "2026-10-18T13:00:00-04:00",
    "spread_line": 7.0,
-   "total_line": 44.5,
+   "total_line": 43.5,
    "week": 6
   },
   {
@@ -815,7 +815,7 @@
    "game_id": "2026_06_BUF_LV",
    "home": "LV",
    "kickoff": "2026-10-18T16:25:00-04:00",
-   "spread_line": -6.0,
+   "spread_line": -5.5,
    "total_line": 52.5,
    "week": 6
   },

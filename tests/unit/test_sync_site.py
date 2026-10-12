@@ -225,3 +225,75 @@ def test_cli_sync_build_and_leakcheck(tmp_path, monkeypatch, capsys):
     assert cli.main(["build", "--data-dir", data, "--site-dir", site]) == 0
     assert cli.main(["leakcheck", data, site]) == 0
     assert "0 hits" in capsys.readouterr().out
+
+
+TNF = datetime(2026, 10, 9, 1, 0, tzinfo=UTC)  # Thu Oct 8, 9 PM ET: TB @ DAL has kicked off
+
+
+def _with_waiver_db(r, solo):
+    """A strong unrostered Sunday DB (NYJ) to compare against Tykee Smith (TB, plays Thursday)."""
+    players, proj = r[f"{V1}/players/nfl"], r[f"{API}/projections/nfl/2026/5"]
+    players["zdb"] = {"full_name": "Sunday Safety", "position": "S", "fantasy_positions": ["DB"], "team": "NYJ",
+                      "status": "Active", "active": True, "injury_status": None}  # fmt: skip
+    row = copy.deepcopy(next(x for x in proj if x["player_id"] == "11017"))
+    row.update(player_id="zdb", team="NYJ", opponent="CLE")
+    row["stats"] = {"gp": 1.0, "idp_tkl_solo": solo, "idp_tkl_ast": 2.0, "idp_tkl": solo + 2.0}
+    proj.append(row)
+    return r
+
+
+def test_frozen_record_and_locked_suggestions_after_kickoff(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, force=True, client=FakeClient(_with_waiver_db(routes(), 9.0)), log=lambda m: None)
+    frozen = json.loads((data / "2026" / "week05" / "frozen.json").read_text())["players"]
+    tykee_before = frozen["11705"]
+    # Thursday night: Sleeper now projects everyone differently; TB/DAL players are locked
+    later = _with_waiver_db(routes(), 9.5)
+    for row in later[f"{API}/projections/nfl/2026/5"]:
+        row["stats"] = {k: (v * 2 if k.startswith("idp_") else v) for k, v in row["stats"].items()}
+    run_sync(CFG, data, cache, TNF, force=True, client=FakeClient(later), log=lambda m: None)
+    frozen = json.loads((data / "2026" / "week05" / "frozen.json").read_text())["players"]
+    assert frozen["11705"] == tykee_before  # frozen at his kickoff
+    assert frozen["zdb"]["mu"] != tykee_before["mu"] and frozen["zdb"]["fetched_at"] == TNF.isoformat()
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    db = d["my_idps"]["DB"]
+    tykee = next(p for p in db["players"] if p["id"] == "11705")
+    assert tykee["mu"] == round(tykee_before["mu"], 2) and "locked" in tykee["unavailable"]
+    assert db["starter_locked"]  # no lineup known, and S (Tykee) is locked
+    start = next(s for s in db["suggestions"] if s["badge"] == "START")
+    assert start["player"]["id"] == "zdb" and start["over"] == "11705" and start["reference"]
+    html = build_site(data, tmp_path / "site").read_text()
+    assert "START · ref" in html and "For reference: your DB starter&#39;s game has started" in html
+
+
+def test_decision_logs(tmp_path):
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # pre-waiver window
+    week = data / "2026" / "week05"
+    badges = json.loads((week / "badges.json").read_text())["badges"]
+    anz = badges["4118|START"]
+    assert anz["active"] and anz["first_p"] == anz["p"] and anz["reference"] is False
+    assert anz["lock_at"] == "2026-10-08T20:15:00-04:00"  # TB @ DAL kicks off before his LB comparison
+    tiers = json.loads((week / "tiers_log.json").read_text())
+    assert tiers["prewaiver"]["players"]["4118"]["tier"] == 1
+    assert tiers["last_pre_kickoff"]["4118"]["slot"] == "LB"
+    # after TNF kickoff the badge and the TB player's tier row are frozen
+    run_sync(CFG, data, tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
+    assert json.loads((week / "badges.json").read_text())["badges"]["4118|START"] == anz
+    assert (
+        json.loads((week / "tiers_log.json").read_text())["last_pre_kickoff"]["4118"]
+        == tiers["last_pre_kickoff"]["4118"]
+    )
+
+
+def test_a_raising_adapter_never_fails_the_sync(tmp_path, monkeypatch):
+    from sadlidp.sources import sleeper_proj
+
+    def boom(*a, **k):
+        raise RuntimeError("parser exploded")
+
+    monkeypatch.setattr(sleeper_proj, "fetch", boom)
+    out = run_sync(
+        CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None
+    )
+    assert out.synced and any(w.startswith("sleeper_proj: failed (RuntimeError in fetch)") for w in out.warnings)

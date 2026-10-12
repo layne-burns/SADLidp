@@ -100,8 +100,48 @@ def test_panel_under_limit_and_unavailable_other():
     assert out["other"] is None and out["badges"]["w1"]["action"] == "choose_drop"
 
 
-def test_panel_empty_slot_and_locked_starter():
+def test_panel_empty_slot():
     empty = _panel({"players": []})
     assert empty["starter"] is None and empty["badges"]["w3"]["badge"] == "START"  # μ_S = 0, σ_S = 0
-    locked = _panel({"players": ["s", "o"]}, statuses=_statuses(s=PlayerStatus(reasons=["locked"])), lineup={"LB": "s"})
-    assert locked["starter_locked"] and not any(b["badge"] == "START" for b in locked["badges"].values())
+    assert empty["badges"]["w3"]["reference"] is False
+
+
+LOCKED = PlayerStatus(reasons=["locked"])
+
+
+def test_locked_starter_still_anchors_and_start_is_reference():
+    # D15 amended: S's game started; he keeps his μ (10) as the comparison and START is shown for reference
+    lb = _panel({"players": ["s", "o"]}, statuses=_statuses(s=LOCKED), lineup={"LB": "s"})
+    assert lb["starter_locked"] and (lb["starter"], lb["other"]) == ("s", "o")
+    start = lb["badges"]["w1"]
+    assert (
+        start["badge"] == "START" and start["over"] == "s" and start["reference"] and start["why"] == ["starter_locked"]
+    )
+    up = lb["badges"]["w2"]  # B (o) is unlocked: dropping him is still possible this week
+    assert up["badge"] == "UPGRADE" and up["reference"] is False and up["why"] == []
+
+
+def test_locked_drop_target_makes_suggestions_reference():
+    lb = _panel({"players": ["s", "o"]}, statuses=_statuses(o=LOCKED), lineup={"LB": "s"})
+    assert lb["badges"]["w1"]["badge"] == "START" and lb["badges"]["w1"]["why"] == ["drop_locked"]
+    assert lb["badges"]["w2"]["badge"] == "UPGRADE" and lb["badges"]["w2"]["why"] == ["drop_locked"]
+    both = _panel({"players": ["s", "o"]}, statuses=_statuses(s=LOCKED, o=LOCKED), lineup={"LB": "s"})
+    assert both["badges"]["w1"]["why"] == ["starter_locked", "drop_locked"]
+
+
+def test_unknown_lineup_uses_s_and_unavailable_players_stay_out():
+    lb = _panel({"players": ["s", "o"]}, statuses=_statuses(s=LOCKED))  # no matchup lineup known
+    assert lb["starter_locked"] and lb["badges"]["w1"]["reference"]
+    # locked *and* ruled out at kickoff: not comparable, so the slot falls to o
+    out = _panel({"players": ["s", "o"]}, statuses=_statuses(s=PlayerStatus(reasons=["Out", "locked"])))
+    assert out["starter"] == "o" and out["other"] is None
+    # choose_drop: the only other player is locked, so you can't make the drop this week
+    bye_locked = _panel({"players": ["s", "o"]}, statuses=_statuses(o=PlayerStatus(reasons=["Out", "locked"])))
+    assert bye_locked["badges"]["w1"]["action"] == "choose_drop" and bye_locked["badges"]["w1"]["why"] == [
+        "drop_locked"
+    ]
+
+
+def test_everything_unlocked_is_actionable():
+    lb = _panel({"players": ["s", "o"]}, lineup={"LB": "s"})
+    assert not lb["starter_locked"] and not any(b["reference"] for b in lb["badges"].values())

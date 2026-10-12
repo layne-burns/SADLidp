@@ -8,13 +8,13 @@
 :root {
   --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
   --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
-  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
     --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
-    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
   }
 }
 * { box-sizing: border-box; }
@@ -43,6 +43,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
 .chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
 .sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
 .tabs > input { position: absolute; opacity: 0; pointer-events: none; }
 .tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
   border: 1px solid var(--line); background: var(--card); font-weight: 600; }
@@ -66,6 +69,7 @@ a { color: var(--accent); }
 {% for f in p.flags if f != 'Q' %}<span class="tag q">{{ f }}</span>{% endfor %}
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
+{%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
 {%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% else %}<small>no projection</small>{% endif %}{%- endmacro %}
 <header>
   <h1>SADL IDP streamer</h1>
@@ -91,13 +95,14 @@ a { color: var(--accent); }
         </li>
         {% else %}<li class="row"><span class="sub">No {{ slot }} rostered</span></li>{% endfor %}
       </ul>
-      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so there are no START suggestions.</p>{% endif %}
+      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so START suggestions are for reference.</p>{% endif %}
       {% for s in m.suggestions %}
-      <div class="sugg">
-        <span class="chip {{ s.badge|lower }}">{{ s.badge }}</span>
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s) }}
         <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
         · {{ '%.1f'|format(s.player.mu) }} pts{% if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}{% else %}; you have no playable {{ slot }} this week{% endif %}.
         <div class="sub">{{ action(s, m.names) }}</div>
+        {% if s.reference %}<div class="why">For reference: {{ why(s, m.names, slot) }}.</div>{% endif %}
       </div>
       {% endfor %}
     </div>
@@ -117,7 +122,7 @@ a { color: var(--accent); }
             {% for p in t.players %}
             <li class="row">
               <div><span class="name">{{ p.name }}</span>
-                {% if p.badge %}<span class="chip {{ p.badge.badge|lower }}">{{ p.badge.badge }}</span>{% endif %}
+                {% if p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
                 <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
               <div class="pts">{{ pts(p) }}</div>

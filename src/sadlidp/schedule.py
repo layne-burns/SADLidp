@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 ET = ZoneInfo("America/New_York")
-NFLVERSE_GAMES = "https://github.com/nflverse/nfldata/raw/master/data/games.csv"
+NFLVERSE_GAMES = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 
 
 @dataclass(frozen=True)

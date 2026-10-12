@@ -6,13 +6,14 @@ source keeps its earlier rows (marked stale), and the page says so.
 
 from __future__ import annotations
 
+import traceback
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from . import gate as gatemod
-from . import scoring, storage
+from . import scoring, storage, weeklog
 from .config import load_alias
 from .consensus import consensus
 from .net import Client
@@ -23,6 +24,7 @@ from .schedule import ET, NFLVERSE_GAMES, Schedule
 from .sigma import within_player_sd
 from .sleeper import Sleeper, my_roster, position_limits, resolve_league, season_of
 from .sources import sleeper_proj
+from .sources.base import AdapterResult
 from .tiers import build_tiers, place
 
 SLIM_FIELDS = (
@@ -40,6 +42,16 @@ class SyncOutcome:
     week: int | None = None
     window: str | None = None
     warnings: list[str] = field(default_factory=list)
+
+
+def _guard(label: str, fn: Callable, default, warnings: list[str], log: Callable[[str], None]):
+    """Run one non-core step; a failure becomes a warning, never a failed sync (SPEC §7)."""
+    try:
+        return fn()
+    except Exception as e:  # isolation by design: the traceback goes to the job log only
+        warnings.append(f"{label} failed ({type(e).__name__}); skipped this sync")
+        log(traceback.format_exc())
+        return default
 
 
 def fetch_schedule(client: Client, cfg: dict, season: int, data_dir: Path) -> tuple[Schedule, str]:
@@ -125,6 +137,40 @@ def zero_fill(source: dict, valued: dict, idp: dict, status_of: Callable[[str], 
         if st.kickoff is not None and not st.locked:
             out[pid] = 0.0
     return out
+
+
+def write_week_logs(
+    wdir: Path,
+    my_panel: dict,
+    tiers_by_slot: dict,
+    cons: dict,
+    sigma_out: dict,
+    kickoff_of: Callable[[str], datetime | None],
+    now: datetime,
+    prewaiver: bool,
+) -> None:
+    """badges.json and tiers_log.json for later evaluation (weeklog.py)."""
+    current = {}
+    for slot in IDP_SLOTS:
+        for w, b in my_panel[slot]["badges"].items():
+            kicks = [k for k in (kickoff_of(w), kickoff_of(b["over"]) if b["over"] else None) if k]
+            current[f"{w}|{b['badge']}"] = {
+                "slot": slot, "w": w, "badge": b["badge"], "over": b["over"], "p": b["p"], "action": b["action"],
+                "drop": b["drop"], "reference": b["reference"], "why": b["why"], "mu_w": round(cons[w]["mu"], 3),
+                "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
+                "lock_at": min(kicks).isoformat() if kicks else None,
+            }  # fmt: skip
+    path = wdir / "badges.json"
+    badges = weeklog.update_badge_log((storage.read_json(path) or {}).get("badges", {}), current, now)
+    storage.write_json(path, {"schema_version": 1, "badges": badges})
+    rows = {
+        pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3)}
+        for slot in IDP_SLOTS
+        for t in tiers_by_slot[slot]
+        for pid in t["players"]
+    }
+    path = wdir / "tiers_log.json"
+    storage.write_json(path, weeklog.update_tiers_log(storage.read_json(path) or {}, rows, now, kickoff_of, prewaiver))
 
 
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
@@ -215,6 +261,10 @@ def run_sync(
     def kickoff_of(pid: str) -> datetime | None:
         return status_of(pid).kickoff
 
+    # actuals first, so this sync's imputation and logs see last week's stats (SPEC §6.5)
+    actuals = _guard("actuals refresh", lambda: refresh_actuals(sleeper, data_dir, season, sched, now, players), [],
+                     warnings, log)  # fmt: skip
+
     # sources -> frozen snapshots
     wdir = storage.week_dir(data_dir, season, week)
     run = {
@@ -233,7 +283,12 @@ def run_sync(
             continue
         path = wdir / "sources" / f"{name}.json"
         existing = storage.load_source(path)
-        res = module.fetch(sleeper, season, week, now)
+        try:
+            res = module.fetch(sleeper, season, week, now)
+        except Exception as e:  # a broken adapter is a failed source, never a failed sync (SPEC §7)
+            log(traceback.format_exc())
+            res = AdapterResult(name=name, kind=kind, status="failed", week=week, fetched_at=now.isoformat(),
+                                error=f"{type(e).__name__} in fetch")  # fmt: skip
         info = res.summary()
         if res.ok:
             merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of)
@@ -268,6 +323,26 @@ def run_sync(
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
 
+    # frozen week record: each player's values at his last sync before kickoff (SPEC §6.5, D15). A locked
+    # player keeps exactly what he showed, whatever happens to other players or sources afterwards.
+    frozen_path = wdir / "frozen.json"
+    records = {
+        pid: {
+            "mu": round(c["mu"], 4),
+            "sigma": round(c["sigma"], 4),
+            "min": c["min"],
+            "max": c["max"],
+            "n_sources": c["n_sources"],
+            "reasons": list(status_of(pid).reasons),
+            "flags": list(status_of(pid).flags),
+        }
+        for pid, c in cons.items()
+    }
+    frozen, _ = storage.merge_rows((storage.read_json(frozen_path) or {}).get("players", {}), records, now, kickoff_of)
+    for pid, rec in frozen.items():
+        if status_of(pid).locked:
+            cons[pid] = {k: rec[k] for k in ("mu", "sigma", "min", "max", "n_sources")}
+
     # waiver pool and tiers
     rostered = rostered_ids(rosters)
     z = float((cfg.get("tiers") or {}).get("z", 1.0))
@@ -288,14 +363,22 @@ def run_sync(
     unset = [slot for slot in IDP_SLOTS if not settings.get(f"position_limit_{slot.lower()}")]
     if unset:
         warnings.append(f"league has no position limit for {', '.join(unset)}; assuming the config fallback")
-    sigma_out = sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings)
-    matchups, _ = sleeper.matchups(league["league_id"], week)
+    sigma_fallback = {s: float((cfg.get("sigma_out") or {}).get(s, 5.0)) for s in IDP_SLOTS}
+    sigma_out = _guard("σ_out estimate", lambda: sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings),
+                       sigma_fallback, warnings, log)  # fmt: skip
+    matchups = _guard("matchups", lambda: sleeper.matchups(league["league_id"], week)[0], None, warnings, log)
     my_matchup = next((m for m in (matchups or []) if me and m.get("roster_id") == me.get("roster_id")), {})
     lineup = starter_slots(league.get("roster_positions") or [], my_matchup.get("starters"))
+    # a locked rostered player is judged on his status at kickoff (a later injury tag can't empty the slot)
+    panel_status: dict[str, PlayerStatus] = {}
     for pid in (me or {}).get("players") or []:
-        status_of(pid)
+        st, rec = status_of(pid), frozen.get(pid)
+        panel_status[pid] = st
+        if st.locked and rec is not None:
+            reasons = [*rec.get("reasons", []), "locked"]
+            panel_status[pid] = PlayerStatus(reasons, list(rec.get("flags", [])), st.kickoff, st.opponent)
     threshold = float((cfg.get("swap") or {}).get("threshold", 0.6))
-    my_panel = panel(me or {}, players, cons, statuses, waiver_order, limits, sigma_out, threshold, lineup)
+    my_panel = panel(me or {}, players, cons, panel_status, waiver_order, limits, sigma_out, threshold, lineup)
 
     # site data: only μ, σ, range, n, position, tier and flags (SPEC §6.4) -- never per-source values
     depth = int((cfg.get("display") or {}).get("depth", 25))
@@ -336,7 +419,9 @@ def run_sync(
             cards.append(card)
         suggestions = [
             {**b, "player": _player_card(w, idp[w], cons[w], status_of(w), None, None, False)}
-            for w, b in sorted(pnl["badges"].items(), key=lambda kv: (-cons[kv[0]]["mu"], kv[0]))[:5]
+            for w, b in sorted(pnl["badges"].items(), key=lambda kv: (kv[1]["reference"], -cons[kv[0]]["mu"], kv[0]))[
+                :5
+            ]
         ]
         my_out[slot] = {
             "players": cards,
@@ -347,8 +432,8 @@ def run_sync(
             "names": {pid: player_name(players.get(pid, {})) for pid in pnl["players"]},
         }
 
-    backfilled = backfill_projections(sleeper, data_dir, season, week, now)
-    actuals = refresh_actuals(sleeper, data_dir, season, sched, now, players)
+    backfilled = _guard("backfill", lambda: backfill_projections(sleeper, data_dir, season, week, now), [], warnings,
+                        log)  # fmt: skip
     if backfilled:
         log(f"sync: backfilled Sleeper projections for weeks {backfilled}")  # a note, not a page banner
 
@@ -374,6 +459,10 @@ def run_sync(
         "warnings": warnings,
     }
     storage.write_json(wdir / "consensus.json", site_data)
+    storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})
+    _guard("decision logs", lambda: write_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of, now,
+                                                    prewaiver=bool(window and window.kind == "pre-waiver")),
+           None, warnings, log)  # fmt: skip
     storage.write_json(wdir / "run.json", run)
     storage.write_json(wdir / "rosters.json", rosters)
     storage.write_json(

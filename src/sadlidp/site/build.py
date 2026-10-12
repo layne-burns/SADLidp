@@ -49,6 +49,17 @@ def _action(badge: dict, names: dict) -> str:
     return ACTION_TEXT.get(badge.get("action"), "").format(drop=names.get(badge.get("drop"), "your weaker player"))
 
 
+def _why(badge: dict, names: dict, slot: str) -> str:
+    """Why a suggestion can't be acted on this week (D15 amended)."""
+    reasons = []
+    if "starter_locked" in (badge.get("why") or []):
+        reasons.append(f"your {slot} starter's game has started, so the swap can't be made this week")
+    if "drop_locked" in (badge.get("why") or []):
+        who = names.get(badge.get("drop")) if badge.get("drop") else f"your other {slot}"
+        reasons.append(f"{who}'s game has started, so the drop can't be made this week")
+    return "; ".join(reasons)
+
+
 def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site") -> Path:
     wdir = latest_week_dir(data_dir)
     if wdir is None:
@@ -56,7 +67,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site") -> 
     data = json.loads((wdir / "consensus.json").read_text())
     env = Environment(loader=PackageLoader("sadlidp.site", "templates"), autoescape=True)  # names come from Sleeper
     env.filters.update(et=_et, tier=_tier_label)
-    env.globals.update(action=_action)
+    env.globals.update(action=_action, why=_why)
     html = env.get_template("index.html.j2").render(d=data, slots=("DL", "LB", "DB"))
     site = Path(site_dir)
     if site.exists():

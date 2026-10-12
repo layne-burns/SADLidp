@@ -16,7 +16,7 @@ from . import backfill as backfillmod
 from . import crosswalk as crosswalkmod
 from . import form as formmod
 from . import gate as gatemod
-from . import scoring, storage, weeklog
+from . import scoring, storage, swing, weeklog
 from .backfill import imputer_for, source_cfg
 from .config import load_alias
 from .consensus import consensus
@@ -229,6 +229,7 @@ def build_week_logs(
                 "slot": slot, "w": w, "badge": b["badge"], "over": b["over"], "p": b["p"], "action": b["action"],
                 "drop": b["drop"], "reference": b["reference"], "why": b["why"], "mu_w": round(cons[w]["mu"], 3),
                 "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
+                "swing_w": cons[w].get("swing"), "swing_over": cons[b["over"]].get("swing") if b["over"] else None,
                 "lock_at": min(kicks).isoformat() if kicks else None,
             }  # fmt: skip
     prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
@@ -415,6 +416,9 @@ def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool
         "badge": badge,
         "mine": mine,
         "late": bool(cons_row and cons_row.get("late")),
+        "swing": cons_row.get("swing") if cons_row else None,  # his game-to-game swing and 1-in-5 band (§6.7)
+        "floor": cons_row.get("floor") if cons_row else None,
+        "ceiling": cons_row.get("ceiling") if cons_row else None,
         "result": None,
     }
 
@@ -644,6 +648,9 @@ def run_sync(
     coef = formmod.coefficients(cfg)
     if coef:  # the form term (SPEC §6.4): his earlier misses this season and his last game's snap share
         run["form"] = {**coef, **formmod.apply(cons, slots, formmod.history(data_dir, season, week, sc), coef)}
+    swing_coef = swing.coefficients(cfg)
+    if swing_coef:  # per-player game-to-game swing from his projected stat mix (SPEC §6.7)
+        run["swing"] = {**swing_coef, **swing.apply(cons, slots, source_rows, groups, sc, swing_coef)}
     late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
     for pid in late & cons.keys():
         cons[pid]["late"] = True  # projection first captured after his kickoff (SPEC §6.5)
@@ -656,6 +663,7 @@ def run_sync(
             "mu": round(c["mu"], 4),
             "base": round(c.get("base", c["mu"]), 4),  # the consensus before the form term
             **({"form": c["form"]} if c.get("form") else {}),
+            **{k: c[k] for k in ("swing", "floor", "ceiling") if k in c},  # his game-to-game swing (§6.7)
             "sigma": round(c["sigma"], 4),
             "min": c["min"],
             "max": c["max"],
@@ -673,7 +681,7 @@ def run_sync(
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
             cons[pid] = {k: rec.get(k) for k in ("mu", "base", "form", "sigma", "min", "max", "n_sources", "eff",
-                                                 "parts", "ranks")}  # fmt: skip
+                                                 "parts", "ranks", "swing", "floor", "ceiling")}  # fmt: skip
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)
@@ -864,6 +872,7 @@ def run_sync(
         "my_idps": my_out,
         "last_week": recap,
         "sigma_out": sigma_out,
+        "swing": swing_coef,  # the per-player swing settings in force, or null (§6.7)
         "sources": {name: footer_info(info) for name, info in run["sources"].items()},
         "warnings": warnings,
     }

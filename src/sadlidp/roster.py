@@ -4,7 +4,8 @@ Per position: S = your comparable player with the highest μ, B = your other com
 player is comparable if he isn't on IR, has a μ, and nothing but `locked` keeps him off the field (a
 locked player is compared on his frozen pre-kickoff μ and status). A waiver player W gets START when
 P(W outscores S) ≥ threshold, and UPGRADE (only when B exists and W lacks START) when P(W outscores B)
-≥ threshold. Outcome probabilities use predictive σ² = σ_μ² + σ_out². IR (`reserve`) players are shown
+≥ threshold. Outcome probabilities use predictive σ² = σ_μ² + swing², his own game-to-game swing from his
+projected stat mix (swing.py, SPEC §6.7) or the position's σ_out when he has none. IR (`reserve`) players are shown
 but never comparable and don't count toward the limit (Phase 1); taxi does.
 
 A suggestion that can't pay off this week is still shown, flagged `reference` with its reasons:
@@ -64,7 +65,8 @@ def panel(
         so = float(sigma_out.get(slot) or 0.0)
 
         def sp(pid: str, so: float = so) -> float:
-            return math.sqrt(cons[pid]["sigma"] ** 2 + so * so)
+            out = float(cons[pid].get("swing") or so)
+            return math.sqrt(cons[pid]["sigma"] ** 2 + out * out)
 
         def locked(pid: str | None) -> bool:
             return bool(pid and pid in statuses and statuses[pid].locked)

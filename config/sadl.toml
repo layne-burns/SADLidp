@@ -27,7 +27,22 @@ DB = 0.75
 [swap]
 threshold = 0.6             # START/UPGRADE badge probability (SPEC §6.7)
 
-[sigma_out]                 # per-position weekly outcome SD fallback if last season can't be read
+[swing]                     # per-player game-to-game swing for START/UPGRADE odds and each card's floor–ceiling (SPEC §6.7)
+enabled = true
+lo = -0.8                   # floor = μ + lo·swing, ceiling = μ + hi·swing: 1 game in 5 below, 1 in 5 above (2025 archive)
+hi = 0.75
+
+[swing.a]                   # swing² = a + b · Σ (points per stat)² × projected stat; fitted on 2025 (`sadlidp backtest run`)
+DL = 0.0
+LB = 18.0
+DB = 27.0
+
+[swing.b]
+DL = 2.5
+LB = 1.35
+DB = 0.65
+
+[sigma_out]                 # per-position weekly outcome SD: the fallback when a player has no projected stats
 method = "last_season"      # "residuals": this season's errors once 3 settled weeks exist (SPEC §6.7)
 DL = 5.0
 LB = 5.5

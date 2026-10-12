@@ -1,0 +1,45 @@
+{
+ "actuals_written": [
+  1,
+  2,
+  3,
+  4
+ ],
+ "backfilled": [
+  1,
+  2,
+  3,
+  4
+ ],
+ "generated_at": "2026-10-12T02:45:20-04:00",
+ "schedule": "nflverse",
+ "season": 2026,
+ "sleeper_week": {
+  "display_week": 5,
+  "week": 5
+ },
+ "sources": {
+  "sleeper_proj": {
+   "error": null,
+   "fetched_at": "2026-10-12T02:45:20-04:00",
+   "kind": "projection",
+   "last_success": "2026-10-12T02:45:20-04:00",
+   "merge": {
+    "added": 47,
+    "deleted": 0,
+    "frozen": 0,
+    "skipped_after_kickoff": 581,
+    "updated": 0
+   },
+   "no_projection": 3729,
+   "rows": 628,
+   "rows_used": 47,
+   "status": "ok",
+   "week": 5,
+   "zero_filled": 0
+  }
+ },
+ "warnings": [],
+ "week": 5,
+ "window": "forced"
+}

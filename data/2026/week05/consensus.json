@@ -1,0 +1,1106 @@
+{
+ "generated_at": "2026-10-12T02:45:20-04:00",
+ "league": {
+  "limits": {
+   "DB": 2,
+   "DL": 2,
+   "LB": 2
+  },
+  "name": "Slow Ass Draft League",
+  "waiver_type": "FAAB"
+ },
+ "my_idps": {
+  "DB": {
+   "count": 2,
+   "limit": 2,
+   "names": {
+    "11739": "Evan Williams",
+    "8323": "Jaquan Brisker"
+   },
+   "players": [
+    {
+     "also": [],
+     "badge": null,
+     "flags": [],
+     "id": "8323",
+     "kickoff": "2026-10-11T13:00:00-04:00",
+     "max": null,
+     "min": null,
+     "mine": true,
+     "mu": null,
+     "n": 0,
+     "name": "Jaquan Brisker",
+     "opp": "IND",
+     "reserve": false,
+     "role": null,
+     "sigma": null,
+     "slot": "DB",
+     "taxi": false,
+     "team": "PIT",
+     "tier": null,
+     "unavailable": [
+      "locked"
+     ]
+    },
+    {
+     "also": [],
+     "badge": null,
+     "flags": [],
+     "id": "11739",
+     "kickoff": "2026-10-11T13:00:00-04:00",
+     "max": null,
+     "min": null,
+     "mine": true,
+     "mu": null,
+     "n": 0,
+     "name": "Evan Williams",
+     "opp": "CHI",
+     "reserve": false,
+     "role": null,
+     "sigma": null,
+     "slot": "DB",
+     "taxi": false,
+     "team": "GB",
+     "tier": null,
+     "unavailable": [
+      "locked"
+     ]
+    }
+   ],
+   "starter_locked": true,
+   "suggestions": []
+  },
+  "DL": {
+   "count": 1,
+   "limit": 2,
+   "names": {
+    "7627": "Greg Rousseau"
+   },
+   "players": [
+    {
+     "also": [
+      "LB"
+     ],
+     "badge": null,
+     "flags": [],
+     "id": "7627",
+     "kickoff": "2026-10-12T20:15:00-04:00",
+     "max": 13.97,
+     "min": 13.97,
+     "mine": true,
+     "mu": 13.97,
+     "n": 1,
+     "name": "Greg Rousseau",
+     "opp": "@LAR",
+     "reserve": false,
+     "role": "starter",
+     "sigma": 1.0,
+     "slot": "DL",
+     "taxi": false,
+     "team": "BUF",
+     "tier": "above",
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": []
+  },
+  "LB": {
+   "count": 2,
+   "limit": 2,
+   "names": {
+    "4960": "Roquan Smith",
+    "8280": "Nik Bonitto"
+   },
+   "players": [
+    {
+     "also": [
+      "DL"
+     ],
+     "badge": null,
+     "flags": [],
+     "id": "8280",
+     "kickoff": "2026-10-11T16:05:00-04:00",
+     "max": null,
+     "min": null,
+     "mine": true,
+     "mu": null,
+     "n": 0,
+     "name": "Nik Bonitto",
+     "opp": "@LAC",
+     "reserve": false,
+     "role": null,
+     "sigma": null,
+     "slot": "LB",
+     "taxi": false,
+     "team": "DEN",
+     "tier": null,
+     "unavailable": [
+      "locked"
+     ]
+    },
+    {
+     "also": [],
+     "badge": null,
+     "flags": [],
+     "id": "4960",
+     "kickoff": "2026-10-11T20:20:00-04:00",
+     "max": null,
+     "min": null,
+     "mine": true,
+     "mu": null,
+     "n": 0,
+     "name": "Roquan Smith",
+     "opp": "@ATL",
+     "reserve": false,
+     "role": null,
+     "sigma": null,
+     "slot": "LB",
+     "taxi": false,
+     "team": "BAL",
+     "tier": null,
+     "unavailable": [
+      "locked"
+     ]
+    }
+   ],
+   "starter_locked": true,
+   "suggestions": []
+  }
+ },
+ "positions": {
+  "DB": {
+   "hidden": 0,
+   "no_projection": 12,
+   "tier_count": 6,
+   "tiers": [
+    {
+     "anchor_mu": 12.2,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11682",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 12.2,
+       "min": 12.2,
+       "mine": false,
+       "mu": 12.2,
+       "n": 1,
+       "name": "Cole Bishop",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 10.49,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "7136",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 10.49,
+       "min": 10.49,
+       "mine": false,
+       "mu": 10.49,
+       "n": 1,
+       "name": "Kam Curl",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "5893",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 9.5,
+       "min": 9.5,
+       "mine": false,
+       "mu": 9.5,
+       "n": 1,
+       "name": "C.J. Gardner-Johnson",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11726",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 9.48,
+       "min": 9.48,
+       "mine": false,
+       "mu": 9.48,
+       "n": 1,
+       "name": "Kamren Kinchens",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "8364",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 9.48,
+       "min": 9.48,
+       "mine": false,
+       "mu": 9.48,
+       "n": 1,
+       "name": "Trent McDuffie",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 8.53,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [
+        "Q"
+       ],
+       "id": "8104",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 8.53,
+       "min": 8.53,
+       "mine": false,
+       "mu": 8.53,
+       "n": 1,
+       "name": "Dee Alford",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "8487",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 8.28,
+       "min": 8.28,
+       "mine": false,
+       "mu": 8.28,
+       "n": 1,
+       "name": "Christian Benford",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 6.96,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "8373",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 6.96,
+       "min": 6.96,
+       "mine": false,
+       "mu": 6.96,
+       "n": 1,
+       "name": "Jaylen Watson",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 4,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12596",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 6.5,
+       "min": 6.5,
+       "mine": false,
+       "mu": 6.5,
+       "n": 1,
+       "name": "Maxwell Hairston",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 4,
+       "unavailable": []
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 3.9,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13511",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 3.9,
+       "min": 3.9,
+       "mine": false,
+       "mu": 3.9,
+       "n": 1,
+       "name": "Jalon Kilgore",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13454",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 3.73,
+       "min": 3.73,
+       "mine": false,
+       "mu": 3.73,
+       "n": 1,
+       "name": "Davison Igbinosun",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      }
+     ],
+     "tier": 5
+    },
+    {
+     "anchor_mu": 1.47,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "10882",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.47,
+       "min": 1.47,
+       "mine": false,
+       "mu": 1.47,
+       "n": 1,
+       "name": "Emmanuel Forbes",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 6,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12142",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.11,
+       "min": 1.11,
+       "mine": false,
+       "mu": 1.11,
+       "n": 1,
+       "name": "Jaylen McCollough",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 6,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13877",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.05,
+       "min": 1.05,
+       "mine": false,
+       "mu": 1.05,
+       "n": 1,
+       "name": "Maximus Pulley",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "LAR",
+       "tier": 6,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "7224",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 0.9,
+       "min": 0.9,
+       "mine": false,
+       "mu": 0.9,
+       "n": 1,
+       "name": "Sam Franklin",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 6,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "7787",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 0.9,
+       "min": 0.9,
+       "mine": false,
+       "mu": 0.9,
+       "n": 1,
+       "name": "Damar Hamlin",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DB",
+       "team": "BUF",
+       "tier": 6,
+       "unavailable": []
+      }
+     ],
+     "tier": 6
+    }
+   ]
+  },
+  "DL": {
+   "hidden": 0,
+   "no_projection": 7,
+   "tier_count": 5,
+   "tiers": [
+    {
+     "anchor_mu": 10.47,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "10916",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 10.47,
+       "min": 10.47,
+       "mine": false,
+       "mu": 10.47,
+       "n": 1,
+       "name": "Kobie Turner",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 7.63,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12652",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 7.63,
+       "min": 7.63,
+       "mine": false,
+       "mu": 7.63,
+       "n": 1,
+       "name": "Deone Walker",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "5226",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 7.4,
+       "min": 7.4,
+       "mine": false,
+       "mu": 7.4,
+       "n": 1,
+       "name": "Poona Ford",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 6.09,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11677",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 6.09,
+       "min": 6.09,
+       "mine": false,
+       "mu": 6.09,
+       "n": 1,
+       "name": "Braden Fiske",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [
+        "LB"
+       ],
+       "badge": null,
+       "flags": [],
+       "id": "7342",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 5.4,
+       "min": 5.4,
+       "mine": false,
+       "mu": 5.4,
+       "n": 1,
+       "name": "Michael Hoecht",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 3.33,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12612",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 3.33,
+       "min": 3.33,
+       "mine": false,
+       "mu": 3.33,
+       "n": 1,
+       "name": "T.J. Sanders",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 4,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12621",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 2.49,
+       "min": 2.49,
+       "mine": false,
+       "mu": 2.49,
+       "n": 1,
+       "name": "Josaiah Stewart",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 4,
+       "unavailable": []
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 1.62,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11021",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.62,
+       "min": 1.62,
+       "mine": false,
+       "mu": 1.62,
+       "n": 1,
+       "name": "Desjuan Johnson",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13808",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.62,
+       "min": 1.62,
+       "mine": false,
+       "mu": 1.62,
+       "n": 1,
+       "name": "Wesley Bailey",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11759",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.23,
+       "min": 1.23,
+       "mine": false,
+       "mu": 1.23,
+       "n": 1,
+       "name": "Javon Solomon",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [
+        "Q"
+       ],
+       "id": "12580",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.23,
+       "min": 1.23,
+       "mine": false,
+       "mu": 1.23,
+       "n": 1,
+       "name": "Landon Jackson",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13455",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.23,
+       "min": 1.23,
+       "mine": false,
+       "mu": 1.23,
+       "n": 1,
+       "name": "TJ Parker",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "6958",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.23,
+       "min": 1.23,
+       "mine": false,
+       "mu": 1.23,
+       "n": 1,
+       "name": "Mike Danna",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "11706",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 0.9,
+       "min": 0.9,
+       "mine": false,
+       "mu": 0.9,
+       "n": 1,
+       "name": "DeWayne Carter",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12676",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 0.57,
+       "min": 0.57,
+       "mine": false,
+       "mu": 0.57,
+       "n": 1,
+       "name": "Ty Hamilton",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "6887",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 0.57,
+       "min": 0.57,
+       "mine": false,
+       "mu": 0.57,
+       "n": 1,
+       "name": "Larrell Murchison",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "DL",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      }
+     ],
+     "tier": 5
+    }
+   ]
+  },
+  "LB": {
+   "hidden": 0,
+   "no_projection": 6,
+   "tier_count": 5,
+   "tiers": [
+    {
+     "anchor_mu": 14.81,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "8659",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 14.81,
+       "min": 14.81,
+       "mine": false,
+       "mu": 14.81,
+       "n": 1,
+       "name": "Nate Landman",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAR",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "8311",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 14.41,
+       "min": 14.41,
+       "mine": false,
+       "mu": 14.41,
+       "n": 1,
+       "name": "Terrel Bernard",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 10.21,
+     "players": [
+      {
+       "also": [
+        "DL"
+       ],
+       "badge": null,
+       "flags": [],
+       "id": "4967",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 10.21,
+       "min": 10.21,
+       "mine": false,
+       "mu": 10.21,
+       "n": 1,
+       "name": "Bradley Chubb",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "10923",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 8.86,
+       "min": 8.86,
+       "mine": false,
+       "mu": 8.86,
+       "n": 1,
+       "name": "Dorian Williams",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 7.61,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12140",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 7.61,
+       "min": 7.61,
+       "mine": false,
+       "mu": 7.61,
+       "n": 1,
+       "name": "Omar Speights",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAR",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 4.21,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13488",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 4.21,
+       "min": 4.21,
+       "mine": false,
+       "mu": 4.21,
+       "n": 1,
+       "name": "Kaleb Elarms-Orr",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 4,
+       "unavailable": []
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 1.98,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "13000",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.98,
+       "min": 1.98,
+       "mine": false,
+       "mu": 1.98,
+       "n": 1,
+       "name": "Shaun Dolac",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "7750",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.98,
+       "min": 1.98,
+       "mine": false,
+       "mu": 1.98,
+       "n": 1,
+       "name": "Grant Stuard",
+       "opp": "BUF",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "flags": [],
+       "id": "12397",
+       "kickoff": "2026-10-12T20:15:00-04:00",
+       "max": 1.41,
+       "min": 1.41,
+       "mine": false,
+       "mu": 1.41,
+       "n": 1,
+       "name": "Joe Andreessen",
+       "opp": "@LAR",
+       "sigma": 1.0,
+       "slot": "LB",
+       "team": "BUF",
+       "tier": 5,
+       "unavailable": []
+      }
+     ],
+     "tier": 5
+    }
+   ]
+  }
+ },
+ "season": 2026,
+ "sigma_out": {
+  "DB": 5.228,
+  "DL": 5.681,
+  "LB": 5.625
+ },
+ "sources": {
+  "sleeper_proj": {
+   "error": null,
+   "fetched_at": "2026-10-12T02:45:20-04:00",
+   "kind": "projection",
+   "last_success": "2026-10-12T02:45:20-04:00",
+   "merge": {
+    "added": 47,
+    "deleted": 0,
+    "frozen": 0,
+    "skipped_after_kickoff": 581,
+    "updated": 0
+   },
+   "no_projection": 3729,
+   "rows": 628,
+   "rows_used": 47,
+   "status": "ok",
+   "week": 5,
+   "zero_filled": 0
+  }
+ },
+ "warnings": [],
+ "week": 5
+}

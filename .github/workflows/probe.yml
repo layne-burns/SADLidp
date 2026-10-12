@@ -1,0 +1,79 @@
+name: probe
+
+# Phase 1 probe spike (SPEC.md §8). Runs on push to claude/** branches that touch the
+# probe, or manually once this file is on main. Results go to the probe-fixtures branch.
+on:
+  push:
+    branches: ["claude/**"]
+    paths: ["probe/**", "tests/probe/**", ".github/workflows/probe.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install age and pytest
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq age
+          python -m pip install --quiet pytest
+
+      - name: Offline tests
+        run: python -m pytest tests/probe -q
+
+      - name: Run probe
+        env:
+          FP_COOKIE: ${{ secrets.FP_COOKIE }}
+          FP_DATA_KEY: ${{ secrets.FP_DATA_KEY }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python -m probe.probe --out out
+
+      - name: Leak guard (output)
+        env:
+          FP_COOKIE: ${{ secrets.FP_COOKIE }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python -m probe.leakcheck out
+
+      - name: Job summary
+        run: cat out/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to probe-fixtures branch
+        env:
+          FP_COOKIE: ${{ secrets.FP_COOKIE }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: |
+          set -euo pipefail
+          run_id="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          wt="$RUNNER_TEMP/fixtures"
+          if git ls-remote --exit-code --heads origin probe-fixtures >/dev/null 2>&1; then
+            git fetch --depth=1 origin probe-fixtures
+            git worktree add -B probe-fixtures "$wt" FETCH_HEAD
+          else
+            git worktree add --detach "$wt"
+            git -C "$wt" checkout --orphan probe-fixtures
+            git -C "$wt" rm -rfq .
+          fi
+          rm -rf "$wt/latest"
+          mkdir -p "$wt/latest" "$wt/runs/$run_id"
+          cp -R out/. "$wt/latest/"
+          cp -R out/. "$wt/runs/$run_id/"
+          git -C "$wt" add -A
+          python -m probe.leakcheck --staged "$wt"
+          git -C "$wt" commit -qm "probe run $run_id (${GITHUB_SHA::7})"
+          git -C "$wt" push origin HEAD:probe-fixtures

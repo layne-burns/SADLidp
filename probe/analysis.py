@@ -1,0 +1,439 @@
+"""Pure analysis functions for the probe (no network). Offline-tested in tests/probe/."""
+
+from __future__ import annotations
+
+import csv
+import io
+import re
+from collections import Counter
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+
+ET = ZoneInfo("America/New_York")
+PT = ZoneInfo("America/Los_Angeles")
+
+POSITION_TO_SLOT = {
+    "DL": "DL", "DE": "DL", "DT": "DL", "NT": "DL",
+    "LB": "LB", "OLB": "LB", "ILB": "LB", "MLB": "LB",
+    "DB": "DB", "CB": "DB", "S": "DB", "FS": "DB", "SS": "DB",
+}  # fmt: skip
+IDP_SLOTS = ("DL", "LB", "DB")
+# Threshold bonus keys -> (stat used, threshold). Phase 1 verifies these semantics.
+THRESHOLD_BONUSES = {
+    "bonus_tkl_10p": ("tkl_total", 10),
+    "bonus_sack_2p": ("idp_sack", 2),
+    "idp_pass_def_3p": ("idp_pass_def", 3),
+}
+BONUS_LIKE = re.compile(r"^bonus|_\d+p$")
+
+
+def num(v) -> float:
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def player_name(p: dict | None) -> str:
+    if not p:
+        return "?"
+    return p.get("full_name") or f"{p.get('first_name', '')} {p.get('last_name', '')}".strip() or "?"
+
+
+# ---------------------------------------------------------------- positions (D14)
+
+
+def slot_by_position(player: dict) -> str | None:
+    return POSITION_TO_SLOT.get((player.get("position") or "").upper())
+
+
+def slot_by_fantasy_first(player: dict) -> str | None:
+    fps = player.get("fantasy_positions") or []
+    return POSITION_TO_SLOT.get(fps[0].upper()) if fps else None
+
+
+def idp_eligibility(player: dict) -> list[str]:
+    out = []
+    for fp in player.get("fantasy_positions") or []:
+        slot = POSITION_TO_SLOT.get(str(fp).upper())
+        if slot and slot not in out:
+            out.append(slot)
+    return out
+
+
+def is_idp(player: dict) -> bool:
+    return bool(slot_by_position(player) or idp_eligibility(player))
+
+
+def position_limits(settings: dict) -> dict[str, int]:
+    """{'DL': 2, ...} from any settings key named position_limit_<slot>."""
+    out = {}
+    for k, v in (settings or {}).items():
+        if k.startswith("position_limit_") and isinstance(v, (int, float)):
+            out[k.removeprefix("position_limit_").upper()] = int(v)
+    return out
+
+
+D14_RULES = {
+    "position": slot_by_position,
+    "fantasy_positions[0]": slot_by_fantasy_first,
+}
+
+
+def _roster_sets(roster: dict) -> dict[str, set[str]]:
+    players = set(roster.get("players") or [])
+    reserve = set(roster.get("reserve") or [])
+    taxi = set(roster.get("taxi") or [])
+    return {
+        "all": players | reserve | taxi,
+        "excl_reserve": (players | taxi) - reserve,
+        "excl_taxi": (players | reserve) - taxi,
+        "excl_reserve_taxi": players - reserve - taxi,
+    }
+
+
+def d14_analysis(rosters: list[dict], players: dict[str, dict], limits: dict[str, int]) -> dict:
+    """Which position rule keeps every SADL roster within its IDP limits?
+
+    If Sleeper enforces limits by rule X, rosters should (barring mid-season
+    eligibility changes) never exceed a limit when counted by X.
+    """
+    result: dict = {"limits": limits, "rules": {}}
+    for rule_name, rule in D14_RULES.items():
+        per_variant = {}
+        for roster in rosters:
+            for variant, ids in _roster_sets(roster).items():
+                counts = Counter(rule(players.get(pid, {})) for pid in ids)
+                v = per_variant.setdefault(variant, {"violations": [], "max_seen": Counter()})
+                for slot in IDP_SLOTS:
+                    v["max_seen"][slot] = max(v["max_seen"][slot], counts.get(slot, 0))
+                    if slot in limits and counts.get(slot, 0) > limits[slot]:
+                        v["violations"].append(
+                            {"roster_id": roster.get("roster_id"), "slot": slot, "count": counts[slot]}
+                        )
+        result["rules"][rule_name] = {
+            k: {"violations": v["violations"], "max_seen": dict(v["max_seen"])} for k, v in per_variant.items()
+        }
+    dual = []
+    for roster in rosters:
+        for pid in _roster_sets(roster)["all"]:
+            p = players.get(pid, {})
+            elig = idp_eligibility(p)
+            if len(elig) >= 2:
+                dual.append(
+                    {
+                        "roster_id": roster.get("roster_id"),
+                        "player_id": pid,
+                        "name": player_name(p),
+                        "team": p.get("team"),
+                        "position": p.get("position"),
+                        "fantasy_positions": p.get("fantasy_positions"),
+                        "in_reserve": pid in set(roster.get("reserve") or []),
+                        "in_taxi": pid in set(roster.get("taxi") or []),
+                    }
+                )
+    result["dual_eligible_rostered"] = dual
+    order_tally: Counter = Counter()
+    disagreements = 0
+    for p in players.values():
+        if len(idp_eligibility(p)) >= 2:
+            order_tally["/".join(p.get("fantasy_positions") or [])] += 1
+        a, b = slot_by_position(p), slot_by_fantasy_first(p)
+        if a and b and a != b:
+            disagreements += 1
+    result["dual_fantasy_positions_orderings"] = dict(order_tally.most_common())
+    result["players_where_position_and_fantasy_first_disagree"] = disagreements
+    return result
+
+
+# ---------------------------------------------------------------- scoring
+
+
+def score_line(stats: dict, scoring: dict) -> float:
+    return sum(num(coef) * num(stats.get(k)) for k, coef in scoring.items() if stats.get(k) is not None)
+
+
+def tackles_total(stats: dict) -> float:
+    if stats.get("idp_tkl") is not None:
+        return num(stats["idp_tkl"])
+    return num(stats.get("idp_tkl_solo")) + num(stats.get("idp_tkl_ast"))
+
+
+def derive_bonuses(stats: dict, scoring: dict) -> dict:
+    """Add threshold bonus keys that SADL scores but the stat line does not carry."""
+    out = dict(stats)
+    for key, (stat, threshold) in THRESHOLD_BONUSES.items():
+        if key in scoring and key not in stats:
+            value = tackles_total(stats) if stat == "tkl_total" else num(stats.get(stat))
+            if value >= threshold:
+                out[key] = 1
+    return out
+
+
+def ground_truth(
+    stats_by_pid: dict[str, dict],
+    players_points: dict[str, float],
+    scoring: dict,
+    idp_ids: set[str],
+    players: dict[str, dict] | None = None,
+    tol: float = 0.011,
+) -> dict:
+    """Compare SADL points computed from Sleeper stats with Sleeper's own players_points."""
+    players = players or {}
+    rows = []
+    for pid in sorted(idp_ids & set(players_points)):
+        st = stats_by_pid.get(pid) or {}
+        sleeper = num(players_points[pid])
+        delivered = round(score_line(st, scoring), 2)
+        derived = round(score_line(derive_bonuses(st, scoring), scoring), 2)
+        rows.append((pid, sleeper, delivered, derived, st))
+    out = {
+        "players_compared": len(rows),
+        "match_as_delivered": sum(abs(s - d) <= tol for _, s, d, _, _ in rows),
+        "match_with_derived_bonuses": sum(abs(s - d) <= tol for _, s, _, d, _ in rows),
+        "max_abs_diff_as_delivered": max((abs(s - d) for _, s, d, _, _ in rows), default=0.0),
+        "max_abs_diff_with_derived": max((abs(s - d) for _, s, _, d, _ in rows), default=0.0),
+        "mismatches": [],
+    }
+    for pid, s, d1, d2, st in rows:
+        if abs(s - d1) > tol and abs(s - d2) > tol and len(out["mismatches"]) < 25:
+            out["mismatches"].append(
+                {
+                    "player_id": pid,
+                    "name": player_name(players.get(pid)),
+                    "sleeper_points": s,
+                    "ours_as_delivered": d1,
+                    "ours_with_derived": d2,
+                    "scored_keys": {k: st[k] for k in scoring if num(st.get(k)) and num(scoring[k])},
+                }
+            )
+    return out
+
+
+def relevant_keys(stat_lines: list[dict], scoring: dict) -> dict[str, dict]:
+    """Scoring keys with a non-zero coefficient that some IDP actually recorded."""
+    seen: Counter = Counter()
+    for st in stat_lines:
+        for k, coef in scoring.items():
+            if num(coef) and num(st.get(k)):
+                seen[k] += 1
+    return {k: {"coefficient": scoring[k], "players_with_stat": n} for k, n in sorted(seen.items())}
+
+
+def bonus_consistency(stat_lines: list[dict]) -> dict:
+    out: dict = {"rows": 0, "idp_tkl_present": 0, "idp_tkl_equals_solo_plus_ast": 0, "bonus_keys": {}}
+    for st in stat_lines:
+        if not any(k.startswith("idp_") for k in st):
+            continue
+        out["rows"] += 1
+        if st.get("idp_tkl") is not None:
+            out["idp_tkl_present"] += 1
+            if abs(num(st["idp_tkl"]) - num(st.get("idp_tkl_solo")) - num(st.get("idp_tkl_ast"))) < 1e-9:
+                out["idp_tkl_equals_solo_plus_ast"] += 1
+    for key, (stat, threshold) in THRESHOLD_BONUSES.items():
+        c = Counter()
+        for st in stat_lines:
+            if not any(k.startswith("idp_") for k in st):
+                continue
+            value = tackles_total(st) if stat == "tkl_total" else num(st.get(stat))
+            present = num(st.get(key)) > 0
+            met = value >= threshold
+            c[f"present={present},threshold_met={met}"] += 1
+            if key == "bonus_tkl_10p" and present:
+                c["present_and_solo_ge_10"] += num(st.get("idp_tkl_solo")) >= 10
+        out["bonus_keys"][key] = dict(c)
+    other = Counter(k for st in stat_lines for k in st if BONUS_LIKE.search(k) and k not in THRESHOLD_BONUSES)
+    out["other_bonus_like_keys"] = dict(other.most_common(20))
+    return out
+
+
+# ---------------------------------------------------------------- projections / stats shape
+
+
+def key_fill_rates(stat_lines: list[dict], prefixes=("idp_", "bonus", "st_", "def_", "gp", "gs")) -> dict:
+    n = len(stat_lines)
+    present: Counter = Counter()
+    nonzero: Counter = Counter()
+    for st in stat_lines:
+        for k, v in st.items():
+            if k.startswith(prefixes):
+                present[k] += 1
+                nonzero[k] += num(v) != 0
+    return (
+        {k: {"present": round(present[k] / n, 3), "nonzero": round(nonzero[k] / n, 3)} for k in sorted(present)}
+        if n
+        else {}
+    )
+
+
+def rows_from_payload(payload) -> list[dict]:
+    """Normalize Sleeper list-of-rows or {player_id: stats} payloads to rows."""
+    if isinstance(payload, list):
+        return [r for r in payload if isinstance(r, dict)]
+    if isinstance(payload, dict):
+        return [{"player_id": pid, "stats": st} for pid, st in payload.items() if isinstance(st, dict)]
+    return []
+
+
+def projection_shape(payload, players: dict[str, dict] | None = None) -> dict:
+    players = players or {}
+    rows = rows_from_payload(payload)
+    stat_lines = [r.get("stats") or {} for r in rows]
+    solo = [num(s.get("idp_tkl_solo")) for s in stat_lines if s.get("idp_tkl_solo") is not None]
+    pos = Counter()
+    for r in rows:
+        p = r.get("player") or players.get(str(r.get("player_id")), {})
+        pos[p.get("position") or "?"] += 1
+    return {
+        "rows": len(rows),
+        "row_keys": sorted({k for r in rows[:200] for k in r}),
+        "with_gp": sum(s.get("gp") is not None for s in stat_lines),
+        "with_opponent": sum(r.get("opponent") not in (None, "") for r in rows),
+        "companies": dict(Counter(r.get("company") for r in rows).most_common(5)),
+        "positions": dict(pos.most_common()),
+        "idp_tkl_solo_noninteger_share": round(sum(v != int(v) for v in solo) / len(solo), 3) if solo else None,
+        "key_fill_rates": key_fill_rates(stat_lines),
+    }
+
+
+# ---------------------------------------------------------------- injuries, waivers
+
+
+def injury_tallies(players: dict[str, dict]) -> dict:
+    idp = [p for p in players.values() if is_idp(p) and p.get("team")]
+    return {
+        "idp_players_on_teams": len(idp),
+        "injury_status": dict(Counter(p.get("injury_status") for p in idp).most_common()),
+        "status": dict(Counter(p.get("status") for p in idp).most_common()),
+        "active": dict(Counter(p.get("active") for p in idp).most_common()),
+    }
+
+
+def waiver_timing(transactions: list[dict]) -> dict:
+    types: Counter = Counter()
+    by_pt: Counter = Counter()
+    by_utc: Counter = Counter()
+    statuses: Counter = Counter()
+    for t in transactions:
+        types[t.get("type")] += 1
+        if t.get("type") != "waiver":
+            continue
+        statuses[t.get("status")] += 1
+        ts = t.get("status_updated") or t.get("created")
+        if not ts:
+            continue
+        dt = datetime.fromtimestamp(num(ts) / 1000, tz=timezone.utc)
+        by_pt[dt.astimezone(PT).strftime("%a %H:00 PT")] += 1
+        by_utc[dt.strftime("%a %H:00 UTC")] += 1
+    return {
+        "transaction_types": dict(types.most_common()),
+        "waiver_statuses": dict(statuses.most_common()),
+        "waiver_processed_at_pt": dict(by_pt.most_common(8)),
+        "waiver_processed_at_utc": dict(by_utc.most_common(8)),
+    }
+
+
+# ---------------------------------------------------------------- schedule
+
+
+def parse_csv(text: str) -> list[dict]:
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def kickoff(row: dict) -> datetime | None:
+    day, t = (row.get("gameday") or "").strip(), (row.get("gametime") or "").strip()
+    if not day:
+        return None
+    try:
+        hh, mm = (t or "13:00").split(":")[:2]
+        return datetime.fromisoformat(day).replace(hour=int(hh), minute=int(mm), tzinfo=ET)
+    except ValueError:
+        return None
+
+
+def regular_season(rows: list[dict], season: int) -> list[dict]:
+    return [r for r in rows if str(r.get("season")) == str(season) and r.get("game_type") == "REG"]
+
+
+def target_week(rows: list[dict], now: datetime) -> int | None:
+    """Week of the earliest regular-season game not yet kicked off (SPEC §4.3)."""
+    upcoming = [(k, int(r["week"])) for r in rows if (k := kickoff(r)) and k > now]
+    return min(upcoming)[1] if upcoming else None
+
+
+def settled_week(rows: list[dict], now: datetime, days: int = 4) -> int | None:
+    """Latest week whose last game kicked off at least `days` days (+4 h) before now."""
+    last: dict[int, datetime] = {}
+    for r in rows:
+        k = kickoff(r)
+        if k:
+            w = int(r["week"])
+            last[w] = max(last.get(w, k), k)
+    done = [w for w, k in last.items() if k + timedelta(hours=4, days=days) <= now]
+    return max(done) if done else None
+
+
+def schedule_summary(rows: list[dict], season: int, now: datetime) -> dict:
+    reg = regular_season(rows, season)
+    teams = sorted({r.get("home_team") for r in reg} | {r.get("away_team") for r in reg})
+    tw = target_week(reg, now)
+    week_teams = {t for r in reg if tw and int(r["week"]) == tw for t in (r["home_team"], r["away_team"])}
+    return {
+        "columns": list(rows[0].keys()) if rows else [],
+        "season_games": len(reg),
+        "teams": teams,
+        "gametime_examples": sorted({r.get("gametime") for r in reg})[:12],
+        "missing_kickoff": sum(kickoff(r) is None for r in reg),
+        "target_week": tw,
+        "settled_week": settled_week(reg, now),
+        "byes_in_target_week": sorted(set(teams) - week_teams) if tw else [],
+    }
+
+
+def crosswalk_coverage(rows: list[dict]) -> dict:
+    idp_rows = [r for r in rows if (r.get("position") or "").upper() in POSITION_TO_SLOT]
+
+    def share(col):
+        return (
+            round(sum(bool((r.get(col) or "").strip()) and r.get(col) != "NA" for r in idp_rows) / len(idp_rows), 3)
+            if idp_rows
+            else None
+        )
+
+    return {
+        "columns": list(rows[0].keys()) if rows else [],
+        "idp_rows": len(idp_rows),
+        "share_with_sleeper_id": share("sleeper_id"),
+        "share_with_fantasypros_id": share("fantasypros_id"),
+        "share_with_espn_id": share("espn_id"),
+        "share_with_gsis_id": share("gsis_id"),
+    }
+
+
+# ---------------------------------------------------------------- ESPN
+
+
+def espn_shape(payload, week: int) -> dict:
+    players = payload.get("players", []) if isinstance(payload, dict) else []
+    pos = Counter()
+    proj_keys: Counter = Counter()
+    actual_keys: Counter = Counter()
+    with_proj = 0
+    for entry in players:
+        p = entry.get("player") or {}
+        pos[p.get("defaultPositionId")] += 1
+        got = False
+        for s in p.get("stats") or []:
+            if s.get("scoringPeriodId") == week and s.get("statSourceId") == 1:
+                proj_keys.update((s.get("stats") or {}).keys())
+                got = True
+            if s.get("scoringPeriodId") == week - 1 and s.get("statSourceId") == 0:
+                actual_keys.update((s.get("stats") or {}).keys())
+        with_proj += got
+    return {
+        "players": len(players),
+        "default_position_ids": dict(pos.most_common()),
+        "players_with_week_projection": with_proj,
+        "projection_stat_ids": dict(proj_keys.most_common(40)),
+        "prior_week_actual_stat_ids": dict(actual_keys.most_common(40)),
+    }

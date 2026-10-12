@@ -112,6 +112,8 @@ def test_gated_sync_writes_the_week(synced):
     assert json.loads((data / "2026" / "gate.json").read_text()) == {"windows_done": ["2026-w05-prewaiver"]}
     league = json.loads((data / "2026" / "league.json").read_text())
     assert league["user_id"] == ME and league["settings"]["waiver_day_of_week"] == 2
+    run = json.loads((week / "run.json").read_text())
+    assert run["backfilled"] == [] and run["window"] == "2026-w05-prewaiver"  # offline: no past projections
     actuals = json.loads((data / "2026" / "week04" / "actuals.json").read_text())
     assert actuals["week"] == 4 and len(actuals["stats"]) > 50
     assert any("σ_out" in w for w in out.warnings)  # no 2025 stats offline: config defaults
@@ -176,6 +178,19 @@ def test_no_usable_source_keeps_the_window_open(tmp_path):
     assert out.synced and out.window == "2026-w05-prewaiver"
     assert any(w.startswith("no source has usable rows") for w in out.warnings)
     assert not (tmp_path / "d" / "2026" / "gate.json").exists()  # the next slot in the window retries
+
+
+def test_backfill_writes_past_weeks_once(tmp_path):
+    r = routes()
+    week4 = [{**row, "week": 4} for row in r[f"{API}/projections/nfl/2026/5"][:5]]
+    client = FakeClient({**r, f"{API}/projections/nfl/2026/4": week4})
+    run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
+    run = json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())
+    assert run["backfilled"] == [4]
+    src = json.loads((tmp_path / "d" / "2026" / "week04" / "sources" / "sleeper_proj.json").read_text())
+    assert src["week"] == 4 and len(src["rows"]) == 5 and all(row["backfill"] for row in src["rows"].values())
+    run_sync(CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=client, log=lambda m: None)
+    assert json.loads((tmp_path / "d" / "2026" / "week05" / "run.json").read_text())["backfilled"] == []
 
 
 def test_off_season_stops_before_league_calls(tmp_path):

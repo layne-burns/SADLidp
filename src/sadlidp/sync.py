@@ -350,9 +350,14 @@ def run_sync(
     backfilled = backfill_projections(sleeper, data_dir, season, week, now)
     actuals = refresh_actuals(sleeper, data_dir, season, sched, now, players)
     if backfilled:
-        warnings.append(f"backfilled Sleeper projections for weeks {backfilled}")
+        log(f"sync: backfilled Sleeper projections for weeks {backfilled}")  # a note, not a page banner
 
-    run.update(warnings=warnings, actuals_written=actuals, window=window.id if window else "forced")
+    run.update(
+        warnings=warnings,
+        backfilled=backfilled,
+        actuals_written=actuals,
+        window=window.id if window else "forced",
+    )
     site_data = {
         "generated_at": now.isoformat(),
         "season": season,

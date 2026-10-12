@@ -84,6 +84,7 @@ a { color: var(--accent); }
   <p class="meta">{{ d.league.name }} · Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
   <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
   {% for w in d.warnings %}<p class="banner">{{ w }}</p>{% endfor %}
+  {% if d.last_week and d.last_week.summary.decided %}<p class="meta"><a href="#lw-h">Last week: {{ d.last_week.summary.hits }} of {{ d.last_week.summary.decided }} suggestions paid off ↓</a></p>{% endif %}
 </header>
 <main>
   <section aria-labelledby="my-h">
@@ -174,6 +175,28 @@ a { color: var(--accent); }
       {% endfor %}
     </div>
   </section>
+  {% set lw = d.last_week %}
+  {% if lw and (lw.slots.DL or lw.slots.LB or lw.slots.DB) %}
+  <section aria-labelledby="lw-h">
+    <h2 id="lw-h">Last week's suggestions (week {{ lw.week }})</h2>
+    <div class="slot">
+      <p class="note">{% if lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).{% else %}No suggestions were decided.{% endif %}
+        {% if lw.provisional %}Scores are provisional until stat corrections close {{ lw.settles|et }}.{% else %}Final scores.{% endif %}</p>
+      {% for slot in slots %}{% for s in lw.slots[slot] %}
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s) }} <b>{{ s.name }}</b> <span class="sub">{{ s.team or '' }} · {{ slot }}</span>
+        · projected {{ '%.1f'|format(s.mu_w) }}, {{ pts_text(s.result) }}
+        {% if s.over %}<div class="sub">vs {{ s.over_name }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+        {% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>
+        {% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>
+        {% elif s.outcome == 'push' %}<div class="out push">= tied</div>
+        {% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}
+        {% if s.reference %}<div class="why">Shown for reference at the time; not counted.</div>{% endif %}
+      </div>
+      {% endfor %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </main>
 <footer>
   <h2>Sources</h2>

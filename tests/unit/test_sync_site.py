@@ -340,3 +340,32 @@ def test_projection_first_seen_after_kickoff_is_kept_as_late(tmp_path):
     run_sync(off, tmp_path / "d2", tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
     rows = json.loads((tmp_path / "d2" / "2026" / "week05" / "sources" / "sleeper_proj.json").read_text())["rows"]
     assert "11705" not in rows
+
+
+WEEK6_TUE = datetime(2026, 10, 13, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: week-6 pre-waiver window
+
+
+def test_last_week_recap_shows_final_scores_of_issued_suggestions(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # week 5: suggestions issued
+    r = routes()
+    r[f"{V1}/state/nfl"] = {"season": "2026", "season_type": "regular", "week": 6, "display_week": 6}
+    r[f"{V1}/league/{LID}/matchups/6"] = []
+    r[f"{V1}/stats/nfl/regular/2026/5"] = {
+        "4118": {"gp": 1, "idp_tkl_solo": 6, "idp_tkl_ast": 2, "idp_sack": 1},  # Anzalone 20 pts
+        "11742": {"gp": 1, "idp_tkl_solo": 4},  # Cedric Gray 8 pts
+        "11017": {"gp": 1, "idp_tkl_solo": 1},  # Dee Winters 2 pts
+    }
+    run_sync(CFG, data, cache, WEEK6_TUE, force=True, client=FakeClient(r), log=lambda m: None)
+    d = json.loads((data / "2026" / "week06" / "consensus.json").read_text())
+    lw = d["last_week"]
+    assert lw["week"] == 5 and lw["provisional"]  # captured Tuesday, corrections until Friday night
+    lb = {x["name"]: x for x in lw["slots"]["LB"]}
+    anz = lb["Alex <i>Anzalone</i>"]
+    assert anz["result"] == {"pts": 20.0, "state": "final"} and anz["over_result"]["pts"] == 8.0
+    assert anz["outcome"] == "hit" and lb["Dee Winters"]["outcome"] == "miss"
+    assert lb["Shemar James"]["outcome"] == "void"  # no stat line: didn't play
+    assert lw["summary"]["hits"] >= 1 and lw["summary"]["decided"] >= 2
+    html = build_site(data, tmp_path / "site").read_text()
+    assert "Last week&#39;s suggestions (week 5)" in html or "Last week's suggestions (week 5)" in html
+    assert "✓ paid off" in html and "suggestions paid off ↓" in html

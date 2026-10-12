@@ -203,6 +203,54 @@ def _outcome(w_res: dict | None, over: str | None, over_res: dict | None) -> str
     return "hit" if w_pts > o_pts else "miss" if w_pts < o_pts else "push"
 
 
+def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc: dict, players: dict) -> dict | None:
+    """Last week's issued suggestions with both players' final scores (D22). Scores come from
+    actuals.json and stay provisional until the stat-correction window closes (last kickoff + 4 d 4 h)."""
+    prev = week - 1
+    wd = storage.week_dir(data_dir, season, prev)
+    badges = (storage.read_json(wd / "badges.json") or {}).get("badges", {})
+    act = storage.read_json(wd / "actuals.json")
+    if prev < 1 or not badges or not act:
+        return None
+    stats = act.get("stats") or {}
+    kicks = [g.kickoff for g in sched.week_games(prev) if g.kickoff]
+    settles = max(kicks) + timedelta(days=4, hours=4) if kicks else None
+    provisional = bool(settles) and datetime.fromisoformat(act["captured_at"]) < settles
+
+    def res(pid: str) -> dict:
+        line = stats.get(pid)
+        if isinstance(line, dict) and (line.get("gp") or any(v for k, v in line.items() if k.startswith("idp_"))):
+            return {"pts": round(scoring.points(line, sc), 2), "state": "final"}
+        return {"pts": None, "state": "dnp"}
+
+    slots: dict[str, list] = {slot: [] for slot in IDP_SLOTS}
+    for e in badges.values():
+        if not e.get("active") or e.get("slot") not in slots:
+            continue  # withdrawn before lock: never issued
+        w, over = e["w"], e.get("over")
+        w_res, over_res = res(w), res(over) if over else None
+        dnp = w_res["state"] == "dnp" or (over_res is not None and over_res["state"] == "dnp")
+        slots[e["slot"]].append({
+            **{k: e.get(k) for k in ("badge", "p", "reference", "why", "mu_w", "mu_over", "over")},
+            "name": player_name(players.get(w, {})), "team": (players.get(w) or {}).get("team"),
+            "over_name": player_name(players.get(over, {})) if over else None,
+            "result": w_res, "over_result": over_res,
+            "outcome": "void" if dnp else _outcome(w_res, over, over_res),
+        })  # fmt: skip
+    for rows in slots.values():
+        rows.sort(key=lambda x: (x["reference"], -((x["result"] or {}).get("pts") or -1.0)))
+    counted = [
+        x for rows in slots.values() for x in rows if not x["reference"] and x["outcome"] in ("hit", "miss", "push")
+    ]
+    return {
+        "week": prev,
+        "provisional": provisional,
+        "settles": settles.isoformat() if settles else None,
+        "slots": slots,
+        "summary": {"hits": sum(1 for x in counted if x["outcome"] == "hit"), "decided": len(counted)},
+    }
+
+
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
     return {
         "id": pid,
@@ -526,6 +574,9 @@ def run_sync(
     if backfilled:
         log(f"sync: backfilled Sleeper projections for weeks {backfilled}")  # a note, not a page banner
 
+    recap = _guard("last week's results", lambda: last_week_recap(data_dir, season, week, sched, sc, players), None,
+                   warnings, log)  # fmt: skip
+
     run.update(
         warnings=warnings,
         backfilled=backfilled,
@@ -543,6 +594,7 @@ def run_sync(
         },
         "positions": positions_out,
         "my_idps": my_out,
+        "last_week": recap,
         "sigma_out": sigma_out,
         "sources": run["sources"],
         "warnings": warnings,

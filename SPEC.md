@@ -20,7 +20,7 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 | D6 | Output | Personal use. Static site on GitHub Pages. The repo `layne-burns/SADLidp` is public. |
 | D7 | League identity | Resolved from Sleeper user `lbburnsy` plus a league-name match for the current season (§4.2). This also identifies **your** roster. |
 | D8 | Rank-only sources | Included. They are converted to SADL points by within-list rank-to-value mapping (§6.4). |
-| D9 | FantasyPros | Logged-in auto fetch with a session cookie stored in Actions secrets. The user accepts the risk of breakage and of FP's terms. FP failing **never fails the sync**. |
+| D9 | FantasyPros | Logged-in auto fetch. **Auto-login first:** each sync logs in with `FP_EMAIL` / `FP_PASSWORD` stored in Actions secrets, so there is no cookie to refresh. Phase 1 tests whether FP allows scripted logins from GitHub's runners. **Fallback** if it doesn't: a session cookie (`FP_COOKIE`) refreshed by a one-command local script that reads it from the user's browser and updates the secret (`gh secret set`). A web page cannot read another site's cookies, so the site itself can never collect it. The user accepts the risk of breakage and of FP's terms, and uses a password unique to FP. FP failing **never fails the sync**. |
 | D10 | v1 scope | Weekly streaming tiers, **my roster vs waivers**, and **source accuracy tracking**. **Out of v1:** look-ahead weeks and an in-house matchup model. |
 | D11 | Weights | The projection : rank group split starts at **60:40** as a prior. Accuracy tracking may move it, with each group kept within 20–80%, and may also move per-source weights within each group (§6.5). |
 | D12 | Tiering | **Anchored significance tiers** (§6.6). |
@@ -60,7 +60,7 @@ ci.yml: ruff + pytest on PRs/pushes; ignores data/** for tests; leak-guard patte
 ```
 Commits made with `GITHUB_TOKEN` don't retrigger workflows, which is the intended behaviour. If a sync fails, nothing is deployed and the last good site stays live.
 
-**One-time setup** (documented in README): Settings → Pages → Source = GitHub Actions. Secrets: `FP_COOKIE`, `FP_DATA_KEY` (age key), and optionally `ODDS_API_KEY`. Public repos auto-disable scheduled workflows after 60 days without activity, so the README pre-season checklist says to re-enable sync.yml in late August.
+**One-time setup** (documented in README): Settings → Pages → Source = GitHub Actions. Secrets: `FP_EMAIL` and `FP_PASSWORD` (auto-login), `FP_COOKIE` (fallback only), `FP_DATA_KEY` (age key), and optionally `ODDS_API_KEY`. Public repos auto-disable scheduled workflows after 60 days without activity, so the README pre-season checklist says to re-enable sync.yml in late August.
 
 ### 3.2 Pipeline modules (`src/sadlidp/`)
 1. `sleeper.py`: documented /v1 endpoints (state, user, leagues, league, rosters, matchups, players) and the undocumented projections and stats endpoints.
@@ -139,9 +139,10 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 **Redundancy:** accuracy weighting can't detect sources that copy each other. Config `prior_weight_cap` can limit aggregate sources such as FP ECR and FantasyNerds.
 
 **FantasyPros adapter:**
+- **Login:** auto-login with `FP_EMAIL` / `FP_PASSWORD` into an in-memory cookie jar for the run (sent only over https to fantasypros.com). If auto-login is unavailable, `FP_COOKIE` is used. Credentials, cookies and CSRF tokens are never written anywhere.
 - **Detection:** it checks for the logged-in state (a Premium-only marker) and for the week label.
 - **Statuses:**
-  - `auth_expired` → banner "refresh FP cookie". This is the only status that triggers that banner.
+  - `auth_expired` → banner "FantasyPros login failed" (check `FP_EMAIL`/`FP_PASSWORD`, or refresh the fallback cookie with the one-command script). This is the only status that triggers that banner.
   - `blocked` (403/429/503 or a challenge page) → banner with that reason.
   - `parse_error` and `not_yet_published` → banner with that reason.
 - **Privacy:** request headers and cookies are never logged.
@@ -237,10 +238,10 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - *When:* sync.yml, probe.yml and the local FP fetch run it on the staged changes (`git diff --cached`) **and** on the built site, immediately before every commit or `upload-pages-artifact`.
   - *On a hit:* it aborts the job, so nothing is committed or deployed, and reports only the file path and the pattern name, never the matched text.
   - *What it looks for:*
-    - each cookie value in `FP_COOKIE` of 8 or more characters;
+    - each cookie value in `FP_COOKIE` of 8 or more characters, `FP_EMAIL` and `FP_PASSWORD`, including their JSON/repr-escaped forms;
     - `ODDS_API_KEY`;
     - `AGE-SECRET-KEY-`;
-    - `Cookie:`, `Set-Cookie:` and `Authorization:` header lines;
+    - `Cookie:`, `Set-Cookie:` and `Authorization:` header lines, also as quoted JSON or dict keys;
     - any file for a `private: true` source under `data/` that isn't `*.json.age`.
   - *CI:* `ci.yml` runs the same pattern scan over `data/**` and `tests/fixtures/**` only. It skips the secret-value checks when secrets aren't available (fork PRs).
 
@@ -256,7 +257,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
      - injury codes;
      - bonus key semantics;
      - whether past weekly projections can be retrieved;
-     - whether FP is reachable from runners;
+     - whether FP is reachable from runners, and whether a scripted login works there (auto-login, D9);
      - each source's weekly availability and parseability.
    - **FP probe output is a structure report only:** HTTP status, final URL path, whether the Premium marker and the week label are present, JSON key paths or table column headers, row counts per position, and the list of stat columns. It never contains cell values, player names, page text, headers or account details. If a full sample is needed for parser work, the probe age-encrypts the raw response to `FP_DATA_KEY`'s public recipient and commits only the `.age` file to `probe-fixtures`. You decrypt it locally and supply a value-redacted excerpt, and the synthetic FP fixtures are built from that.
    - **Deliverable:** a SPEC amendment covering the final source list, the verified facts, and the ESPN-league and FP-fallback questions, approved by the owner before Phase 3.
@@ -300,3 +301,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **Dropped schedules.** GitHub can delay or drop scheduled runs. Each window has several slots and catches up, but if every slot in a window is dropped, that refresh doesn't happen unless you press sync.
 - **Inactives.** The Sunday refresh can run before official inactives are posted (~90 min before kickoff).
 - **Weight compression.** Weights based on accuracy stay close to equal, because game noise dominates IDP squared error. Shrinkage keeps this conservative.
+
+## 12. Change log
+- **2026-10-12 · v2:** agreed spec.
+- **2026-10-12 · D9 amended (user decision):** FantasyPros access via auto-login with `FP_EMAIL`/`FP_PASSWORD`, tested in Phase 1, with a one-command local cookie refresh as the fallback. The manual cookie copy-paste is no longer the plan.

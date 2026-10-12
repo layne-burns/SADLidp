@@ -45,6 +45,14 @@ FP_HTML = (
     f'<script>var ecrData = {{"players":[{{"player_name":"{FP_SECRET_NAME}","player_position_id":"LB","rank_ecr":1}}],'
     '"week":6,"year":2026};</script></html>'
 )
+FP_PUBLIC_HTML = "<html><a href='/accounts/login/'>Sign In</a><p>Week 6</p><table><tr><th>RK</th></tr></table></html>"
+FP_LOGIN_HTML = (
+    '<html><form method="post" action="/accounts/login/">'
+    '<input type="hidden" name="csrfmiddlewaretoken" value="csrfTOKENvalue999">'
+    '<input type="email" name="username"><input type="password" name="password"></form></html>'
+)
+SESSION_SECRET = "sessJAR_secret_987654"
+FP_EMAIL, FP_PASSWORD = "layne.test@example.com", "pw-Sup3rSecret!"
 
 
 def route(url: str):
@@ -84,18 +92,36 @@ def route(url: str):
 def fake_network(monkeypatch):
     seen = []
 
-    def fake_get(self, url, *, headers=None, redact=()):
+    def fake_request(self, method, url, *, data=None, headers=None, jar=None, redact=()):
         self.request_count += 1
-        seen.append((url, dict(headers or {})))
-        body, ctype = route(url)
+        headers = dict(headers or {})
+        if jar:
+            headers["Cookie"] = "; ".join(f"{k}={v}" for k, v in jar.items())
+        seen.append((method, url, headers, data))
+        if url.startswith("https://secure.fantasypros.com/accounts/login/"):
+            if method == "POST":
+                assert b"username=layne.test%40example.com" in data and b"csrfTOKENvalue999" in data
+                jar["sessionid"] = SESSION_SECRET
+                return Response(url=url, final_url="https://www.fantasypros.com/", status=200,
+                                headers={"content-type": "text/html"}, body=b"<html>ok</html>")  # fmt: skip
+            if jar is not None:
+                jar["csrftoken"] = "csrfTOKENvalue999"
+            body, ctype = FP_LOGIN_HTML, "text/html"
+        elif url.startswith("https://www.fantasypros.com/"):
+            logged_in = SESSION_SECRET in headers.get("Cookie", "") or "fakecookievalue123" in headers.get("Cookie", "")
+            body, ctype = (FP_HTML if logged_in else FP_PUBLIC_HTML), "text/html"
+        else:
+            body, ctype = route(url)
         if body is None:
             return Response(url=url, final_url=url, status=404, headers={"content-type": "text/html"}, body=b"nope")
         if not isinstance(body, str):
             body, ctype = json.dumps(body), "application/json"
         return Response(url=url, final_url=url, status=200, headers={"content-type": ctype}, body=body.encode())
 
-    monkeypatch.setattr(Client, "get", fake_get)
+    monkeypatch.setattr(Client, "request", fake_request)
     monkeypatch.setenv("FP_COOKIE", "sessionid=fakecookievalue123; csrftoken=othertokenvalue456")
+    monkeypatch.setenv("FP_EMAIL", FP_EMAIL)
+    monkeypatch.setenv("FP_PASSWORD", FP_PASSWORD)
     monkeypatch.delenv("FP_DATA_KEY", raising=False)
     monkeypatch.delenv("ODDS_API_KEY", raising=False)
     return seen
@@ -111,29 +137,51 @@ def test_probe_end_to_end(tmp_path, fake_network):
     sl = secs["sleeper"]
     assert sl["errors"] == []
     assert sl["league"]["league_id"] == "L1" and sl["my_roster_id"] == 1
-    assert sl["ground_truth"]["week"] == 4
-    assert sl["ground_truth"]["v1"]["match_with_derived_bonuses"] == 3
+    gt = sl["ground_truth"]
+    assert gt["week"] == 4
+    assert gt["v1"]["match_with_derived_bonuses"] == 3 and gt["v1"]["bonus_hits"] == {"bonus_tkl_10p": 1}
+    assert "ground_truth_prev_week" not in sl
     assert sl["d14"]["rules"]["position"]["all"]["violations"] == []
     assert sl["projections"]["week"] == 5 and sl["projections"]["slot_positions"]["rows"] == 2
     assert sl["past_projections_week1"]["players_with_projection_and_actual"] == 1
+    assert "rollover" in sl and "failed_waiver_notes" in sl
     assert secs["schedule"]["target_week"] == 5
     assert secs["index_pages"]["idpguru"]["followed"]["status"] == 200
     assert secs["odds_api"]["status"] == "skipped"
 
     fp = secs["fantasypros"]
-    assert fp["cookie_configured"] and set(fp["pages"]["rankings_idp"]) == {"public", "authenticated"}
-    auth = fp["pages"]["rankings_idp"]["authenticated"]
+    login = fp["auto_login"]
+    assert login["attempted"] and login["login_succeeded"]
+    assert login["login_post"]["cookie_names"] == ["csrftoken", "sessionid"]
+    assert set(fp["pages"]["rankings_idp"]) == {"public", "with_cookie", "auto_login"}
+    public = fp["pages"]["rankings_idp"]["public"]
+    auth = fp["pages"]["rankings_idp"]["auto_login"]
+    assert public["markers"]["login_prompt"] and not public["markers"]["logout_link"]
     assert auth["ecrData"]["players"] == 1 and auth["markers"]["logout_link"]
     assert auth["tables"][0]["headers"] == ["RK", "Player", "Tackles"]
 
-    # cookie only ever sent to fantasypros
-    assert all("Cookie" not in h for u, h in fake_network if "fantasypros.com" not in u)
+    # credentials only ever sent to fantasypros
+    assert all("Cookie" not in h for _, u, h, _ in fake_network if "fantasypros.com" not in u)
+    assert all(d is None for m, u, _, d in fake_network if "fantasypros.com" not in u)
     # nothing private or secret anywhere in the output
-    files = [p for p in Path(out).rglob("*") if p.is_file()]
-    blob = b"".join(p.read_bytes() for p in files)
-    assert FP_SECRET_NAME.encode() not in blob
-    assert b"fakecookievalue123" not in blob and b"othertokenvalue456" not in blob
+    blob = b"".join(p.read_bytes() for p in Path(out).rglob("*") if p.is_file())
+    for secret in (FP_SECRET_NAME, "fakecookievalue123", "othertokenvalue456", SESSION_SECRET,
+                   "csrfTOKENvalue999", FP_EMAIL, FP_PASSWORD):  # fmt: skip
+        assert secret.encode() not in blob, secret
     assert leakcheck.main([str(out)]) == 0
     md = (out / "report.md").read_text()
-    assert "D14" in md and "Probe report" in md
+    assert "D14" in md and "Auto-login feasibility" in md
     assert (out / "samples" / "sleeper_ground_truth_week04.json").exists()
+    assert (out / "samples" / "sleeper_transactions.json").exists()
+
+
+def test_probe_writes_partial_report_on_interrupt(tmp_path, fake_network, monkeypatch):
+    def boom(*a, **k):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(sources_probe, "probe_fantasypros", boom)
+    out = tmp_path / "out"
+    with pytest.raises(KeyboardInterrupt):
+        probe.main(["--out", str(out), "--now", "2026-10-12T18:00:00+00:00"])
+    report = json.loads((out / "report.json").read_text())
+    assert report["aborted"] == "KeyboardInterrupt" and "sleeper" in report["sections"]

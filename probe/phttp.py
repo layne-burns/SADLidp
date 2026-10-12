@@ -1,20 +1,25 @@
 """Polite stdlib HTTP client for the probe.
 
-Per-host request spacing, retries with backoff, an identifying User-Agent,
-manual redirect handling that never forwards credentials to another domain,
-and no logging of request headers (SPEC.md D5, §7).
+Per-host request spacing, retries with backoff, an identifying User-Agent, a global
+deadline with a per-host circuit breaker, and manual redirect handling that only sends
+credentials (Cookie/Authorization, cookie jar) over https to the original site. Error
+strings never contain request headers or exception messages that could echo them
+(SPEC.md D5, §7).
 """
 
 from __future__ import annotations
 
 import gzip
+import http.client
 import json
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import zlib
+from collections import Counter
 from dataclasses import dataclass, field
+from http.cookies import CookieError, SimpleCookie
 
 USER_AGENT = "SADLidp-probe/0.1 (+https://github.com/layne-burns/SADLidp)"
 MIN_INTERVAL_S = 2.0
@@ -35,6 +40,7 @@ SAFE_RESPONSE_HEADERS = {
 }
 RETRY_STATUSES = {429, 500, 502, 503, 504}
 MAX_REDIRECTS = 5
+DEAD_AFTER_TIMEOUTS = 2
 
 
 @dataclass
@@ -58,6 +64,16 @@ class Response:
         return json.loads(self.body)
 
 
+@dataclass
+class _Raw:
+    status: int | None = None
+    headers: dict[str, str] = field(default_factory=dict)
+    set_cookies: list[str] = field(default_factory=list)
+    body: bytes = b""
+    error: str | None = None
+    retryable: bool = False
+
+
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None  # surface 3xx as HTTPError so redirects are followed manually
@@ -73,25 +89,58 @@ def redact_url(url: str, redact: tuple[str, ...] = ()) -> str:
     return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query, safe="[]")))
 
 
-def base_domain(host: str) -> str:
-    labels = host.lower().split(":")[0].split(".")
+def base_domain(hostname: str) -> str:
+    """Last two labels of a hostname (adequate for the .com hosts this probe talks to)."""
+    labels = (hostname or "").lower().rstrip(".").split(".")
     return ".".join(labels[-2:])
 
 
+def _credentials_allowed(url: str, origin_domain: str) -> bool:
+    parts = urllib.parse.urlsplit(url)
+    return (
+        parts.scheme == "https"
+        and parts.username is None
+        and parts.password is None
+        and base_domain(parts.hostname or "") == origin_domain
+    )
+
+
 def _decode(body: bytes, encoding: str | None) -> bytes:
-    if encoding == "gzip":
+    enc = (encoding or "").strip().lower()
+    if enc in ("gzip", "x-gzip"):
         return gzip.decompress(body)
-    if encoding == "deflate":
-        return zlib.decompress(body)
+    if enc == "deflate":
+        try:
+            return zlib.decompress(body)
+        except zlib.error:
+            return zlib.decompress(body, -zlib.MAX_WBITS)
     return body
+
+
+def _headers(msg) -> tuple[dict[str, str], list[str]]:
+    if msg is None:
+        return {}, []
+    return {k.lower(): v for k, v in msg.items()}, list(msg.get_all("Set-Cookie") or [])
+
+
+def _merge_cookies(jar: dict[str, str], set_cookies: list[str]) -> None:
+    for header in set_cookies:
+        try:
+            parsed = SimpleCookie()
+            parsed.load(header)
+        except CookieError:
+            continue
+        for name, morsel in parsed.items():
+            jar[name] = morsel.value
 
 
 class Client:
     def __init__(
         self,
         min_interval_s: float = MIN_INTERVAL_S,
-        timeout_s: float = 45.0,
+        timeout_s: float = 40.0,
         retries: int = 3,
+        deadline_s: float = 20 * 60,
         sleep=time.sleep,
         clock=time.monotonic,
     ):
@@ -100,7 +149,10 @@ class Client:
         self.retries = retries
         self._sleep = sleep
         self._clock = clock
+        self._deadline = clock() + deadline_s
         self._last_request: dict[str, float] = {}
+        self._timeouts: Counter = Counter()
+        self.dead_hosts: set[str] = set()
         self._opener = urllib.request.build_opener(_NoRedirect)
         self.request_count = 0
 
@@ -112,74 +164,113 @@ class Client:
                 self._sleep(wait)
         self._last_request[host] = self._clock()
 
-    def _once(self, url: str, headers: dict[str, str]) -> tuple[int | None, dict, bytes, str | None]:
-        req = urllib.request.Request(url, method="GET")
-        req.add_header("User-Agent", USER_AGENT)
-        req.add_header("Accept-Encoding", "gzip, deflate")
-        for k, v in headers.items():
-            req.add_header(k, v)
+    def _once(self, method: str, url: str, headers: dict[str, str], data: bytes | None) -> _Raw:
         self.request_count += 1
         try:
+            req = urllib.request.Request(url, data=data, method=method)
+            req.add_header("User-Agent", USER_AGENT)
+            req.add_header("Accept-Encoding", "gzip, deflate")
+            for k, v in headers.items():
+                req.add_header(k, v)
             with self._opener.open(req, timeout=self.timeout_s) as resp:
                 raw = resp.read()
-                hdrs = {k.lower(): v for k, v in resp.headers.items()}
-                return resp.status, hdrs, _decode(raw, hdrs.get("content-encoding")), None
+                hdrs, cookies = _headers(resp.headers)
+                return _Raw(resp.status, hdrs, cookies, _decode(raw, hdrs.get("content-encoding")))
         except urllib.error.HTTPError as e:
-            hdrs = {k.lower(): v for k, v in (e.headers or {}).items()}
+            hdrs, cookies = _headers(e.headers)
             try:
-                raw = e.read()
-                body = _decode(raw, hdrs.get("content-encoding"))
+                body = _decode(e.read(), hdrs.get("content-encoding"))
             except Exception:  # noqa: BLE001 - body of an error response is best-effort
                 body = b""
-            return e.code, hdrs, body, None
-        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as e:
-            return None, {}, b"", f"{type(e).__name__}: {getattr(e, 'reason', e)}"
+            return _Raw(e.code, hdrs, cookies, body)
+        except (http.client.InvalidURL, ValueError) as e:
+            # Bad URL or header value. Never echo str(e): it can contain the header (e.g. a cookie).
+            return _Raw(error=f"invalid request: {type(e).__name__}")
+        except (urllib.error.URLError, OSError) as e:
+            reason = getattr(e, "reason", e)
+            if isinstance(e, TimeoutError) or isinstance(reason, TimeoutError):
+                return _Raw(error="timeout", retryable=True)
+            return _Raw(error=f"{type(e).__name__}: {type(reason).__name__}", retryable=True)
+        except (http.client.HTTPException, EOFError, zlib.error) as e:
+            return _Raw(error=f"transfer error: {type(e).__name__}", retryable=True)
 
-    def get(self, url: str, *, headers: dict[str, str] | None = None, redact: tuple[str, ...] = ()) -> Response:
-        """GET with spacing, retries and manual redirects.
+    def _skip(self, host: str) -> str | None:
+        if host in self.dead_hosts:
+            return "skipped: host unresponsive"
+        if self._clock() > self._deadline:
+            return "skipped: probe deadline"
+        return None
 
-        Sensitive headers (Cookie, Authorization) are only sent to hosts sharing the
-        original request's base domain; they are dropped on cross-domain redirects.
+    def get(self, url: str, **kw) -> Response:
+        return self.request("GET", url, **kw)
+
+    def post_form(self, url: str, fields: dict[str, str], **kw) -> Response:
+        headers = dict(kw.pop("headers", None) or {})
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+        return self.request("POST", url, data=urllib.parse.urlencode(fields).encode(), headers=headers, **kw)
+
+    def request(
+        self,
+        method: str,
+        url: str,
+        *,
+        data: bytes | None = None,
+        headers: dict[str, str] | None = None,
+        jar: dict[str, str] | None = None,
+        redact: tuple[str, ...] = (),
+    ) -> Response:
+        """Request with spacing, retries, a deadline and manual redirects.
+
+        Sensitive headers and the cookie `jar` are only sent, and Set-Cookie only
+        accepted, on https hops whose base domain matches the original request's.
         """
         headers = dict(headers or {})
-        origin_domain = base_domain(urllib.parse.urlsplit(url).netloc)
+        origin_domain = base_domain(urllib.parse.urlsplit(url).hostname or "")
         start = self._clock()
         current = url
+        raw = _Raw()
         for _hop in range(MAX_REDIRECTS + 1):
-            host = urllib.parse.urlsplit(current).netloc
-            hop_headers = {
-                k: v
-                for k, v in headers.items()
-                if k.lower() not in SENSITIVE_HEADERS or base_domain(host) == origin_domain
-            }
-            status, hdrs, body, error = None, {}, b"", None
+            host = urllib.parse.urlsplit(current).hostname or ""
+            allowed = _credentials_allowed(current, origin_domain)
+            hop_headers = {k: v for k, v in headers.items() if k.lower() not in SENSITIVE_HEADERS or allowed}
+            if jar and allowed:
+                hop_headers["Cookie"] = "; ".join(f"{k}={v}" for k, v in jar.items())
             for attempt in range(self.retries + 1):
+                skipped = self._skip(host)
+                if skipped:
+                    raw = _Raw(error=skipped)
+                    break
                 self._space(host)
-                status, hdrs, body, error = self._once(current, hop_headers)
-                retryable = error is not None or status in RETRY_STATUSES
-                if not retryable or attempt == self.retries:
+                raw = self._once(method, current, hop_headers, data)
+                if raw.error == "timeout":
+                    self._timeouts[host] += 1
+                    if self._timeouts[host] >= DEAD_AFTER_TIMEOUTS:
+                        self.dead_hosts.add(host)
+                elif raw.status is not None:
+                    self._timeouts[host] = 0
+                if not (raw.retryable or raw.status in RETRY_STATUSES) or attempt == self.retries:
                     break
                 backoff = 2.0 * (2**attempt)
-                retry_after = hdrs.get("retry-after", "")
+                retry_after = raw.headers.get("retry-after", "")
                 if retry_after.isdigit():
                     backoff = max(backoff, min(float(retry_after), 30.0))
                 self._sleep(backoff)
-            if status in (301, 302, 303, 307, 308) and hdrs.get("location"):
-                current = urllib.parse.urljoin(current, hdrs["location"])
+            if jar is not None and allowed:
+                _merge_cookies(jar, raw.set_cookies)
+            if raw.status in (301, 302, 303, 307, 308) and raw.headers.get("location"):
+                current = urllib.parse.urljoin(current, raw.headers["location"])
+                if raw.status in (301, 302, 303):
+                    method, data = "GET", None
                 continue
-            return Response(
-                url=redact_url(url, redact),
-                final_url=redact_url(current, redact),
-                status=status,
-                headers={k: v for k, v in hdrs.items() if k in SAFE_RESPONSE_HEADERS},
-                body=body,
-                error=error,
-                elapsed_s=round(self._clock() - start, 2),
-            )
+            break
+        else:
+            raw = _Raw(error=f"too many redirects (> {MAX_REDIRECTS})")
         return Response(
             url=redact_url(url, redact),
             final_url=redact_url(current, redact),
-            status=None,
-            error=f"too many redirects (> {MAX_REDIRECTS})",
+            status=raw.status,
+            headers={k: v for k, v in raw.headers.items() if k in SAFE_RESPONSE_HEADERS},
+            body=raw.body,
+            error=raw.error,
             elapsed_s=round(self._clock() - start, 2),
         )

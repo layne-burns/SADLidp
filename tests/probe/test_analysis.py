@@ -30,11 +30,28 @@ def test_d14_distinguishes_rules():
     res = an.d14_analysis(rosters, players, {"DL": 2, "LB": 2, "DB": 2})
     by_pos = res["rules"]["position"]["all"]
     by_fp = res["rules"]["fantasy_positions[0]"]["all"]
+    by_all = res["rules"]["all_eligible"]["all"]
     assert by_pos["violations"] == [] and by_pos["max_seen"] == {"DL": 2, "LB": 2, "DB": 0}
-    assert by_fp["violations"] == [{"roster_id": 1, "slot": "DL", "count": 3}]
+    assert [(v["slot"], v["count"]) for v in by_fp["violations"]] == [("DL", 3)]
+    assert {p["id"] for p in by_fp["violations"][0]["players"]} == {"1", "2", "x"}
+    assert [(v["slot"], v["count"]) for v in by_all["violations"]] == [("DL", 3)]
+    disc = [d for d in res["discriminating"] if d["subset"] == "all"]
+    assert disc == [
+        {"roster_id": 1, "subset": "all", "slot": "DL", "counts": {"position": 2, "fantasy_positions[0]": 3,
+                                                                  "all_eligible": 3}, "limit": 2}
+    ]  # fmt: skip
+    assert res["verdict"].startswith("see discriminating")
     assert [d["player_id"] for d in res["dual_eligible_rostered"]] == ["1"]
     assert res["dual_fantasy_positions_orderings"] == {"DL/LB": 1, "DB/LB": 1}
     assert res["players_where_position_and_fantasy_first_disagree"] == 1
+
+
+def test_d14_inconclusive_without_data_or_discrimination():
+    assert an.d14_analysis([], PLAYERS, {"DL": 2})["inconclusive"] == "no rosters"
+    assert "players DB" in an.d14_analysis([{"roster_id": 1}], {}, {"DL": 2})["inconclusive"]
+    assert "position_limit" in an.d14_analysis([{"roster_id": 1}], PLAYERS, {})["inconclusive"]
+    res = an.d14_analysis([{"roster_id": 1, "players": ["2", "3"]}], PLAYERS, {"DL": 2, "LB": 2})
+    assert res["discriminating"] == [] and res["verdict"].startswith("inconclusive")
 
 
 def test_d14_reserve_variant_excludes_ir():
@@ -62,11 +79,14 @@ def test_derive_bonuses_uses_total_tackles():
 
 def test_ground_truth_reports_both_variants():
     stats = {"1": {"idp_tkl_solo": 6, "idp_tkl_ast": 4}, "2": {"idp_sack": 1}}
-    points = {"1": 10.0, "2": 3.0, "9": 20.0}
-    res = an.ground_truth(stats, points, SCORING, {"1", "2"}, PLAYERS)
-    assert res["players_compared"] == 2
-    assert res["match_as_delivered"] == 1  # player 1 needs the derived bonus
-    assert res["match_with_derived_bonuses"] == 2
+    points = {"1": 10.0, "2": 3.0, "3": 0.0, "9": 20.0}
+    res = an.ground_truth(stats, points, SCORING, {"1", "2", "3"}, PLAYERS)
+    assert res["players_compared"] == 3
+    assert res["match_as_delivered"] == 2  # player 1 needs the derived bonus; idle player 3 matches trivially
+    assert res["match_with_derived_bonuses"] == 3
+    assert res["nontrivial_compared"] == 2 and res["nontrivial_match_as_delivered"] == 1
+    assert res["nontrivial_match_with_derived"] == 2
+    assert res["bonus_hits"] == {"bonus_tkl_10p": 1}
     assert res["mismatches"] == []
 
 
@@ -96,6 +116,26 @@ def test_projection_shape_handles_list_and_dict():
     assert shape["positions"] == {"LB": 1, "DE": 1}
     assert shape["idp_tkl_solo_noninteger_share"] == 0.5
     assert an.projection_shape({"1": {"idp_sack": 1}})["rows"] == 1
+
+
+def test_leg_boundaries_and_failed_waiver_notes():
+    ms = lambda d: int(d.timestamp() * 1000)
+    txns = [
+        {"type": "free_agent", "leg": 5, "created": ms(datetime(2026, 10, 6, 15, 0, tzinfo=timezone.utc))},
+        {"type": "free_agent", "leg": 5, "created": ms(datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc))},
+        {"type": "waiver", "leg": 6, "created": ms(datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc)),
+         "status": "failed", "metadata": {"notes": "Exceeds position limit"}},
+    ]  # fmt: skip
+    legs = an.leg_boundaries(txns)
+    assert list(legs) == ["5"] and legs["5"]["n"] == 2
+    assert legs["5"]["first"].startswith("Tue 2026-10-06 11:00")
+    assert an.failed_waiver_notes(txns) == {"Exceeds position limit": 1}
+
+
+def test_rows_from_payload_normalises_ids_and_stats():
+    rows = an.rows_from_payload([{"player_id": 12, "stats": None}, {"stats": {}}, "junk"])
+    assert rows == [{"player_id": "12", "stats": {}}]
+    assert an.stats_by_player({"7": {"idp_sack": 1}, "8": None}) == {"7": {"idp_sack": 1}}
 
 
 def test_waiver_timing_buckets_pacific():

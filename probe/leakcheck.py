@@ -8,6 +8,7 @@ Reports only the file path and the pattern name, never the matched text.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -16,28 +17,38 @@ from pathlib import Path
 
 PATTERNS = {
     "age_secret_key": re.compile(rb"AGE-SECRET-KEY-"),
-    "http_credential_header": re.compile(rb"(?im)^[ \t\"']*(cookie|set-cookie|authorization)[ \t]*:"),
+    # `Cookie: x` at line start, or a quoted key in JSON / Python dicts: "Cookie": / 'Authorization':
+    "http_credential_header": re.compile(rb"(?im)(?:^[ \t]*|[\"'])(cookie|set-cookie|authorization)[\"']?[ \t]*:"),
 }
 PRIVATE_SOURCES = ("fantasypros",)
 MIN_SECRET_LEN = 8
 
 
+def _escaped_forms(value: str) -> set[bytes]:
+    """The value plus how it looks after JSON / repr escaping, so escaped echoes are caught too."""
+    forms = {value, json.dumps(value)[1:-1], repr(value)[1:-1], value.encode("unicode_escape").decode()}
+    return {f.encode() for f in forms if len(f) >= MIN_SECRET_LEN}
+
+
 def secret_values(env: dict[str, str] | None = None) -> dict[str, list[bytes]]:
     env = os.environ if env is None else env
-    out: dict[str, list[bytes]] = {}
-    cookie = env.get("FP_COOKIE", "")
-    parts = []
-    for pair in cookie.split(";"):
-        value = pair.split("=", 1)[1] if "=" in pair else pair
-        value = value.strip()
+    out: dict[str, set[bytes]] = {}
+    raw_cookie = env.get("FP_COOKIE", "")
+    for pair in re.split(r"[;\r\n]+", raw_cookie):
+        value = (pair.split("=", 1)[1] if "=" in pair else pair).strip().strip("\"'")
         if len(value) >= MIN_SECRET_LEN:
-            parts.append(value.encode())
-    if parts:
-        out["fp_cookie_value"] = parts
-    key = env.get("ODDS_API_KEY", "").strip()
-    if len(key) >= MIN_SECRET_LEN:
-        out["odds_api_key"] = [key.encode()]
-    return out
+            out.setdefault("fp_cookie_value", set()).update(_escaped_forms(value))
+    if len(raw_cookie.strip()) >= MIN_SECRET_LEN:
+        out.setdefault("fp_cookie_value", set()).update(_escaped_forms(raw_cookie.strip()))
+    for var, name, min_len in (
+        ("ODDS_API_KEY", "odds_api_key", MIN_SECRET_LEN),
+        ("FP_PASSWORD", "fp_password", 6),
+        ("FP_EMAIL", "fp_email", 6),
+    ):
+        value = env.get(var, "").strip() if var != "FP_PASSWORD" else env.get(var, "")
+        if len(value) >= min_len:
+            out.setdefault(name, set()).update(_escaped_forms(value) | {value.encode()})
+    return {k: sorted(v) for k, v in out.items()}
 
 
 def scan_file(path: Path, secrets: dict[str, list[bytes]]) -> list[str]:

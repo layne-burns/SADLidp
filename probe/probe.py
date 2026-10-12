@@ -11,11 +11,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
+from . import leakcheck
 from . import sources_probe as sp
 from .phttp import Client
 from .report import render_markdown, stringify_keys
@@ -26,17 +26,17 @@ def _guarded(report: dict, name: str, fn, *args):
     try:
         return fn(*args)
     except Exception as e:  # noqa: BLE001 - one failing probe must not stop the others
+        # Type and location only: exception messages can echo header values (e.g. a cookie).
         tb = traceback.extract_tb(e.__traceback__)[-1]
-        report["sections"][name] = {"error": f"{type(e).__name__}: {e} ({Path(tb.filename).name}:{tb.lineno})"}
+        report["sections"][name] = {"error": f"{type(e).__name__} ({Path(tb.filename).name}:{tb.lineno})"}
         return None
 
 
 def redact_secrets(text: str) -> str:
-    for var in ("FP_COOKIE", "ODDS_API_KEY", "FP_DATA_KEY"):
-        raw = os.environ.get(var, "")
-        for piece in [raw, *(p.split("=", 1)[-1].strip() for p in raw.split(";"))]:
-            if len(piece) >= 8:
-                text = text.replace(piece, "REDACTED")
+    """Belt and braces: replace any secret (and its escaped forms) that slipped into the output."""
+    for values in leakcheck.secret_values().values():
+        for v in sorted(values, key=len, reverse=True):
+            text = text.replace(v.decode("utf-8", errors="replace"), "REDACTED")
     return text
 
 
@@ -50,12 +50,31 @@ def run(args) -> dict:
     season_hint = now.year if now.month >= 3 else now.year - 1
     out = Path(args.out)
     client = Client()
-    report: dict = {"generated_at": now.isoformat(), "probe_version": 1, "sections": {}}
+    report: dict = {"generated_at": now.isoformat(), "probe_version": 2, "sections": {}}
     samples: dict[str, object] = {}
-    secs = report["sections"]
+    try:
+        _run_probes(args, now, season_hint, out, client, report, samples)
+    except BaseException as e:
+        report["aborted"] = type(e).__name__
+        if not isinstance(e, Exception):
+            _write(out, report, samples, client)
+            raise
+    _write(out, report, samples, client)
+    return report
 
+
+def _write(out: Path, report: dict, samples: dict, client: Client) -> None:
+    report["request_count"] = client.request_count
+    report["dead_hosts"] = sorted(client.dead_hosts)
+    write_json(out / "report.json", report)
+    for name, obj in samples.items():
+        write_json(out / "samples" / name, obj)
+    (out / "report.md").write_text(redact_secrets(render_markdown(report)))
+
+
+def _run_probes(args, now, season_hint, out, client, report, samples) -> None:
+    secs = report["sections"]
     res = _guarded(report, "schedule", sp.probe_schedule, client, season_hint, now)
-    sched_rows: list = []
     if res:
         secs["schedule"], sched_rows = res
         samples["schedule_season.json"] = [r for r in sched_rows if str(r.get("season")) == str(season_hint)]
@@ -73,9 +92,11 @@ def run(args) -> dict:
     if res:
         secs["sleeper"], sl_samples = res
         samples.update({f"sleeper_{k}": v for k, v in sl_samples.items()})
-    season = (secs.get("sleeper") or {}).get("season") or season_hint
+    sl = secs.get("sleeper") or {}
+    season = sl.get("season") or season_hint
+    week = target_week or (sl.get("weeks_used") or {}).get("week_used")
 
-    res = _guarded(report, "espn_api", sp.probe_espn, client, season, target_week)
+    res = _guarded(report, "espn_api", sp.probe_espn, client, season, week)
     if res:
         secs["espn_api"], espn_sample = res
         if espn_sample:
@@ -99,16 +120,9 @@ def run(args) -> dict:
     res = _guarded(report, "fantasypros", sp.probe_fantasypros, client, out)
     if res is not None:
         secs["fantasypros"] = res
-    res = _guarded(report, "odds_api", sp.probe_odds, client)
+    res = _guarded(report, "odds_api", sp.probe_odds, client, now)
     if res is not None:
         secs["odds_api"] = res
-
-    report["request_count"] = client.request_count
-    write_json(out / "report.json", report)
-    for name, obj in samples.items():
-        write_json(out / "samples" / name, obj)
-    (out / "report.md").write_text(redact_secrets(render_markdown(report)))
-    return report
 
 
 def main(argv: list[str] | None = None) -> int:

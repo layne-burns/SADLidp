@@ -74,9 +74,16 @@ def position_limits(settings: dict) -> dict[str, int]:
     return out
 
 
+def _one(slot: str | None) -> list[str]:
+    return [slot] if slot else []
+
+
 D14_RULES = {
-    "position": slot_by_position,
-    "fantasy_positions[0]": slot_by_fantasy_first,
+    "position": lambda p: _one(slot_by_position(p)),
+    "fantasy_positions[0]": lambda p: _one(slot_by_fantasy_first(p)),
+    # A dual-eligible player counts toward every slot he can fill. Counts under this rule are
+    # always >= the others, so its violations can rule it out but 0 violations can't confirm it.
+    "all_eligible": lambda p: sorted(set(idp_eligibility(p)) | set(_one(slot_by_position(p)))),
 }
 
 
@@ -95,25 +102,64 @@ def _roster_sets(roster: dict) -> dict[str, set[str]]:
 def d14_analysis(rosters: list[dict], players: dict[str, dict], limits: dict[str, int]) -> dict:
     """Which position rule keeps every SADL roster within its IDP limits?
 
-    If Sleeper enforces limits by rule X, rosters should (barring mid-season
-    eligibility changes) never exceed a limit when counted by X.
+    If Sleeper enforces limits by rule X, rosters should (barring mid-season eligibility
+    changes) never exceed a limit when counted by X. A violation rules a hypothesis out;
+    0 violations under several rules is inconclusive unless a discriminating roster exists.
     """
-    result: dict = {"limits": limits, "rules": {}}
+    if not players:
+        return {"inconclusive": "players DB unavailable", "limits": limits}
+    if not limits:
+        return {"inconclusive": "no position_limit_* keys in league settings", "limits": {}}
+    if not rosters:
+        return {"inconclusive": "no rosters", "limits": limits}
+    result: dict = {"limits": limits, "rules": {}, "discriminating": []}
+    counts_by: dict[tuple, dict[str, int]] = {}
     for rule_name, rule in D14_RULES.items():
-        per_variant = {}
+        per_variant: dict = {}
         for roster in rosters:
+            reserve = set(roster.get("reserve") or [])
+            taxi = set(roster.get("taxi") or [])
             for variant, ids in _roster_sets(roster).items():
-                counts = Counter(rule(players.get(pid, {})) for pid in ids)
+                counts = Counter(s for pid in ids for s in rule(players.get(pid, {})))
                 v = per_variant.setdefault(variant, {"violations": [], "max_seen": Counter()})
                 for slot in IDP_SLOTS:
-                    v["max_seen"][slot] = max(v["max_seen"][slot], counts.get(slot, 0))
-                    if slot in limits and counts.get(slot, 0) > limits[slot]:
+                    n = counts.get(slot, 0)
+                    v["max_seen"][slot] = max(v["max_seen"][slot], n)
+                    counts_by.setdefault((roster.get("roster_id"), variant, slot), {})[rule_name] = n
+                    if slot in limits and n > limits[slot]:
                         v["violations"].append(
-                            {"roster_id": roster.get("roster_id"), "slot": slot, "count": counts[slot]}
+                            {
+                                "roster_id": roster.get("roster_id"),
+                                "slot": slot,
+                                "count": n,
+                                "players": [
+                                    {
+                                        "id": pid,
+                                        "name": player_name(players.get(pid)),
+                                        "position": players.get(pid, {}).get("position"),
+                                        "fantasy_positions": players.get(pid, {}).get("fantasy_positions"),
+                                        "reserve": pid in reserve,
+                                        "taxi": pid in taxi,
+                                    }
+                                    for pid in sorted(ids)
+                                    if slot in rule(players.get(pid, {}))
+                                ],
+                            }
                         )
         result["rules"][rule_name] = {
             k: {"violations": v["violations"], "max_seen": dict(v["max_seen"])} for k, v in per_variant.items()
         }
+    for (roster_id, variant, slot), by_rule in counts_by.items():
+        over = {rule: n > limits[slot] for rule, n in by_rule.items()} if slot in limits else {}
+        if over and len(set(over.values())) > 1:
+            result["discriminating"].append(
+                {"roster_id": roster_id, "subset": variant, "slot": slot, "counts": by_rule, "limit": limits[slot]}
+            )
+    result["verdict"] = (
+        "inconclusive: no roster distinguishes the rules"
+        if not result["discriminating"]
+        else "see discriminating rosters: rules with violations there are ruled out"
+    )
     dual = []
     for roster in rosters:
         for pid in _roster_sets(roster)["all"]:
@@ -170,6 +216,16 @@ def derive_bonuses(stats: dict, scoring: dict) -> dict:
     return out
 
 
+def _nontrivial(points: float, stats: dict) -> bool:
+    return bool(points) or any(num(v) for v in stats.values())
+
+
+def _bonus_hit(stats: dict, key: str) -> bool:
+    stat, threshold = THRESHOLD_BONUSES[key]
+    value = tackles_total(stats) if stat == "tkl_total" else num(stats.get(stat))
+    return num(stats.get(key)) > 0 or value >= threshold
+
+
 def ground_truth(
     stats_by_pid: dict[str, dict],
     players_points: dict[str, float],
@@ -193,6 +249,12 @@ def ground_truth(
         "match_with_derived_bonuses": sum(abs(s - d) <= tol for _, s, _, d, _ in rows),
         "max_abs_diff_as_delivered": max((abs(s - d) for _, s, d, _, _ in rows), default=0.0),
         "max_abs_diff_with_derived": max((abs(s - d) for _, s, _, d, _ in rows), default=0.0),
+        # players with points or any recorded stat; 0-point bench players with no line match trivially
+        "nontrivial_compared": sum(_nontrivial(s, st) for _, s, _, _, st in rows),
+        "nontrivial_match_as_delivered": sum(_nontrivial(s, st) and abs(s - d) <= tol for _, s, d, _, st in rows),
+        "nontrivial_match_with_derived": sum(_nontrivial(s, st) and abs(s - d) <= tol for _, s, _, d, st in rows),
+        # threshold-bonus hits in this week (delivered key or threshold met); SPEC §10 needs >= 1
+        "bonus_hits": {k: sum(_bonus_hit(st, k) for *_, st in rows) for k in THRESHOLD_BONUSES if num(scoring.get(k))},
         "mismatches": [],
     }
     for pid, s, d1, d2, st in rows:
@@ -267,12 +329,21 @@ def key_fill_rates(stat_lines: list[dict], prefixes=("idp_", "bonus", "st_", "de
 
 
 def rows_from_payload(payload) -> list[dict]:
-    """Normalize Sleeper list-of-rows or {player_id: stats} payloads to rows."""
+    """Normalize Sleeper list-of-rows or {player_id: stats} payloads to rows with str ids and dict stats."""
     if isinstance(payload, list):
-        return [r for r in payload if isinstance(r, dict)]
+        rows = [
+            dict(r, player_id=str(r["player_id"]), stats=r.get("stats") if isinstance(r.get("stats"), dict) else {})
+            for r in payload
+            if isinstance(r, dict) and r.get("player_id") is not None
+        ]
+        return rows
     if isinstance(payload, dict):
-        return [{"player_id": pid, "stats": st} for pid, st in payload.items() if isinstance(st, dict)]
+        return [{"player_id": str(pid), "stats": st} for pid, st in payload.items() if isinstance(st, dict)]
     return []
+
+
+def stats_by_player(payload) -> dict[str, dict]:
+    return {r["player_id"]: r["stats"] for r in rows_from_payload(payload)}
 
 
 def projection_shape(payload, players: dict[str, dict] | None = None) -> dict:
@@ -331,6 +402,33 @@ def waiver_timing(transactions: list[dict]) -> dict:
         "waiver_processed_at_pt": dict(by_pt.most_common(8)),
         "waiver_processed_at_utc": dict(by_utc.most_common(8)),
     }
+
+
+def _et(ms: float) -> str:
+    return datetime.fromtimestamp(ms / 1000, tz=timezone.utc).astimezone(ET).strftime("%a %Y-%m-%d %H:%M ET")
+
+
+def leg_boundaries(transactions: list[dict]) -> dict:
+    """First/last creation time of free-agent and trade transactions per leg (week).
+
+    Sleeper's week rollover N -> N+1 lies between leg N's last and leg N+1's first
+    transaction. Waivers are excluded: their leg may be assigned when they process.
+    """
+    by_leg: dict[int, list[float]] = {}
+    for t in transactions:
+        if t.get("type") in ("free_agent", "trade") and t.get("leg") and t.get("created"):
+            by_leg.setdefault(int(t["leg"]), []).append(num(t["created"]))
+    return {str(leg): {"first": _et(min(v)), "last": _et(max(v)), "n": len(v)} for leg, v in sorted(by_leg.items())}
+
+
+def failed_waiver_notes(transactions: list[dict]) -> dict:
+    """Sleeper's reasons for failed waiver claims (may mention position limits: D14 evidence)."""
+    notes = Counter(
+        (t.get("metadata") or {}).get("notes")
+        for t in transactions
+        if t.get("type") == "waiver" and t.get("status") == "failed"
+    )
+    return {str(k): v for k, v in notes.most_common(15)}
 
 
 # ---------------------------------------------------------------- schedule

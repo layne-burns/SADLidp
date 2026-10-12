@@ -1,0 +1,65 @@
+# SADL IDP streamer
+
+Weekly IDP streaming tiers for SADL ("Slow Ass Draft League") on Sleeper. Each sync pulls IDP projections, rescores them with SADL's own `scoring_settings`, blends the sources into a consensus with an uncertainty for each player, and publishes tiers of the DL, LB and DB actually available in SADL, next to START / UPGRADE suggestions for your roster.
+
+**Page:** https://layne-burns.github.io/SADLidp/
+
+The design and every decision behind it are in [SPEC.md](SPEC.md). This is the MVP (Phase 2): Sleeper's projections are the only source so far. FantasyPros ECR, RotoBaller and the ESPN league come in Phase 3.
+
+## One-time setup
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
+2. **Actions → sync → Run workflow** (branch `main`) for the first sync. It finds the league, backfills this season's earlier weeks where Sleeper still serves their projections, commits `data/` and deploys the page.
+
+No secrets are needed. The sync pushes its data commits straight to `main`, so if you ever protect `main`, let GitHub Actions push to it.
+
+## The sync button and the schedule
+- **Button:** Actions → sync → Run workflow. It also works from the GitHub mobile app, and it always syncs.
+- **Automatic:** the workflow wakes every 3 hours (hourly on Sunday mornings), but it only syncs once in each of these windows per week:
+  - **Pre-waiver:** from 12 h to 1 h before SADL's waivers process at 00:00 Pacific on Wednesday, so Tuesday noon to 11 PM PT.
+  - **Saturday:** 12:00 to 6:00 PM ET, after the final injury reports.
+  - **Sunday:** from 4 h to 15 min before the first Sunday kickoff, including 9:30 AM ET international games.
+- **When a sync fails,** nothing is deployed and the previous page stays up. The run's log is under Actions.
+- **To check the windows,** run `uv run sadlidp gate`. It prints this week's windows and whether one is due.
+
+## Reading the page
+- **Week N · data as of …:** a yellow banner appears when the data is more than 36 hours old.
+- **Points** are SADL points. **±** is how much the sources disagree about a player, not week-to-week luck. With one source it's a fixed default.
+- **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). With one source every ± is the same, so for now the tiers are equal-width point bands.
+- **My IDPs** places your DL, LB and DB against the waiver tiers.
+  - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
+  - **UPGRADE:** the same test against your other player at that position.
+  - These odds include game-to-game spread (σ<sub>out</sub>, measured from last season's actual SADL points). The suggested move says whether to add only, add and drop, or choose the drop yourself.
+- **Tags:**
+  - Q: questionable.
+  - "also LB": dual eligible. The player is listed under the position Sleeper counts toward the 2-per-position limit.
+  - IR and taxi.
+  - The reason a player can't play: bye, Out, locked, and so on.
+- **Hidden from the waiver tiers:**
+  - Out, Doubtful, IR, PUP, NFI and suspended players.
+  - Inactive players, and players with no team.
+  - Teams on bye, and anyone whose game has started.
+- **Footer:** each source's status, how many players it covers, and when it last succeeded. If a source fails, the page keeps its earlier projections and says so.
+
+## Each season
+- **In late August,** re-enable the schedule: Actions → sync → Enable workflow, then Run workflow once. GitHub turns off scheduled workflows in public repos after 60 days without activity.
+- **The league is found by name** (`[league] names` in `config/sadl.toml`) among `lbburnsy`'s leagues for the new season. If the name changes, set `league_id` there instead.
+
+## Local development
+```
+uv sync
+uv run pytest                                          # offline: tests use recorded fixtures
+uv run ruff check . && uv run ruff format --check .
+uv run sadlidp sync --force --data-dir /tmp/sadl       # live: needs network access to Sleeper
+uv run sadlidp build --data-dir /tmp/sadl --site-dir /tmp/site
+uv run sadlidp gate
+```
+Pushes to `claude/**` branches also run a live preview in CI: a forced sync into a scratch directory, published to the `preview` branch, which each run replaces.
+
+## Layout
+| Path | What |
+|---|---|
+| `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/`, `scoring`, `consensus`, `tiers`, `roster`, `gate`, `site/` |
+| `config/sadl.toml` | all tunables (SPEC §9) |
+| `data/<season>/` | `league.json`, `schedule.json`, `gate.json` (windows already run) |
+| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json`, `rosters.json`, `players_idp.json`, `actuals.json`, `sources/<source>.json` (projections frozen at kickoff) |
+| `probe/` | the Phase 1 data-source probe (SPEC §13) |

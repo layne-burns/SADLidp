@@ -1,0 +1,50 @@
+# SADL IDP streamer configuration (SPEC.md §9). Values here are tunables, not secrets.
+
+[league]
+username = "lbburnsy"
+names = ["SADL", "Slow Ass Draft League"]
+# league_id = ""            # optional override of the name match (SPEC §4.2)
+
+[espn]
+league_id = "942104146"     # owner's public IDP league (Phase 3 source)
+
+[roster]
+position_limit = 2          # used only if Sleeper's settings have no position_limit_* keys
+
+[display]
+depth = 25                  # players shown per position tab
+
+[tiers]
+z = 1.0                     # strictness of anchored significance tiers (SPEC §6.6)
+nu0 = 2                     # shrinkage pseudo-count for between-source spread (SPEC §6.4)
+s0_default = 1.0            # between-source SD assumed until >=3-source players exist
+
+[tiers.sigma_floor]
+DL = 0.75
+LB = 0.75
+DB = 0.75
+
+[swap]
+threshold = 0.6             # START/UPGRADE badge probability (SPEC §6.7)
+
+[sigma_out]                 # per-position weekly outcome SD fallback if last season can't be read
+DL = 5.0
+LB = 5.5
+DB = 5.0
+
+[weights]
+prior_split = 0.6           # projection : rank group prior (D11)
+
+[sources]
+max_source_age_h = 96
+
+[sources.sleeper_proj]
+enabled = true
+
+[gate]
+pre_waiver_open_h = 12      # window opens this many hours before waivers process
+pre_waiver_close_h = 1
+saturday_open_et = "12:00"
+saturday_close_et = "18:00"
+sunday_open_h = 4           # before the first Sunday kickoff
+sunday_close_min = 15

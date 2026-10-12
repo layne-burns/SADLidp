@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import datetime
 
-from . import storage
+from . import scoring, storage
 
 
 def _open(entry: dict, now: datetime) -> bool:
@@ -50,3 +50,29 @@ def update_tiers_log(
     if prewaiver:
         out["prewaiver"] = {"at": now.isoformat(), "players": tier_rows}
     return out
+
+
+def played(line) -> bool:
+    """A Sleeper stat line from a player who took part (gp, or any IDP stat)."""
+    return isinstance(line, dict) and bool(line.get("gp") or any(v for k, v in line.items() if k.startswith("idp_")))
+
+
+def stat_result(line, sc: dict, final: bool) -> dict:
+    """SADL points from a stat line: `live`/`final`, or `dnp` once final with no line (D22)."""
+    if played(line):
+        return {"pts": round(scoring.points(line, sc), 2), "state": "final" if final else "live"}
+    return {"pts": None, "state": "dnp"} if final else {"pts": 0.0, "state": "live"}
+
+
+def settled(r: dict | None) -> bool:
+    return bool(r) and r["state"] in ("final", "dnp")
+
+
+def outcome(w_res: dict | None, over: str | None, over_res: dict | None) -> str | None:
+    """hit / miss / push once both results are final (an empty slot counts as 0); void if either didn't play."""
+    if not settled(w_res) or (over and not settled(over_res)):
+        return None
+    if w_res["state"] == "dnp" or (over and over_res["state"] == "dnp"):
+        return "void"
+    w_pts, o_pts = w_res["pts"] or 0.0, (over_res or {}).get("pts") or 0.0
+    return "hit" if w_pts > o_pts else "miss" if w_pts < o_pts else "push"

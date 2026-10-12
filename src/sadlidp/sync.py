@@ -180,27 +180,9 @@ def live_results(payload, pids, sc: dict, status_of: Callable[[str], PlayerStatu
     out = {}
     for pid in pids:
         st = status_of(pid)
-        if st.kickoff is None or st.kickoff > now:
-            continue
-        state = "final" if st.kickoff + timedelta(hours=4) <= now else "live"
-        line = payload.get(pid)
-        if isinstance(line, dict) and (line.get("gp") or any(v for k, v in line.items() if k.startswith("idp_"))):
-            out[pid] = {"pts": round(scoring.points(line, sc), 2), "state": state}
-        else:
-            out[pid] = {"pts": None, "state": "dnp"} if state == "final" else {"pts": 0.0, "state": "live"}
+        if st.kickoff is not None and st.kickoff <= now:
+            out[pid] = weeklog.stat_result(payload.get(pid), sc, st.kickoff + timedelta(hours=4) <= now)
     return out
-
-
-def _settled(r: dict | None) -> bool:
-    return bool(r) and r["state"] in ("final", "dnp")
-
-
-def _outcome(w_res: dict | None, over: str | None, over_res: dict | None) -> str | None:
-    """hit / miss / push once both results are final (an empty slot counts as 0)."""
-    if not _settled(w_res) or (over and not _settled(over_res)):
-        return None
-    w_pts, o_pts = w_res["pts"] or 0.0, (over_res or {}).get("pts") or 0.0
-    return "hit" if w_pts > o_pts else "miss" if w_pts < o_pts else "push"
 
 
 def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc: dict, players: dict) -> dict | None:
@@ -218,10 +200,7 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     provisional = bool(settles) and datetime.fromisoformat(act["captured_at"]) < settles
 
     def res(pid: str) -> dict:
-        line = stats.get(pid)
-        if isinstance(line, dict) and (line.get("gp") or any(v for k, v in line.items() if k.startswith("idp_"))):
-            return {"pts": round(scoring.points(line, sc), 2), "state": "final"}
-        return {"pts": None, "state": "dnp"}
+        return weeklog.stat_result(stats.get(pid), sc, final=True)
 
     slots: dict[str, list] = {slot: [] for slot in IDP_SLOTS}
     for e in badges.values():
@@ -229,13 +208,12 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
             continue  # withdrawn before lock: never issued
         w, over = e["w"], e.get("over")
         w_res, over_res = res(w), res(over) if over else None
-        dnp = w_res["state"] == "dnp" or (over_res is not None and over_res["state"] == "dnp")
         slots[e["slot"]].append({
             **{k: e.get(k) for k in ("badge", "p", "reference", "why", "mu_w", "mu_over", "over")},
             "name": player_name(players.get(w, {})), "team": (players.get(w) or {}).get("team"),
             "over_name": player_name(players.get(over, {})) if over else None,
             "result": w_res, "over_result": over_res,
-            "outcome": "void" if dnp else _outcome(w_res, over, over_res),
+            "outcome": weeklog.outcome(w_res, over, over_res),
         })  # fmt: skip
     for rows in slots.values():
         rows.sort(key=lambda x: (x["reference"], -((x["result"] or {}).get("pts") or -1.0)))
@@ -555,7 +533,7 @@ def run_sync(
             played_sugg.append({
                 **{k: e.get(k) for k in ("badge", "over", "p", "action", "drop", "reference", "why", "mu_over")},
                 "player": card, "over_result": results.get(over) if over else None,
-                "outcome": _outcome(results.get(w), over, results.get(over) if over else None),
+                "outcome": weeklog.outcome(results.get(w), over, results.get(over) if over else None),
             })  # fmt: skip
         played_sugg.sort(key=lambda x: (-((x["player"]["result"] or {}).get("pts") or -1.0), -(x["player"]["mu"] or 0)))
         my_out[slot] = {
@@ -577,7 +555,9 @@ def run_sync(
     recap = _guard("last week's results", lambda: last_week_recap(data_dir, season, week, sched, sc, players), None,
                    warnings, log)  # fmt: skip
 
+    week_kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
     run.update(
+        settles_at=(max(week_kicks) + timedelta(days=4, hours=4)).isoformat() if week_kicks else None,
         warnings=warnings,
         backfilled=backfilled,
         actuals_written=actuals,

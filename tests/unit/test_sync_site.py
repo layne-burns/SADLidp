@@ -369,3 +369,27 @@ def test_last_week_recap_shows_final_scores_of_issued_suggestions(tmp_path):
     html = build_site(data, tmp_path / "site").read_text()
     assert "Last week&#39;s suggestions (week 5)" in html or "Last week's suggestions (week 5)" in html
     assert "✓ paid off" in html and "suggestions paid off ↓" in html
+
+
+def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # week 5
+    r = routes()
+    r[f"{V1}/state/nfl"] = {"season": "2026", "season_type": "regular", "week": 6, "display_week": 6}
+    r[f"{V1}/stats/nfl/regular/2026/5"] = {"4118": {"gp": 1, "idp_tkl_solo": 6, "idp_tkl_ast": 2, "idp_sack": 1}}
+    run_sync(CFG, data, cache, WEEK6_TUE, force=True, client=FakeClient(r), log=lambda m: None)  # week 6
+    site = tmp_path / "site"
+    build_site(data, site)
+    assert {p.name for p in site.iterdir()} >= {
+        "index.html", "data.json", "week-2026-05.html", "week-2026-06.html", "data-2026-05.json", "data-2026-06.json",
+    }  # fmt: skip
+    assert (site / "index.html").read_text() == (site / "week-2026-06.html").read_text()
+    past = (site / "week-2026-05.html").read_text()
+    assert 'href="week-2026-06.html"' in past and "Week 6 · now" in past and 'aria-current="page"' in past
+    assert "looking at a past week" in past and "provisional" in past
+    w5 = json.loads((site / "data-2026-05.json").read_text())
+    anz = next(p for t in w5["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "4118")
+    assert anz["result"] == {"pts": 20.0, "state": "final"}  # re-scored from week 5's actuals
+    sugg = next(s for s in w5["my_idps"]["LB"]["suggestions"] if s["player"]["id"] == "4118")
+    assert sugg["outcome"] == "void"  # Cedric Gray has no stat line in this fixture
+    assert "looking at a past week" not in (site / "index.html").read_text()

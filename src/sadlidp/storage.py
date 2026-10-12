@@ -119,6 +119,8 @@ def save_source(path: Path, result, rows: dict[str, dict]) -> None:
             "kind": result.kind,
             "week": result.week,
             "last_success": result.fetched_at,
+            # when the source says it first posted this week's data; the earliest seen counts (§5.3)
+            "published_at": old.get("published_at") or getattr(result, "published_at", None),
             "rows": rows,
             "no_projection_ids": sorted(result.no_projection_ids),
             "universe": result.universe,

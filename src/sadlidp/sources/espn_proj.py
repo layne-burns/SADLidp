@@ -144,10 +144,10 @@ def fetch(ctx: FetchContext) -> AdapterResult:
         if ctx.imputer is not None:
             stats, imputed = ctx.imputer.fill(pid, stats, covered)
         imputed_counts.update(imputed)
-        result.rows[pid] = {
-            "stats": stats,
+        result.rows[pid] = {  # 3 decimals: well below any scoring step, and a third of the file size
+            "stats": {k: round(v, 3) for k, v in stats.items()},
             "imputed": list(imputed),
-            "raw": {k: v for k, v in line.items() if k in STAT_MAP or k in RAW_ONLY},
+            "raw": {k: round(v, 3) for k, v in line.items() if k in STAT_MAP or k in RAW_ONLY},
             "map_version": MAP_VERSION,
             "espn_id": sid,
             "team": team,

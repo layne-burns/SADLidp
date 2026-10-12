@@ -110,9 +110,9 @@ def test_rows_covered_keys_imputation_and_report():
     assert len(res.rows) == 44 and len(res.no_projection_ids) == 11 and not set(res.rows) & res.no_projection_ids
 
     fred = res.rows[FRED]  # week-6 projection, not his week-5 actuals line (10 tackles)
-    assert fred["stats"]["idp_tkl_solo"] == pytest.approx(5.028540718)
-    assert fred["stats"]["idp_tkl_ast"] == pytest.approx(3.987932272)
-    assert fred["stats"]["idp_sack"] == pytest.approx(0.111941852)
+    assert fred["stats"]["idp_tkl_solo"] == 5.029  # stored to 3 decimals
+    assert fred["stats"]["idp_tkl_ast"] == 3.988
+    assert fred["stats"]["idp_sack"] == 0.112
     assert fred["imputed"] == ["idp_def_td", "idp_qb_hit", "idp_safe", "idp_tkl_loss"]
     assert fred["stats"]["idp_tkl_loss"] == 0.1 and "idp_blk_kick" not in fred["imputed"]
     assert set(fred["raw"]) == set(espn_proj.STAT_MAP) | {"94", "98", "103", "105"}  # no 93, 100, 110, 210

@@ -63,7 +63,8 @@ def test_last_fantasy_week():
 def test_sunday_results_window_follows_the_afternoon_games():
     res = next(w for w in gate.windows(SCHED, 2026, 5, SADL, {}) if w.kind == "results")
     assert res.id == "2026-w05-results"
-    assert res.open == datetime(2026, 10, 11, 16, 25, tzinfo=ET) + timedelta(hours=3.25)  # last daytime kickoff 4:25
+    assert res.open == datetime(2026, 10, 11, 16, 25, tzinfo=ET) + timedelta(hours=4.25)  # last daytime kickoff 4:25
     assert res.close == res.open + timedelta(hours=6)
-    slots = [datetime(2026, 10, 12, h, 17, tzinfo=UTC) for h in (0, 3)]  # '17 */3' at 8:17 / 11:17 PM ET
-    assert all(res.contains(t) for t in slots)
+    # '17 */3' slots: 8:17 PM ET is too early (the 4:25 games are final at 8:25); 11:17 PM and 2:17 AM are in
+    assert not res.contains(datetime(2026, 10, 12, 0, 17, tzinfo=UTC))
+    assert all(res.contains(datetime(2026, 10, 12, h, 17, tzinfo=UTC)) for h in (3, 6))

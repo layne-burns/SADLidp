@@ -98,6 +98,11 @@ class Schedule:
         upcoming = [(g.kickoff, g.week) for g in self.games if g.kickoff and g.kickoff > now]
         return min(upcoming)[1] if upcoming else None
 
+    def settles_at(self, week: int) -> datetime | None:
+        """When a week's stats are final: its last kickoff + 4 d 4 h (Sleeper's stat corrections)."""
+        kicks = [g.kickoff for g in self.week_games(week) if g.kickoff]
+        return max(kicks) + timedelta(days=4, hours=4) if kicks else None
+
     def settled_week(self, now: datetime, days: int = 4) -> int | None:
         """The latest week whose last game kicked off at least `days` days (+4 h) ago."""
         last: dict[int, datetime] = {}

@@ -2,8 +2,10 @@
 
 `badges.json`: every START/UPGRADE suggestion, keyed `W|BADGE|OVER`. Until the earlier kickoff of W and the
 player he is compared with (`lock_at`) it takes the latest state (`active` false if withdrawn); after
-that it is frozen, so "issued" = active at the last sync before lock. `tiers_log.json`: the waiver tiers
-as shown at the pre-waiver sync and, per player, at his last sync before kickoff.
+that it is frozen, so "issued" = active at the last sync before lock. A suggestion whose player is
+claimed before lock (by you or anyone) is frozen at the claim as it stood (`claimed_by`), not withdrawn.
+`tiers_log.json`: the waiver tiers as shown at the pre-waiver sync and, per player, at his last sync
+before kickoff.
 """
 
 from __future__ import annotations
@@ -15,16 +17,31 @@ from . import scoring, storage
 
 
 def _open(entry: dict, now: datetime) -> bool:
+    if entry.get("claimed_at"):
+        return False
     lock_at = entry.get("lock_at")
     return lock_at is None or datetime.fromisoformat(lock_at) > now
 
 
-def update_badge_log(existing: dict[str, dict], current: dict[str, dict], now: datetime) -> dict[str, dict]:
+def update_badge_log(
+    existing: dict[str, dict],
+    current: dict[str, dict],
+    now: datetime,
+    claimed: Callable[[str], str | None] = lambda pid: None,
+) -> dict[str, dict]:
     """Keys are `W|BADGE|OVER` (the comparison is part of the suggestion). An open entry takes the latest
-    state; one that disappears before its lock is marked withdrawn; after lock nothing changes."""
+    state; one that disappears before its lock is marked withdrawn, unless its player was claimed
+    (`claimed(W)` = "me" or "other"), which freezes it as it stood; after lock nothing changes."""
     stamp = now.isoformat()
     live = {key for key, e in current.items() if _open(e, now)}
-    out = {key: ({**e, "active": key in live} if _open(e, now) else e) for key, e in existing.items()}
+    out = {}
+    for key, e in existing.items():
+        if not _open(e, now) or key in live:
+            out[key] = e
+        elif who := claimed(e["w"]):
+            out[key] = {**e, "claimed_at": stamp, "claimed_by": who}  # followed (or taken): judged as it stood
+        else:
+            out[key] = {**e, "active": False}
     for key, entry in current.items():
         old = out.get(key)
         if not _open(entry, now) or (old is not None and not _open(old, now)):

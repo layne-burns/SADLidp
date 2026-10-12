@@ -49,5 +49,5 @@ saturday_open_et = "12:00"
 saturday_close_et = "18:00"
 sunday_open_h = 4           # before the first Sunday kickoff
 sunday_close_min = 15
-results_after_h = 3.25      # Sunday-evening results sync: this long after the last daytime kickoff
+results_after_h = 4.25      # Sunday-evening results sync: this long after the last daytime kickoff (games final at +4 h)
 results_window_h = 6

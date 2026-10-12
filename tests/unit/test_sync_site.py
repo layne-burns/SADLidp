@@ -329,12 +329,45 @@ def test_late_capture_live_results_and_played_suggestions(tmp_path):
     assert "Already played this week" in html and "did not play" in html
 
 
+THU_NOON = datetime(2026, 10, 8, 16, 0, tzinfo=UTC)  # Thu noon ET: after waivers, before TNF
+
+
+def test_a_followed_suggestion_is_judged_with_its_result(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # Tue: START Anzalone
+    claimed = routes()
+    mine = copy.deepcopy(ROSTERS)
+    mine[0]["players"] = [*mine[0]["players"], "4118"]  # Wednesday waivers: you claimed him
+    claimed[f"{V1}/league/{LID}/rosters"] = mine
+    run_sync(CFG, data, cache, THU_NOON, force=True, client=FakeClient(claimed), log=lambda m: None)
+    entry = json.loads((data / "2026" / "week05" / "badges.json").read_text())["badges"]["4118|START|11742"]
+    assert entry["active"] is True and entry["claimed_by"] == "me"
+    claimed[f"{V1}/stats/nfl/regular/2026/5"] = {"4118": {"gp": 1, "idp_tkl_solo": 6, "idp_tkl_ast": 2, "idp_sack": 1}}
+    run_sync(CFG, data, cache, FRIDAY, force=True, client=FakeClient(claimed), log=lambda m: None)
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    sugg = {s["player"]["id"]: s for s in d["my_idps"]["LB"]["played_suggestions"]}
+    assert sugg["4118"]["player"]["result"] == {"pts": 20.0, "state": "final"}
+
+
+def test_a_failed_stats_fetch_says_so(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)
+    out = run_sync(CFG, data, cache, FRIDAY, force=True, client=FakeClient(routes()), log=lambda m: None)  # 404
+    assert any(w.startswith("Live scores unavailable this sync (HTTP 404") for w in out.warnings)
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    tykee = next(p for p in d["my_idps"]["DB"]["players"] if p["id"] == "11705")
+    assert tykee["result"] == {"pts": None, "state": "unavailable"}
+    played = [s for m in d["my_idps"].values() for s in m["played_suggestions"]]
+    assert played and all(s["player"]["result"]["state"] == "unavailable" for s in played)  # not "not played yet"
+    assert "score unavailable" in build_site(data, tmp_path / "site").read_text()
+
+
 def test_projection_first_seen_after_kickoff_is_kept_as_late(tmp_path):
     # the first-ever sync runs Thursday night: TB/DAL rows are kept (flagged late), not dropped
     run_sync(CFG, tmp_path / "d", tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
     week = tmp_path / "d" / "2026" / "week05"
     src = json.loads((week / "sources" / "sleeper_proj.json").read_text())
-    assert src["rows"]["11705"]["late"] is True
+    assert src["rows"]["11705"]["late"] is True and src["rows"]["11705"]["kickoff"] == "2026-10-08T20:15:00-04:00"
     d = json.loads((week / "consensus.json").read_text())
     tykee = next(p for p in d["my_idps"]["DB"]["players"] if p["id"] == "11705")
     assert tykee["mu"] is not None and tykee["late"] is True
@@ -395,6 +428,11 @@ def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
     sugg = next(s for s in w5["my_idps"]["LB"]["suggestions"] if s["player"]["id"] == "4118")
     assert sugg["outcome"] == "void"  # Cedric Gray has no stat line in this fixture
     assert "looking at a past week" not in (site / "index.html").read_text()
+    # a run.json written before settles_at existed: the schedule still says week 5 isn't settled
+    run = data / "2026" / "week05" / "run.json"
+    run.write_text(json.dumps({k: v for k, v in json.loads(run.read_text()).items() if k != "settles_at"}))
+    build_site(data, site)
+    assert "provisional" in (site / "week-2026-05.html").read_text()
 
 
 def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):

@@ -8,8 +8,8 @@ catches up. A window is marked done only after a successful sync. The manual but
   Wednesday) at 00:00 Pacific. Open 12 h before, close 1 h before.
 - Saturday: 12:00–18:00 ET.
 - Sunday: from 4 h before the first Sunday kickoff to 15 min before it.
-- Results (D22): Sunday evening, from 3¼ h after the last Sunday daytime kickoff, for 6 h, so the page
-  shows the afternoon's scores.
+- Results (D22): Sunday evening, from 4¼ h after the last Sunday daytime kickoff, for 6 h, so the page
+  shows the afternoon's final scores (a game counts as final 4 h after kickoff).
 """
 
 from __future__ import annotations
@@ -108,7 +108,7 @@ def windows(schedule: Schedule, season: int, week: int, settings: dict, gcfg: di
         if g.kickoff and g.kickoff.astimezone(ET).weekday() == 6 and g.kickoff.astimezone(ET).hour < 17
     ]
     if day:
-        start = max(day) + timedelta(hours=float(gcfg.get("results_after_h", 3.25)))
+        start = max(day) + timedelta(hours=float(gcfg.get("results_after_h", 4.25)))
         out.append(
             Window(
                 f"{prefix}-results", "results", start, start + timedelta(hours=float(gcfg.get("results_window_h", 6)))

@@ -98,7 +98,7 @@ def refresh_actuals(
         if not kicks or max(kicks) + timedelta(hours=4) > now:
             continue
         path = storage.week_dir(data_dir, season, week) / "actuals.json"
-        settled_at = max(kicks) + timedelta(days=4, hours=4)
+        settled_at = sched.settles_at(week)
         captured = (storage.read_json(path) or {}).get("captured_at")
         if captured and datetime.fromisoformat(captured) >= settled_at:
             continue  # captured after the stat-correction window: final
@@ -148,8 +148,10 @@ def build_week_logs(
     kickoff_of: Callable[[str], datetime | None],
     now: datetime,
     prewaiver: bool,
+    claimed: Callable[[str], str | None] = lambda pid: None,
 ) -> tuple[dict, dict]:
-    """badges.json and tiers_log.json documents for later evaluation (weeklog.py); written by the caller."""
+    """badges.json and tiers_log.json documents for later evaluation (weeklog.py); written by the caller.
+    `claimed(pid)` says who has rostered a player ("me", "other" or None)."""
     current = {}
     for slot in IDP_SLOTS:
         for w, b in my_panel[slot]["badges"].items():
@@ -161,7 +163,7 @@ def build_week_logs(
                 "lock_at": min(kicks).isoformat() if kicks else None,
             }  # fmt: skip
     prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
-    badges = {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now)}
+    badges = {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now, claimed)}
     rows = {
         pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3)}
         for slot in IDP_SLOTS
@@ -174,14 +176,17 @@ def build_week_logs(
 
 def live_results(payload, pids, sc: dict, status_of: Callable[[str], PlayerStatus], now: datetime) -> dict[str, dict]:
     """This week's scored results for players whose game has started (D22): SADL points so far, `live`
-    until kickoff + 4 h and `final` after; `dnp` if the game is over and he has no stat line."""
-    if not isinstance(payload, dict):
-        return {}
+    until kickoff + 4 h and `final` after; `dnp` if the game is over and he has no stat line;
+    `unavailable` if the /stats fetch failed (shown as such, never as "not played yet")."""
     out = {}
     for pid in pids:
         st = status_of(pid)
-        if st.kickoff is not None and st.kickoff <= now:
+        if st.kickoff is None or st.kickoff > now:
+            continue
+        if isinstance(payload, dict):
             out[pid] = weeklog.stat_result(payload.get(pid), sc, st.kickoff + timedelta(hours=4) <= now)
+        else:
+            out[pid] = {"pts": None, "state": "unavailable"}
     return out
 
 
@@ -195,8 +200,7 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     if prev < 1 or not badges or not act:
         return None
     stats = act.get("stats") or {}
-    kicks = [g.kickoff for g in sched.week_games(prev) if g.kickoff]
-    settles = max(kicks) + timedelta(days=4, hours=4) if kicks else None
+    settles = sched.settles_at(prev)
     provisional = bool(settles) and datetime.fromisoformat(act["captured_at"]) < settles
 
     def res(pid: str) -> dict:
@@ -447,12 +451,21 @@ def run_sync(
     threshold = float((cfg.get("swap") or {}).get("threshold", 0.6))
     my_panel = panel(me or {}, players, cons, panel_status, waiver_order, limits, sigma_out, threshold, lineup)
 
+    mine = {str(pid) for pid in (me or {}).get("players") or []}
+
+    def claimed(pid: str) -> str | None:
+        return "me" if pid in mine else "other" if pid in rostered else None
+
     logs = _guard("decision logs", lambda: build_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of,
-                                                         now, prewaiver=bool(window and window.kind == "pre-waiver")),
+                                                         now, prewaiver=bool(window and window.kind == "pre-waiver"),
+                                                         claimed=claimed),
                   (None, None), warnings, log)  # fmt: skip
     badge_doc, tiers_doc = logs
-    live_stats = _guard("live stats", lambda: sleeper.stats(season, week)[0], None, warnings, log)
-    results = live_results(live_stats, [pid for pid in idp if status_of(pid).locked], sc, status_of, now)
+    started = [pid for pid in idp if status_of(pid).locked]
+    live_stats, stats_err = _guard("live stats", lambda: sleeper.stats(season, week), (None, None), warnings, log)
+    if started and stats_err:  # an exception already has its own banner from _guard
+        warnings.append(f"Live scores unavailable this sync ({stats_err}); games already played show no score.")
+    results = live_results(live_stats, started, sc, status_of, now)
 
     def was_playable(pid: str) -> bool:
         """Playable at his kickoff: per the frozen record, else nothing but `locked` stops him now."""
@@ -558,9 +571,9 @@ def run_sync(
     recap = _guard("last week's results", lambda: last_week_recap(data_dir, season, week, sched, sc, players), None,
                    warnings, log)  # fmt: skip
 
-    week_kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
+    settles = sched.settles_at(week)
     run.update(
-        settles_at=(max(week_kicks) + timedelta(days=4, hours=4)).isoformat() if week_kicks else None,
+        settles_at=settles.isoformat() if settles else None,
         warnings=warnings,
         backfilled=backfilled,
         actuals_written=actuals,

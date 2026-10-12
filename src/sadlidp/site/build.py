@@ -16,7 +16,7 @@ from pathlib import Path
 from jinja2 import Environment, PackageLoader
 
 from .. import storage, weeklog
-from ..schedule import ET
+from ..schedule import ET, Schedule
 
 ACTION_TEXT = {
     "add": "Add; you're under the limit, so no drop is needed",
@@ -52,9 +52,13 @@ def final_results(wdir: Path, scoring_settings: dict) -> tuple[dict | None, bool
         return None, False
     stats = act.get("stats") or {}
     results = {pid: weeklog.stat_result(line, scoring_settings, final=True) for pid, line in stats.items()}
-    run = storage.read_json(wdir / "run.json") or {}
-    settles = run.get("settles_at")
-    provisional = bool(settles) and act.get("captured_at", "") < settles
+    sched = storage.read_json(wdir.parent / "schedule.json")
+    settles = Schedule.from_json(sched).settles_at(int(wdir.name[4:])) if sched else None
+    if settles is None:  # no schedule saved: the week's run.json says when it settles (newer runs only)
+        stamp = (storage.read_json(wdir / "run.json") or {}).get("settles_at")
+        settles = datetime.fromisoformat(stamp) if stamp else None
+    captured = act.get("captured_at")
+    provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
     return results, provisional
 
 

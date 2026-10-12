@@ -56,7 +56,7 @@ def merge_rows(
             continue  # frozen: never modified
         if locked(pid):
             if accept_late:
-                merged[pid] = {**row, "fetched_at": stamp, "late": True}
+                merged[pid] = {**row, "fetched_at": stamp, "late": True, "kickoff": kickoff_of(pid).isoformat()}
                 counts["late"] += 1
             else:
                 counts["skipped_after_kickoff"] += 1  # first seen after kickoff: can't be a pre-game value

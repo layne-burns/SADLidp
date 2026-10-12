@@ -129,7 +129,8 @@ def test_two_sources_blend_equally_and_espn_estimates_are_marked(tmp_path):
     frozen = json.loads((week / "frozen.json").read_text())["players"][TYKEE]
     assert frozen["eff"] == {"sleeper_proj": 0.5, "espn_proj": 0.5} and frozen["n_sources"] == 2
     by = parts(tykee)
-    assert [p["source"] for p in tykee["breakdown"]["parts"]] == ["Sleeper", "ESPN"]
+    assert [p["source"] for p in tykee["breakdown"]["parts"]] == ["Sleeper", "ESPN", "FantasyPros"]
+    assert by["FantasyPros"]["missing"] == "couldn't be read this sync"  # not served offline
     assert by["Sleeper"]["share"] == by["ESPN"]["share"] == 0.5
     assert tykee["mu"] == round((by["Sleeper"]["pts"] + by["ESPN"]["pts"]) / 2, 2)
     espn_stats = {label: est for label, _, est in by["ESPN"]["stats"]}
@@ -318,7 +319,8 @@ def test_stats_score_each_source_on_the_consensus_pool(tmp_path):
     ev = evaluate(data, 2026, CFG)
     assert list(ev["season_by_source"]) == ["sleeper_proj", "espn_proj"]
     assert ev["source_labels"] == {"sleeper_proj": "Sleeper", "espn_proj": "ESPN"}
-    assert ev["sources"] == [{"name": "Sleeper", "share": 0.5}, {"name": "ESPN", "share": 0.5}]
+    assert ev["sources"] == [{"name": "Sleeper", "share": 0.5, "kind": "projection"},
+                             {"name": "ESPN", "share": 0.5, "kind": "projection"}]  # fmt: skip
     # the pool is chosen by the equal-weight mean: every even LB averages above every odd one
     sleeper = {pid: 2 * (3 + i * 0.05) for i, pid in enumerate(players)}
     mean = {pid: (v + 10.0) / 2 if int(pid[1:]) % 2 == 0 else v for pid, v in sleeper.items()}
@@ -338,7 +340,8 @@ def test_stats_score_each_source_on_the_consensus_pool(tmp_path):
 
     only, _ = _season(tmp_path, espn=False)  # one source: the consensus is that source, numbers unchanged
     ev1 = evaluate(only, 2026, CFG)
-    assert list(ev1["season_by_source"]) == ["sleeper_proj"] and ev1["sources"] == [{"name": "Sleeper", "share": 1.0}]
+    assert list(ev1["season_by_source"]) == ["sleeper_proj"]
+    assert ev1["sources"] == [{"name": "Sleeper", "share": 1.0, "kind": "projection"}]
     top = sorted((p for p in sleeper if p in actual), key=lambda p: (-sleeper[p], p))[:50]
     assert ev1["weekly"][0]["by_slot"]["LB"]["mae"] == sum(abs(sleeper[p] - actual[p]) for p in top) / 50
     for key in ("mae", "rmse", "bias", "n", "mae_base"):

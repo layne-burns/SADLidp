@@ -69,15 +69,16 @@ def _weeks(spec: str) -> range:
 
 def cmd_backfill(args: argparse.Namespace) -> int:
     """Fetch past weeks from every source with an archive (SPEC §5.3); `--redo` refetches backfilled weeks."""
-    from . import backfill
+    from . import backfill, crosswalk
     from .impute import load_or_build_priors
     from .positions import slot_of
     from .sleeper import Sleeper, season_of
-    from .sync import SOURCES, build_matcher, fetch_schedule, make_client
+    from .sync import SIGNALS, SOURCES, build_matcher, fetch_schedule, make_client
 
     cfg = load_config(args.config)
-    if args.source and args.source not in SOURCES:
-        print(f"backfill: unknown source {args.source!r}; one of {', '.join(SOURCES)}")
+    archives = {**SOURCES, **SIGNALS}
+    if args.source and args.source not in archives:
+        print(f"backfill: unknown source {args.source!r}; one of {', '.join(archives)}")
         return 2
     now = datetime.now(ET).replace(microsecond=0)
     client = make_client(cfg)
@@ -90,9 +91,9 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     players = {str(k): v for k, v in sleeper.players(now.date().isoformat()).items()}
     idp = {pid: p for pid, p in players.items() if slot_of(p)}
     priors = load_or_build_priors(sleeper, data_dir, season, players)
-    matcher = build_matcher(cfg, players)
+    matcher = build_matcher(cfg, players, crosswalk.load(client, args.cache_dir, now.date().isoformat()))
     done = backfill.run(
-        SOURCES,
+        archives,
         cfg,
         data_dir,
         season,

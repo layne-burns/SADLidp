@@ -79,9 +79,11 @@ class Matcher:
         players: dict[str, dict],
         overrides: dict[str, dict[str, str]] | None = None,
         nicknames: dict[str, list[str]] | None = None,
+        crosswalk: dict[str, dict[str, str]] | None = None,
     ):
         self.players = players
         self.nicknames = _symmetric(nicknames)
+        self.crosswalk = crosswalk or {}  # crosswalk name -> {source id: Sleeper id} (crosswalk.py)
         self._idp: set[str] = set()
         self._by_name: dict[str, list[str]] = {}
         for pid, p in players.items():
@@ -115,9 +117,10 @@ class Matcher:
             self._by_id[field] = index
         return self._by_id[field]
 
-    def _crosswalk(self, source: str, source_id: str) -> str | None:
-        """§6.1 step 3, the crosswalk id (FantasyPros, PR 4): same IDP guard as step 2. Not wired up yet."""
-        return None
+    def _crosswalk(self, table: str | None, source_id: str) -> str | None:
+        """§6.1 step 3, the crosswalk id (FantasyPros, PR 4): same IDP guard as step 2."""
+        pid = (self.crosswalk.get(table) or {}).get(source_id) if table else None
+        return pid if pid in self._idp else None
 
     def _eligible(self, pid: str, slot: str | None) -> bool:
         p = self.players[pid]
@@ -152,6 +155,7 @@ class Matcher:
         name: str | None = None,
         team: str | None = None,
         slot: str | None = None,
+        crosswalk: str | None = None,
     ) -> Match:
         """One source row -> a Sleeper id, by the first §6.1 step that gives exactly one IDP."""
         sid = str(source_id).strip() if source_id not in (None, "") else None
@@ -165,7 +169,7 @@ class Matcher:
             hits = self._id_index(id_field).get(sid, [])  # IDPs only: an id landing on a non-IDP is ignored
             if len(hits) == 1:
                 return Match(hits[0], "source_id")
-        if sid is not None and (pid := self._crosswalk(source, sid)) is not None:
+        if sid is not None and (pid := self._crosswalk(crosswalk, sid)) is not None:
             return Match(pid, "source_id")
         if team is None:
             return Match(None, "no_team")

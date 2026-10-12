@@ -4,11 +4,11 @@ Weekly IDP streaming tiers for SADL ("Slow Ass Draft League") on Sleeper. Each s
 
 **Page:** https://layne-burns.github.io/SADLidp/
 
-The design and every decision behind it are in [SPEC.md](SPEC.md). Two projection sources so far: Sleeper's own projections and the owner's public ESPN league (read logged out, no secrets). FantasyPros ECR, RotoBaller and FantasyData come next.
+The design and every decision behind it are in [SPEC.md](SPEC.md). Three sources so far: two projections (Sleeper's own and the owner's public ESPN league, read logged out) and one ranking (FantasyPros' free weekly expert consensus for DL, LB and DB). No secrets. RotoBaller and FantasyData come next.
 
 ## One-time setup
 1. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
-2. **Actions → sync → Run workflow** (branch `main`) for the first sync. It finds the league, backfills this season's earlier weeks from every source that still serves them (Sleeper and ESPN do), commits `data/` and deploys the page. The first sync also builds the imputation priors from last season's stats (`data/<last season>/impute_priors.json`), once.
+2. **Actions → sync → Run workflow** (branch `main`) for the first sync. It finds the league, backfills this season's earlier weeks from every source that still serves them (Sleeper, ESPN and FantasyPros do), commits `data/` and deploys the page. The first sync also builds the imputation priors from last season's stats (`data/<last season>/impute_priors.json`), once.
 
 No secrets are needed. The sync pushes its data commits straight to `main`, so if you ever protect `main`, let GitHub Actions push to it.
 
@@ -25,8 +25,8 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 
 ## Reading the page
 - **Week N · data as of …:** a yellow banner appears when the data is more than 36 hours old.
-- **Points** are SADL points, the blend of the sources (Sleeper and ESPN). **±** is how much the sources disagree about a player, not week-to-week luck; a player only one source projects gets a default.
-- **Where a number comes from:** tap a player to see each source's points for him, the projected stats behind them, and its share of his number (equal shares for now). A source with nothing for him says why. Stats marked \* are our estimates: ESPN doesn't project TFL, QB hits, defensive TDs or safeties, so those come from the player's own rates this season, shrunk toward last season's (SPEC §6.2).
+- **Points** are SADL points, the blend of the sources: projections (Sleeper and ESPN) get 60% of a player's number and rankings (FantasyPros) 40% when both have him. A ranking becomes points by giving rank N the Nth-best projection among the players on that list; a player the list leaves out, but who projects near its end, is counted just past its end. **±** is how much the sources disagree about a player, not week-to-week luck; a player only one source projects gets a default.
+- **Where a number comes from:** tap a player to see each source's points for him, the projected stats behind them, and its share of his number (equal shares within projections and within rankings for now); for FantasyPros, his rank on its list. A source with nothing for him says why. Stats marked \* are our estimates: ESPN doesn't project TFL, QB hits, defensive TDs or safeties, so those come from the player's own rates this season, shrunk toward last season's (SPEC §6.2).
 - **How the numbers did →** (the Stats page): how far off the projections were each week and season to date, by position, against a naive guess (each player's own average), plus whether the START/UPGRADE odds held up. Each source is also scored on the same players, picked by all sources together, with how many of them it covered. Small samples say "not enough games yet".
 - **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). Where the sources disagree, the ± is wider and so are the tiers.
 - **My IDPs** places your DL, LB and DB against the waiver tiers.
@@ -68,9 +68,9 @@ Pushes to `claude/**` branches also run a live preview in CI: the branch's commi
 ## Layout
 | Path | What |
 |---|---|
-| `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/` (`sleeper_proj`, `espn_proj`), `matching`, `impute`, `backfill`, `scoring`, `consensus`, `tiers`, `roster`, `gate`, `site/` |
+| `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/` (`sleeper_proj`, `espn_proj`, `fp_ecr`, `fp_dst`), `crosswalk`, `rankmap`, `matching`, `impute`, `backfill`, `scoring`, `consensus`, `tiers`, `roster`, `gate`, `site/` |
 | `config/sadl.toml` | all tunables (SPEC §9) |
 | `config/player_overrides.toml`, `config/aliases/` | manual source → Sleeper player fixes, team code and nickname tables (SPEC §6.1) |
 | `data/<season>/` | `league.json`, `schedule.json`, `gate.json` (windows already run) |
-| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json` (with each source's match report), `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections frozen at kickoff; `backfill: true` rows came from an archive), `frozen.json`, `badges.json`, `tiers_log.json` |
+| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json` (with each source's match report), `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections and ranks frozen at kickoff; `fp_dst.json` holds FantasyPros' D/ST ranks, kept for a later test and never blended; `backfill: true` rows came from an archive), `frozen.json`, `badges.json`, `tiers_log.json` |
 | `probe/` | the Phase 1 data-source probe (SPEC §13) |

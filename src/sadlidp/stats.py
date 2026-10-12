@@ -19,6 +19,7 @@ from pathlib import Path
 
 from . import metrics, scoring, storage, weeklog
 from .positions import IDP_SLOTS, slot_of
+from .rankmap import rank_values
 from .schedule import Schedule
 from .sync import SOURCE_LABELS
 
@@ -49,16 +50,25 @@ def _positions(season_dir: Path) -> dict[str, str]:
     return slots
 
 
-def _projection_sources(wd: Path) -> dict[str, dict]:
-    """name -> rows of every projection source saved for the week, in the sync's source order."""
+def _projection_sources(wd: Path, kind: str = "projection") -> dict[str, dict]:
+    """name -> rows of every source of `kind` saved for the week, in the sync's source order."""
     order = list(SOURCE_LABELS)
     out = {}
     for path in sorted((wd / "sources").glob("*.json"), key=lambda p: (order.index(p.stem) if p.stem in order
                                                                        else len(order), p.stem)):  # fmt: skip
         doc = storage.read_json(path) or {}
-        if doc.get("kind", "projection") == "projection":
-            out[path.stem] = doc.get("rows") or {}
+        if doc.get("kind", "projection") == kind:
+            out[path.stem] = (doc.get("rows") or {}) if kind == "projection" else doc
     return out
+
+
+def _shares(kinds: dict[str, str], names, split: float) -> list[dict]:
+    """Each source's prior share of a player's number when every source covers him (§6.4, D11)."""
+    by = {g: [n for n in names if kinds.get(n, "projection") == g] for g in ("projection", "rank")}
+    group = {"projection": split, "rank": 1 - split} if all(by.values()) else {g: 1.0 for g in by}
+    return [
+        {"name": SOURCE_LABELS.get(n, n), "share": group[g] / len(ns), "kind": g} for g, ns in by.items() for n in ns
+    ]
 
 
 def _naive(history: dict[str, list[float]], pid: str) -> float | None:
@@ -104,6 +114,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     season_rows = {s: {"pred": [], "act": [], "sig": [], "base": [], "pairs": []} for s in IDP_SLOTS}
     by_source: dict[str, dict[str, dict]] = {}  # source -> slot -> pooled pred/act/sig/base, covered, pool
     weekly, suggestions, tiers = [], [], {s: {} for s in IDP_SLOTS}
+    kinds: dict[str, str] = {}  # source -> projection or rank
     for week, wd in weeks:
         act_doc = storage.read_json(wd / "actuals.json") or {}
         lines = act_doc.get("stats") or {}
@@ -111,6 +122,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         settles, captured = sched.settles_at(week), act_doc.get("captured_at")
         provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
         sources = _projection_sources(wd)
+        kinds.update(dict.fromkeys(sources, "projection"))
         preds = {
             name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
             for name, rows in sources.items()
@@ -120,6 +132,12 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             for pid, v in pred_s.items():
                 covering.setdefault(pid, []).append(v)
         pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
+        for name, doc in _projection_sources(wd, "rank").items():  # scored on their mapped points (§6.4)
+            rows = {pid: r for pid, r in (doc.get("rows") or {}).items() if pid in slots}
+            universe, members = doc.get("universe") or {}, doc.get("lists") or {}
+            preds[name], _ = rank_values(rows, pred_all, slots.get, universe, lambda pid: False, members=members)
+            sources[name] = rows
+            kinds[name] = "rank"
         late = sum(1 for rows in sources.values() for r in rows.values() if r.get("late"))
         backfill = sum(1 for rows in sources.values() for r in rows.values() if r.get("backfill"))
         row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {},
@@ -221,7 +239,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             history.setdefault(pid, []).append(pts)
 
     season_by_source = {}
-    for name, slots_acc in by_source.items():
+    order = list(SOURCE_LABELS)
+    for name, slots_acc in sorted(by_source.items(), key=lambda kv: (order.index(kv[0]) if kv[0] in order
+                                                                     else len(order), kv[0])):  # fmt: skip
         season_by_source[name] = {}
         for slot, acc in slots_acc.items():
             summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
@@ -256,9 +276,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "tiers": tier_rows,
         "season_by_source": season_by_source,
         "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
-        # equal priors within the projection group (PR 3); PR 6 records the accuracy weights in force each week
-        "sources": [{"name": SOURCE_LABELS.get(n, n), "share": 1 / len(season_by_source)} for n in season_by_source]
-        or [{"name": "Sleeper", "share": 1.0}],
+        # equal priors within each group, 60:40 between them (D11); PR 6 records the accuracy weights in force
+        "sources": _shares(kinds, season_by_source, float((cfg.get("weights") or {}).get("prior_split", 0.6)))
+        or [{"name": "Sleeper", "share": 1.0, "kind": "projection"}],
+        "prior_split": float((cfg.get("weights") or {}).get("prior_split", 0.6)),
         "sigma_out": so,
         "n_eval": N_EVAL,
         "min_corr_n": MIN_CORR_N,

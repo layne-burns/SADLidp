@@ -1,6 +1,6 @@
 # Probe report
 
-Generated 2026-10-12T05:30:23.273147+00:00 · 53 requests
+Generated 2026-10-12T05:37:33.959975+00:00 · 52 requests
 
 ## 1. League
 
@@ -958,13 +958,13 @@ Dual-eligible rostered players: **20**
 | roster | player | team | position | fantasy_positions | reserve | taxi |
 |---|---|---|---|---|---|---|
 | 1 | Tuli Tuipulotu | LAC | DL | ['DL', 'LB'] | False | False |
+| 2 | Dallas Turner | MIN | LB | ['DL', 'LB'] | False | False |
 | 2 | Danielle Hunter | HOU | DE | ['DL', 'LB'] | False | False |
 | 2 | Carl Granderson | NO | DE | ['DL', 'LB'] | False | False |
-| 2 | Dallas Turner | MIN | LB | ['DL', 'LB'] | False | False |
-| 3 | David Bailey | NYJ | LB | ['DL', 'LB'] | False | False |
 | 3 | Brian Burns | NYG | DE | ['DL', 'LB'] | True | False |
-| 5 | Will Anderson | HOU | DL | ['DL', 'LB'] | False | False |
+| 3 | David Bailey | NYJ | LB | ['DL', 'LB'] | False | False |
 | 5 | Josh Hines-Allen | JAX | DE | ['DL', 'LB'] | False | False |
+| 5 | Will Anderson | HOU | DL | ['DL', 'LB'] | False | False |
 | 7 | Nik Bonitto | DEN | LB | ['DL', 'LB'] | False | False |
 | 7 | Greg Rousseau | BUF | DE | ['DL', 'LB'] | False | False |
 | 8 | Donovan Ezeiruaku | DAL | DL | ['DL', 'LB'] | False | False |
@@ -972,8 +972,8 @@ Dual-eligible rostered players: **20**
 | 9 | Byron Young | LAR | LB | ['DL', 'LB'] | False | False |
 | 10 | T.J. Watt | PIT | LB | ['DL', 'LB'] | False | False |
 | 10 | Jaishawn Barham | DAL | LB | ['DL', 'LB'] | False | False |
-| 11 | Rueben Bain | TB | DL | ['DL', 'LB'] | False | False |
 | 11 | Andrew Van Ginkel | MIN | LB | ['DL', 'LB'] | False | False |
+| 11 | Rueben Bain | TB | DL | ['DL', 'LB'] | False | False |
 | 11 | Arvell Reese | NYG | LB | ['DL', 'LB'] | False | False |
 | 12 | Boye Mafe | CIN | DL | ['DL', 'LB'] | False | False |
 | 12 | Micah Parsons | GB | LB | ['DL', 'LB'] | True | False |
@@ -990,6 +990,87 @@ Dual-eligible rostered players: **20**
 </details>
 
 Players whose `position` and `fantasy_positions[0]` map to different slots: **160**
+
+
+### Add-time replay (in-season adds, leg ≥ 2)
+Sleeper enforces limits when a player is added (trades and the draft can exceed them), so the enforced rule never shows an add that ends over the limit.
+
+**Rules consistent with every add (IR excluded):** ['position']
+
+| rule | roster subset | adds checked | ended exactly at limit | ended over limit |
+|---|---|---|---|---|
+| position | all | 18 | 12 | 5 |
+| position | excl_reserve | 18 | 15 | 0 |
+| position | excl_reserve_taxi | 18 | 15 | 0 |
+| fantasy_positions[0] | all | 18 | 10 | 7 |
+| fantasy_positions[0] | excl_reserve | 18 | 13 | 3 |
+| fantasy_positions[0] | excl_reserve_taxi | 18 | 13 | 3 |
+| all_eligible | all | 20 | 10 | 9 |
+| all_eligible | excl_reserve | 20 | 15 | 4 |
+| all_eligible | excl_reserve_taxi | 20 | 15 | 4 |
+<details><summary>adds that would be over the limit under 'fantasy_positions[0]' (IR excluded)</summary>
+
+```json
+[
+ {
+  "count": 4,
+  "leg": 4,
+  "player": "Jaishawn Barham",
+  "roster_id": 10,
+  "slot": "DL"
+ },
+ {
+  "count": 3,
+  "leg": 4,
+  "player": "Mason Graham",
+  "roster_id": 3,
+  "slot": "DL"
+ },
+ {
+  "count": 3,
+  "leg": 3,
+  "player": "Austin Booker",
+  "roster_id": 10,
+  "slot": "DL"
+ }
+]
+```
+</details>
+<details><summary>adds that would be over the limit under 'all_eligible' (IR excluded)</summary>
+
+```json
+[
+ {
+  "count": 3,
+  "leg": 5,
+  "player": "Demetrius Knight",
+  "roster_id": 12,
+  "slot": "LB"
+ },
+ {
+  "count": 4,
+  "leg": 4,
+  "player": "Jaishawn Barham",
+  "roster_id": 10,
+  "slot": "DL"
+ },
+ {
+  "count": 3,
+  "leg": 4,
+  "player": "Mason Graham",
+  "roster_id": 3,
+  "slot": "DL"
+ },
+ {
+  "count": 3,
+  "leg": 3,
+  "player": "Austin Booker",
+  "roster_id": 10,
+  "slot": "DL"
+ }
+]
+```
+</details>
 
 
 ## 3. Waiver timing
@@ -1199,109 +1280,6 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
   "bonus_def_int_td_50p": 1
  },
  "rows": 534
-}
-```
-</details>
-
-
-No threshold-bonus hit that week, so the previous week was checked too:
-
-Week **3**, rostered IDPs with Sleeper points: **73**
-
-| stats endpoint | compared | exact, non-trivial (as delivered) | exact, non-trivial (derived bonuses) | max diff | max diff (derived) | bonus hits |
-|---|---|---|---|---|---|---|
-| v1 | 73 | 67/67 | 67/67 | 0.0 | 0.0 | {} |
-| api | 73 | 67/67 | 67/67 | 0.0 | 0.0 | {} |
-
-_Non-trivial = the player scored or recorded a stat; idle bench players match trivially._
-<details><summary>relevant scoring keys (recorded by IDPs that week)</summary>
-
-```json
-{
- "fum_lost": {
-  "coefficient": -2.0,
-  "players_with_stat": 1
- },
- "idp_blk_kick": {
-  "coefficient": 3.0,
-  "players_with_stat": 3
- },
- "idp_def_td": {
-  "coefficient": 6.0,
-  "players_with_stat": 2
- },
- "idp_ff": {
-  "coefficient": 3.0,
-  "players_with_stat": 25
- },
- "idp_fum_rec": {
-  "coefficient": 3.0,
-  "players_with_stat": 14
- },
- "idp_int": {
-  "coefficient": 6.0,
-  "players_with_stat": 23
- },
- "idp_pass_def": {
-  "coefficient": 3.0,
-  "players_with_stat": 129
- },
- "idp_qb_hit": {
-  "coefficient": 1.0,
-  "players_with_stat": 133
- },
- "idp_sack": {
-  "coefficient": 6.0,
-  "players_with_stat": 58
- },
- "idp_tkl_ast": {
-  "coefficient": 1.0,
-  "players_with_stat": 416
- },
- "idp_tkl_loss": {
-  "coefficient": 2.0,
-  "players_with_stat": 109
- },
- "idp_tkl_solo": {
-  "coefficient": 2.0,
-  "players_with_stat": 408
- },
- "st_ff": {
-  "coefficient": 1.0,
-  "players_with_stat": 3
- },
- "st_fum_rec": {
-  "coefficient": 1.0,
-  "players_with_stat": 3
- }
-}
-```
-</details>
-<details><summary>bonus consistency</summary>
-
-```json
-{
- "bonus_keys": {
-  "bonus_sack_2p": {
-   "present=False,threshold_met=False": 525,
-   "present=True,threshold_met=True": 6
-  },
-  "bonus_tkl_10p": {
-   "present=False,threshold_met=False": 512,
-   "present=True,threshold_met=True": 19,
-   "present_and_solo_ge_10": 2
-  },
-  "idp_pass_def_3p": {
-   "present=False,threshold_met=False": 526,
-   "present=True,threshold_met=True": 5
-  }
- },
- "idp_tkl_equals_solo_plus_ast": 513,
- "idp_tkl_present": 513,
- "other_bonus_like_keys": {
-  "bonus_def_int_td_50p": 2
- },
- "rows": 531
 }
 ```
 </details>
@@ -1557,121 +1535,113 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
 
 ```json
 {
- "week3": {
+ "week4": {
   "api_shapes": {
    "granular": {
     "companies": {
-     "sportradar": 301
+     "sportradar": 306
     },
     "idp_tkl_solo_noninteger_share": 0.0,
     "key_fill_rates": {
-     "bonus_def_int_td_50p": {
-      "nonzero": 0.003,
-      "present": 0.003
-     },
      "bonus_sack_2p": {
-      "nonzero": 0.01,
-      "present": 0.01
+      "nonzero": 0.007,
+      "present": 0.007
      },
      "bonus_tkl_10p": {
-      "nonzero": 0.037,
-      "present": 0.037
+      "nonzero": 0.036,
+      "present": 0.036
      },
      "def_snp": {
-      "nonzero": 0.558,
-      "present": 0.558
+      "nonzero": 0.559,
+      "present": 0.559
      },
      "gp": {
-      "nonzero": 0.734,
-      "present": 0.734
+      "nonzero": 0.716,
+      "present": 0.716
      },
      "gs": {
-      "nonzero": 0.372,
-      "present": 0.372
+      "nonzero": 0.356,
+      "present": 0.356
      },
-     "idp_def_td": {
+     "idp_blk_kick": {
       "nonzero": 0.003,
       "present": 0.003
      },
      "idp_ff": {
-      "nonzero": 0.04,
-      "present": 0.04
+      "nonzero": 0.049,
+      "present": 0.049
      },
      "idp_fum_rec": {
       "nonzero": 0.013,
       "present": 0.013
      },
-     "idp_fum_ret_yd": {
-      "nonzero": 0.007,
-      "present": 0.007
-     },
      "idp_int": {
-      "nonzero": 0.017,
-      "present": 0.017
+      "nonzero": 0.026,
+      "present": 0.026
      },
      "idp_int_ret_yd": {
-      "nonzero": 0.01,
-      "present": 0.01
+      "nonzero": 0.023,
+      "present": 0.023
      },
      "idp_pass_def": {
-      "nonzero": 0.103,
-      "present": 0.103
+      "nonzero": 0.082,
+      "present": 0.082
      },
      "idp_pass_def_3p": {
       "nonzero": 0.003,
       "present": 0.003
      },
      "idp_qb_hit": {
-      "nonzero": 0.183,
-      "present": 0.183
+      "nonzero": 0.173,
+      "present": 0.173
      },
      "idp_sack": {
-      "nonzero": 0.083,
-      "present": 0.083
+      "nonzero": 0.111,
+      "present": 0.111
      },
      "idp_sack_yd": {
-      "nonzero": 0.08,
-      "present": 0.08
+      "nonzero": 0.098,
+      "present": 0.098
      },
      "idp_tkl": {
-      "nonzero": 0.475,
-      "present": 0.475
+      "nonzero": 0.503,
+      "present": 0.503
      },
      "idp_tkl_ast": {
-      "nonzero": 0.412,
-      "present": 0.412
+      "nonzero": 0.363,
+      "present": 0.363
      },
      "idp_tkl_loss": {
-      "nonzero": 0.163,
-      "present": 0.163
+      "nonzero": 0.16,
+      "present": 0.16
      },
      "idp_tkl_solo": {
-      "nonzero": 0.389,
-      "present": 0.389
+      "nonzero": 0.438,
+      "present": 0.438
      },
      "st_ff": {
       "nonzero": 0.01,
       "present": 0.01
      },
      "st_fum_rec": {
-      "nonzero": 0.007,
-      "present": 0.007
+      "nonzero": 0.003,
+      "present": 0.003
      },
      "st_snp": {
-      "nonzero": 0.555,
-      "present": 0.555
+      "nonzero": 0.533,
+      "present": 0.533
      },
      "st_tkl_solo": {
-      "nonzero": 0.096,
-      "present": 0.096
+      "nonzero": 0.118,
+      "present": 0.118
      }
     },
     "positions": {
      "DB": 8,
      "DE": 17,
-     "DL": 13,
+     "DL": 14,
      "DT": 3,
-     "LB": 256,
+     "LB": 260,
      "LS": 2,
      "OL": 1,
      "SS": 1
@@ -1695,85 +1665,93 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
      "week",
      "week_shard"
     ],
-    "rows": 301,
-    "with_gp": 221,
-    "with_opponent": 301
+    "rows": 306,
+    "with_gp": 219,
+    "with_opponent": 306
    },
    "slot": {
     "companies": {
-     "sportradar": 1094
+     "sportradar": 1110
     },
     "idp_tkl_solo_noninteger_share": 0.0,
     "key_fill_rates": {
      "bonus_def_int_td_50p": {
-      "nonzero": 0.002,
-      "present": 0.002
+      "nonzero": 0.001,
+      "present": 0.001
      },
      "bonus_sack_2p": {
-      "nonzero": 0.005,
-      "present": 0.005
+      "nonzero": 0.003,
+      "present": 0.003
      },
      "bonus_tkl_10p": {
       "nonzero": 0.017,
       "present": 0.017
      },
      "def_snp": {
-      "nonzero": 0.555,
-      "present": 0.555
+      "nonzero": 0.549,
+      "present": 0.549
      },
      "gp": {
-      "nonzero": 0.668,
-      "present": 0.668
+      "nonzero": 0.665,
+      "present": 0.665
      },
      "gs": {
-      "nonzero": 0.323,
-      "present": 0.323
+      "nonzero": 0.318,
+      "present": 0.318
      },
      "idp_blk_kick": {
-      "nonzero": 0.003,
-      "present": 0.003
-     },
-     "idp_def_td": {
       "nonzero": 0.002,
       "present": 0.002
      },
+     "idp_def_td": {
+      "nonzero": 0.001,
+      "present": 0.001
+     },
      "idp_ff": {
+      "nonzero": 0.022,
+      "present": 0.022
+     },
+     "idp_fum_rec": {
+      "nonzero": 0.01,
+      "present": 0.01
+     },
+     "idp_int": {
       "nonzero": 0.023,
       "present": 0.023
      },
-     "idp_fum_rec": {
-      "nonzero": 0.013,
-      "present": 0.013
-     },
-     "idp_fum_ret_yd": {
-      "nonzero": 0.002,
-      "present": 0.002
-     },
-     "idp_int": {
-      "nonzero": 0.021,
-      "present": 0.021
-     },
      "idp_int_ret_yd": {
-      "nonzero": 0.013,
-      "present": 0.013
+      "nonzero": 0.015,
+      "present": 0.015
      },
      "idp_pass_def": {
-      "nonzero": 0.118,
-      "present": 0.118
+      "nonzero": 0.115,
+      "present": 0.115
      },
      "idp_pass_def_3p": {
       "nonzero": 0.005,
       "present": 0.005
      },
      "idp_qb_hit": {
-      "nonzero": 0.122,
-      "present": 0.122
+      "nonzero": 0.128,
+      "present": 0.128
      },
      "idp_sack": {
-      "nonzero": 0.053,
-      "present": 0.053
+      "nonzero": 0.066,
+      "present": 0.066
      },
-     
+     "idp_sack_yd": {
+      "nonzero": 0.06,
+      "present": 0.06
+     },
+     "idp_tkl": {
+      "nonzero": 0.461,
+      "present": 0.461
+     },
+     "idp_tkl_ast": {
+      "nonzero": 0.351,
+      "present": 0.351
+     },
+     "idp_tkl_loss":
 … (truncated; see report.json)
 ```
 </details>
@@ -1961,15 +1939,17 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
 
 | source | status | error | tables | first table headers | rows | week labels | markers | followed |
 |---|---|---|---|---|---|---|---|---|
-| fantasynerds_idp_weekly | 200 |  | 1 | PLAYER, TEAM, POS, TKLS, ASS TKLS, SACKS, PASS DEF, INT, PTS | 0 | [5, 6] | {'login_prompt': True, 'paywall_or_upgrade': True} |  |
+| fantasynerds_idp_weekly | 200 |  | 1 | PLAYER, TEAM, POS, TKLS, ASS TKLS, SACKS, PASS DEF, INT, PTS | 0 | [5] | {'login_prompt': True, 'paywall_or_upgrade': True} |  |
 | razzball_idp_ros | 200 |  | 6 |  | 7 | [] | {'login_prompt': True, 'paywall_or_upgrade': True} |  |
 | razzball_idp_weekly | 404 (guessed URL) |  | 0 |  |  |  | {} |  |
+| razzball_idp_weekly_rankings | 200 |  | 0 |  |  | [] | {'login_prompt': True, 'paywall_or_upgrade': True} |  |
 | espn_idp_rankings_article | 202 |  | 0 |  |  | [] | {} |  |
 | idpguru | 200 |  | 0 |  |  | [1, 2, 3, 4, 5] | {'login_prompt': True, 'logout_link': True, 'paywall_or_upgrade': True} | https://idpguru.com/plans/premium-content-pricing-plans/?access=denied&mepr-unauth-page=8466&redirect_to=%2F2026%2F09%2F2026-weekly-idp-rankings%2F |
 | dynastynerds_idp | 200 |  | 0 |  |  | [1, 2, 3, 4, 5, 6] | {'login_prompt': True, 'paywall_or_upgrade': True} | https://www.dynastynerds.com/idp/week-5-idp-start-sit-2026/ |
 | rotoballer_idp | 200 |  | 0 |  |  | [1, 2, 3, 4, 5, 6] | {'login_prompt': True, 'logout_link': True, 'paywall_or_upgrade': True, 'bot_challenge': True} | https://www.rotoballer.com/week-5-idp-rankings-streamers-start-sit-fantasy-football-2026/1959614 |
 | thehuddle_idp | 402 |  | 0 |  |  |  | {} |  |
 | razzball_idp | 200 |  | 2 |  | 2 | [3, 4, 5] | {'login_prompt': True, 'paywall_or_upgrade': True} | https://football.razzball.com/projections-idp-restofseason/ |
+| razzball_idp_this_week | 200 |  | 6 |  | 7 | [] | {'login_prompt': True, 'paywall_or_upgrade': True} | https://football.razzball.com/weekly-rankings-teamdefense/ |
 
 <details><summary>index pages: matching same-site links</summary>
 
@@ -2041,6 +2021,24 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
    "text": "Individual Defense (IDP)"
   }
  ],
+ "razzball_idp_this_week": [
+  {
+   "href": "https://football.razzball.com/weekly-rankings-teamdefense/",
+   "text": "Team Defense"
+  },
+  {
+   "href": "https://football.razzball.com/weekly-rankings-idp/",
+   "text": "Individual Defense (IDP)"
+  },
+  {
+   "href": "https://football.razzball.com/weekly-rankings-teamdefense",
+   "text": "DEF(Team)"
+  },
+  {
+   "href": "https://football.razzball.com/weekly-rankings-idp",
+   "text": "DEF(IDP)"
+  }
+ ],
  "rotoballer_idp": [
   {
    "href": "https://www.rotoballer.com/week-5-idp-rankings-streamers-start-sit-fantasy-football-2026/1959614",
@@ -2048,22 +2046,7 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
   },
   {
    "href": "https://www.rotoballer.com/week-4-idp-rankings-streamers-start-sit-fantasy-football-2026/1953178",
-   "text": ""
-  },
-  {
-   "href": "https://www.rotoballer.com/week-3-idp-rankings-streamers-start-sit-fantasy-football-2026/1933908",
-   "text": ""
-  },
-  {
-   "href": "https://www.rotoballer.com/week-2-idp-rankings-streamers-start-sit-fantasy-football-2026/1932774",
-   "text": ""
-  },
-  {
-   "href": "https://www.rotoballer.com/week-1-idp-rankings-streamers-start-sit-fantasy-football-2026/1922997",
-   "text": ""
-  },
-  {
-   "href": "https://www.rotoballe
+   "tex
 … (truncated; see report.json)
 ```
 </details>
@@ -2072,126 +2055,25 @@ _Non-trivial = the player scored or recorded a stat; idle bench players match tr
 
 ```json
 {
- "default": {
-  "bytes": 11376,
-  "content_type": "application/json;charset=utf-8",
-  "error": null,
-  "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info",
-  "key_paths": [
-   "$: object",
-   "players[]: array",
-   "players[].draftAuctionValue: int",
-   "players[].droppedByEliminatedTeam: bool",
-   "players[].id: int",
-   "players[].keeperValue: int",
-   "players[].keeperValueFuture: int",
-   "players[].lineupLocked: bool",
-   "players[].onTeamId: int",
-   "players[].player: object",
-   "players[].player.active: bool",
-   "players[].player.defaultPositionId: int",
-   "players[].player.draftRanksByRankType: object",
-   "players[].player.draftRanksByRankType.ELIMINATION: object",
-   "players[].player.draftRanksByRankType.PPR: object",
-   "players[].player.draftRanksByRankType.STANDARD: object",
-   "players[].player.draftRanksByRankType.SUPERFLEX: object",
-   "players[].player.droppable: bool",
-   "players[].player.eligibleSlots[]: array",
-   "players[].player.firstName: str",
-   "players[].player.fullName: str",
-   "players[].player.id: int",
-   "players[].player.injured: bool",
-   "players[].player.injuryStatus: str",
-   "players[].player.jersey: str",
-   "players[].player.lastName: str",
-   "players[].player.lastNewsDate: int",
-   "players[].player.outlooks: object",
-   "players[].player.outlooks.outlooksByWeek: object",
-   "players[].player.ownership: object",
-   "players[].player.ownership.activityLevel: NoneType",
-   "players[].player.ownership.auctionValueAverage: float",
-   "players[].player.ownership.auctionValueAverageChange: float",
-   "players[].player.ownership.averageDraftPosition: float",
-   "players[].player.ownership.averageDraftPositionPercentChange: float",
-   "players[].player.ownership.date: int",
-   "players[].player.ownership.leagueType: int",
-   "players[].player.ownership.percentChange: float",
-   "players[].player.ownership.percentOwned: float",
-   "players[].player.ownership.percentStarted: float",
-   "players[].player.proTeamId: int",
-   "players[].player.rankings: object",
-   "players[].player.rankings.0[]: array",
-   "players[].player.rankings.1[]: array",
-   "players[].player.rankings.2[]: array",
-   "players[].player.rankings.3[]: array",
-   "players[].player.rankings.4[]: array",
-   "players[].player.rankings.5[]: array",
-   "players[].player.seasonOutlook: str",
-   "players[].player.stats[]: array",
-   "players[].ratings: object",
-   "players[].ratings.0: object",
-   "players[].ratings.0.positionalRanking: int",
-   "players[].ratings.0.totalRanking: int",
-   "players[].ratings.0.totalRating: float",
-   "players[].rosterLocked: bool",
-   "players[].status: str",
-   "players[].tradeLocked: bool",
-   "players[].waiverProcessDate: int"
-  ],
-  "shape": {
-   "default_position_ids": {
-    "3": 1
-   },
-   "players": 1,
-   "players_with_week_projection": 1,
-   "prior_week_actual_stat_ids": {
-    "107": 1,
-    "108": 1,
-    "109": 1,
-    "110": 1,
-    "113": 1,
-    "155": 1,
-    "210": 1
-   },
-   "projection_stat_ids": {
-    "100": 1,
-    "103": 1,
-    "104": 1,
-    "105": 1,
-    "106": 1,
-    "107": 1,
-    "108": 1,
-    "109": 1,
-    "110": 1,
-    "112": 1,
-    "113": 1,
-    "93": 1,
-    "94": 1,
-    "95": 1,
-    "96": 1,
-    "97": 1,
-    "98": 1,
-    "99": 1
-   }
-  },
-  "status": 200,
-  "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info"
- },
- "scoring_period": {
-  "bytes": 11376,
+ "by_ids": {
+  "bytes": 284,
   "content_type": "application/json;charset=utf-8",
   "error": null,
   "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
-  "key_paths": [
-   "$: object",
-   "players[]: array",
-   "players[].draftAuctionValue: int",
-   "players[].droppedByEliminatedTeam: bool",
-   "players[].id: int",
-   "players[].keeperValue: int",
-   "players[].keeperValueFuture: int",
-   "players[].l
-… (truncated; see report.json)
+  "status": 400,
+  "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
+ },
+ "by_slots": {
+  "bytes": 284,
+  "content_type": "application/json;charset=utf-8",
+  "error": null,
+  "final_url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5",
+  "status": 400,
+  "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&scoringPeriodId=5"
+ },
+ "ids_requested": 60,
+ "week_used": 5
+}
 ```
 </details>
 

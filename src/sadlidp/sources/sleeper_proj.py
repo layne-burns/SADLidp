@@ -1,7 +1,8 @@
 """Sleeper (RotoWire) IDP projections: the MVP projection source (SPEC.md §5.2, §13).
 
 Only rows with `stats.gp` and an opponent are real projections; the rest are placeholders and mean
-"no projection", never 0 (§4.1). The universe is complete for DL/LB/DB.
+"no projection", never 0 (§4.1). The universe is complete for DL/LB/DB. A response with no real rows
+at all is `suspect` (Sleeper rewrites a week's rows in a batch; mid-batch it serves only placeholders).
 """
 
 from __future__ import annotations
@@ -10,7 +11,7 @@ from datetime import datetime
 
 from ..positions import IDP_SLOTS
 from ..sleeper import Sleeper
-from .base import OK, AdapterResult
+from .base import OK, SUSPECT, AdapterResult
 
 NAME = "sleeper_proj"
 
@@ -40,6 +41,9 @@ def fetch(sleeper: Sleeper, season: int, week: int, now: datetime) -> AdapterRes
             result.covered_keys.update(k for k in line if k.startswith("idp_"))
         else:
             result.no_projection_ids.add(pid)
+    if not result.rows:  # all placeholders: not posted yet, or caught mid-update (seen 2026-10-12 09:10 UTC)
+        result.status, result.error = SUSPECT, "only placeholder rows; Sleeper may be mid-update"
+        return result
     result.universe = {slot: {"complete": True, "depth": None} for slot in IDP_SLOTS}
     result.status = OK
     return result

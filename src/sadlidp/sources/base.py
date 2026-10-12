@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 OK = "ok"
-STATUSES = {OK, "skipped", "not_yet_published", "blocked", "parse_error", "budget", "failed"}
+STATUSES = {OK, "skipped", "not_yet_published", "suspect", "blocked", "parse_error", "budget", "failed"}
+SUSPECT = "suspect"  # the response looks incomplete (e.g. the source is mid-update): not merged
 
 
 @dataclass

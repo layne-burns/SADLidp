@@ -180,6 +180,31 @@ def test_no_usable_source_keeps_the_window_open(tmp_path):
     assert not (tmp_path / "d" / "2026" / "gate.json").exists()  # the next slot in the window retries
 
 
+def test_a_fetch_caught_mid_update_is_skipped(synced):
+    """Sleeper rewrites a week's rows in a batch; mid-batch it serves only placeholders (seen 2026-10-12)."""
+    _, data, cache, _ = synced
+    week = data / "2026" / "week05"
+    before = json.loads((week / "sources" / "sleeper_proj.json").read_text())["rows"]
+    gate = data / "2026" / "gate.json"
+    gate.unlink()  # reopen the pre-waiver window
+    blank = routes()
+    blank[f"{API}/projections/nfl/2026/5"] = [
+        {**r, "stats": {}, "opponent": None} for r in blank[f"{API}/projections/nfl/2026/5"]
+    ]
+    out = run_sync(CFG, data, cache, NOW + timedelta(hours=1), client=FakeClient(blank), log=lambda m: None)
+    assert any(w.startswith("sleeper_proj: this fetch looked incomplete and was skipped") for w in out.warnings)
+    assert json.loads((week / "sources" / "sleeper_proj.json").read_text())["rows"] == before
+    assert json.loads((week / "consensus.json").read_text())["positions"]["LB"]["tiers"]
+    assert not gate.exists()  # nothing fresh was fetched: the next slot in the window retries
+    # a partial response (under 60% of the stored rows) is skipped the same way
+    part = routes()
+    real = [r for r in part[f"{API}/projections/nfl/2026/5"] if r["stats"].get("gp") and r.get("opponent")]
+    part[f"{API}/projections/nfl/2026/5"] = real[:10]  # 10 of 45
+    out = run_sync(CFG, data, cache, NOW + timedelta(hours=2), client=FakeClient(part), log=lambda m: None)
+    assert any("rows against" in w for w in out.warnings) and not gate.exists()
+    assert json.loads((week / "sources" / "sleeper_proj.json").read_text())["rows"] == before
+
+
 def test_backfill_writes_past_weeks_once(tmp_path):
     r = routes()
     week4 = [{**row, "week": 4} for row in r[f"{API}/projections/nfl/2026/5"][:5]]

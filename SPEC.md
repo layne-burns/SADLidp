@@ -119,7 +119,7 @@ League name match: case-insensitive, trimmed, exact, against config `["SADL", "S
 ## 5. Sources
 ### 5.1 Adapter contract
 Every adapter returns an `AdapterResult` with these fields:
-- `status`: one of ok, skipped, not_yet_published, auth_expired, blocked, parse_error, budget, or failed.
+- `status`: one of ok, skipped, not_yet_published, suspect (§7), auth_expired, blocked, parse_error, budget, or failed.
 - `kind`: projection or rank.
 - `universe`: the positions covered, the list depth D per list, and `complete` (true or false) per position.
 - `covered_keys`: the Sleeper stat keys it projects (projection sources only).
@@ -245,6 +245,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - Every source adapter, including Sleeper projections. An adapter that raises is recorded as a `failed` source (error = step and exception type, traceback in the job log only); actuals refresh, σ_out, matchups, backfill and the decision logs are isolated the same way (added 2026-10-12).
   - A `/stats` failure shows a banner, skips the accuracy update, and reuses cached season rates.
   - A sync succeeds if ≥1 projection or rank source returns rows. If none do, the page shows the stale data with a banner.
+  - *Incomplete fetches (added 2026-10-12):* a fetch that looks incomplete is `suspect` and isn't merged; the earlier rows stay, with a banner. Two cases: a Sleeper response with no real rows at all (Sleeper rewrites a week's rows in a batch, and mid-batch serves only placeholders: seen live at 09:10 UTC on 2026-10-12, and its batches also run during game days), and any source whose fetch has fewer rows than `sources.shrink_guard` (0.6) × the rows already stored for the week. A gate window counts as done only when at least one source fetched successfully in that run, so the next slot retries.
 - **Secrets:**
   - Authenticated responses, cookies and API keys are never committed, logged, uploaded as workflow artifacts, or stored in actions/cache. All four are readable by others in a public repo (pull requests, including from forks, can restore caches created on main).
   - Private and keyed sources (FantasyPros, The Odds API) bypass the HTTP cache. Their responses stay in memory only, and the cache never stores Cookie, Set-Cookie or Authorization headers. The Odds once-per-event rule is enforced from a fetch log in `run.json` (event id, fetched_at, credits remaining), never from a cached URL.

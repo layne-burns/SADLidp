@@ -24,7 +24,7 @@ from .schedule import ET, NFLVERSE_GAMES, Schedule
 from .sigma import within_player_sd
 from .sleeper import Sleeper, my_roster, position_limits, resolve_league, season_of
 from .sources import sleeper_proj
-from .sources.base import AdapterResult
+from .sources.base import SUSPECT, AdapterResult
 from .tiers import build_tiers, place
 
 SLIM_FIELDS = (
@@ -341,6 +341,8 @@ def run_sync(
     groups: dict[str, str] = {}
     late_rows: dict[str, dict] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
+    shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
+    fetched_ok: set[str] = set()
     for name, (module, kind) in SOURCES.items():
         if not ((cfg.get("sources") or {}).get(name) or {}).get("enabled", True):
             continue
@@ -352,9 +354,13 @@ def run_sync(
             log(traceback.format_exc())
             res = AdapterResult(name=name, kind=kind, status="failed", week=week, fetched_at=now.isoformat(),
                                 error=f"{type(e).__name__} in fetch")  # fmt: skip
+        before = len(existing.get("rows") or {})
+        if res.ok and before and len(res.rows) < shrink * before:  # SPEC §7: a shrunken fetch isn't merged
+            res.status, res.error = SUSPECT, f"{len(res.rows)} rows against {before} before"
         info = res.summary()
         late_ok = bool(((cfg.get("sources") or {}).get(name) or {}).get("late_rows"))
         if res.ok:
+            fetched_ok.add(name)
             merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of, late_ok)
             storage.save_source(path, res, merged)
             info.update(merge=counts, last_success=res.fetched_at)
@@ -362,7 +368,8 @@ def run_sync(
         else:
             info["last_success"] = existing.get("last_success")
             rows = existing.get("rows", {})
-            why = f"week {week} not posted yet" if res.status == "not_yet_published" else res.status
+            why = {"not_yet_published": f"week {week} not posted yet",
+                   SUSPECT: "this fetch looked incomplete and was skipped"}.get(res.status, res.status)  # fmt: skip
             why += f" ({res.error})" if res.error else ""
             warnings.append(f"{name}: {why}" + ("; using earlier rows" if rows else ""))
         info["rows_used"] = len(rows)
@@ -384,7 +391,7 @@ def run_sync(
             info["zero_filled"] = len(zeros)
         run["sources"][name] = info
 
-    if not values:
+    if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
     late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
@@ -618,7 +625,7 @@ def run_sync(
             "scoring_settings": sc,
         },
     )
-    if window and values:  # with no usable source the window stays open, so the next slot retries
+    if window and fetched_ok and any(values.values()):  # else the window stays open: the next slot retries
         gate_path = season_dir / "gate.json"
         done_list = storage.read_json(gate_path, {}).get("windows_done", [])
         storage.write_json(gate_path, {"windows_done": sorted({*done_list, window.id})})

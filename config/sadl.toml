@@ -37,6 +37,7 @@ prior_split = 0.6           # projection : rank group prior (D11)
 
 [sources]
 max_source_age_h = 96
+shrink_guard = 0.6          # a fetch with fewer rows than this share of the stored rows is skipped (SPEC §7)
 
 [sources.sleeper_proj]
 enabled = true

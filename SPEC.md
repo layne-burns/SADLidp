@@ -132,7 +132,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 | FantasyPros weekly ECR (IDP, DL, LB, DB pages) | Rank | ✅ **Free, no login** | ✅ Embedded `ecrData` JSON: ~376 IDP players, ~25 experts, weekly, STD scoring. Treated as private (D16) like all FP data. |
 | ~~FantasyPros IDP projections~~ | | Logged-in only | ❌ Dropped (owner decision; the login sits behind Cloudflare Turnstile). |
 | RotoBaller weekly IDP rankings article | Rank | ✅ Free | ✅ Three tables (DL/edge, LB, DB), top 50 each, `Rank/Player/Team/Opponent`. Article URL found weekly from its search page. |
-| ESPN league 942104146 (owner's public league, IDP enabled) | Projection (ESPN stat ids; mapping in §13) | Free, no secrets | ✅ Phase 3 source, pending probe run 4. ESPN's default feed omits IDP players, so projections are read through this league (§5 ESPN adapter). |
+| ESPN league 942104146 (owner's public league, IDP enabled) | Projection (solo, assisted, total tackles, sack, INT, FF, FR, PD; no TFL or QB hit) | Free, no secrets | ✅ **Verified (probe run 4):** readable logged out; 398 of 400 IDPs returned had a week projection; stat-id mapping in §13. Phase 3 source. |
 | The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | ⏸ Docketed for Phase 5 (Vegas odds, D18). Rules in §6.2. |
 | ~~FantasyNerds, IDP Guru~~ | | Paywalled | ❌ Dropped (no free rows). |
 | ~~Razzball IDP~~ | | Free but rest-of-season only | ❌ Dropped (weekly rankings page is JS-rendered; projections are ROS). |
@@ -148,7 +148,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 
 **ESPN adapter (owner's league, Phase 3):**
 - **Fetch:** `lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{espn.league_id}?view=kona_player_info&scoringPeriodId={week}` with an `X-Fantasy-Filter` for the league's IDP slots. The league is public, so there are no cookies or secrets.
-- **Rows:** each player's target-week projection (`statSourceId` 1, `statSplitTypeId` 1), with ESPN stat ids translated to Sleeper keys through the mapping verified in §13. Keys ESPN doesn't project are imputed (§6.2).
+- **Rows:** each player's target-week projection (`statSourceId` 1, `statSplitTypeId` 1), with ESPN stat ids translated to Sleeper keys through the mapping verified in §13. Keys ESPN doesn't project are imputed (§6.2). The request asks for all IDP slots (`filterSlotIds` 10/11/14/15 in this league) and must page (`offset`) or raise `limit`: run 4 hit the 400-row cap.
 - **Matching:** Sleeper `espn_id` first, then normalized name + team + position (§6.1).
 
 ## 6. Methods
@@ -312,8 +312,9 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · Phase 1 amendment:** verified facts in §13; final source list in §5.2; D14 resolved to Sleeper's `position` field.
 - **2026-10-12 · Owner decisions closing Phase 1:** FantasyPros = free ECR only (D9 superseded; no FP credentials); The Odds API deferred past the MVP; ESPN projections through the owner's public IDP league 942104146 (§5.2), pending probe run 4.
 - **2026-10-12 · D18 added (owner request):** Vegas odds docketed for tier creation and analysis as Phase 5 (game lines from the nflverse schedule and/or Odds API props); polish moves to Phase 6.
+- **2026-10-12 · ESPN verified (probe run 4):** league 942104146 readable logged out; stat-id mapping recorded in §13; ESPN rows impute TFL and QB hits.
 
-## 13. Phase 1 findings (probe runs 1–3, 2026-10-12)
+## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 
 **Sleeper / SADL facts**
@@ -329,13 +330,33 @@ Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 - nflverse `games.csv` works; uses `LA` for the Rams (alias to `LAR`); kickoffs include 09:30 ET international games.
 - The DynastyProcess crosswalk covers IDPs poorly (Sleeper id 51%, FantasyPros id 34%), and only ~21 of SADL's rostered IDPs carry an ESPN id in Sleeper. Matching relies on normalized name + team + position with `player_overrides.yaml`.
 
+**ESPN league 942104146 (probe run 4)**
+- **Access:** settings and players read logged out (HTTP 200), so no cookies or secrets. Lineup slots enabled: LB (10) ×2, DL (11) ×2, DB (14) ×2, DP (15) ×1.
+- **Coverage:** 400 IDPs returned (the request's cap, so the adapter must page), 398 with a week-5 projection. 392 of the 400 matched a Sleeper player (155 by `espn_id`, 237 by unique normalized name; 7 ambiguous names, 1 unmatched).
+- **Stat-id mapping**, learned from 366 player pairs on week-4 actuals (exact agreement where either side is non-zero; the runner-up candidate stayed below 0.26 for every accepted id):
+
+| ESPN stat id | Sleeper key | Agreement | n |
+|---|---|---|---|
+| 108 | `idp_tkl_solo` | 0.936 | 281 |
+| 107 | `idp_tkl_ast` | 0.943 | 263 |
+| 109 | `idp_tkl` | 0.911 | 315 |
+| 99 | `idp_sack` | 1.000 | 51 |
+| 95 | `idp_int` | 1.000 | 22 |
+| 106 | `idp_ff` | 1.000 | 18 |
+| 96 | `idp_fum_rec` | 1.000 | 9 |
+| 113 | `idp_pass_def` | 1.000 | 96 |
+| 97 | `idp_blk_kick` (provisional) | 1.000 | 2 |
+
+  Tackle ids agree about 94% of the time rather than 100%: the two sites' official-stat feeds differ slightly, which doesn't matter for projections. Ids 94, 103 and 105 each matched one defensive TD (too few to confirm); 98 (likely safeties) had no events. Ids 100, 110–112, 155, 156 and 210 match no Sleeper key.
+- **SADL keys ESPN doesn't project:** `idp_tkl_loss` (TFL, 2 pts) and `idp_qb_hit` (1 pt) are imputed for ESPN rows (§6.2). Defensive TDs, safeties and blocked kicks are too rare to confirm and are imputed the same way until confirmed.
+
 **FantasyPros access (D9)**
 - The login page (`secure.fantasypros.com/accounts/login/`) runs **Cloudflare Turnstile**, a browser human-check, plus a hidden `token` field. Scripted auto-login will very likely fail; it's untested because no credentials are configured. Logged-in session cookies are named `fpjwt`, `fptoken`, `fpuserinfo`, `fp_level`.
 - The weekly ECR rankings don't need a login at all. Login only unlocks the full stat projections.
 
 **Owner decisions (closing Phase 1)**
 1. FantasyPros: free ECR rankings only; no FP projections, login or cookie (D9).
-2. ESPN: projections through the owner's public league 942104146 with IDP enabled; verified by probe run 4 (below).
+2. ESPN: projections through the owner's public league 942104146 with IDP enabled; verified by probe run 4 (above).
 3. The Odds API: deferred until after the MVP.
 
 **Still open (before Phase 3):** do the free FantasyPros ECR rows still need D16's encrypted storage and blend-only display, or can they be committed like other public sources?

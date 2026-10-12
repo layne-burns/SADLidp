@@ -34,6 +34,9 @@ class SleeperProbe:
         self.section: dict = {"requests": [], "errors": []}
         self.samples: dict[str, object] = {}
         self._roster_list: list[dict] = []
+        self.players_db: dict[str, dict] = {}
+        self.stats_by_week: dict[int, dict[str, dict]] = {}
+        self.sadl_idp_keys: list[str] = []
         self._player_db: dict[str, dict] = {}
 
     def _json(self, label: str, url: str):
@@ -91,6 +94,7 @@ class SleeperProbe:
         }
 
         players = self._step("players_db", self._players) or {}
+        self.players_db = players
         if not players:
             s["d14"] = {"inconclusive": "players DB unavailable; D14 not evaluated"}
         league = self._step("league", self._league, username, league_names, season)
@@ -220,6 +224,8 @@ class SleeperProbe:
         by_pid_api = self._stats_api(season, week, players)
         self.section.setdefault("stats_endpoints", {}).setdefault(f"week{week}", {})["v1_rows"] = len(by_pid_v1)
         best = by_pid_v1 or by_pid_api
+        self.stats_by_week[week] = best
+        self.sadl_idp_keys = sorted(k for k, v in scoring.items() if k.startswith("idp_") and an.num(v))
         idp_lines = [st for pid, st in best.items() if an.is_idp(players.get(pid, {}))]
         gt = {"week": week, "rostered_idp_in_players_points": len(idp_ids)}
         for label, by_pid in (("v1", by_pid_v1), ("api", by_pid_api)):

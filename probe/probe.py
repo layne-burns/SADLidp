@@ -104,6 +104,24 @@ def _run_probes(args, now, season_hint, out, client, report, samples) -> None:
         if espn_sample:
             samples["espn_api_sample.json"] = espn_sample
 
+    settled_used = (sl.get("weeks_used") or {}).get("settled_week_used")
+    res = _guarded(
+        report,
+        "espn_league",
+        sp.probe_espn_league,
+        client,
+        season,
+        week,
+        settled_used,
+        args.espn_league,
+        sleeper.players_db,
+        sleeper.stats_by_week.get(settled_used, {}),
+        sleeper.sadl_idp_keys,
+    )
+    if res:
+        secs["espn_league"], league_samples = res
+        samples.update(league_samples)
+
     secs["public_pages"] = {}
     for name, url in sp.PUBLIC_PAGES.items():
         res = _guarded(report, f"page_{name}", sp.probe_public_page, client, url)
@@ -133,6 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--username", default="lbburnsy")
     ap.add_argument("--league-name", action="append", default=None)
     ap.add_argument("--now", help="ISO timestamp override (testing)")
+    ap.add_argument("--espn-league", default="942104146", help="owner's public ESPN league with IDP enabled")
     args = ap.parse_args(argv)
     args.league_name = args.league_name or ["SADL", "Slow Ass Draft League"]
     report = run(args)

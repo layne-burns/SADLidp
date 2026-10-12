@@ -55,6 +55,35 @@ SESSION_SECRET = "sessJAR_secret_987654"
 FP_EMAIL, FP_PASSWORD = "layne.test@example.com", "pw-Sup3rSecret!"
 
 
+ESPN_LEAGUE = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/942104146"
+ESPN_SETTINGS = {
+    "settings": {
+        "rosterSettings": {"lineupSlotCounts": {"0": 1, "10": 1, "11": 1, "14": 1, "20": 7}},
+        "scoringSettings": {"scoringItems": [{"statId": 108, "points": 2.0}]},
+    }
+}
+
+
+def _espn_player(espn_id, name, actual_w4, proj_w5):
+    return {
+        "player": {
+            "id": espn_id,
+            "fullName": name,
+            "defaultPositionId": 11,
+            "stats": [
+                {"scoringPeriodId": 4, "statSourceId": 0, "statSplitTypeId": 1, "stats": actual_w4},
+                {"scoringPeriodId": 5, "statSourceId": 1, "statSplitTypeId": 1, "stats": proj_w5},
+            ],
+        }
+    }
+
+
+ESPN_PLAYERS = [
+    _espn_player(901, "Edge Hybrid", {"108": 6, "107": 4, "109": 10}, {"108": 4.4, "107": 2.1}),
+    _espn_player(902, "Pure DL", {"99": 1}, {"99": 0.5}),
+]
+
+
 def route(url: str):
     v1, api = "https://api.sleeper.app/v1", "https://api.sleeper.com"
     table = [
@@ -75,6 +104,8 @@ def route(url: str):
         (f"{v1}/stats/nfl/regular/2026/1", {"1": {"idp_tkl_solo": 5}}, None),
         (f"{api}/stats/nfl/2026/4", [{"player_id": k, "stats": v} for k, v in STATS_W4.items()], None),
         (f"{api}/projections/nfl/2026/", PROJ_ROWS, None),
+        (f"{ESPN_LEAGUE}?view=mSettings", ESPN_SETTINGS, None),
+        (f"{ESPN_LEAGUE}?view=kona_player_info", {"players": ESPN_PLAYERS}, None),
         ("https://lm-api-reads.fantasy.espn.com/", {"players": []}, None),
         ("https://www.fantasypros.com/", FP_HTML, "text/html"),
         ("https://idpguru.com/", INDEX_HTML, "text/html"),
@@ -150,6 +181,11 @@ def test_probe_end_to_end(tmp_path, fake_network):
     assert secs["schedule"]["target_week"] == 5
     assert secs["index_pages"]["idpguru"]["followed"]["status"] == 200
     assert secs["odds_api"]["status"] == "skipped"
+    league = secs["espn_league"]
+    assert league["public_access"] and league["idp_slots_enabled"] == {"10": 1, "11": 1, "14": 1}
+    assert league["matched_to_sleeper"] == {"name": 2}
+    assert league["projection_coverage"] == {"players": 2, "with_target_week_projection": 2}
+    assert league["stat_mapping"]["pairs"] == 2 and league["stat_mapping"]["mapping"]["108"]["best"] == "idp_tkl_solo"
 
     fp = secs["fantasypros"]
     login = fp["auto_login"]

@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import unicodedata
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
@@ -596,4 +597,89 @@ def espn_shape(payload, week: int) -> dict:
         "players_with_week_projection": with_proj,
         "projection_stat_ids": dict(proj_keys.most_common(40)),
         "prior_week_actual_stat_ids": dict(actual_keys.most_common(40)),
+    }
+
+
+# ---------------------------------------------------------------- ESPN league: matching and stat-id mapping
+
+NAME_SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
+
+
+def normalize_name(name: str | None) -> str:
+    """'Jevón Holland Jr.' -> 'jevon holland' (accents, punctuation and suffixes removed)."""
+    text = unicodedata.normalize("NFKD", name or "")
+    text = "".join(c for c in text if not unicodedata.combining(c)).lower()
+    text = re.sub(r"[.'’`]", "", text)
+    tokens = [t for t in re.split(r"[^a-z0-9]+", text) if t and t not in NAME_SUFFIXES]
+    return " ".join(tokens)
+
+
+def espn_week_line(entry: dict, week: int | None, source: int) -> dict | None:
+    """One ESPN player's single-week stat line (statSourceId 0 = actual, 1 = projected)."""
+    player = entry.get("player") or entry
+    for s in player.get("stats") or []:
+        if s.get("scoringPeriodId") == week and s.get("statSourceId") == source and s.get("statSplitTypeId") == 1:
+            return s.get("stats") or {}
+    return None
+
+
+def match_espn_to_sleeper(espn_entries: list[dict], sleeper_players: dict[str, dict]) -> dict:
+    """ESPN player id -> Sleeper player id: Sleeper's `espn_id` first, then a unique normalized name among IDPs."""
+    by_espn_id = {str(p.get("espn_id")): pid for pid, p in sleeper_players.items() if p.get("espn_id")}
+    by_name: dict[str, list[str]] = {}
+    for pid, p in sleeper_players.items():
+        if is_idp(p):
+            by_name.setdefault(normalize_name(player_name(p)), []).append(pid)
+    matched, how = {}, Counter()
+    for e in espn_entries:
+        player = e.get("player") or e
+        eid = str(player.get("id"))
+        if eid in by_espn_id:
+            matched[eid] = by_espn_id[eid]
+            how["espn_id"] += 1
+            continue
+        candidates = by_name.get(normalize_name(player.get("fullName")), [])
+        if len(candidates) == 1:
+            matched[eid] = candidates[0]
+            how["name"] += 1
+        else:
+            how["ambiguous_name" if candidates else "unmatched"] += 1
+    return {"map": matched, "how": dict(how)}
+
+
+def espn_stat_mapping(
+    pairs: list[tuple[dict, dict]], sadl_keys: list[str] | None = None, min_n: int = 8, threshold: float = 0.9
+) -> dict:
+    """Which Sleeper stat key does each ESPN stat id measure?
+
+    `pairs` holds (ESPN actual line, Sleeper actual line) for the same player and week. For each
+    ESPN stat id, every Sleeper `idp_*` key is scored by exact agreement over the players where
+    either value is non-zero (so idle players don't make every pairing look perfect).
+    """
+    espn_ids = sorted({k for e, _ in pairs for k, v in e.items() if num(v)}, key=lambda k: (len(k), k))
+    sleeper_keys = sorted({k for _, s in pairs for k, v in s.items() if k.startswith("idp_") and num(v)})
+    mapping: dict[str, dict] = {}
+    for eid in espn_ids:
+        scored = []
+        for key in sleeper_keys:
+            rows = [(num(e.get(eid)), num(s.get(key))) for e, s in pairs if num(e.get(eid)) or num(s.get(key))]
+            if rows:
+                agree = sum(abs(a - b) < 1e-9 for a, b in rows)
+                scored.append((agree / len(rows), len(rows), key))
+        if not scored:
+            continue
+        scored.sort(key=lambda t: (-t[0], -t[1], t[2]))
+        rate, n, key = scored[0]
+        mapping[eid] = {
+            "sleeper_key": key if rate >= threshold and n >= min_n else None,
+            "best": key,
+            "rate": round(rate, 3),
+            "n": n,
+            "runner_up": {"key": scored[1][2], "rate": round(scored[1][0], 3)} if len(scored) > 1 else None,
+        }
+    mapped = {m["sleeper_key"] for m in mapping.values() if m["sleeper_key"]}
+    return {
+        "pairs": len(pairs),
+        "mapping": mapping,
+        "sadl_keys_without_espn_stat": sorted(k for k in (sadl_keys or []) if k not in mapped),
     }

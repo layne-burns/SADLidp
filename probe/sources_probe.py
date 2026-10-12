@@ -85,7 +85,10 @@ SCHEDULE_URLS = [
 ]
 CROSSWALK_URL = "https://github.com/dynastyprocess/data/raw/master/files/db_playerids.csv"
 ESPN_URL = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leaguedefaults/3?view=kona_player_info"
-ESPN_IDP_SLOT_IDS = [8, 9, 10, 11, 12, 13, 14, 15]  # guessed IDP slots; run 1 returned only one player
+ESPN_IDP_SLOT_IDS = [8, 9, 10, 11, 12, 13, 14, 15]  # DT, DE, LB, DL, CB, S, DB, DP
+ESPN_LEAGUE_URL = (
+    "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{league_id}"
+)
 ODDS_BASE = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
 ODDS_MARKETS = "player_tackles_assists,player_solo_tackles,player_sacks"
 
@@ -373,6 +376,84 @@ def probe_espn(
                 rep["error"] = "not JSON"
         sec[label] = rep
     return sec, sample
+
+
+def probe_espn_league(
+    client: Client,
+    season: int,
+    week: int | None,
+    settled_week: int | None,
+    league_id: str,
+    sleeper_players: dict,
+    sleeper_stats: dict,
+    sadl_keys: list[str],
+) -> tuple[dict, dict]:
+    """The owner's public ESPN IDP league: access, IDP slots, projection coverage, and the
+    ESPN stat id -> Sleeper key mapping learned from the last settled week's actual stats."""
+    base = ESPN_LEAGUE_URL.format(season=season, league_id=league_id)
+    sec: dict = {"league_id": league_id, "week_used": week, "settled_week_used": settled_week}
+    samples: dict = {}
+
+    r = client.get(f"{base}?view=mSettings")
+    sec["settings_request"] = _req_summary(r)
+    sec["public_access"] = r.ok
+    slots = list(ESPN_IDP_SLOT_IDS)
+    if r.ok:
+        try:
+            settings = (r.json() or {}).get("settings") or {}
+        except ValueError:
+            settings = {}
+            sec["settings_request"]["error"] = "not JSON"
+        roster = settings.get("rosterSettings") or {}
+        counts = {str(k): v for k, v in (roster.get("lineupSlotCounts") or {}).items()}
+        enabled = sorted(int(k) for k, v in counts.items() if v and k.isdigit() and int(k) in ESPN_IDP_SLOT_IDS)
+        slots = enabled or slots
+        items = (settings.get("scoringSettings") or {}).get("scoringItems") or []
+        sec["idp_slots_enabled"] = {str(k): counts.get(str(k)) for k in enabled}
+        sec["scoring_stat_ids"] = sorted({str(i.get("statId")) for i in items if i.get("statId") is not None}, key=int)
+        samples["espn_league_settings.json"] = {
+            "rosterSettings": {k: roster.get(k) for k in ("lineupSlotCounts", "positionLimits")},
+            "scoringItems": items,
+        }
+    if not r.ok:
+        return sec, samples
+
+    splits = [f"00{season}", f"10{season}"] + ([f"11{season}{week}"] if week else [])
+    filters = {
+        "players": {
+            "filterSlotIds": {"value": slots},
+            "filterStatus": {"value": ["FREEAGENT", "WAIVERS", "ONTEAM"]},
+            "filterStatsForTopScoringPeriodIds": {"value": 3, "additionalValue": splits},
+            "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
+            "limit": 400,
+        }
+    }
+    period = f"&scoringPeriodId={week}" if week else ""
+    r = client.get(f"{base}?view=kona_player_info{period}", headers={"X-Fantasy-Filter": json.dumps(filters)})
+    sec["players_request"] = _req_summary(r)
+    try:
+        payload = r.json() if r.ok else {}
+    except ValueError:
+        payload, sec["players_request"]["error"] = {}, "not JSON"
+    entries = (payload or {}).get("players") or []
+    sec["shape"] = an.espn_shape(payload, week) if week and entries else None
+    samples["espn_league_players_sample.json"] = entries[:5]
+
+    match = an.match_espn_to_sleeper(entries, sleeper_players or {})
+    sec["matched_to_sleeper"] = match["how"]
+    pairs = []
+    for e in entries:
+        eid = str((e.get("player") or {}).get("id"))
+        actual = an.espn_week_line(e, settled_week, source=0)
+        pid = match["map"].get(eid)
+        if actual is not None and pid and pid in (sleeper_stats or {}):
+            pairs.append((actual, sleeper_stats[pid]))
+    sec["stat_mapping"] = an.espn_stat_mapping(pairs, sadl_keys)
+    sec["projection_coverage"] = {
+        "players": len(entries),
+        "with_target_week_projection": sum(an.espn_week_line(e, week, source=1) is not None for e in entries),
+    }
+    return sec, samples
 
 
 def _iso(value) -> datetime | None:

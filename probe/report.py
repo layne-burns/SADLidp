@@ -182,6 +182,42 @@ def _source_rows(pages: dict) -> list[list]:
     return rows
 
 
+def _espn_league(e: dict) -> str:
+    if not e:
+        return ""
+    md = f"\n### ESPN league {e.get('league_id')} (owner's public IDP league)\n"
+    if e.get("error"):
+        return md + f"**{e['error']}**\n"
+    cov = e.get("projection_coverage") or {}
+    md += _table(
+        ["question", "answer"],
+        [
+            ["settings readable without login", f"{e.get('public_access')} (HTTP {(e.get('settings_request') or {}).get('status')})"],
+            ["IDP lineup slots enabled (ESPN slot id: count)", e.get("idp_slots_enabled")],
+            ["players returned", cov.get("players")],
+            [f"with a week-{e.get('week_used')} projection", cov.get("with_target_week_projection")],
+            ["matched to Sleeper players", e.get("matched_to_sleeper")],
+            [f"player pairs used for the mapping (week {e.get('settled_week_used')} actuals)",
+             (e.get("stat_mapping") or {}).get("pairs")],
+        ],
+    )  # fmt: skip
+    mapping = (e.get("stat_mapping") or {}).get("mapping") or {}
+    if mapping:
+        md += "\nESPN stat id → Sleeper key (exact agreement where either side is non-zero):\n\n" + _table(
+            ["ESPN stat", "mapped to", "best candidate", "agreement", "n", "runner-up"],
+            [
+                [k, m["sleeper_key"] or "—", m["best"], m["rate"], m["n"],
+                 f"{m['runner_up']['key']} ({m['runner_up']['rate']})" if m.get("runner_up") else ""]
+                for k, m in mapping.items()
+            ],
+        )  # fmt: skip
+    md += (
+        "\nSADL-scored IDP keys with no ESPN stat (must be imputed, §6.2): "
+        f"**{(e.get('stat_mapping') or {}).get('sadl_keys_without_espn_stat')}**\n"
+    )
+    return md
+
+
 def _fp(fp: dict) -> str:
     login = fp.get("auto_login") or {}
     pages = login.get("login_pages") or {}
@@ -352,6 +388,7 @@ def render_markdown(report: dict) -> str:
         )
     )
     md.append(_details("ESPN fantasy API (IDP slots)", s.get("espn_api")))
+    md.append(_espn_league(s.get("espn_league") or {}))
     md.append(_fp(s.get("fantasypros") or {}))
     md.append("\n### The Odds API\n" + _details("props availability", s.get("odds_api")))
     return "\n".join(md)

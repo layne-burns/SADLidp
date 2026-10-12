@@ -215,3 +215,60 @@ def test_espn_shape():
     assert shape["players_with_week_projection"] == 1
     assert shape["projection_stat_ids"] == {"107": 1, "99": 1}
     assert shape["prior_week_actual_stat_ids"] == {"107": 1}
+
+
+def test_normalize_name():
+    assert an.normalize_name("Jevón Holland Jr.") == "jevon holland"
+    assert an.normalize_name("T.J. Watt") == an.normalize_name("TJ Watt") == "tj watt"
+    assert an.normalize_name("Ja'Marr Chase II") == "jamarr chase"
+    assert an.normalize_name(None) == ""
+
+
+def test_espn_week_line_picks_week_and_source():
+    entry = {"player": {"stats": [
+        {"scoringPeriodId": 4, "statSourceId": 0, "statSplitTypeId": 1, "stats": {"108": 5}},
+        {"scoringPeriodId": 5, "statSourceId": 1, "statSplitTypeId": 1, "stats": {"108": 4.2}},
+        {"scoringPeriodId": 0, "statSourceId": 1, "statSplitTypeId": 0, "stats": {"108": 70}},
+    ]}}  # fmt: skip
+    assert an.espn_week_line(entry, 4, source=0) == {"108": 5}
+    assert an.espn_week_line(entry, 5, source=1) == {"108": 4.2}
+    assert an.espn_week_line(entry, 5, source=0) is None
+
+
+def test_match_espn_to_sleeper():
+    sleeper = {
+        "a": {"full_name": "T.J. Watt", "position": "LB", "espn_id": 3045},
+        "b": {"full_name": "Jevón Holland", "position": "S"},
+        "c": {"full_name": "Josh Allen", "position": "LB"},
+        "d": {"full_name": "Josh Allen", "position": "DE"},
+    }
+    entries = [
+        {"player": {"id": 3045, "fullName": "TJ Watt"}},
+        {"player": {"id": 1, "fullName": "Jevon Holland"}},
+        {"player": {"id": 2, "fullName": "Josh Allen"}},
+        {"player": {"id": 3, "fullName": "Nobody Atall"}},
+    ]
+    res = an.match_espn_to_sleeper(entries, sleeper)
+    assert res["map"] == {"3045": "a", "1": "b"}
+    assert res["how"] == {"espn_id": 1, "name": 1, "ambiguous_name": 1, "unmatched": 1}
+
+
+def test_espn_stat_mapping_recovers_keys_and_flags_gaps():
+    pairs = []
+    for i in range(12):
+        solo, ast, pd = i % 7, (2 * i + 1) % 4, i % 3
+        sack = 1 if i % 5 == 0 else (0.5 if i % 7 == 3 else 0)
+        sleeper = {"idp_tkl_solo": solo, "idp_tkl_ast": ast, "idp_tkl": solo + ast, "idp_sack": sack,
+                   "idp_pass_def": pd, "idp_qb_hit": i % 2}  # fmt: skip
+        espn = {"108": solo, "107": ast, "109": solo + ast, "99": sack, "113": pd}
+        pairs.append((espn, sleeper))
+    sadl = ["idp_tkl_solo", "idp_tkl_ast", "idp_sack", "idp_pass_def", "idp_qb_hit"]
+    res = an.espn_stat_mapping(pairs, sadl)
+    m = res["mapping"]
+    assert {k: m[k]["sleeper_key"] for k in ("108", "107", "109", "113")} == {
+        "108": "idp_tkl_solo", "107": "idp_tkl_ast", "109": "idp_tkl", "113": "idp_pass_def",
+    }  # fmt: skip
+    assert m["108"]["rate"] == 1.0
+    # sacks agree perfectly but on too few players (4 < min_n) to accept
+    assert m["99"]["best"] == "idp_sack" and m["99"]["rate"] == 1.0 and m["99"]["sleeper_key"] is None
+    assert res["sadl_keys_without_espn_stat"] == ["idp_qb_hit", "idp_sack"]

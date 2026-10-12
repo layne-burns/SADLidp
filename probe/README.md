@@ -15,7 +15,8 @@ A one-off spike (SPEC.md §8, Phase 1) that checks every candidate data source a
 | Schedule columns and team codes; ID crosswalk coverage for IDPs | 8 |
 | Each candidate source: reachable from GitHub's runners? parseable tables? weekly? | 9 |
 | FantasyPros public vs logged-in pages (structure only, never values) | 9 |
-| Can a script log in to FantasyPros from GitHub's runners (auto-login, D9)? | 9 |
+| Can a script log in to FantasyPros from GitHub's runners? (Answered: no, Cloudflare Turnstile. D9 now uses the free rankings only.) | 9 |
+| The owner's ESPN league: public access, IDP slots, projection coverage, and which ESPN stat ids match which Sleeper stats | 9 |
 
 ## Where the results go
 
@@ -29,7 +30,7 @@ Nothing from FantasyPros is ever written in plain text. The leak guard (`python 
 
 ## Optional secrets
 
-Add these under **Settings → Secrets and variables → Actions → New repository secret**. All are optional; the probe reports "not configured" without them. For the FantasyPros auto-login test, `FP_EMAIL` and `FP_PASSWORD` are the ones that matter; `FP_COOKIE` is only the fallback.
+None are needed any more. FantasyPros is read logged out (SPEC D9) and the ESPN league is public. The probe still accepts these if set, as Phase 1 evidence; it reports "not configured" without them.
 
 | Secret | What it is | How to get it |
 |---|---|---|

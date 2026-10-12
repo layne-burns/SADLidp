@@ -25,7 +25,7 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 | D11 | Weights | The projection : rank group split starts at **60:40** as a prior. Accuracy tracking may move it, with each group kept within 20–80%, and may also move per-source weights within each group (§6.5). |
 | D12 | Tiering | **Anchored significance tiers** (§6.6). |
 | D13 | Sync timing | Manual button, plus an automatic run before SADL waivers process, plus weekend injury refreshes (§4.3). |
-| D14 | Dual eligibility | A player's position is **the one Sleeper counts toward the max-2 roster limit**. Phase 1 checks this against SADL's real rosters. Until then the tool uses Sleeper's designated `position` field (§6.1). He appears **only** in that position's list, with a **dual-eligible** tag (e.g. "LB · also DL"). |
+| D14 | Dual eligibility | A player's position is **the one Sleeper counts toward the max-2 roster limit**. **Verified in Phase 1 (§13): Sleeper's designated `position` field** (DE/DT/NT/DL→DL, LB/OLB/ILB/MLB→LB, CB/S/FS/SS/DB→DB), not `fantasy_positions[0]`. He appears **only** in that position's list, with a **dual-eligible** tag (e.g. "LB · also DL"). |
 | D15 | Swap badges | **Both**: `START over X`, meaning the waiver player likely outscores your projected starter this week, and `UPGRADE over Y`, meaning he likely outscores your other eligible player at that position (§6.7). |
 | D16 | FP data privacy | FP rows are committed **encrypted only** (key in Actions secrets). The site shows FP **only through the blend**: no FP column, and FP is excluded from the displayed min–max range. FP's aggregate accuracy metrics may be shown. |
 | D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one. FantasyPros and other sources come next, then accuracy weighting. Weeks 1–5 are backfilled if Sleeper serves past weekly projections. |
@@ -127,16 +127,17 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 
 | Source | Kind | Access | Notes |
 |---|---|---|---|
-| Sleeper projections (`api.sleeper.com/projections/nfl/{season}/{week}`) | Projection (full lines) | Free, undocumented | MVP source. Universe: complete for DL/LB/DB. The gp/opponent placeholder filter applies (§4.1). Past weeks may be retrievable, which enables the backfill. |
-| FantasyPros IDP projections | Projection | Premium cookie, private | Phase 1 checks whether Premium has IDP stat projections. |
-| FantasyPros IDP weekly ECR (DL/LB/DB) | Rank | Premium/free, private | Already an aggregate of experts. |
-| ESPN fantasy API IDP projections | Projection (no TFL) | Free, **but requires an ESPN league with IDP enabled**, ideally public | Strongest second full-line source. **User question at the Phase 1 review:** create a free ESPN IDP league? |
-| FantasyNerds weekly IDP | Projection (partial: Tkl/Ast/Sack/PD/INT) | Free visibility unverified (Premium upsell seen) | Itself an aggregate. |
-| Razzball IDP, IDP Guru | Projection or rank | Verify | Check weekly vs ROS. |
-| ESPN / Dynasty Nerds / The Huddle / RotoBaller weekly IDP articles | Rank | Free | 2026 weekly tables unconfirmed. Include only those that are parseable each week. |
-| The Odds API props (`player_tackles_assists`, `player_solo_tackles`, `player_sacks`) | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | Optional. Budget and conversion rules in §6.2. |
+| Sleeper projections (`api.sleeper.com/projections/nfl/{season}/{week}`) | Projection (full lines) | Free, undocumented | ✅ **MVP source.** RotoWire data; ~630 real IDP rows/week with solo, assisted, TFL, sack, QB hit, PD, INT, FF, FR. Query with `position[]=DL&LB&DB` (returns granular positions too). Universe: complete for DL/LB/DB. Past weeks retrievable and still pre-game → backfill weeks 1–4. |
+| FantasyPros weekly ECR (IDP, DL, LB, DB pages) | Rank | ✅ **Free, no login** | ✅ Embedded `ecrData` JSON: ~376 IDP players, ~25 experts, weekly, STD scoring. Treated as private (D16) like all FP data. |
+| FantasyPros IDP projections (`/nfl/projections/{dl,lb,db}.php`) | Projection (TACKLE, ASSIST, SACK, PD, INT, FF, FR, TD; no TFL/QB hit) | Logged-in only: logged out shows 10 rows | Depends on FP access (D9, §13 Q1). Private. |
+| RotoBaller weekly IDP rankings article | Rank | ✅ Free | ✅ Three tables (DL/edge, LB, DB), top 50 each, `Rank/Player/Team/Opponent`. Article URL found weekly from its search page. |
+| ESPN fantasy API IDP projections | Projection (ESPN stat ids 93–113) | Requires an **ESPN league with IDP enabled** | ESPN's default feed omits IDP players entirely (verified). Usable only if the user creates one (§13 Q2). |
+| The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | Optional; not configured. Rules in §6.2. |
+| ~~FantasyNerds, IDP Guru~~ | | Paywalled | ❌ Dropped (no free rows). |
+| ~~Razzball IDP~~ | | Free but rest-of-season only | ❌ Dropped (weekly rankings page is JS-rendered; projections are ROS). |
+| ~~ESPN article, Dynasty Nerds, The Huddle~~ | | | ❌ Dropped (JS-rendered / start-sit only / blocks automated requests). |
 
-**Redundancy:** accuracy weighting can't detect sources that copy each other. Config `prior_weight_cap` can limit aggregate sources such as FP ECR and FantasyNerds.
+**Redundancy:** accuracy weighting can't detect sources that copy each other. Config `prior_weight_cap` can limit aggregate sources such as FP ECR.
 
 **FantasyPros adapter:**
 - **Login:** auto-login with `FP_EMAIL` / `FP_PASSWORD` into an in-memory cookie jar for the run (sent only over https to fantasypros.com). If auto-login is unavailable, `FP_COOKIE` is used. Credentials, cookies and CSRF tokens are never written anywhere.
@@ -212,7 +213,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 ### 6.7 My IDPs panel (D15)
 - **Outcome probabilities use predictive σ:** σ_pred,i² = σ_μ,i² + σ_out,p². σ_out,p is the RMS of (actual − frozen μ) for evaluated pool players at position p once 3 evaluated weeks exist. Before that, it is last season's within-player SD of weekly SADL points (players with ≥8 games) under the current scoring.
 - **Eligible** = your rostered players at the position (D14) who pass every §2 waiver-pool filter (the same injury codes, `status`, `active`, `team`, bye and locked rules), have a μ, and are not in `reserve`.
-- **Limit count** = all your rostered players at the position, `taxi` and `reserve` included, unless Phase 1 shows that Sleeper excludes them from `position_limit_*`.
+- **Limit count** = your rostered players at the position, excluding `reserve` (IR), which Phase 1 showed Sleeper doesn't count (§13); `taxi` players are counted.
 - **S (projected starter)** = the eligible player with the highest μ. If there is none, μ_S = 0 and σ_pred,S = 0.
 - **B (other)** = the remaining eligible player, if any.
 - **START over S badge** on waiver player W when `Φ((μ_W − μ_S)/√(σ_pred,W² + σ_pred,S²)) ≥ swap_threshold` (default 0.6). Suggested move:
@@ -305,3 +306,31 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 ## 12. Change log
 - **2026-10-12 · v2:** agreed spec.
 - **2026-10-12 · D9 amended (user decision):** FantasyPros access via auto-login with `FP_EMAIL`/`FP_PASSWORD`, tested in Phase 1, with a one-command local cookie refresh as the fallback. The manual cookie copy-paste is no longer the plan.
+- **2026-10-12 · Phase 1 amendment:** verified facts in §13; final source list in §5.2; D14 resolved to Sleeper's `position` field.
+
+## 13. Phase 1 findings (probe runs 1–3, 2026-10-12)
+Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
+
+**Sleeper / SADL facts**
+- **League:** "Slow Ass Draft League", 12 teams, superflex offense + 1 DL / 1 LB / 1 DB, 16 bench, 4 IR, 3 taxi. `settings.position_limit_{dl,lb,db}` = 2 (also QB = 4). Your roster is `roster_id` 7.
+- **D14:** replaying all 18 in-season free-agent/waiver IDP adds, only Sleeper's `position` field fits every add (15 adds ended exactly at the limit, none over). `fantasy_positions[0]` would have broken it 3 times and "counts at every eligible slot" 4 times. **IR players don't count** toward the limit (5 adds succeeded only with IR excluded). Taxi: no evidence (no taxi IDPs involved), so taxi players are counted, as the spec defaults. Sleeper enforces limits only at add time: trades and the draft can leave a roster over (one roster has 4 DL now).
+- **Scoring:** SADL IDP coefficients are solo 2, assisted 1, TFL 2, sack 6, QB hit 1, PD 3, INT 6, FF 3, FR 3, def TD 6, safety 3, blocked kick 3, plus special-teams FF 1 / FR 1 / TD 6. **No threshold bonuses**, so the §6.3 bonus logic is dormant for SADL. The scoring engine reproduces Sleeper's `players_points` **exactly** for every IDP who recorded a stat in week 4 (69/69, max difference 0.00), from either stats endpoint. This is the §10 acceptance fixture.
+- **Waivers:** FAAB, $100 budget, `waiver_day_of_week` = 2 processes **Wednesday 00:00 Pacific** (108 of 117 claims processed at that time; 0 = Monday). `daily_waivers` = 0, `waiver_clear_days` = 1. Failed claims cite roster size or being outbid, never position limits.
+- **Week rollover:** `state.week` stays on the current week through Monday night; new-week transactions start Wednesday. Target week comes from the schedule (§4.3) as specced.
+- **Injury codes seen:** IR, Out, PUP, Questionable, Sus, NA, COV, plus `status` Active/Inactive. Doubtful is valid but wasn't present this week.
+- **Projections endpoint:** of 4,357 rows, 628 are real (have `gp` and an opponent); the rest are placeholders, as §4.1 assumed.
+
+**Schedule and IDs**
+- nflverse `games.csv` works; uses `LA` for the Rams (alias to `LAR`); kickoffs include 09:30 ET international games.
+- The DynastyProcess crosswalk covers IDPs poorly (Sleeper id 51%, FantasyPros id 34%), and only ~21 of SADL's rostered IDPs carry an ESPN id in Sleeper. Matching relies on normalized name + team + position with `player_overrides.yaml`.
+
+**FantasyPros access (D9)**
+- The login page (`secure.fantasypros.com/accounts/login/`) runs **Cloudflare Turnstile**, a browser human-check, plus a hidden `token` field. Scripted auto-login will very likely fail; it's untested because no credentials are configured. Logged-in session cookies are named `fpjwt`, `fptoken`, `fpuserinfo`, `fp_level`.
+- The weekly ECR rankings don't need a login at all. Login only unlocks the full stat projections.
+
+**Open questions for the owner**
+1. FantasyPros projections: test auto-login once with `FP_EMAIL`/`FP_PASSWORD` (likely blocked), or go straight to the cookie fallback, or skip FP projections and use only the free ECR?
+2. ESPN: create a free ESPN league with IDP scoring so its IDP projections can be read?
+3. Optional: sign up for The Odds API (free) for tackle/sack prop lines?
+
+**MVP source set (if no changes):** Sleeper projections (projection group) + FantasyPros ECR and RotoBaller (rank group), 60:40.

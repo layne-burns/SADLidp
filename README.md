@@ -25,6 +25,8 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 ## Reading the page
 - **Week N · data as of …:** a yellow banner appears when the data is more than 36 hours old.
 - **Points** are SADL points. **±** is how much the sources disagree about a player, not week-to-week luck. With one source it's a fixed default.
+- **Where a number comes from:** tap a player to see each source's points for him, the projected stats behind them, and its share of his number. A source with nothing for him says why.
+- **How the numbers did →** (the Stats page): how far off the projections were each week and season to date, by position, against a naive guess (each player's own average), plus whether the START/UPGRADE odds held up. Small samples say "not enough games yet".
 - **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). With one source every ± is the same, so for now the tiers are equal-width point bands.
 - **My IDPs** places your DL, LB and DB against the waiver tiers.
   - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
@@ -58,7 +60,7 @@ uv run sadlidp sync --force --data-dir /tmp/sadl       # live: needs network acc
 uv run sadlidp build --data-dir /tmp/sadl --site-dir /tmp/site
 uv run sadlidp gate
 ```
-Pushes to `claude/**` branches also run a live preview in CI: a forced sync into a scratch directory, published to the `preview` branch, which each run replaces.
+Pushes to `claude/**` branches also run a live preview in CI: the branch's committed data is copied to a scratch directory, a forced sync runs on top of it, and the site is published to the `previews/<branch>` branch, which each run of that branch replaces.
 
 ## Layout
 | Path | What |

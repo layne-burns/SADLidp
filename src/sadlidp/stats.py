@@ -13,7 +13,7 @@ each week's page. Nothing here feeds back into the numbers on the main page.
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from . import metrics, scoring, storage, weeklog
@@ -87,9 +87,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         act_doc = storage.read_json(wd / "actuals.json") or {}
         lines = act_doc.get("stats") or {}
         played = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
-        kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
-        settles = max(kicks) + timedelta(days=4, hours=4) if kicks else None
-        provisional = bool(settles) and datetime.fromisoformat(act_doc.get("captured_at")) < settles
+        settles, captured = sched.settles_at(week), act_doc.get("captured_at")
+        provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
         src = storage.read_json(wd / "sources" / "sleeper_proj.json") or {}
         rows = src.get("rows") or {}
         pred_all = {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}

@@ -13,7 +13,9 @@ each week's page. Nothing here feeds back into the numbers on the main page.
 
 from __future__ import annotations
 
+import math
 import re
+import statistics
 from datetime import datetime
 from pathlib import Path
 
@@ -60,6 +62,29 @@ def _projection_sources(wd: Path, kind: str = "projection") -> dict[str, dict]:
         if doc.get("kind", "projection") == kind:
             out[path.stem] = (doc.get("rows") or {}) if kind == "projection" else doc
     return out
+
+
+def source_points(wd: Path, sc: dict, slots: dict[str, str]):
+    """Each saved source's SADL points for the week: (points[source][pid], rows[source], kind[source],
+    equal-weight projection mean). Rank sources are mapped to points against that mean (§6.4)."""
+    sources = _projection_sources(wd)
+    kinds = dict.fromkeys(sources, "projection")
+    preds = {
+        name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
+        for name, rows in sources.items()
+    }
+    covering: dict[str, list[float]] = {}
+    for pred_s in preds.values():
+        for pid, v in pred_s.items():
+            covering.setdefault(pid, []).append(v)
+    pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
+    for name, doc in _projection_sources(wd, "rank").items():  # scored on their mapped points (§6.4)
+        rows = {pid: r for pid, r in (doc.get("rows") or {}).items() if pid in slots}
+        universe, members = doc.get("universe") or {}, doc.get("lists") or {}
+        preds[name], _ = rank_values(rows, pred_all, slots.get, universe, lambda pid: False, members=members)
+        sources[name] = rows
+        kinds[name] = "rank"
+    return preds, sources, kinds, pred_all
 
 
 def _shares(kinds: dict[str, str], names, split: float) -> list[dict]:
@@ -121,23 +146,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         played = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
         settles, captured = sched.settles_at(week), act_doc.get("captured_at")
         provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
-        sources = _projection_sources(wd)
-        kinds.update(dict.fromkeys(sources, "projection"))
-        preds = {
-            name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
-            for name, rows in sources.items()
-        }
-        covering: dict[str, list[float]] = {}
-        for pred_s in preds.values():
-            for pid, v in pred_s.items():
-                covering.setdefault(pid, []).append(v)
-        pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
-        for name, doc in _projection_sources(wd, "rank").items():  # scored on their mapped points (§6.4)
-            rows = {pid: r for pid, r in (doc.get("rows") or {}).items() if pid in slots}
-            universe, members = doc.get("universe") or {}, doc.get("lists") or {}
-            preds[name], _ = rank_values(rows, pred_all, slots.get, universe, lambda pid: False, members=members)
-            sources[name] = rows
-            kinds[name] = "rank"
+        preds, sources, week_kinds, pred_all = source_points(wd, sc, slots)
+        kinds.update(week_kinds)
         late = sum(1 for rows in sources.values() for r in rows.values() if r.get("late"))
         backfill = sum(1 for rows in sources.values() for r in rows.values() if r.get("backfill"))
         row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {},
@@ -263,8 +273,17 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         return {"hits": sum(e["outcome"] == "hit" for e in decided), "decided": len(decided),
                 "void": sum(e["outcome"] == "void" for e in sel)}  # fmt: skip
 
-    tier_rows = {
-        slot: [{"tier": t, "n": len(v), "avg": sum(v) / len(v)} for t, v in sorted(tiers[slot].items()) if v]
+    tier_rows = {  # margin = 2 standard errors of the tier's average (None below 2 player-games)
+        slot: [
+            {
+                "tier": t,
+                "n": len(v),
+                "avg": sum(v) / len(v),
+                "margin": 2 * statistics.stdev(v) / math.sqrt(len(v)) if len(v) >= 2 else None,
+            }
+            for t, v in sorted(tiers[slot].items())
+            if v
+        ]
         for slot in IDP_SLOTS
     }
     return {

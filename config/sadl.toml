@@ -15,7 +15,7 @@ position_limit = 2          # used only if Sleeper's settings have no position_l
 depth = 25                  # players shown per position tab
 
 [tiers]
-z = 1.0                     # strictness of anchored significance tiers (SPEC §6.6)
+z = 0.75                    # strictness of anchored significance tiers (SPEC §6.6); tuned 2026-10-12 with `sadlidp tune`
 nu0 = 2                     # shrinkage pseudo-count for between-source spread (SPEC §6.4)
 s0_default = 1.0            # between-source SD assumed until >=3-source players exist
 

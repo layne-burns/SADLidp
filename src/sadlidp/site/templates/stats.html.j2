@@ -132,11 +132,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     <h2 id="tiers-h">Do the tiers mean anything?</h2>
     <div class="slot">
       <p>Average score of the players in each tier as shown when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), all weeks together, with the number of player-games. Higher tiers should score more.</p>
+      <p>The ± is the margin of error (about 95%): one game swings a player's score by around 7 points, while the waiver players a position shows are usually projected within 2 to 4 points of each other. Where two tiers' ranges overlap, the games so far can't tell them apart yet, even if the tiers are right.</p>
       <div class="scroll"><table>
         <tr><th>Tier</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
         {% set nums = (s.tiers.DL + s.tiers.LB + s.tiers.DB)|map(attribute='tier')|unique|sort %}
         {% for n in nums %}
-        <tr><td>Tier {{ n }}</td>{% for slot in slots %}{% set t = s.tiers[slot]|selectattr('tier', 'equalto', n)|first %}<td class="num">{% if t %}{{ f1(t.avg) }} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
+        <tr><td>Tier {{ n }}</td>{% for slot in slots %}{% set t = s.tiers[slot]|selectattr('tier', 'equalto', n)|first %}<td class="num">{% if t %}{{ f1(t.avg) }}{% if t.margin is not none %} <small>±{{ f1(t.margin) }}</small>{% endif %} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
         {% endfor %}
       </table></div>
     </div>

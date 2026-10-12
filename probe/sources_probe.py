@@ -19,7 +19,7 @@ from pathlib import Path
 
 from . import analysis as an
 from . import structure as st
-from .phttp import Client, base_domain
+from .phttp import Client, base_domain, credentials_allowed
 
 PAGE_MARKERS = {
     "login_prompt": r"\b(sign|log)\s?in\b",
@@ -43,6 +43,10 @@ FP_PAGES = {
     "projections_lb": "https://www.fantasypros.com/nfl/projections/lb.php",
     "projections_db": "https://www.fantasypros.com/nfl/projections/db.php",
 }
+FP_DOMAIN = "fantasypros.com"
+# Every FantasyPros request: credentials pinned to fantasypros.com over https, and no retries --
+# a 403/429/503 is itself the Phase 1 answer, and a login must never be re-submitted.
+FP_HTTP = {"credential_domain": FP_DOMAIN, "retries": 0}
 FP_LOGIN_URLS = [
     "https://secure.fantasypros.com/accounts/login/",
     "https://www.fantasypros.com/accounts/login/",
@@ -228,7 +232,7 @@ def probe_fp_login(client: Client, creds: tuple[str, str] | None) -> tuple[dict,
     jar: dict[str, str] = {}
     form, page = None, None
     for url in FP_LOGIN_URLS:
-        page = client.get(url, jar=jar)
+        page = client.get(url, jar=jar, **FP_HTTP)
         info = {"status": page.status, "error": page.error, "final_path": urllib.parse.urlsplit(page.final_url).path}
         if page.ok and _is_html(page):
             html = page.text()
@@ -256,8 +260,13 @@ def probe_fp_login(client: Client, creds: tuple[str, str] | None) -> tuple[dict,
     fields[form["user_field"] or "username"] = email
     fields[form["password_field"]] = password
     action = urllib.parse.urljoin(page.final_url, form["action"] or page.final_url)
+    if not (credentials_allowed(page.final_url, FP_DOMAIN) and credentials_allowed(action, FP_DOMAIN)):
+        del fields
+        rep["attempted"] = False
+        rep["refused"] = "login form not served from, or not posting to, https fantasypros.com; password not sent"
+        return rep, None
     origin = "{0.scheme}://{0.netloc}".format(urllib.parse.urlsplit(page.final_url))
-    resp = client.post_form(action, fields, jar=jar, headers={"Referer": page.final_url, "Origin": origin})
+    resp = client.post_form(action, fields, jar=jar, headers={"Referer": page.final_url, "Origin": origin}, **FP_HTTP)
     del fields
     rep["attempted"] = True
     rep["login_post"] = {
@@ -266,7 +275,7 @@ def probe_fp_login(client: Client, creds: tuple[str, str] | None) -> tuple[dict,
         "final_path": urllib.parse.urlsplit(resp.final_url).path,
         "cookie_names": sorted(jar),
     }
-    check = client.get(FP_PAGES["rankings_idp"], jar=jar)
+    check = client.get(FP_PAGES["rankings_idp"], jar=jar, **FP_HTTP)
     marks = st.markers(check.text(), PAGE_MARKERS) if check.ok and _is_html(check) else {}
     rep["after_login"] = {
         "status": check.status,
@@ -297,7 +306,7 @@ def probe_fantasypros(client: Client, out_dir: Path) -> dict:
     for name, url in FP_PAGES.items():
         page: dict = {}
         for mode, kwargs in modes:
-            r = client.get(url, **kwargs)
+            r = client.get(url, **kwargs, **FP_HTTP)
             rep = {
                 "status": r.status,
                 "error": r.error,

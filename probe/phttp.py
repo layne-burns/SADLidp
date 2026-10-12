@@ -95,7 +95,7 @@ def base_domain(hostname: str) -> str:
     return ".".join(labels[-2:])
 
 
-def _credentials_allowed(url: str, origin_domain: str) -> bool:
+def credentials_allowed(url: str, origin_domain: str) -> bool:
     parts = urllib.parse.urlsplit(url)
     return (
         parts.scheme == "https"
@@ -153,6 +153,7 @@ class Client:
         self._last_request: dict[str, float] = {}
         self._timeouts: Counter = Counter()
         self.dead_hosts: set[str] = set()
+        self.rate_limited_hosts: set[str] = set()
         self._opener = urllib.request.build_opener(_NoRedirect)
         self.request_count = 0
 
@@ -197,6 +198,8 @@ class Client:
     def _skip(self, host: str) -> str | None:
         if host in self.dead_hosts:
             return "skipped: host unresponsive"
+        if host in self.rate_limited_hosts:
+            return "skipped: host rate-limited (429)"
         if self._clock() > self._deadline:
             return "skipped: probe deadline"
         return None
@@ -218,24 +221,32 @@ class Client:
         headers: dict[str, str] | None = None,
         jar: dict[str, str] | None = None,
         redact: tuple[str, ...] = (),
+        credential_domain: str | None = None,
+        retries: int | None = None,
     ) -> Response:
         """Request with spacing, retries, a deadline and manual redirects.
 
-        Sensitive headers and the cookie `jar` are only sent, and Set-Cookie only
-        accepted, on https hops whose base domain matches the original request's.
+        Sensitive headers, the cookie `jar` and any request body are only sent (and
+        Set-Cookie only accepted) on https hops whose base domain is `credential_domain`,
+        or the original request's base domain if not given. Only GET/HEAD are retried
+        by default: a POST (e.g. a login) is never re-sent unless `retries` says so.
         """
         headers = dict(headers or {})
-        origin_domain = base_domain(urllib.parse.urlsplit(url).hostname or "")
+        origin_domain = credential_domain or base_domain(urllib.parse.urlsplit(url).hostname or "")
+        max_retries = retries if retries is not None else (self.retries if method in ("GET", "HEAD") else 0)
         start = self._clock()
         current = url
         raw = _Raw()
         for _hop in range(MAX_REDIRECTS + 1):
             host = urllib.parse.urlsplit(current).hostname or ""
-            allowed = _credentials_allowed(current, origin_domain)
+            allowed = credentials_allowed(current, origin_domain)
+            if data is not None and not allowed:
+                raw = _Raw(error="refused: request body is only sent over https to the original site")
+                break
             hop_headers = {k: v for k, v in headers.items() if k.lower() not in SENSITIVE_HEADERS or allowed}
             if jar and allowed:
                 hop_headers["Cookie"] = "; ".join(f"{k}={v}" for k, v in jar.items())
-            for attempt in range(self.retries + 1):
+            for attempt in range(max_retries + 1):
                 skipped = self._skip(host)
                 if skipped:
                     raw = _Raw(error=skipped)
@@ -248,7 +259,9 @@ class Client:
                         self.dead_hosts.add(host)
                 elif raw.status is not None:
                     self._timeouts[host] = 0
-                if not (raw.retryable or raw.status in RETRY_STATUSES) or attempt == self.retries:
+                if raw.status == 429 and attempt == max_retries:
+                    self.rate_limited_hosts.add(host)
+                if not (raw.retryable or raw.status in RETRY_STATUSES) or attempt == max_retries:
                     break
                 backoff = 2.0 * (2**attempt)
                 retry_after = raw.headers.get("retry-after", "")

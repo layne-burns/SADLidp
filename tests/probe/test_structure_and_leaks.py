@@ -1,4 +1,7 @@
 import json
+import urllib.parse
+
+import pytest
 
 from probe import leakcheck as lc
 from probe import sources_probe as sp
@@ -224,3 +227,78 @@ def test_leakcheck_main_exit_codes(tmp_path, monkeypatch, capsys):
     assert lc.main([str(tmp_path)]) == 1
     err = capsys.readouterr().err
     assert "b.txt: http_credential_header" in err and "Bearer" not in err
+
+
+# ---------------------------------------------------------------- FantasyPros login hardening
+
+LOGIN_PAGE = (
+    '<form method="post" action="{action}"><input type="hidden" name="csrfmiddlewaretoken" value="tok123">'
+    '<input type="email" name="username"><input type="password" name="password"></form>'
+)
+PASSWORD = "pw-Sup3rSecret!"
+PW_WIRE = urllib.parse.urlencode({"p": PASSWORD})[2:].encode()  # how it appears in the form body
+
+
+def _has_pw(data) -> bool:
+    return bool(data) and PW_WIRE in data
+
+
+def _login_world(monkeypatch, action: str, post_response=None):
+    calls = []
+
+    def fake_once(self, method, url, headers, data):
+        calls.append((method, url, data))
+        if method == "POST":
+            return post_response or _Raw(200, {"content-type": "text/html"}, [], b"<html>ok</html>")
+        if "/accounts/login/" in url:
+            return _Raw(
+                200, {"content-type": "text/html"}, ["csrftoken=fpcsrf"], LOGIN_PAGE.format(action=action).encode()
+            )
+        return _Raw(200, {"content-type": "text/html"}, [], b"<a>Log Out</a>")
+
+    monkeypatch.setattr(Client, "_once", fake_once)
+    return Client(min_interval_s=0, sleep=lambda s: None), calls
+
+
+@pytest.mark.parametrize(
+    "action", ["https://evil.example/collect", "//evil.example/collect", "http://www.fantasypros.com/accounts/login/"]
+)
+def test_login_refuses_offsite_or_plain_http_form(monkeypatch, action):
+    client, calls = _login_world(monkeypatch, action)
+    rep, jar = sp.probe_fp_login(client, ("me@example.com", PASSWORD))
+    assert rep["attempted"] is False and "refused" in rep and jar is None
+    assert not any(_has_pw(d) for _, _, d in calls)
+
+
+def test_login_posts_once_to_fantasypros(monkeypatch):
+    client, calls = _login_world(monkeypatch, "/accounts/login/")
+    rep, jar = sp.probe_fp_login(client, ("me@example.com", PASSWORD))
+    posts = [(u, d) for m, u, d in calls if m == "POST"]
+    assert rep["login_succeeded"] and jar == {"csrftoken": "fpcsrf"}
+    assert [u for u, _ in posts] == ["https://secure.fantasypros.com/accounts/login/"]
+    assert _has_pw(posts[0][1])  # sanity: the check above would catch a leak
+
+
+@pytest.mark.parametrize("status", [429, 503])
+def test_login_post_is_never_retried(monkeypatch, status):
+    client, calls = _login_world(monkeypatch, "/accounts/login/", post_response=_Raw(status))
+    sp.probe_fp_login(client, ("me@example.com", PASSWORD))
+    assert sum(1 for m, _, d in calls if m == "POST" and _has_pw(d)) == 1
+
+
+@pytest.mark.parametrize("location", ["http://www.fantasypros.com/accounts/login/", "https://evil.example/x"])
+def test_login_body_not_forwarded_on_307_308(monkeypatch, location):
+    for status in (307, 308):
+        client, calls = _login_world(
+            monkeypatch, "/accounts/login/", post_response=_Raw(status, {"location": location})
+        )
+        sp.probe_fp_login(client, ("me@example.com", PASSWORD))
+        with_pw = [u for m, u, d in calls if _has_pw(d)]
+        assert with_pw == ["https://secure.fantasypros.com/accounts/login/"], (status, location)
+
+
+def test_rate_limited_host_is_skipped_afterwards(monkeypatch):
+    monkeypatch.setattr(Client, "_once", lambda self, method, url, headers, data: _Raw(429))
+    c = Client(min_interval_s=0, sleep=lambda s: None)
+    assert c.get("https://www.fantasypros.com/a", retries=0).status == 429
+    assert c.get("https://www.fantasypros.com/b").error == "skipped: host rate-limited (429)"

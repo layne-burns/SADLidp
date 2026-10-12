@@ -94,8 +94,10 @@ class SleeperProbe:
         league = self._step("league", self._league, username, league_names, season)
         if league:
             self._step("league_details", self._league_details, league, players)
-            if settled:
+            if settled and players:
                 self._step("ground_truth", self._ground_truth, league, players, settled)
+            elif settled:
+                s["ground_truth"] = {"week": settled, "error": "players DB unavailable; ground truth not evaluated"}
             self._step("transactions", self._transactions, league, week)
         self._step("projections", self._projections, season, week, players)
         self._step("past_projections", self._past_projections, season, players)
@@ -104,7 +106,11 @@ class SleeperProbe:
     # -- steps ---------------------------------------------------------------
 
     def _players(self) -> dict:
-        players = self._json("players_db", f"{V1}/players/nfl") or {}
+        players = self._json("players_db", f"{V1}/players/nfl")
+        if not isinstance(players, dict) or not players:
+            self.section["players_db"] = {"error": "request failed or empty"}
+            self.section["injuries"] = {"error": "players DB unavailable"}
+            return {}
         idp = {pid: p for pid, p in players.items() if an.is_idp(p)}
         sample_fields = sorted(next(iter(idp.values())).keys()) if idp else []
         self.section["players_db"] = {"total": len(players), "idp": len(idp), "fields": sample_fields}
@@ -189,8 +195,9 @@ class SleeperProbe:
     def _ground_truth(self, league: dict, players: dict, week: int) -> None:
         gt = self._ground_truth_week(league, players, week)
         self.section["ground_truth"] = gt
-        has_bonus = any((gt.get("v1") or gt.get("api") or {}).get("bonus_hits", {}).values())
-        if not has_bonus and week > 1:
+        best = gt.get("v1") or gt.get("api") or {}
+        has_bonus = any(best.get("bonus_hits", {}).values())
+        if best.get("players_compared") and not has_bonus and week > 1:
             # SPEC §10: the acceptance fixture needs at least one threshold-bonus hit; try the week before
             self.section["ground_truth_prev_week"] = self._ground_truth_week(league, players, week - 1)
 

@@ -92,7 +92,9 @@ def route(url: str):
 def fake_network(monkeypatch):
     seen = []
 
-    def fake_request(self, method, url, *, data=None, headers=None, jar=None, redact=()):
+    def fake_request(
+        self, method, url, *, data=None, headers=None, jar=None, redact=(), credential_domain=None, retries=None
+    ):
         self.request_count += 1
         headers = dict(headers or {})
         if jar:

@@ -179,6 +179,7 @@ def _fp(fp: dict) -> str:
                 {u: {k: v for k, v in (i.get("bot_markers") or {}).items() if v} for u, i in pages.items()},
             ],
             ["login attempted", login.get("attempted")],
+            ["login refused (safety check)", login.get("refused")],
             ["login POST", login.get("login_post")],
             ["after login", login.get("after_login")],
             ["**login succeeded**", login.get("login_succeeded")],

@@ -297,3 +297,46 @@ def test_a_raising_adapter_never_fails_the_sync(tmp_path, monkeypatch):
         CFG, tmp_path / "d", tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None
     )
     assert out.synced and any(w.startswith("sleeper_proj: failed (RuntimeError in fetch)") for w in out.warnings)
+
+
+FRIDAY = datetime(2026, 10, 9, 5, 30, tzinfo=UTC)  # Fri 1:30 AM ET: TB @ DAL is final
+
+
+def test_late_capture_live_results_and_played_suggestions(tmp_path):
+    data, cache = tmp_path / "d", tmp_path / "c"
+    run_sync(CFG, data, cache, NOW, client=FakeClient(routes()), log=lambda m: None)  # Tue pre-waiver: badges issued
+    r = routes()
+    r[f"{V1}/stats/nfl/regular/2026/5"] = {
+        "4118": {"gp": 1, "idp_tkl_solo": 6, "idp_tkl_ast": 2, "idp_sack": 1},  # Anzalone: 12+2+6 = 20 pts
+        "11705": {"gp": 1, "idp_tkl_solo": 3, "idp_pass_def": 1},  # Tykee Smith: 6+3 = 9 pts
+    }
+    out = run_sync(CFG, data, cache, FRIDAY, force=True, client=FakeClient(r), log=lambda m: None)
+    assert out.synced
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    tykee = next(p for p in d["my_idps"]["DB"]["players"] if p["id"] == "11705")
+    assert tykee["result"] == {"pts": 9.0, "state": "final"}
+    played = {p["id"]: p for p in d["positions"]["LB"]["played"]}
+    assert played["4118"]["result"] == {"pts": 20.0, "state": "final"} and played["4118"]["tier"] == 1
+    assert played["11017"]["result"] == {"pts": None, "state": "dnp"}  # TB/DAL final, no stat line
+    sugg = {s["player"]["id"]: s for s in d["my_idps"]["LB"]["played_suggestions"]}
+    anz = sugg["4118"]
+    assert anz["badge"] == "START" and anz["player"]["result"]["pts"] == 20.0
+    assert anz["over_result"] is None and anz["outcome"] is None  # his comparison plays Sunday
+    html = build_site(data, tmp_path / "site").read_text()
+    assert "This week's suggestions that have played" in html and "scored 20.0" in html
+    assert "Already played this week" in html and "did not play" in html
+
+
+def test_projection_first_seen_after_kickoff_is_kept_as_late(tmp_path):
+    # the first-ever sync runs Thursday night: TB/DAL rows are kept (flagged late), not dropped
+    run_sync(CFG, tmp_path / "d", tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
+    week = tmp_path / "d" / "2026" / "week05"
+    src = json.loads((week / "sources" / "sleeper_proj.json").read_text())
+    assert src["rows"]["11705"]["late"] is True
+    d = json.loads((week / "consensus.json").read_text())
+    tykee = next(p for p in d["my_idps"]["DB"]["players"] if p["id"] == "11705")
+    assert tykee["mu"] is not None and tykee["late"] is True
+    off = {**CFG, "sources": {**CFG["sources"], "sleeper_proj": {"enabled": True, "late_rows": False}}}
+    run_sync(off, tmp_path / "d2", tmp_path / "c", TNF, force=True, client=FakeClient(routes()), log=lambda m: None)
+    rows = json.loads((tmp_path / "d2" / "2026" / "week05" / "sources" / "sleeper_proj.json").read_text())["rows"]
+    assert "11705" not in rows

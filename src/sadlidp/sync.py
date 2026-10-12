@@ -139,7 +139,7 @@ def zero_fill(source: dict, valued: dict, idp: dict, status_of: Callable[[str], 
     return out
 
 
-def write_week_logs(
+def build_week_logs(
     wdir: Path,
     my_panel: dict,
     tiers_by_slot: dict,
@@ -148,8 +148,8 @@ def write_week_logs(
     kickoff_of: Callable[[str], datetime | None],
     now: datetime,
     prewaiver: bool,
-) -> None:
-    """badges.json and tiers_log.json for later evaluation (weeklog.py)."""
+) -> tuple[dict, dict]:
+    """badges.json and tiers_log.json documents for later evaluation (weeklog.py); written by the caller."""
     current = {}
     for slot in IDP_SLOTS:
         for w, b in my_panel[slot]["badges"].items():
@@ -160,17 +160,47 @@ def write_week_logs(
                 "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
                 "lock_at": min(kicks).isoformat() if kicks else None,
             }  # fmt: skip
-    path = wdir / "badges.json"
-    badges = weeklog.update_badge_log((storage.read_json(path) or {}).get("badges", {}), current, now)
-    storage.write_json(path, {"schema_version": 1, "badges": badges})
+    prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
+    badges = {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now)}
     rows = {
         pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3)}
         for slot in IDP_SLOTS
         for t in tiers_by_slot[slot]
         for pid in t["players"]
     }
-    path = wdir / "tiers_log.json"
-    storage.write_json(path, weeklog.update_tiers_log(storage.read_json(path) or {}, rows, now, kickoff_of, prewaiver))
+    tiers = weeklog.update_tiers_log(storage.read_json(wdir / "tiers_log.json") or {}, rows, now, kickoff_of, prewaiver)
+    return badges, tiers
+
+
+def live_results(payload, pids, sc: dict, status_of: Callable[[str], PlayerStatus], now: datetime) -> dict[str, dict]:
+    """This week's scored results for players whose game has started (D22): SADL points so far, `live`
+    until kickoff + 4 h and `final` after; `dnp` if the game is over and he has no stat line."""
+    if not isinstance(payload, dict):
+        return {}
+    out = {}
+    for pid in pids:
+        st = status_of(pid)
+        if st.kickoff is None or st.kickoff > now:
+            continue
+        state = "final" if st.kickoff + timedelta(hours=4) <= now else "live"
+        line = payload.get(pid)
+        if isinstance(line, dict) and (line.get("gp") or any(v for k, v in line.items() if k.startswith("idp_"))):
+            out[pid] = {"pts": round(scoring.points(line, sc), 2), "state": state}
+        else:
+            out[pid] = {"pts": None, "state": "dnp"} if state == "final" else {"pts": 0.0, "state": "live"}
+    return out
+
+
+def _settled(r: dict | None) -> bool:
+    return bool(r) and r["state"] in ("final", "dnp")
+
+
+def _outcome(w_res: dict | None, over: str | None, over_res: dict | None) -> str | None:
+    """hit / miss / push once both results are final (an empty slot counts as 0)."""
+    if not _settled(w_res) or (over and not _settled(over_res)):
+        return None
+    w_pts, o_pts = w_res["pts"] or 0.0, (over_res or {}).get("pts") or 0.0
+    return "hit" if w_pts > o_pts else "miss" if w_pts < o_pts else "push"
 
 
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
@@ -182,7 +212,7 @@ def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool
         "slot": slot_of(p),
         "also": also_eligible(p),
         "mu": round(cons_row["mu"], 2) if cons_row else None,
-        "sigma": round(cons_row["sigma"], 2) if cons_row else None,
+        "sigma": round(cons_row["sigma"], 2) if cons_row and cons_row.get("sigma") is not None else None,
         "min": round(cons_row["min"], 2) if cons_row and cons_row["min"] is not None else None,
         "max": round(cons_row["max"], 2) if cons_row and cons_row["max"] is not None else None,
         "n": cons_row["n_sources"] if cons_row else 0,
@@ -192,6 +222,8 @@ def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool
         "kickoff": status.kickoff.isoformat() if status.kickoff else None,
         "badge": badge,
         "mine": mine,
+        "late": bool(cons_row and cons_row.get("late")),
+        "result": None,
     }
 
 
@@ -277,6 +309,7 @@ def run_sync(
     }
     values: dict[str, dict[str, float]] = {}
     groups: dict[str, str] = {}
+    late_rows: dict[str, dict] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     for name, (module, kind) in SOURCES.items():
         if not ((cfg.get("sources") or {}).get(name) or {}).get("enabled", True):
@@ -290,8 +323,9 @@ def run_sync(
             res = AdapterResult(name=name, kind=kind, status="failed", week=week, fetched_at=now.isoformat(),
                                 error=f"{type(e).__name__} in fetch")  # fmt: skip
         info = res.summary()
+        late_ok = bool(((cfg.get("sources") or {}).get(name) or {}).get("late_rows"))
         if res.ok:
-            merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of)
+            merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of, late_ok)
             storage.save_source(path, res, merged)
             info.update(merge=counts, last_success=res.fetched_at)
             rows = merged
@@ -310,6 +344,7 @@ def run_sync(
             run["sources"][name] = info
             continue
         groups[name] = kind
+        late_rows[name] = {pid: r for pid, r in rows.items() if r.get("late")}
         values[name] = {
             pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp
         }
@@ -322,6 +357,9 @@ def run_sync(
     if not values:
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
+    late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
+    for pid in late & cons.keys():
+        cons[pid]["late"] = True  # projection first captured after his kickoff (SPEC §6.5)
 
     # frozen week record: each player's values at his last sync before kickoff (SPEC §6.5, D15). A locked
     # player keeps exactly what he showed, whatever happens to other players or sources afterwards.
@@ -380,8 +418,21 @@ def run_sync(
     threshold = float((cfg.get("swap") or {}).get("threshold", 0.6))
     my_panel = panel(me or {}, players, cons, panel_status, waiver_order, limits, sigma_out, threshold, lineup)
 
+    logs = _guard("decision logs", lambda: build_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of,
+                                                         now, prewaiver=bool(window and window.kind == "pre-waiver")),
+                  (None, None), warnings, log)  # fmt: skip
+    badge_doc, tiers_doc = logs
+    live_stats = _guard("live stats", lambda: sleeper.stats(season, week)[0], None, warnings, log)
+    results = live_results(live_stats, [pid for pid in idp if status_of(pid).locked], sc, status_of, now)
+
+    def was_playable(pid: str) -> bool:
+        """Playable at his kickoff: per the frozen record, else nothing but `locked` stops him now."""
+        rec = frozen.get(pid)
+        return not rec.get("reasons") if rec is not None else status_of(pid).comparable
+
     # site data: only μ, σ, range, n, position, tier and flags (SPEC §6.4) -- never per-source values
     depth = int((cfg.get("display") or {}).get("depth", 25))
+    logged_tier = {pid: r.get("tier") for pid, r in ((tiers_doc or {}).get("last_pre_kickoff") or {}).items()}
     positions_out = {}
     for slot in IDP_SLOTS:
         badges = my_panel[slot]["badges"]
@@ -400,11 +451,23 @@ def run_sync(
             for pid, p in idp.items()
             if slot_of(p) == slot and pid not in cons and pid not in rostered and status_of(pid).playable
         )
+        played_ids = sorted(
+            (pid for pid in cons if slot_of(idp[pid]) == slot and pid not in rostered and status_of(pid).locked
+             and was_playable(pid)),
+            key=lambda pid: (logged_tier.get(pid) or 999, -cons[pid]["mu"], pid),
+        )  # fmt: skip
+        played = []
+        for pid in played_ids[:depth]:
+            card = _player_card(pid, idp[pid], cons[pid], status_of(pid), logged_tier.get(pid), None, False)
+            card["result"] = results.get(pid)
+            played.append(card)
         positions_out[slot] = {
             "tiers": out_tiers,
             "tier_count": len(tiers_by_slot[slot]),
             "hidden": len(waiver_order[slot]) - shown,
             "no_projection": no_projection,
+            "played": played,
+            "played_hidden": max(0, len(played_ids) - depth),
         }
     my_out = {}
     for slot in IDP_SLOTS:
@@ -414,6 +477,7 @@ def run_sync(
             c = cons.get(pid)
             tier = place(c["mu"], c["sigma"], tiers_by_slot[slot], z) if c else None
             card = _player_card(pid, players.get(pid, {}), c, status_of(pid), tier, None, True)
+            card["result"] = results.get(pid)
             card.update(reserve=pid in pnl["reserve"], taxi=pid in pnl["taxi"], role=(
                 "starter" if pid == pnl["starter"] else "other" if pid == pnl["other"] else None))  # fmt: skip
             cards.append(card)
@@ -423,13 +487,36 @@ def run_sync(
                 :5
             ]
         ]
+        names = {pid: player_name(players.get(pid, {})) for pid in pnl["players"]}
+        played_sugg = []  # issued this week (active at lock) and already locked: shown with their results
+        issued = (badge_doc or {}).get("badges", {}).values()
+        for e in sorted(issued, key=lambda e: (e.get("lock_at") or "", e["w"])):
+            if e["slot"] != slot or not e.get("active") or not e.get("lock_at"):
+                continue
+            if datetime.fromisoformat(e["lock_at"]) > now:
+                continue
+            w, over = e["w"], e.get("over")
+            c = cons.get(w) or {"mu": e["mu_w"], "sigma": None, "min": None, "max": None, "n_sources": 0}
+            card = _player_card(w, players.get(w, {}), c, status_of(w), None, None, False)
+            card["result"] = results.get(w)
+            for pid in (over, e.get("drop")):
+                if pid:
+                    names.setdefault(pid, player_name(players.get(pid, {})))
+            played_sugg.append({
+                **{k: e.get(k) for k in ("badge", "over", "p", "action", "drop", "reference", "why", "mu_over")},
+                "player": card, "over_result": results.get(over) if over else None,
+                "outcome": _outcome(results.get(w), over, results.get(over) if over else None),
+            })  # fmt: skip
+        played_sugg.sort(key=lambda x: (-((x["player"]["result"] or {}).get("pts") or -1.0), -(x["player"]["mu"] or 0)))
         my_out[slot] = {
             "players": cards,
             "count": pnl["count"],
             "limit": pnl["limit"],
             "starter_locked": pnl["starter_locked"],
             "suggestions": suggestions,
-            "names": {pid: player_name(players.get(pid, {})) for pid in pnl["players"]},
+            "played_suggestions": played_sugg[:6],
+            "played_suggestions_hidden": max(0, len(played_sugg) - 6),
+            "names": names,
         }
 
     backfilled = _guard("backfill", lambda: backfill_projections(sleeper, data_dir, season, week, now), [], warnings,
@@ -460,9 +547,9 @@ def run_sync(
     }
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})
-    _guard("decision logs", lambda: write_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of, now,
-                                                    prewaiver=bool(window and window.kind == "pre-waiver")),
-           None, warnings, log)  # fmt: skip
+    if badge_doc is not None:
+        storage.write_json(wdir / "badges.json", badge_doc)
+        storage.write_json(wdir / "tiers_log.json", tiers_doc)
     storage.write_json(wdir / "run.json", run)
     storage.write_json(wdir / "rosters.json", rosters)
     storage.write_json(

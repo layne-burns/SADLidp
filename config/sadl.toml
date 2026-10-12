@@ -40,6 +40,7 @@ max_source_age_h = 96
 
 [sources.sleeper_proj]
 enabled = true
+late_rows = true            # keep projections first seen after kickoff, flagged late (SPEC §6.5)
 
 [gate]
 pre_waiver_open_h = 12      # window opens this many hours before waivers process
@@ -48,3 +49,5 @@ saturday_open_et = "12:00"
 saturday_close_et = "18:00"
 sunday_open_h = 4           # before the first Sunday kickoff
 sunday_close_min = 15
+results_after_h = 3.25      # Sunday-evening results sync: this long after the last daytime kickoff
+results_window_h = 6

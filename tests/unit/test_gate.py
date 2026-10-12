@@ -58,3 +58,12 @@ def test_last_fantasy_week():
         gate.last_fantasy_week({"playoff_week_start": 15, "playoff_teams": 6, "playoff_round_type": 1}) == 18
     )  # capped
     assert gate.last_fantasy_week({}) == 18
+
+
+def test_sunday_results_window_follows_the_afternoon_games():
+    res = next(w for w in gate.windows(SCHED, 2026, 5, SADL, {}) if w.kind == "results")
+    assert res.id == "2026-w05-results"
+    assert res.open == datetime(2026, 10, 11, 16, 25, tzinfo=ET) + timedelta(hours=3.25)  # last daytime kickoff 4:25
+    assert res.close == res.open + timedelta(hours=6)
+    slots = [datetime(2026, 10, 12, h, 17, tzinfo=UTC) for h in (0, 3)]  # '17 */3' at 8:17 / 11:17 PM ET
+    assert all(res.contains(t) for t in slots)

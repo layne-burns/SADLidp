@@ -61,7 +61,13 @@ def test_merge_rows_freeze_rule():
     assert merged["thu"] == existing["thu"]
     assert merged["sun"]["stats"] == {"idp_tkl_solo": 4} and merged["sun"]["fetched_at"] == NOW.isoformat()
     assert "gone" not in merged and "late" not in merged and "new" in merged
-    assert counts == {"frozen": 1, "updated": 1, "added": 1, "deleted": 1, "skipped_after_kickoff": 1}
+    assert counts == {"frozen": 1, "updated": 1, "added": 1, "deleted": 1, "skipped_after_kickoff": 1, "late": 0}
+    # a source whose rows don't change after games may keep the late row, flagged, then frozen
+    merged, counts = storage.merge_rows(existing, fetched, NOW, kickoffs.get, accept_late=True)
+    assert merged["late"]["late"] is True and counts["late"] == 1 and counts["skipped_after_kickoff"] == 0
+    assert merged["thu"] == existing["thu"]  # pre-kickoff rows still never touched
+    again, _ = storage.merge_rows(merged, {"late": {"stats": {"idp_tkl_solo": 99}}}, NOW, kickoffs.get, True)
+    assert again["late"]["stats"] == {"idp_tkl_solo": 7}
 
 
 CFG = {"tiers": {"nu0": 2, "s0_default": 1.0, "sigma_floor": {"LB": 0.75, "DL": 0.75}}, "weights": {"prior_split": 0.6}}

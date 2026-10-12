@@ -20,15 +20,15 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 | D6 | Output | Personal use. Static site on GitHub Pages. The repo `layne-burns/SADLidp` is public. |
 | D7 | League identity | Resolved from Sleeper user `lbburnsy` plus a league-name match for the current season (§4.2). This also identifies **your** roster. |
 | D8 | Rank-only sources | Included. They are converted to SADL points by within-list rank-to-value mapping (§6.4). |
-| D9 | FantasyPros | Logged-in auto fetch. **Auto-login first:** each sync logs in with `FP_EMAIL` / `FP_PASSWORD` stored in Actions secrets, so there is no cookie to refresh. Phase 1 tests whether FP allows scripted logins from GitHub's runners. **Fallback** if it doesn't: a session cookie (`FP_COOKIE`) refreshed by a one-command local script that reads it from the user's browser and updates the secret (`gh secret set`). A web page cannot read another site's cookies, so the site itself can never collect it. The user accepts the risk of breakage and of FP's terms, and uses a password unique to FP. FP failing **never fails the sync**. |
+| D9 | FantasyPros | **Free weekly consensus rankings (ECR) only:** the public `/nfl/rankings/{idp,dl,lb,db}.php` pages and their embedded `ecrData`. No login, no cookie, no FP projections, so no FantasyPros credentials are stored. (Owner decision closing Phase 1: FP's login page runs Cloudflare Turnstile. This supersedes the earlier auto-login plan; see §12.) FP failing **never fails the sync**. |
 | D10 | v1 scope | Weekly streaming tiers, **my roster vs waivers**, and **source accuracy tracking**. **Out of v1:** look-ahead weeks and an in-house matchup model. |
 | D11 | Weights | The projection : rank group split starts at **60:40** as a prior. Accuracy tracking may move it, with each group kept within 20–80%, and may also move per-source weights within each group (§6.5). |
 | D12 | Tiering | **Anchored significance tiers** (§6.6). |
 | D13 | Sync timing | Manual button, plus an automatic run before SADL waivers process, plus weekend injury refreshes (§4.3). |
 | D14 | Dual eligibility | A player's position is **the one Sleeper counts toward the max-2 roster limit**. **Verified in Phase 1 (§13): Sleeper's designated `position` field** (DE/DT/NT/DL→DL, LB/OLB/ILB/MLB→LB, CB/S/FS/SS/DB→DB), not `fantasy_positions[0]`. He appears **only** in that position's list, with a **dual-eligible** tag (e.g. "LB · also DL"). |
 | D15 | Swap badges | **Both**: `START over X`, meaning the waiver player likely outscores your projected starter this week, and `UPGRADE over Y`, meaning he likely outscores your other eligible player at that position (§6.7). |
-| D16 | FP data privacy | FP rows are committed **encrypted only** (key in Actions secrets). The site shows FP **only through the blend**: no FP column, and FP is excluded from the displayed min–max range. FP's aggregate accuracy metrics may be shown. |
-| D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one. FantasyPros and other sources come next, then accuracy weighting. Weeks 1–5 are backfilled if Sleeper serves past weekly projections. |
+| D16 | FP data privacy | FP rows are committed **encrypted only** (key in Actions secrets). The site shows FP **only through the blend**: no FP column, and FP is excluded from the displayed min–max range. FP's aggregate accuracy metrics may be shown. *Open before Phase 3:* whether the free ECR rows still need this treatment (§13). |
+| D17 | Rollout | **MVP first**: Sleeper projections → SADL scoring → tiers → My IDPs → page, with snapshot freezing from day one. FantasyPros ECR, RotoBaller and the ESPN league come next (Phase 3), then accuracy weighting. Weeks 1–5 are backfilled if Sleeper serves past weekly projections. |
 
 ## 2. Defaults (engineer-chosen; changeable via config or a spec amendment)
 - **Stack:** Python 3.12, `uv`, `httpx`, `selectolax`, `pydantic`, `jinja2`, `pytest`, `ruff`, and `age` for encryption. No database. Normalized JSON snapshots are committed under `data/`.
@@ -44,7 +44,7 @@ SADL ("Slow Ass Draft League") is a Sleeper league whose IDP scoring differs fro
 ```
 GitHub Actions — sync.yml (runs from default branch `main`)
   triggers: workflow_dispatch  (= the sync button; works from the GitHub mobile app;
-                                input fp_mode=normal|force_invalid for testing)
+                                input fp_mode=normal|force_fail for testing)
             schedule '17 */3 * * *' and '17 10,11,13,14,16 * * 0' (UTC; together they give
                      hourly Sunday slots 09:17–16:17 UTC) → Python gate decides (§4.3)
   concurrency: group=sync, cancel-in-progress=false
@@ -60,7 +60,7 @@ ci.yml: ruff + pytest on PRs/pushes; ignores data/** for tests; leak-guard patte
 ```
 Commits made with `GITHUB_TOKEN` don't retrigger workflows, which is the intended behaviour. If a sync fails, nothing is deployed and the last good site stays live.
 
-**One-time setup** (documented in README): Settings → Pages → Source = GitHub Actions. Secrets: `FP_EMAIL` and `FP_PASSWORD` (auto-login), `FP_COOKIE` (fallback only), `FP_DATA_KEY` (age key), and optionally `ODDS_API_KEY`. Public repos auto-disable scheduled workflows after 60 days without activity, so the README pre-season checklist says to re-enable sync.yml in late August.
+**One-time setup** (documented in README): Settings → Pages → Source = GitHub Actions. Secrets: `FP_DATA_KEY` (age key, while FP rows are encrypted per D16) and, if props are ever added, `ODDS_API_KEY`. No FantasyPros or ESPN credentials are needed: FP is read logged out (D9) and the ESPN league is public. Public repos auto-disable scheduled workflows after 60 days without activity, so the README pre-season checklist says to re-enable sync.yml in late August.
 
 ### 3.2 Pipeline modules (`src/sadlidp/`)
 1. `sleeper.py`: documented /v1 endpoints (state, user, leagues, league, rosters, matchups, players) and the undocumented projections and stats endpoints.
@@ -129,25 +129,26 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 |---|---|---|---|
 | Sleeper projections (`api.sleeper.com/projections/nfl/{season}/{week}`) | Projection (full lines) | Free, undocumented | ✅ **MVP source.** RotoWire data; ~630 real IDP rows/week with solo, assisted, TFL, sack, QB hit, PD, INT, FF, FR. Query with `position[]=DL&LB&DB` (returns granular positions too). Universe: complete for DL/LB/DB. Past weeks retrievable and still pre-game → backfill weeks 1–4. |
 | FantasyPros weekly ECR (IDP, DL, LB, DB pages) | Rank | ✅ **Free, no login** | ✅ Embedded `ecrData` JSON: ~376 IDP players, ~25 experts, weekly, STD scoring. Treated as private (D16) like all FP data. |
-| FantasyPros IDP projections (`/nfl/projections/{dl,lb,db}.php`) | Projection (TACKLE, ASSIST, SACK, PD, INT, FF, FR, TD; no TFL/QB hit) | Logged-in only: logged out shows 10 rows | Depends on FP access (D9, §13 Q1). Private. |
+| ~~FantasyPros IDP projections~~ | | Logged-in only | ❌ Dropped (owner decision; the login sits behind Cloudflare Turnstile). |
 | RotoBaller weekly IDP rankings article | Rank | ✅ Free | ✅ Three tables (DL/edge, LB, DB), top 50 each, `Rank/Player/Team/Opponent`. Article URL found weekly from its search page. |
-| ESPN fantasy API IDP projections | Projection (ESPN stat ids 93–113) | Requires an **ESPN league with IDP enabled** | ESPN's default feed omits IDP players entirely (verified). Usable only if the user creates one (§13 Q2). |
-| The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | Optional; not configured. Rules in §6.2. |
+| ESPN league 942104146 (owner's public league, IDP enabled) | Projection (ESPN stat ids; mapping in §13) | Free, no secrets | ✅ Phase 3 source, pending probe run 4. ESPN's default feed omits IDP players, so projections are read through this league (§5 ESPN adapter). |
+| The Odds API props | Projection (partial, market-implied) | Free tier, `ODDS_API_KEY` | ⏸ Deferred until after the MVP (owner decision). Rules in §6.2. |
 | ~~FantasyNerds, IDP Guru~~ | | Paywalled | ❌ Dropped (no free rows). |
 | ~~Razzball IDP~~ | | Free but rest-of-season only | ❌ Dropped (weekly rankings page is JS-rendered; projections are ROS). |
 | ~~ESPN article, Dynasty Nerds, The Huddle~~ | | | ❌ Dropped (JS-rendered / start-sit only / blocks automated requests). |
 
 **Redundancy:** accuracy weighting can't detect sources that copy each other. Config `prior_weight_cap` can limit aggregate sources such as FP ECR.
 
-**FantasyPros adapter:**
-- **Login:** auto-login with `FP_EMAIL` / `FP_PASSWORD` into an in-memory cookie jar for the run (sent only over https to fantasypros.com). If auto-login is unavailable, `FP_COOKIE` is used. Credentials, cookies and CSRF tokens are never written anywhere.
-- **Detection:** it checks for the logged-in state (a Premium-only marker) and for the week label.
-- **Statuses:**
-  - `auth_expired` → banner "FantasyPros login failed" (check `FP_EMAIL`/`FP_PASSWORD`, or refresh the fallback cookie with the one-command script). This is the only status that triggers that banner.
-  - `blocked` (403/429/503 or a challenge page) → banner with that reason.
-  - `parse_error` and `not_yet_published` → banner with that reason.
-- **Privacy:** request headers and cookies are never logged.
-- **Fallback:** if Phase 1 shows FP blocks GitHub's runners, you choose at the Phase 1 review between three options: drop FP Premium; a local `sadlidp fetch fantasypros` run on your own computer that pushes encrypted rows; or a self-hosted runner, which GitHub advises against on public repos.
+**FantasyPros adapter (free ECR only, D9):**
+- **Fetch:** the four public ranking pages (IDP, DL, LB, DB), logged out, no cookies. Parse the embedded `ecrData` JSON: players, ECR ranks, positions, week and expert count.
+- **Detection:** `ecrData.week` (and the page's week label) must match the target week, otherwise `not_yet_published`.
+- **Statuses:** `blocked` (403/429/503 or a challenge page), `parse_error` (no `ecrData`) and `not_yet_published` → a banner with that reason. There is no login state.
+- **Privacy:** D16 applies until the owner decides otherwise (§13).
+
+**ESPN adapter (owner's league, Phase 3):**
+- **Fetch:** `lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{espn.league_id}?view=kona_player_info&scoringPeriodId={week}` with an `X-Fantasy-Filter` for the league's IDP slots. The league is public, so there are no cookies or secrets.
+- **Rows:** each player's target-week projection (`statSourceId` 1, `statSplitTypeId` 1), with ESPN stat ids translated to Sleeper keys through the mapping verified in §13. Keys ESPN doesn't project are imputed (§6.2).
+- **Matching:** Sleeper `espn_id` first, then normalized name + team + position (§6.1).
 
 ## 6. Methods
 ### 6.1 Positions and matching
@@ -236,10 +237,10 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - Private-source plaintext is decrypted in memory only and never written inside the working tree. FP normalized rows are committed only as `age`-encrypted files (D16).
   - The fixture recorder strips Cookie, Set-Cookie and Authorization headers and token query parameters. FP fixtures are synthetic rows.
 - **Leak guard (`sadlidp leakcheck`):**
-  - *When:* sync.yml, probe.yml and the local FP fetch run it on the staged changes (`git diff --cached`) **and** on the built site, immediately before every commit or `upload-pages-artifact`.
+  - *When:* sync.yml and probe.yml run it on the staged changes (`git diff --cached`) **and** on the built site, immediately before every commit or `upload-pages-artifact`.
   - *On a hit:* it aborts the job, so nothing is committed or deployed, and reports only the file path and the pattern name, never the matched text.
   - *What it looks for:*
-    - each cookie value in `FP_COOKIE` of 8 or more characters, `FP_EMAIL` and `FP_PASSWORD`, including their JSON/repr-escaped forms;
+    - every configured secret value (`ODDS_API_KEY`, and the probe's legacy `FP_COOKIE`/`FP_EMAIL`/`FP_PASSWORD` if they are ever set), including their JSON/repr-escaped forms;
     - `ODDS_API_KEY`;
     - `AGE-SECRET-KEY-`;
     - `Cookie:`, `Set-Cookie:` and `Authorization:` header lines, also as quoted JSON or dict keys;
@@ -263,12 +264,12 @@ Tiers are computed over the available pool after §2 filters, locked players rem
    - **FP probe output is a structure report only:** HTTP status, final URL path, whether the Premium marker and the week label are present, JSON key paths or table column headers, row counts per position, and the list of stat columns. It never contains cell values, player names, page text, headers or account details. If a full sample is needed for parser work, the probe age-encrypts the raw response to `FP_DATA_KEY`'s public recipient and commits only the `.age` file to `probe-fixtures`. You decrypt it locally and supply a value-redacted excerpt, and the synthetic FP fixtures are built from that.
    - **Deliverable:** a SPEC amendment covering the final source list, the verified facts, and the ESPN-league and FP-fallback questions, approved by the owner before Phase 3.
 2. **MVP (live ASAP):** skeleton, config, Sleeper client, scoring engine plus the ground-truth test, Sleeper projections adapter, snapshot/freeze storage, consensus, tiers, My IDPs, site, sync.yml (gate, concurrency, Pages), README setup. Then backfill weeks 1–5 if possible.
-3. **More sources:** FP (encrypted storage, status handling), the adapters approved in Phase 1, matching/crosswalk, imputation, rank mapping and censoring.
+3. **More sources:** FantasyPros ECR (storage per the owner's D16 decision), RotoBaller, the ESPN league (stat-id mapping from §13), matching/crosswalk, imputation, rank mapping and censoring.
 4. **Accuracy:** evaluation and adaptive weights, using data collected since the MVP went live plus the backfill. Accuracy table on the page.
 5. **Polish:** props adapter (if a key exists), accuracy and `z` tuning, UI refinements.
 
 ## 9. Config tunables (`config/sadl.toml`)
-`league.names`, `league.league_id?`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
+`league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
 
 ## 10. Verification
 - **Unit tests** (pytest, offline fixtures):
@@ -287,13 +288,13 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - league-match failures;
   - matching edge cases: Jr./III, team changes, LAR/LA, duplicate names;
   - freeze rules, where a post-kickoff sync must not modify rows.
-- **Ground-truth acceptance:** the fixture is `stats/{week}`, `matchups/{week}` and `scoring_settings` captured ≥4 days after a completed week. Assert `|ours − players_points[pid]| ≤ 0.01` for every IDP in `players_points`, and list any mismatch with its stat keys. The fixture week must include at least one threshold-bonus hit, and a defender with special-teams or return stats if one exists.
+- **Ground-truth acceptance:** the fixture is `stats/{week}`, `matchups/{week}` and `scoring_settings` captured ≥4 days after a completed week. Assert `|ours − players_points[pid]| ≤ 0.01` for every IDP in `players_points`, and list any mismatch with its stat keys. If SADL scores threshold bonuses, the fixture week must include at least one hit (it currently scores none, §13). It should include a defender with special-teams or return stats if one exists.
 - **End to end:** run sync.yml via workflow_dispatch, then confirm:
   - the site renders on a phone with tiers, My IDPs badges, the footer and the data-as-of time;
-  - `fp_mode=force_invalid` produces the cookie banner, not a failure;
+  - `fp_mode=force_fail` produces a FantasyPros source banner, not a failed sync;
   - `sadlidp gate` reports the expected next windows;
   - a second run after a game kicks off leaves that game's rows unchanged.
-- **Security:** the leak guard passes on every sync, probe and local-fetch commit and on the built site, and the CI pattern scan passes. A seeded fake secret in a test fixture branch makes the guard abort. No FP plaintext exists in the repo, the site, artifacts or caches.
+- **Security:** the leak guard passes on every sync and probe commit and on the built site, and the CI pattern scan passes. A seeded fake secret in a test fixture branch makes the guard abort. No FP plaintext exists in the repo, the site, artifacts or caches.
 
 ## 11. Known limitations (accepted)
 - **Weekly decisions only.** There is no look-ahead (D10).
@@ -307,6 +308,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · v2:** agreed spec.
 - **2026-10-12 · D9 amended (user decision):** FantasyPros access via auto-login with `FP_EMAIL`/`FP_PASSWORD`, tested in Phase 1, with a one-command local cookie refresh as the fallback. The manual cookie copy-paste is no longer the plan.
 - **2026-10-12 · Phase 1 amendment:** verified facts in §13; final source list in §5.2; D14 resolved to Sleeper's `position` field.
+- **2026-10-12 · Owner decisions closing Phase 1:** FantasyPros = free ECR only (D9 superseded; no FP credentials); The Odds API deferred past the MVP; ESPN projections through the owner's public IDP league 942104146 (§5.2), pending probe run 4.
 
 ## 13. Phase 1 findings (probe runs 1–3, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
@@ -328,9 +330,11 @@ Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 - The login page (`secure.fantasypros.com/accounts/login/`) runs **Cloudflare Turnstile**, a browser human-check, plus a hidden `token` field. Scripted auto-login will very likely fail; it's untested because no credentials are configured. Logged-in session cookies are named `fpjwt`, `fptoken`, `fpuserinfo`, `fp_level`.
 - The weekly ECR rankings don't need a login at all. Login only unlocks the full stat projections.
 
-**Open questions for the owner**
-1. FantasyPros projections: test auto-login once with `FP_EMAIL`/`FP_PASSWORD` (likely blocked), or go straight to the cookie fallback, or skip FP projections and use only the free ECR?
-2. ESPN: create a free ESPN league with IDP scoring so its IDP projections can be read?
-3. Optional: sign up for The Odds API (free) for tackle/sack prop lines?
+**Owner decisions (closing Phase 1)**
+1. FantasyPros: free ECR rankings only; no FP projections, login or cookie (D9).
+2. ESPN: projections through the owner's public league 942104146 with IDP enabled; verified by probe run 4 (below).
+3. The Odds API: deferred until after the MVP.
 
-**MVP source set (if no changes):** Sleeper projections (projection group) + FantasyPros ECR and RotoBaller (rank group), 60:40.
+**Still open (before Phase 3):** do the free FantasyPros ECR rows still need D16's encrypted storage and blend-only display, or can they be committed like other public sources?
+
+**Source plan:** the MVP uses Sleeper projections only (D17). Phase 3 adds FantasyPros ECR and RotoBaller (rank group) and the ESPN league (projection group), with the 60:40 group prior.

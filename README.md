@@ -14,6 +14,7 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 
 ## The sync button and the schedule
 - **Button:** Actions → sync → Run workflow. It also works from the GitHub mobile app, and it always syncs.
+- **New code:** a merge to `main` that changes code or config also syncs and redeploys the page.
 - **Automatic:** the workflow wakes every 3 hours (hourly on Sunday mornings), but it only syncs once in each of these windows per week:
   - **Pre-waiver:** from 12 h to 1 h before SADL's waivers process at 00:00 Pacific on Wednesday, so Tuesday noon to 11 PM PT.
   - **Saturday:** 12:00 to 6:00 PM ET, after the final injury reports.

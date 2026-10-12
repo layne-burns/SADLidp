@@ -80,6 +80,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     s_mu = {s: max(float(tcfg.get("s0_default", 1.0)), float(floor.get(s, 0.75))) for s in IDP_SLOTS}
 
     history: dict[str, list[float]] = {}  # pid -> SADL points of earlier games this season
+    resid: dict[str, dict[int, tuple[bool, list[float]]]] = {}  # slot -> week -> (provisional, actual − predicted)
     season_rows = {s: {"pred": [], "act": [], "sig": [], "base": [], "pairs": []} for s in IDP_SLOTS}
     weekly, suggestions, tiers = [], [], {s: {} for s in IDP_SLOTS}
     for week, wd in weeks:
@@ -111,6 +112,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             summ = _summary(pred, act, sig, base)
             summ.update(top12=top, pearson=None, spearman=None, r2=None)  # weekly: too few for correlations
             row["by_slot"][slot] = summ
+            resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
             agg = season_rows[slot]
             agg["pred"] += pred
             agg["act"] += act
@@ -185,4 +187,28 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "sigma_out": so,
         "n_eval": N_EVAL,
         "min_corr_n": MIN_CORR_N,
+        "sigma_mu": s_mu,
+        "_resid": resid,  # internal (σ_out from residuals); not written to stats.json
     }
+
+
+def residual_sigma_out(
+    data_dir: Path | str, season: int, cfg: dict, target_week: int, min_weeks: int = 3
+) -> dict | None:
+    """σ_out per position from this season's errors (SPEC §6.7, §F): σ_out² = mean(e²) − σ_μ², with e =
+    actual − predicted over each week's evaluation pool, demeaned within the position-week (a level
+    offset changes no decision). Uses settled weeks ≤ target_week − 2 only; a position without
+    `min_weeks` such weeks is left out (it keeps last season's value)."""
+    ev = evaluate(data_dir, season, cfg)
+    if not ev:
+        return None
+    out = {}
+    for slot in IDP_SLOTS:
+        weeks = {
+            w: e for w, (prov, e) in (ev["_resid"].get(slot) or {}).items() if not prov and w <= target_week - 2 and e
+        }
+        if len(weeks) < min_weeks:
+            continue  # this position keeps last season's value
+        sq = [(x - sum(e) / len(e)) ** 2 for e in weeks.values() for x in e]
+        out[slot] = round(max(0.0, sum(sq) / len(sq) - ev["sigma_mu"][slot] ** 2) ** 0.5, 3)
+    return out or None

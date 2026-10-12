@@ -28,6 +28,7 @@ DB = 0.75
 threshold = 0.6             # START/UPGRADE badge probability (SPEC §6.7)
 
 [sigma_out]                 # per-position weekly outcome SD fallback if last season can't be read
+method = "last_season"      # "residuals": this season's errors once 3 settled weeks exist (SPEC §6.7)
 DL = 5.0
 LB = 5.5
 DB = 5.0

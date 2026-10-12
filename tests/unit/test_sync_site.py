@@ -107,7 +107,7 @@ def test_gated_sync_writes_the_week(synced):
     out, data, _, _ = synced
     assert out.synced and (out.season, out.week, out.window) == (2026, 5, "2026-w05-prewaiver")
     week = data / "2026" / "week05"
-    for name in ("consensus.json", "run.json", "rosters.json", "players_idp.json", "sources/sleeper_proj.json"):
+    for name in ("consensus.json", "run.json", "rosters.json", "players.json", "sources/sleeper_proj.json"):
         assert (week / name).exists(), name
     assert json.loads((data / "2026" / "gate.json").read_text()) == {"windows_done": ["2026-w05-prewaiver"]}
     league = json.loads((data / "2026" / "league.json").read_text())
@@ -513,3 +513,23 @@ def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
     html = build_site(data, tmp_path / "site").read_text()  # index = week 5; week 4 page rebuilt
     page = (tmp_path / "site" / "week-2026-04.html").read_text()
     assert "Rebuilt after the fact" in page and "as they stood at the week" not in page and "week-2026-04.html" in html
+
+
+def test_breakdown_and_stats_page(tmp_path):
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)
+    d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+    anz = next(p for t in d["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "4118")
+    part = anz["breakdown"]["parts"][0]
+    assert part["source"] == "Sleeper" and part["share"] == 1.0 and part["pts"] == anz["mu"]
+    assert ["solo", 3.0] in [[k, round(v, 1)] for k, v in part["stats"]] and anz["breakdown"]["mu"] == anz["mu"]
+    zero = next(p for t in d["positions"]["LB"]["tiers"] for p in t["players"] if p["id"] == "z1")
+    assert zero["breakdown"]["parts"][0]["zero"] is True  # absent from a complete source: counts as 0
+    me = d["my_idps"]["DB"]["players"][0]
+    assert me["breakdown"]["parts"]
+    site = tmp_path / "site"
+    html = build_site(data, site, CFG).read_text()
+    assert "100% of his number" in html and 'href="stats.html"' in html
+    stats = (site / "stats.html").read_text()
+    assert "How the numbers did" in stats  # no week has final stats here: the page says so
+    assert json.loads((site / "stats.json").read_text()) is None or "_resid" not in (site / "stats.json").read_text()

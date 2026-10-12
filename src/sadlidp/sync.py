@@ -29,7 +29,7 @@ from .tiers import build_tiers, place
 
 SLIM_FIELDS = (
     "full_name", "first_name", "last_name", "position", "fantasy_positions",
-    "team", "status", "active", "injury_status", "espn_id",
+    "team", "status", "active", "injury_status", "espn_id", "fantasy_data_id",
 )  # fmt: skip
 SOURCES = {sleeper_proj.NAME: (sleeper_proj, "projection")}
 
@@ -67,9 +67,17 @@ def fetch_schedule(client: Client, cfg: dict, season: int, data_dir: Path) -> tu
 
 
 def sigma_out_for(
-    sleeper: Sleeper, cfg: dict, data_dir: Path, season: int, players: dict, sc: dict, warnings: list
+    sleeper: Sleeper, cfg: dict, data_dir: Path, season: int, players: dict, sc: dict, warnings: list, week: int = 0
 ) -> dict:
-    """σ_out per position from last season's actuals, cached once per season (SPEC §6.7)."""
+    """σ_out per position (SPEC §6.7): this season's residuals once enabled (`sigma_out.method =
+    "residuals"`) and 3 settled weeks exist; otherwise last season's within-player SD, cached per season."""
+    residual = {}
+    if (cfg.get("sigma_out") or {}).get("method") == "residuals":
+        from .stats import residual_sigma_out
+
+        residual = residual_sigma_out(data_dir, season, cfg, week) or {}
+        if all(s in residual for s in IDP_SLOTS):
+            return residual
     prev = season - 1
     path = data_dir / str(prev) / "sigma_out.json"
     est = storage.read_json(path)
@@ -85,7 +93,7 @@ def sigma_out_for(
             est = {**within_player_sd(weekly, players, sc), "season": prev}
             storage.write_json(path, est)
     fallback = cfg.get("sigma_out") or {}
-    return {s: float((est or {}).get(s) or fallback.get(s, 5.0)) for s in IDP_SLOTS}
+    return {s: float(residual.get(s) or (est or {}).get(s) or fallback.get(s, 5.0)) for s in IDP_SLOTS}
 
 
 def refresh_actuals(
@@ -489,8 +497,13 @@ def run_sync(
     if unset:
         warnings.append(f"league has no position limit for {', '.join(unset)}; assuming the config fallback")
     sigma_fallback = {s: float((cfg.get("sigma_out") or {}).get(s, 5.0)) for s in IDP_SLOTS}
-    sigma_out = _guard("σ_out estimate", lambda: sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings),
-                       sigma_fallback, warnings, log)  # fmt: skip
+    sigma_out = _guard(
+        "σ_out estimate",
+        lambda: sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings, week),
+        sigma_fallback,
+        warnings,
+        log,
+    )
     matchups = _guard("matchups", lambda: sleeper.matchups(league["league_id"], week)[0], None, warnings, log)
     my_matchup = next((m for m in (matchups or []) if me and m.get("roster_id") == me.get("roster_id")), {})
     lineup = starter_slots(league.get("roster_positions") or [], my_matchup.get("starters"))
@@ -661,9 +674,11 @@ def run_sync(
         storage.write_json(wdir / "tiers_log.json", tiers_doc)
     storage.write_json(wdir / "run.json", run)
     storage.write_json(wdir / "rosters.json", rosters)
-    storage.write_json(
-        wdir / "players_idp.json", {pid: {k: p.get(k) for k in SLIM_FIELDS} for pid, p in idp.items() if p.get("team")}
-    )
+    # the week's players as of each one's kickoff (teamless included): what later replays read (SPEC §6.5)
+    slim = {pid: {k: p.get(k) for k in SLIM_FIELDS} for pid, p in idp.items()}
+    week_players = (storage.read_json(wdir / "players.json") or {}).get("players", {})
+    week_players, _ = storage.merge_rows(week_players, slim, now, kickoff_of)
+    storage.write_json(wdir / "players.json", {"schema_version": 1, "players": week_players})
     storage.write_json(season_dir / "schedule.json", sched.to_json())
     storage.write_json(
         season_dir / "league.json",

@@ -22,9 +22,36 @@ def read_json(path: Path, default=None):
     return json.loads(path.read_text()) if path.exists() else default
 
 
+COMPACT_KEYS = {"rows", "players", "stats", "badges", "last_pre_kickoff"}  # per-player maps: one entry per line
+
+
+def dumps(obj) -> str:
+    """JSON with sorted keys. Per-player maps (COMPACT_KEYS) are written one player per line, so a
+    sync's diff touches only the players that changed and files stay small (SPEC §6.5)."""
+    if not isinstance(obj, dict) or not COMPACT_KEYS & obj.keys():
+        return json.dumps(obj, indent=1, sort_keys=True, default=str) + "\n"
+    parts = []
+    for key in sorted(obj):
+        value = obj[key]
+        if key in COMPACT_KEYS and isinstance(value, dict) and value:
+            lines = ",\n".join(
+                f"  {json.dumps(str(k))}: {json.dumps(v, sort_keys=True, separators=(',', ':'), default=str)}"
+                for k, v in sorted(value.items())
+            )
+            parts.append(f" {json.dumps(key)}: {{\n{lines}\n }}")
+        else:
+            text = json.dumps(value, indent=1, sort_keys=True, default=str).replace("\n", "\n ")
+            parts.append(f" {json.dumps(key)}: {text}")
+    return "{\n" + ",\n".join(parts) + "\n}\n"
+
+
 def write_json(path: Path, obj) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=1, sort_keys=True, default=str) + "\n")
+    path.write_text(dumps(obj))
+
+
+def _content(row: dict) -> dict:
+    return {k: v for k, v in row.items() if k not in ("fetched_at", "kickoff", "late")}
 
 
 def merge_rows(
@@ -49,7 +76,8 @@ def merge_rows(
         return bool(stored) and datetime.fromisoformat(stored) <= fetched_at  # after playing stays frozen
 
     merged = {pid: row for pid, row in existing.items() if locked(pid, row)}
-    counts = {"frozen": len(merged), "updated": 0, "added": 0, "deleted": 0, "skipped_after_kickoff": 0, "late": 0}
+    counts = {"frozen": len(merged), "updated": 0, "unchanged": 0, "added": 0, "deleted": 0,
+              "skipped_after_kickoff": 0, "late": 0}  # fmt: skip
     stamp = fetched_at.isoformat()
     for pid, row in fetched.items():
         if pid in merged:
@@ -61,9 +89,15 @@ def merge_rows(
             else:
                 counts["skipped_after_kickoff"] += 1  # first seen after kickoff: can't be a pre-game value
             continue
-        counts["updated" if pid in existing else "added"] += 1
         k = kickoff_of(pid)
-        merged[pid] = {**row, "fetched_at": stamp, **({"kickoff": k.isoformat()} if k else {})}
+        kick = {"kickoff": k.isoformat()} if k else {}
+        old = existing.get(pid)
+        if old is not None and _content(old) == _content(row):
+            merged[pid] = {**old, **kick}  # unchanged: keep when it was first seen (the file lists every fetch)
+            counts["unchanged"] += 1
+            continue
+        counts["updated" if old is not None else "added"] += 1
+        merged[pid] = {**row, "fetched_at": stamp, **kick}
     counts["deleted"] = sum(1 for pid in existing if pid not in merged)
     return merged, counts
 
@@ -73,9 +107,12 @@ def load_source(path: Path) -> dict:
 
 
 def save_source(path: Path, result, rows: dict[str, dict]) -> None:
+    fetches = [*(read_json(path, {}) or {}).get("fetches", []), result.fetched_at][-50:]
     write_json(
         path,
         {
+            "schema_version": 2,
+            "fetches": fetches,  # every successful fetch (a row's fetched_at is when its content was first seen)
             "source": result.name,
             "kind": result.kind,
             "week": result.week,

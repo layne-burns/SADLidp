@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T05:19:54-04:00",
+ "generated_at": "2026-10-12T05:51:00-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -24,6 +24,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.92,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.92,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.12
+         ],
+         [
+          "ast",
+          2.4
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.17
+         ],
+         [
+          "PD",
+          0.33
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8323",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -53,6 +100,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.06,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.06,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.7
+         ],
+         [
+          "ast",
+          2.64
+         ],
+         [
+          "TFL",
+          0.17
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11739",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -91,6 +177,53 @@
      "player": {
       "also": [],
       "badge": null,
+      "breakdown": {
+       "mu": 12.2,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 12.2,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           3.27
+          ],
+          [
+           "ast",
+           2.05
+          ],
+          [
+           "TFL",
+           0.22
+          ],
+          [
+           "sack",
+           0.06
+          ],
+          [
+           "QB hit",
+           0.11
+          ],
+          [
+           "PD",
+           0.5
+          ],
+          [
+           "INT",
+           0.17
+          ],
+          [
+           "FF",
+           0.06
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
       "flags": [],
       "id": "11682",
       "kickoff": "2026-10-12T20:15:00-04:00",
@@ -131,6 +264,49 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 13.97,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 13.97,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.06
+         ],
+         [
+          "ast",
+          1.18
+         ],
+         [
+          "TFL",
+          0.88
+         ],
+         [
+          "sack",
+          0.74
+         ],
+         [
+          "QB hit",
+          1.42
+         ],
+         [
+          "FF",
+          0.29
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7627",
      "kickoff": "2026-10-12T20:15:00-04:00",
@@ -171,6 +347,49 @@
       "DL"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 12.04,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.04,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.7
+         ],
+         [
+          "ast",
+          0.8
+         ],
+         [
+          "TFL",
+          0.8
+         ],
+         [
+          "sack",
+          0.69
+         ],
+         [
+          "QB hit",
+          1.44
+         ],
+         [
+          "PD",
+          0.11
+         ],
+         [
+          "FF",
+          0.11
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8280",
      "kickoff": "2026-10-11T16:05:00-04:00",
@@ -200,6 +419,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 14.38,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 14.38,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          4.19
+         ],
+         [
+          "ast",
+          3.39
+         ],
+         [
+          "TFL",
+          0.22
+         ],
+         [
+          "sack",
+          0.08
+         ],
+         [
+          "QB hit",
+          0.22
+         ],
+         [
+          "PD",
+          0.22
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4960",
      "kickoff": "2026-10-11T20:20:00-04:00",
@@ -238,6 +504,57 @@
      "player": {
       "also": [],
       "badge": null,
+      "breakdown": {
+       "mu": 14.81,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 14.81,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.0
+          ],
+          [
+           "ast",
+           2.68
+          ],
+          [
+           "TFL",
+           0.44
+          ],
+          [
+           "sack",
+           0.12
+          ],
+          [
+           "QB hit",
+           0.31
+          ],
+          [
+           "PD",
+           0.37
+          ],
+          [
+           "INT",
+           0.06
+          ],
+          [
+           "FF",
+           0.19
+          ],
+          [
+           "FR",
+           0.06
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
       "flags": [],
       "id": "8659",
       "kickoff": "2026-10-12T20:15:00-04:00",
@@ -271,6 +588,53 @@
      "player": {
       "also": [],
       "badge": null,
+      "breakdown": {
+       "mu": 14.41,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 14.41,
+         "share": 1.0,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "solo",
+           4.42
+          ],
+          [
+           "ast",
+           2.65
+          ],
+          [
+           "TFL",
+           0.41
+          ],
+          [
+           "sack",
+           0.06
+          ],
+          [
+           "QB hit",
+           0.12
+          ],
+          [
+           "PD",
+           0.18
+          ],
+          [
+           "INT",
+           0.12
+          ],
+          [
+           "FR",
+           0.12
+          ]
+         ],
+         "zero": false
+        }
+       ]
+      },
       "flags": [],
       "id": "8311",
       "kickoff": "2026-10-12T20:15:00-04:00",
@@ -306,6 +670,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.1,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.1,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          4.04
+         ],
+         [
+          "ast",
+          2.29
+         ],
+         [
+          "TFL",
+          0.22
+         ],
+         [
+          "PD",
+          0.33
+         ],
+         [
+          "INT",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "3233",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -332,6 +731,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.13,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.13,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.62
+         ],
+         [
+          "ast",
+          2.23
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "QB hit",
+          0.06
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10927",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -358,6 +800,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.09,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.09,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.18
+         ],
+         [
+          "ast",
+          2.21
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.38
+         ],
+         [
+          "INT",
+          0.16
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5017",
      "kickoff": "2026-10-11T20:20:00-04:00",
@@ -384,6 +869,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.09,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.09,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.75
+         ],
+         [
+          "ast",
+          2.59
+         ],
+         [
+          "TFL",
+          0.05
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.53
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6788",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -412,6 +948,53 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 11.03,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.03,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.22
+         ],
+         [
+          "ast",
+          2.67
+         ],
+         [
+          "TFL",
+          0.16
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.16
+         ],
+         [
+          "PD",
+          0.22
+         ],
+         [
+          "FF",
+          0.11
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7016",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -438,6 +1021,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.93,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.93,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.72
+         ],
+         [
+          "ast",
+          1.55
+         ],
+         [
+          "TFL",
+          0.22
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "INT",
+          0.11
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11731",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -464,6 +1082,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.81,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.81,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.73
+         ],
+         [
+          "ast",
+          0.75
+         ],
+         [
+          "TFL",
+          0.1
+         ],
+         [
+          "PD",
+          0.45
+         ],
+         [
+          "INT",
+          0.15
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7715",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -490,6 +1147,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.6,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.6,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.81
+         ],
+         [
+          "ast",
+          0.8
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "PD",
+          0.9
+         ],
+         [
+          "INT",
+          0.21
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11675",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -516,6 +1208,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.59,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.59,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.31
+         ],
+         [
+          "ast",
+          1.46
+         ],
+         [
+          "TFL",
+          0.13
+         ],
+         [
+          "PD",
+          0.57
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5372",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -542,6 +1273,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.18,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.18,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.12
+         ],
+         [
+          "ast",
+          1.62
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "QB hit",
+          0.06
+         ],
+         [
+          "PD",
+          0.56
+         ],
+         [
+          "INT",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8286",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -568,6 +1338,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.12,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.12,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.12
+         ],
+         [
+          "ast",
+          1.11
+         ],
+         [
+          "TFL",
+          0.16
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.48
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6333",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -596,6 +1413,49 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 10.0,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.0,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.66
+         ],
+         [
+          "ast",
+          2.44
+         ],
+         [
+          "TFL",
+          0.06
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.11
+         ],
+         [
+          "PD",
+          0.33
+         ],
+         [
+          "INT",
+          0.11
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6901",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -622,6 +1482,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.96,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.96,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.87
+         ],
+         [
+          "ast",
+          2.55
+         ],
+         [
+          "TFL",
+          0.13
+         ],
+         [
+          "QB hit",
+          0.06
+         ],
+         [
+          "PD",
+          0.13
+         ],
+         [
+          "INT",
+          0.13
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4224",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -648,6 +1551,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.81,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.81,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.54
+         ],
+         [
+          "ast",
+          1.06
+         ],
+         [
+          "TFL",
+          0.28
+         ],
+         [
+          "sack",
+          0.09
+         ],
+         [
+          "QB hit",
+          0.23
+         ],
+         [
+          "PD",
+          0.55
+         ],
+         [
+          "INT",
+          0.09
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8333",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -674,6 +1624,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.74,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.74,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.58
+         ],
+         [
+          "ast",
+          1.48
+         ],
+         [
+          "TFL",
+          0.05
+         ],
+         [
+          "PD",
+          0.63
+         ],
+         [
+          "INT",
+          0.16
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11676",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -700,6 +1689,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.73,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.73,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.8
+         ],
+         [
+          "ast",
+          0.97
+         ],
+         [
+          "TFL",
+          0.05
+         ],
+         [
+          "PD",
+          0.7
+         ],
+         [
+          "INT",
+          0.16
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11656",
      "kickoff": "2026-10-11T20:20:00-04:00",
@@ -726,6 +1750,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.68,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.68,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.62
+         ],
+         [
+          "ast",
+          1.62
+         ],
+         [
+          "TFL",
+          0.12
+         ],
+         [
+          "PD",
+          0.62
+         ],
+         [
+          "INT",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8476",
      "kickoff": "2026-10-08T20:15:00-04:00",
@@ -752,6 +1811,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.67,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.67,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.12
+         ],
+         [
+          "ast",
+          1.21
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.33
+         ],
+         [
+          "INT",
+          0.11
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10974",
      "kickoff": "2026-10-11T09:30:00-04:00",
@@ -778,6 +1880,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.52,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.52,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.49
+         ],
+         [
+          "ast",
+          0.64
+         ],
+         [
+          "TFL",
+          0.12
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.12
+         ],
+         [
+          "PD",
+          0.58
+         ],
+         [
+          "INT",
+          0.12
+         ],
+         [
+          "FF",
+          0.12
+         ],
+         [
+          "FR",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8359",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -804,6 +1957,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.39,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.39,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.78
+         ],
+         [
+          "ast",
+          1.48
+         ],
+         [
+          "TFL",
+          0.12
+         ],
+         [
+          "PD",
+          0.89
+         ],
+         [
+          "INT",
+          0.18
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10894",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -830,6 +2026,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.37,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.37,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.55
+         ],
+         [
+          "ast",
+          1.05
+         ],
+         [
+          "TFL",
+          0.17
+         ],
+         [
+          "PD",
+          0.56
+         ],
+         [
+          "INT",
+          0.17
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5864",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -856,6 +2091,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.35,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.35,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.0
+         ],
+         [
+          "ast",
+          1.67
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8406",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -882,6 +2152,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.33,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.33,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.33
+         ],
+         [
+          "ast",
+          2.11
+         ],
+         [
+          "TFL",
+          0.17
+         ],
+         [
+          "QB hit",
+          0.06
+         ],
+         [
+          "PD",
+          0.44
+         ],
+         [
+          "INT",
+          0.11
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [
       "Q"
      ],
@@ -910,6 +2223,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.29,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.29,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.51
+         ],
+         [
+          "ast",
+          1.15
+         ],
+         [
+          "PD",
+          0.52
+         ],
+         [
+          "INT",
+          0.21
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11710",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -936,6 +2288,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.29,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.29,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.01
+         ],
+         [
+          "ast",
+          1.95
+         ],
+         [
+          "TFL",
+          0.06
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "INT",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8294",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -980,6 +2367,53 @@
          "drop_locked"
         ]
        },
+       "breakdown": {
+        "mu": 12.2,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 12.2,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            3.27
+           ],
+           [
+            "ast",
+            2.05
+           ],
+           [
+            "TFL",
+            0.22
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.11
+           ],
+           [
+            "PD",
+            0.5
+           ],
+           [
+            "INT",
+            0.17
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11682",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1007,6 +2441,57 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 10.49,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.49,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.81
+           ],
+           [
+            "ast",
+            2.5
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.31
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "7136",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1028,6 +2513,53 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 9.5,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.5,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.65
+           ],
+           [
+            "ast",
+            1.47
+           ],
+           [
+            "TFL",
+            0.18
+           ],
+           [
+            "sack",
+            0.09
+           ],
+           [
+            "QB hit",
+            0.24
+           ],
+           [
+            "PD",
+            0.35
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "5893",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1049,6 +2581,53 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 9.48,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.48,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.7
+           ],
+           [
+            "ast",
+            1.47
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.18
+           ],
+           [
+            "PD",
+            0.35
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11726",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1070,6 +2649,53 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 9.48,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.48,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.62
+           ],
+           [
+            "ast",
+            0.81
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "sack",
+            0.12
+           ],
+           [
+            "QB hit",
+            0.25
+           ],
+           [
+            "PD",
+            0.56
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "8364",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1097,6 +2723,57 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 8.53,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.53,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.71
+           ],
+           [
+            "ast",
+            1.12
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.18
+           ],
+           [
+            "PD",
+            0.71
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [
         "Q"
        ],
@@ -1120,6 +2797,57 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 8.28,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.28,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.0
+           ],
+           [
+            "ast",
+            0.77
+           ],
+           [
+            "TFL",
+            0.18
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.47
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "8487",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1147,6 +2875,49 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 6.96,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.96,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.0
+           ],
+           [
+            "ast",
+            0.56
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.44
+           ],
+           [
+            "INT",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "8373",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1168,6 +2939,41 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 6.5,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.5,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.47
+           ],
+           [
+            "ast",
+            0.77
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "PD",
+            0.65
+           ],
+           [
+            "INT",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12596",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1195,6 +3001,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 3.9,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.9,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.24
+           ],
+           [
+            "ast",
+            0.94
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "PD",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13511",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1216,6 +3053,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 3.73,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.73,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.24
+           ],
+           [
+            "ast",
+            0.71
+           ],
+           [
+            "PD",
+            0.18
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13454",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1243,6 +3107,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.47,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.47,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.31
+           ],
+           [
+            "ast",
+            0.31
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "INT",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "10882",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1264,6 +3159,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.11,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.11,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.31
+           ],
+           [
+            "ast",
+            0.31
+           ],
+           [
+            "PD",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12142",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1285,6 +3207,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.05,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.05,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.31
+           ],
+           [
+            "ast",
+            0.25
+           ],
+           [
+            "PD",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13877",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1306,6 +3255,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 0.9,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.9,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.24
+           ],
+           [
+            "ast",
+            0.24
+           ],
+           [
+            "PD",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "7224",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1327,6 +3303,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 0.9,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.9,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.24
+           ],
+           [
+            "ast",
+            0.24
+           ],
+           [
+            "PD",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "7787",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -1357,6 +3360,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.94,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.94,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.24
+         ],
+         [
+          "ast",
+          1.36
+         ],
+         [
+          "TFL",
+          0.34
+         ],
+         [
+          "sack",
+          0.45
+         ],
+         [
+          "QB hit",
+          2.03
+         ],
+         [
+          "PD",
+          0.23
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5871",
      "kickoff": "2026-10-11T16:05:00-04:00",
@@ -1383,6 +3425,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.57,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.57,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.51
+         ],
+         [
+          "ast",
+          1.4
+         ],
+         [
+          "TFL",
+          0.58
+         ],
+         [
+          "sack",
+          0.41
+         ],
+         [
+          "QB hit",
+          0.99
+         ],
+         [
+          "PD",
+          0.12
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8265",
      "kickoff": "2026-10-11T09:30:00-04:00",
@@ -1409,6 +3494,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.51,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.51,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.76
+         ],
+         [
+          "ast",
+          1.6
+         ],
+         [
+          "TFL",
+          0.5
+         ],
+         [
+          "sack",
+          0.36
+         ],
+         [
+          "QB hit",
+          1.05
+         ],
+         [
+          "PD",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "2311",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1435,6 +3559,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.43,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.43,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.01
+         ],
+         [
+          "ast",
+          1.6
+         ],
+         [
+          "TFL",
+          0.47
+         ],
+         [
+          "sack",
+          0.36
+         ],
+         [
+          "QB hit",
+          0.71
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4032",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1463,6 +3622,53 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 9.42,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.42,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.51
+         ],
+         [
+          "ast",
+          1.11
+         ],
+         [
+          "TFL",
+          0.6
+         ],
+         [
+          "sack",
+          0.43
+         ],
+         [
+          "QB hit",
+          1.06
+         ],
+         [
+          "PD",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10921",
      "kickoff": "2026-10-08T20:15:00-04:00",
@@ -1489,6 +3695,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 9.14,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 9.14,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.5
+         ],
+         [
+          "ast",
+          1.5
+         ],
+         [
+          "TFL",
+          0.5
+         ],
+         [
+          "sack",
+          0.34
+         ],
+         [
+          "QB hit",
+          1.06
+         ],
+         [
+          "PD",
+          0.06
+         ],
+         [
+          "FF",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6118",
      "kickoff": "2026-10-08T20:15:00-04:00",
@@ -1515,6 +3764,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.93,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.93,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.78
+         ],
+         [
+          "ast",
+          1.54
+         ],
+         [
+          "TFL",
+          0.36
+         ],
+         [
+          "sack",
+          0.3
+         ],
+         [
+          "QB hit",
+          0.95
+         ],
+         [
+          "PD",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5847",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1541,6 +3829,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.78,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.78,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.95
+         ],
+         [
+          "ast",
+          1.84
+         ],
+         [
+          "TFL",
+          0.45
+         ],
+         [
+          "sack",
+          0.17
+         ],
+         [
+          "QB hit",
+          0.28
+         ],
+         [
+          "PD",
+          0.28
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "843",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1567,6 +3894,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.73,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.73,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.45
+         ],
+         [
+          "ast",
+          1.39
+         ],
+         [
+          "TFL",
+          0.64
+         ],
+         [
+          "sack",
+          0.35
+         ],
+         [
+          "QB hit",
+          0.7
+         ],
+         [
+          "PD",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7696",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1593,6 +3963,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.64,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.64,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.34
+         ],
+         [
+          "ast",
+          2.4
+         ],
+         [
+          "TFL",
+          0.47
+         ],
+         [
+          "sack",
+          0.32
+         ],
+         [
+          "QB hit",
+          0.7
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11668",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1619,6 +4024,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.5,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.5,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.29
+         ],
+         [
+          "ast",
+          1.46
+         ],
+         [
+          "TFL",
+          0.47
+         ],
+         [
+          "sack",
+          0.29
+         ],
+         [
+          "QB hit",
+          0.88
+         ],
+         [
+          "PD",
+          0.12
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "2064",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1645,6 +4097,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.45,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.45,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.43
+         ],
+         [
+          "ast",
+          1.13
+         ],
+         [
+          "TFL",
+          0.54
+         ],
+         [
+          "sack",
+          0.34
+         ],
+         [
+          "QB hit",
+          0.74
+         ],
+         [
+          "PD",
+          0.1
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5297",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1671,6 +4170,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.43,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.43,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.46
+         ],
+         [
+          "ast",
+          0.89
+         ],
+         [
+          "TFL",
+          0.45
+         ],
+         [
+          "sack",
+          0.38
+         ],
+         [
+          "QB hit",
+          1.08
+         ],
+         [
+          "PD",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "13458",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1697,6 +4239,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.37,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.37,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.22
+         ],
+         [
+          "ast",
+          0.74
+         ],
+         [
+          "TFL",
+          0.53
+         ],
+         [
+          "sack",
+          0.45
+         ],
+         [
+          "QB hit",
+          0.95
+         ],
+         [
+          "PD",
+          0.11
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6782",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1723,6 +4308,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.21,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.21,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.26
+         ],
+         [
+          "ast",
+          1.15
+         ],
+         [
+          "TFL",
+          0.33
+         ],
+         [
+          "sack",
+          0.38
+         ],
+         [
+          "QB hit",
+          1.15
+         ],
+         [
+          "PD",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [
       "Q"
      ],
@@ -1753,6 +4385,57 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 8.18,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.18,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.18
+         ],
+         [
+          "ast",
+          1.04
+         ],
+         [
+          "TFL",
+          0.33
+         ],
+         [
+          "sack",
+          0.33
+         ],
+         [
+          "QB hit",
+          0.85
+         ],
+         [
+          "PD",
+          0.19
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.09
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [
       "Q"
      ],
@@ -1781,6 +4464,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.17,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.17,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.53
+         ],
+         [
+          "ast",
+          1.16
+         ],
+         [
+          "TFL",
+          0.42
+         ],
+         [
+          "sack",
+          0.34
+         ],
+         [
+          "QB hit",
+          0.74
+         ],
+         [
+          "PD",
+          0.11
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "3172",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1807,6 +4529,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.11,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.11,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.64
+         ],
+         [
+          "ast",
+          0.82
+         ],
+         [
+          "TFL",
+          0.38
+         ],
+         [
+          "sack",
+          0.41
+         ],
+         [
+          "QB hit",
+          0.49
+         ],
+         [
+          "PD",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7633",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1833,6 +4598,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 8.07,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 8.07,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.05
+         ],
+         [
+          "ast",
+          0.76
+         ],
+         [
+          "TFL",
+          0.7
+         ],
+         [
+          "sack",
+          0.52
+         ],
+         [
+          "FF",
+          0.17
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4999",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1861,6 +4665,49 @@
       "LB"
      ],
      "badge": null,
+     "breakdown": {
+      "mu": 7.92,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.92,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.4
+         ],
+         [
+          "ast",
+          1.66
+         ],
+         [
+          "TFL",
+          0.32
+         ],
+         [
+          "sack",
+          0.25
+         ],
+         [
+          "QB hit",
+          0.57
+         ],
+         [
+          "PD",
+          0.19
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6868",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -1887,6 +4734,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 7.73,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.73,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.18
+         ],
+         [
+          "ast",
+          1.01
+         ],
+         [
+          "TFL",
+          0.45
+         ],
+         [
+          "sack",
+          0.34
+         ],
+         [
+          "QB hit",
+          0.73
+         ],
+         [
+          "PD",
+          0.17
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8270",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1913,6 +4803,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 7.69,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.69,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.67
+         ],
+         [
+          "ast",
+          1.39
+         ],
+         [
+          "sack",
+          0.22
+         ],
+         [
+          "QB hit",
+          0.44
+         ],
+         [
+          "PD",
+          0.28
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11328",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1939,6 +4872,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 7.67,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.67,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.32
+         ],
+         [
+          "ast",
+          0.8
+         ],
+         [
+          "TFL",
+          0.29
+         ],
+         [
+          "sack",
+          0.37
+         ],
+         [
+          "QB hit",
+          0.92
+         ],
+         [
+          "FF",
+          0.11
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [
       "Q"
      ],
@@ -1967,6 +4943,41 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 7.46,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.46,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          0.11
+         ],
+         [
+          "ast",
+          0.22
+         ],
+         [
+          "TFL",
+          2.0
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          2.66
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11819",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -1993,6 +5004,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 7.37,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 7.37,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          1.26
+         ],
+         [
+          "ast",
+          1.37
+         ],
+         [
+          "TFL",
+          0.29
+         ],
+         [
+          "sack",
+          0.29
+         ],
+         [
+          "QB hit",
+          0.8
+         ],
+         [
+          "PD",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10899",
      "kickoff": "2026-10-11T20:20:00-04:00",
@@ -2026,6 +5080,49 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 10.47,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.47,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.7
+           ],
+           [
+            "ast",
+            1.53
+           ],
+           [
+            "TFL",
+            0.53
+           ],
+           [
+            "sack",
+            0.47
+           ],
+           [
+            "QB hit",
+            0.94
+           ],
+           [
+            "PD",
+            0.18
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "10916",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2053,6 +5150,53 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 7.63,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.63,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.22
+           ],
+           [
+            "ast",
+            1.28
+           ],
+           [
+            "TFL",
+            0.5
+           ],
+           [
+            "sack",
+            0.22
+           ],
+           [
+            "QB hit",
+            0.39
+           ],
+           [
+            "PD",
+            0.28
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12652",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2074,6 +5218,49 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 7.4,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.4,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.18
+           ],
+           [
+            "ast",
+            1.06
+           ],
+           [
+            "TFL",
+            0.24
+           ],
+           [
+            "sack",
+            0.12
+           ],
+           [
+            "QB hit",
+            0.29
+           ],
+           [
+            "PD",
+            0.12
+           ],
+           [
+            "blocked kick",
+            0.71
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "5226",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2101,6 +5288,53 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 6.09,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.09,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.82
+           ],
+           [
+            "ast",
+            0.76
+           ],
+           [
+            "TFL",
+            0.29
+           ],
+           [
+            "sack",
+            0.32
+           ],
+           [
+            "QB hit",
+            0.65
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11677",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2124,6 +5358,45 @@
         "LB"
        ],
        "badge": null,
+       "breakdown": {
+        "mu": 5.4,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.4,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.3
+           ],
+           [
+            "ast",
+            0.71
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "sack",
+            0.18
+           ],
+           [
+            "QB hit",
+            0.41
+           ],
+           [
+            "PD",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "7342",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2151,6 +5424,45 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 3.33,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.33,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.71
+           ],
+           [
+            "ast",
+            0.65
+           ],
+           [
+            "TFL",
+            0.18
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.18
+           ],
+           [
+            "PD",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12612",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2172,6 +5484,29 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 2.49,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.49,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.62
+           ],
+           [
+            "ast",
+            1.25
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12621",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2199,6 +5534,29 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.62,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.62,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.5
+           ],
+           [
+            "ast",
+            0.62
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11021",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2220,6 +5578,29 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.62,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.62,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.5
+           ],
+           [
+            "ast",
+            0.62
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13808",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2241,6 +5622,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.23,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41
+           ],
+           [
+            "ast",
+            0.29
+           ],
+           [
+            "TFL",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11759",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2262,6 +5670,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.23,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41
+           ],
+           [
+            "ast",
+            0.29
+           ],
+           [
+            "TFL",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [
         "Q"
        ],
@@ -2285,6 +5720,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.23,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41
+           ],
+           [
+            "ast",
+            0.29
+           ],
+           [
+            "TFL",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13455",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2306,6 +5768,33 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.23,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.23,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41
+           ],
+           [
+            "ast",
+            0.29
+           ],
+           [
+            "TFL",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "6958",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2327,6 +5816,41 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 0.9,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.9,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.12
+           ],
+           [
+            "ast",
+            0.12
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "11706",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2348,6 +5872,29 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 0.57,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.57,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.19
+           ],
+           [
+            "ast",
+            0.19
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12676",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2369,6 +5916,29 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 0.57,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.57,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.19
+           ],
+           [
+            "ast",
+            0.19
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "6887",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -2399,6 +5969,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 14.64,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 14.64,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          4.0
+         ],
+         [
+          "ast",
+          3.89
+         ],
+         [
+          "TFL",
+          0.33
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.38
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5332",
      "kickoff": "2026-10-11T09:30:00-04:00",
@@ -2425,6 +6046,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 14.37,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 14.37,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          4.44
+         ],
+         [
+          "ast",
+          3.05
+         ],
+         [
+          "TFL",
+          0.28
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.17
+         ],
+         [
+          "PD",
+          0.33
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6485",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2451,6 +6119,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 13.96,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 13.96,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.61
+         ],
+         [
+          "ast",
+          3.55
+         ],
+         [
+          "TFL",
+          0.35
+         ],
+         [
+          "sack",
+          0.15
+         ],
+         [
+          "PD",
+          0.29
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10947",
      "kickoff": "2026-10-11T09:30:00-04:00",
@@ -2477,6 +6188,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 13.1,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 13.1,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.42
+         ],
+         [
+          "ast",
+          3.25
+         ],
+         [
+          "TFL",
+          0.29
+         ],
+         [
+          "sack",
+          0.12
+         ],
+         [
+          "QB hit",
+          0.12
+         ],
+         [
+          "PD",
+          0.29
+         ],
+         [
+          "INT",
+          0.12
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5726",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2503,6 +6257,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.91,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.91,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.33
+         ],
+         [
+          "ast",
+          3.22
+         ],
+         [
+          "TFL",
+          0.44
+         ],
+         [
+          "sack",
+          0.16
+         ],
+         [
+          "QB hit",
+          0.38
+         ],
+         [
+          "PD",
+          0.27
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "8266",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2529,6 +6322,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.85,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.85,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.49
+         ],
+         [
+          "ast",
+          2.8
+         ],
+         [
+          "TFL",
+          0.4
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.17
+         ],
+         [
+          "PD",
+          0.34
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5843",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2555,6 +6399,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.69,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.69,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.27
+         ],
+         [
+          "ast",
+          2.97
+         ],
+         [
+          "TFL",
+          0.4
+         ],
+         [
+          "sack",
+          0.13
+         ],
+         [
+          "QB hit",
+          0.25
+         ],
+         [
+          "PD",
+          0.2
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.1
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6815",
      "kickoff": "2026-10-11T09:30:00-04:00",
@@ -2581,6 +6476,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.58,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.58,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.5
+         ],
+         [
+          "ast",
+          2.55
+         ],
+         [
+          "TFL",
+          0.28
+         ],
+         [
+          "sack",
+          0.25
+         ],
+         [
+          "QB hit",
+          0.28
+         ],
+         [
+          "PD",
+          0.17
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6217",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2607,6 +6545,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.43,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.43,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.45
+         ],
+         [
+          "ast",
+          3.73
+         ],
+         [
+          "TFL",
+          0.23
+         ],
+         [
+          "QB hit",
+          0.11
+         ],
+         [
+          "PD",
+          0.23
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "2617",
      "kickoff": "2026-10-11T16:05:00-04:00",
@@ -2633,6 +6614,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.37,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.37,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.69
+         ],
+         [
+          "ast",
+          2.21
+         ],
+         [
+          "TFL",
+          0.39
+         ],
+         [
+          "sack",
+          0.1
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.05
+         ],
+         [
+          "INT",
+          0.1
+         ],
+         [
+          "FF",
+          0.1
+         ],
+         [
+          "FR",
+          0.1
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "13453",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2659,6 +6691,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.36,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.36,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.66
+         ],
+         [
+          "ast",
+          1.91
+         ],
+         [
+          "TFL",
+          0.52
+         ],
+         [
+          "sack",
+          0.1
+         ],
+         [
+          "QB hit",
+          0.26
+         ],
+         [
+          "PD",
+          0.31
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6214",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2685,6 +6764,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 12.1,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 12.1,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.02
+         ],
+         [
+          "ast",
+          2.91
+         ],
+         [
+          "TFL",
+          0.32
+         ],
+         [
+          "sack",
+          0.16
+         ],
+         [
+          "QB hit",
+          0.32
+         ],
+         [
+          "PD",
+          0.26
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "5346",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2711,6 +6837,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.87,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.87,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.97
+         ],
+         [
+          "ast",
+          2.48
+         ],
+         [
+          "TFL",
+          0.1
+         ],
+         [
+          "QB hit",
+          0.05
+         ],
+         [
+          "PD",
+          0.2
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6860",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2737,6 +6910,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.76,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.76,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.94
+         ],
+         [
+          "ast",
+          1.57
+         ],
+         [
+          "TFL",
+          0.26
+         ],
+         [
+          "sack",
+          0.1
+         ],
+         [
+          "QB hit",
+          0.26
+         ],
+         [
+          "PD",
+          0.16
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11727",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2763,6 +6983,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.76,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.76,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.74
+         ],
+         [
+          "ast",
+          2.5
+         ],
+         [
+          "TFL",
+          0.23
+         ],
+         [
+          "sack",
+          0.12
+         ],
+         [
+          "QB hit",
+          0.29
+         ],
+         [
+          "PD",
+          0.47
+         ],
+         [
+          "INT",
+          0.12
+         ],
+         [
+          "FF",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6131",
      "kickoff": "2026-10-11T16:25:00-04:00",
@@ -2789,6 +7056,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.64,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.64,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.29
+         ],
+         [
+          "ast",
+          2.44
+         ],
+         [
+          "TFL",
+          0.32
+         ],
+         [
+          "sack",
+          0.11
+         ],
+         [
+          "QB hit",
+          0.21
+         ],
+         [
+          "PD",
+          0.27
+         ],
+         [
+          "INT",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "10914",
      "kickoff": "2026-10-11T16:05:00-04:00",
@@ -2815,6 +7125,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.56,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.56,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.99
+         ],
+         [
+          "ast",
+          3.1
+         ],
+         [
+          "TFL",
+          0.37
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.21
+         ],
+         [
+          "PD",
+          0.21
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FF",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "6807",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2841,6 +7202,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.47,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.47,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.05
+         ],
+         [
+          "ast",
+          2.62
+         ],
+         [
+          "TFL",
+          0.27
+         ],
+         [
+          "sack",
+          0.13
+         ],
+         [
+          "QB hit",
+          0.32
+         ],
+         [
+          "PD",
+          0.27
+         ],
+         [
+          "INT",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4118",
      "kickoff": "2026-10-08T20:15:00-04:00",
@@ -2867,6 +7271,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.42,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.42,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.31
+         ],
+         [
+          "ast",
+          2.31
+         ],
+         [
+          "TFL",
+          0.16
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.16
+         ],
+         [
+          "PD",
+          0.42
+         ],
+         [
+          "INT",
+          0.05
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4968",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2893,6 +7344,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.41,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.41,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.51
+         ],
+         [
+          "ast",
+          3.01
+         ],
+         [
+          "TFL",
+          0.11
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.11
+         ],
+         [
+          "PD",
+          0.11
+         ],
+         [
+          "INT",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "12646",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2919,6 +7413,53 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.3,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.3,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.53
+         ],
+         [
+          "ast",
+          2.48
+         ],
+         [
+          "TFL",
+          0.44
+         ],
+         [
+          "sack",
+          0.14
+         ],
+         [
+          "QB hit",
+          0.33
+         ],
+         [
+          "PD",
+          0.39
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [
       "Q"
      ],
@@ -2947,6 +7488,57 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 11.05,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 11.05,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.58
+         ],
+         [
+          "ast",
+          2.58
+         ],
+         [
+          "TFL",
+          0.34
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.17
+         ],
+         [
+          "PD",
+          0.46
+         ],
+         [
+          "INT",
+          0.06
+         ],
+         [
+          "FF",
+          0.06
+         ],
+         [
+          "FR",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "7677",
      "kickoff": "2026-10-11T20:20:00-04:00",
@@ -2973,6 +7565,45 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.81,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.81,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.72
+         ],
+         [
+          "ast",
+          2.56
+         ],
+         [
+          "TFL",
+          0.57
+         ],
+         [
+          "sack",
+          0.21
+         ],
+         [
+          "QB hit",
+          0.26
+         ],
+         [
+          "FF",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "4413",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -2999,6 +7630,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.66,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.66,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          2.97
+         ],
+         [
+          "ast",
+          3.19
+         ],
+         [
+          "TFL",
+          0.32
+         ],
+         [
+          "sack",
+          0.05
+         ],
+         [
+          "QB hit",
+          0.11
+         ],
+         [
+          "PD",
+          0.11
+         ],
+         [
+          "FR",
+          0.05
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "1052",
      "kickoff": "2026-10-11T13:00:00-04:00",
@@ -3025,6 +7699,49 @@
     {
      "also": [],
      "badge": null,
+     "breakdown": {
+      "mu": 10.57,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": true,
+        "pts": 10.57,
+        "share": 1.0,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "solo",
+          3.53
+         ],
+         [
+          "ast",
+          1.47
+         ],
+         [
+          "TFL",
+          0.18
+         ],
+         [
+          "sack",
+          0.06
+         ],
+         [
+          "QB hit",
+          0.24
+         ],
+         [
+          "PD",
+          0.24
+         ],
+         [
+          "INT",
+          0.06
+         ]
+        ],
+        "zero": false
+       }
+      ]
+     },
      "flags": [],
      "id": "11017",
      "kickoff": "2026-10-08T20:15:00-04:00",
@@ -3069,6 +7786,57 @@
          "drop_locked"
         ]
        },
+       "breakdown": {
+        "mu": 14.81,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.81,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.0
+           ],
+           [
+            "ast",
+            2.68
+           ],
+           [
+            "TFL",
+            0.44
+           ],
+           [
+            "sack",
+            0.12
+           ],
+           [
+            "QB hit",
+            0.31
+           ],
+           [
+            "PD",
+            0.37
+           ],
+           [
+            "INT",
+            0.06
+           ],
+           [
+            "FF",
+            0.19
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "8659",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3101,6 +7869,53 @@
          "drop_locked"
         ]
        },
+       "breakdown": {
+        "mu": 14.41,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 14.41,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            4.42
+           ],
+           [
+            "ast",
+            2.65
+           ],
+           [
+            "TFL",
+            0.41
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.18
+           ],
+           [
+            "INT",
+            0.12
+           ],
+           [
+            "FR",
+            0.12
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "8311",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3130,6 +7945,53 @@
         "DL"
        ],
        "badge": null,
+       "breakdown": {
+        "mu": 10.21,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.21,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.39
+           ],
+           [
+            "ast",
+            1.39
+           ],
+           [
+            "TFL",
+            0.5
+           ],
+           [
+            "sack",
+            0.53
+           ],
+           [
+            "QB hit",
+            1.17
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.11
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "4967",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3151,6 +8013,49 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 8.86,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.86,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.95
+           ],
+           [
+            "ast",
+            2.06
+           ],
+           [
+            "TFL",
+            0.12
+           ],
+           [
+            "QB hit",
+            0.12
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "10923",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3178,6 +8083,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 7.61,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.61,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            2.56
+           ],
+           [
+            "ast",
+            2.19
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "PD",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12140",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3205,6 +8141,49 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 4.21,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 4.21,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            1.18
+           ],
+           [
+            "ast",
+            0.59
+           ],
+           [
+            "TFL",
+            0.18
+           ],
+           [
+            "sack",
+            0.06
+           ],
+           [
+            "QB hit",
+            0.18
+           ],
+           [
+            "PD",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13488",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3232,6 +8211,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.98,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.98,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.5
+           ],
+           [
+            "ast",
+            0.62
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "13000",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3253,6 +8263,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.98,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.98,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.5
+           ],
+           [
+            "ast",
+            0.62
+           ],
+           [
+            "FF",
+            0.06
+           ],
+           [
+            "FR",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "7750",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3274,6 +8315,37 @@
       {
        "also": [],
        "badge": null,
+       "breakdown": {
+        "mu": 1.41,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 1.41,
+          "share": 1.0,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "solo",
+            0.41
+           ],
+           [
+            "ast",
+            0.29
+           ],
+           [
+            "TFL",
+            0.06
+           ],
+           [
+            "FF",
+            0.06
+           ]
+          ],
+          "zero": false
+         }
+        ]
+       },
        "flags": [],
        "id": "12397",
        "kickoff": "2026-10-12T20:15:00-04:00",
@@ -3307,16 +8379,17 @@
  "sources": {
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-12T05:19:54-04:00",
+   "fetched_at": "2026-10-12T05:51:00-04:00",
    "kind": "projection",
-   "last_success": "2026-10-12T05:19:54-04:00",
+   "last_success": "2026-10-12T05:51:00-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
-    "frozen": 0,
-    "late": 581,
+    "frozen": 581,
+    "late": 0,
     "skipped_after_kickoff": 0,
-    "updated": 47
+    "unchanged": 47,
+    "updated": 0
    },
    "no_projection": 3729,
    "rows": 628,

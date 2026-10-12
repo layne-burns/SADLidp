@@ -71,16 +71,17 @@ Commits made with `GITHUB_TOKEN` don't retrigger workflows, which is the intende
 1. `sleeper.py`: documented /v1 endpoints (state, user, leagues, league, rosters, matchups, players) and the undocumented projections and stats endpoints.
 2. `schedule.py`: nflverse schedules CSV. Kickoff = `gameday` + `gametime` as **America/New_York** local time. Provides byes and opponents. A team with zero games in the season is a hard error, never treated as "on bye".
 3. `sources/`: one adapter per source behind a shared interface (§5.1).
-4. `matching.py` (§6.1) · `impute.py` (§6.2) · `scoring.py` (§6.3) · `aggregate.py` (§6.4) · `accuracy.py` (§6.5) · `tiers.py` (§6.6) · `roster.py` (§6.7)
+4. `matching.py` (§6.1) · `impute.py` (§6.2) · `scoring.py` (§6.3) · `aggregate.py` (§6.4) · `accuracy.py` (§6.5) · `tiers.py` (§6.6) · `roster.py` (§6.7) · `backfill.py` (§5.3)
 5. `site/`: Jinja templates producing static HTML plus a JSON copy of the consensus.
-6. `cli.py`: `sadlidp sync [--force]`, `sadlidp build`, `sadlidp backfill --weeks 1-5`, `sadlidp gate` (dry-run: prints whether the schedule would run, and why).
+6. `cli.py`: `sadlidp sync [--force]`, `sadlidp build`, `sadlidp backfill [--source NAME] [--weeks 1-5] [--redo]`, `sadlidp replay --weeks 1-4`, `sadlidp gate` (dry-run: prints whether the schedule would run, and why).
 
 ### 3.3 Repo layout
 ```
 SPEC.md  README.md  pyproject.toml
 config/sadl.toml               # all tunables (§9)
-config/player_overrides.yaml   # manual name → sleeper_id fixes
-config/aliases/                # team and position code alias tables per source
+config/player_overrides.toml   # manual source id / name → sleeper_id fixes (§6.1)
+config/aliases/                # team and position code alias tables per source (espn_teams.json: proTeamId → code)
+data/<prev season>/impute_priors.json  # imputation priors from last season's actuals, built once (§6.2)
 src/sadlidp/...                # §3.2
 data/<season>/league.json      # resolved league id, scoring_settings, settings (per sync)
 data/<season>/week<NN>/
@@ -129,6 +130,8 @@ Every adapter returns an `AdapterResult` with these fields:
 
 A failed or skipped adapter never fails the sync (§7).
 
+*Calling convention (added 2026-10-12, PR 3):* every adapter is `fetch(ctx) -> AdapterResult`, where `ctx` carries the HTTP client, the Sleeper client, season, week, `now`, the week's IDP players, the source's config, the matcher (§6.1), the imputer (§6.2) and `archive` (true when the backfill runner asks for a past week). An adapter may also return `published_at` (when the source says it posted the week's data) and a `report` (pages, match counts by method, the unmatched players, imputed keys) that `run.json` and the page footer show.
+
 ### 5.2 Candidate sources
 Availability is unconfirmed until **Phase 1 probes each one from Actions.** The final list is a SPEC amendment approved by the owner.
 
@@ -152,20 +155,38 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 - **Statuses:** `blocked` (403/429/503 or a challenge page), `parse_error` (no `ecrData`) and `not_yet_published` → a banner with that reason. There is no login state.
 - **Privacy:** D16 applies until the owner decides otherwise (§13).
 
-**ESPN adapter (owner's league, Phase 3):**
-- **Fetch:** `lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{espn.league_id}?view=kona_player_info&scoringPeriodId={week}` with an `X-Fantasy-Filter` for the league's IDP slots. The league is public, so there are no cookies or secrets.
-- **Rows:** each player's target-week projection (`statSourceId` 1, `statSplitTypeId` 1), with ESPN stat ids translated to Sleeper keys through the mapping verified in §13. Keys ESPN doesn't project are imputed (§6.2). The request asks for all IDP slots (`filterSlotIds` 10/11/14/15 in this league) and must page (`offset`) or raise `limit`: run 4 hit the 400-row cap.
-- **Matching:** Sleeper `espn_id` first, then normalized name + team + position (§6.1).
+**ESPN adapter (owner's league, PR 3; re-verified live 2026-10-12):**
+- **Fetch:** `lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{espn.league_id}?view=kona_player_info&scoringPeriodId={week}` with an `X-Fantasy-Filter` of `filterSlotIds` [10, 11, 14, 15] (LB, DL, DB, DP), sorted by percent owned, `limit` 400 and `offset` 0, 400, 800, … until a page has fewer than 400 players (at most 6 pages). On 2026-10-12 this returned 1,511 IDPs (400/400/400/311), no duplicates, 964 with a week-6 projection line. The league is public: no cookies or secrets.
+- **Week check:** the week is published when at least one returned player has a line with `scoringPeriodId` = week, `statSourceId` 1 and `statSplitTypeId` 1; otherwise `not_yet_published`. Past weeks stay available through `scoringPeriodId` (week 4's projections were still served on 2026-10-12), so ESPN supports backfill (§5.3).
+- **All or nothing:** any page error fails the whole fetch (no merge). The result is *complete* only if paging ended on a short page, no ESPN id repeats, and ≥ 98% of the returned players who have an NFL team matched a Sleeper player. An incomplete result still contributes its rows but zero-fills nobody.
+- **Rows:** each matched player's target-week projection, ESPN stat ids translated to Sleeper keys by the §13 mapping (108 solo, 107 assisted, 109 total, 99 sack, 95 INT, 106 FF, 96 FR, 113 PD, 97 blocked kick). `covered_keys` are those keys; TFL, QB hits, defensive TDs and safeties are imputed (§6.2) and listed per row as `imputed`. Rows keep the raw ESPN stat ids and a `map_version`. A matched player whose line is missing or has no IDP stat ids is a placeholder (`no_projection_ids`).
+- **Team and position:** `proTeamId` through `config/aliases/espn_teams.json` (0 = free agent, no team); `defaultPositionId` 9 DT, 10 DE, 11 LB, 12 CB, 13 S (§13) is used only for matching guards; the slot is always Sleeper's (D14).
+- **Absence:** an observed (§5.3) active Sleeper IDP whose Sleeper record has an `espn_id` but who isn't among a complete result's rows or placeholders counts as 0. Everyone else not listed is missing.
+- **Matching:** §6.1 with Sleeper's `espn_id` as the source id.
+
+### 5.3 Multi-source core (added 2026-10-12, PR 3)
+- **Observation rule.** A player counts as *observed* by a source in a week only if his kickoff is after max(the source's first successful fetch that week, its `published_at`). The §6.4 absence rules (zero-fill, censoring) apply only to observed players; an unobserved player who isn't listed is missing, never 0. Late rows (§6.5) stay limited to sources with `late_rows = true`.
+- **Backfill runner (`backfill.py`).** For each enabled source with `archive = true`, past weeks of the season with no snapshot are fetched once with `ctx.archive`, as of the backfill time, and every row is marked `backfill: true`. Its imputation uses only actuals from earlier weeks. The runner runs after the live fetches inside every sync, within `backfill.budget_s` (300 s) and `backfill.max_requests` per host; what's left waits for the next sync. `sadlidp backfill --source espn_proj --weeks 1-5 --redo` re-fetches named weeks by hand. Backfilled weeks feed the Stats page; they feed accuracy weights (PR 6) only after the source passes its archive-integrity check (ESPN: its live week-6 rows must equal the week-6 archive for ≥ 99% of players).
+- **Shrink guard.** Applies to every source (§7).
+- **Replays (D22)** read every saved source file of the week (no refetch), so a rebuilt week includes every source that was backfilled.
 
 ## 6. Methods
 ### 6.1 Positions and matching
 - **Position (D14):** the slot Sleeper counts toward `position_limit_*`. Phase 1 verifies it against SADL rosters and transactions. Until then, Sleeper's `position` is mapped as DE/DT/NT→DL, LB/OLB/ILB/MLB→LB, CB/S/FS/SS/DB→DB. `fantasy_positions[0]` is used only if `position` isn't a defensive code. Note that the order of `fantasy_positions` is canonical (DL before LB, DB before LB) and does **not** indicate the primary position. Players with more than one IDP fantasy position get the dual-eligible tag.
-- **Matching:** the Sleeper ID is canonical. Sleeper's own `espn_id` / `gsis_id` are used first, then the DynastyProcess/nflverse crosswalk, then normalized name (suffixes, punctuation, nicknames) plus team plus position. `player_overrides.yaml` holds manual fixes.
+- **Matching (amended 2026-10-12, PR 3):** the Sleeper ID is canonical. In order:
+  1. `config/player_overrides.toml` (`[<source>] "<source id>" = "<sleeper id>"`, or `"<name>|<TEAM>" = "<sleeper id>"`);
+  2. Sleeper's own id fields (`espn_id`, `fantasy_data_id`), accepted only if they land on an IDP;
+  3. a crosswalk id (FantasyPros, PR 4), same guard;
+  4. normalized name (lowercase, punctuation and suffixes Jr/Sr/II–V dropped) + team + a slot the player is eligible for;
+  5. normalized name + team;
+  6. normalized name alone, only if it is unique among Sleeper IDPs, the source row has a team, and the slot is eligible;
+  7. the nickname table (`config/aliases/nicknames.json`, e.g. Cam ↔ Cameron), flagged as such;
+  8. otherwise unmatched (or "no NFL team"). Unmatched players are always listed with counts in `run.json` and the footer, never silently dropped. Two source rows matching one Sleeper player keep the higher-precedence match; the other is reported as a conflict.
 - **Code tables:** all team and position codes go through per-source alias tables into Sleeper's vocabulary (e.g. nflverse `LA` → `LAR`). An unresolved code or an unmatched player is listed in the footer and never silently dropped.
 
 ### 6.2 Partial stat lines and imputation
 - A key in `covered_keys` that is absent counts as **0**. Only keys outside `covered_keys` are imputed. Imputed keys are flagged per source in the snapshot.
-- `imputed_k = anchor × r̂_k`. The anchor is a volume stat the source does project (total tackles; games = 1 if there is none). `r̂_k = (x_k + m_k·r_prior,k) / (exposure + m_k)`, where x_k is the player's season total of k and exposure is his season total of the same anchor stat (tackles, or games). This is the player's season rate per anchor unit from Sleeper actuals, shrunk toward the average for his granular Sleeper position (DE/DT/LB/CB/S) last season. `m_k` is set per category in config and is large for INT, FF, FR, def TD, safety and blocked kick.
+- `imputed_k = anchor × r̂_k` (anchors amended 2026-10-12, PR 3): TFL on the source's projected tackles (solo + assisted); QB hits on its projected sacks for players with ≥ 2 sacks over last season and this one so far, otherwise on games (= 1); defensive TDs, safeties and blocked kicks on games. Exposure is the player's total of the same anchor in the same games. Rates use actuals from weeks before the target week only. `r̂_k = (x_k + m_k·r_prior,k) / (exposure + m_k)`, where x_k is the player's season total of k and exposure is his season total of the same anchor stat (tackles, or games). This is the player's season rate per anchor unit from Sleeper actuals, shrunk toward a prior. The prior is hierarchical: his granular Sleeper position's rate last season (DE/DT/LB/CB/S), then his own last-season rate shrunk toward it. `m_k` is set by empirical Bayes (method of moments) from last season's player rates, saved with the position rates in `data/<prev>/impute_priors.json`; `impute.m_k.*` in config overrides it. Validation: imputing Sleeper's own TFL and QB hits from its projected tackles and sacks must be close to the values Sleeper projects (unit test on the recorded fixtures).
 - A total-tackles-only source is split into solo and assisted using the player's shrunk solo share.
 - **Props:**
   - *Conversion:* de-vig each two-way market (multiplicative), take the median p_over across books, and solve for the Poisson λ with P(X > line) = p_over. Assisted = λ(tackles_assists) − λ(solo), floored at 0. If only the combined market exists, split by solo share.
@@ -247,7 +268,8 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **Tiers as shown:** the tiers at the pre-waiver sync (`tiers_log.json`), when the owner sets waivers; for a rebuilt week, its page. A live week without a pre-waiver log is skipped (its final page lists only players yet to play).
 - **Top-12 hits** count a player tied with the 12th-best score as in the top 12.
 - **Metrics (per position, weekly and season to date):** avg miss (MAE) against a naive baseline on the same players (his average SADL points over his earlier games this season, 2+ games), RMSE, bias (predicted − actual: positive = our number runs high), share within ±1σ and ±2σ of σ_pred, top-12 hits (our top 12 vs the actual top 12 among everyone at the position), Pearson, Spearman and out-of-sample R² (season to date only, n ≥ 100), Brier score of the pairwise "who outscores whom" odds (n ≥ 30 pairs) with calibration buckets, START/UPGRADE results ("x of y"; reference badges and void ones apart; live from the decision log, rebuilt for replayed weeks, shown separately), and average actual points per tier as shown.
-- **Weights:** the share of each source (v0: Sleeper 100%); PR 6 adds the recorded weights in force each week.
+- **Per source (PR 3):** every metric is shown for each projection source and for the consensus, on the same evaluation pool (chosen by the equal-weight consensus of the sources' values, so no source picks its own pool); a source is scored on the pool players it covers, and its coverage is shown.
+- **Weights:** the share of each source (v0: Sleeper 100%; PR 3: equal priors within the projection group); PR 6 adds the recorded weights in force each week.
 - **Readability:** each section opens with a one-line plain headline; at most four default columns with plain labels; the rest under "More stats"; a "What these mean" glossary says what no skill looks like for each metric. The newest week is marked provisional until its stat corrections close (last kickoff + 4 d 4 h). Small samples show "not enough games yet" instead of a number.
 - `stats.json` is the same data without internals.
 
@@ -258,6 +280,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - A `/stats` failure shows a banner, skips the accuracy update, and reuses cached season rates.
   - A sync succeeds if ≥1 projection or rank source returns rows. If none do, the page shows the stale data with a banner.
   - *Incomplete fetches (added 2026-10-12):* a fetch that looks incomplete is `suspect` and isn't merged; the earlier rows stay, with a banner. Two cases: a Sleeper response with no real rows at all (Sleeper rewrites a week's rows in a batch, and mid-batch serves only placeholders: seen live at 09:10 UTC on 2026-10-12, and its batches also run during game days), and any source whose fetch has fewer rows than `sources.shrink_guard` (0.6) × the rows already stored for the week. A gate window counts as done only when at least one source fetched successfully in that run, so the next slot retries.
+- **Network (added 2026-10-12, PR 3):** per-host request spacing (`net.host_interval_s`, default 2 s; FantasyPros 5 s per its robots.txt). A challenge (403/503 with `cf-mitigated`, or a "Just a moment" page) is never retried and blocks that host for the rest of the run; its source reports `blocked`.
 - **Secrets:**
   - Authenticated responses, cookies and API keys are never committed, logged, uploaded as workflow artifacts, or stored in actions/cache. All four are readable by others in a public repo (pull requests, including from forks, can restore caches created on main).
   - Private and keyed sources (FantasyPros, The Odds API) bypass the HTTP cache. Their responses stay in memory only, and the cache never stores Cookie, Set-Cookie or Authorization headers. The Odds once-per-event rule is enforced from a fetch log in `run.json` (event id, fetched_at, credits remaining), never from a cached URL.
@@ -294,7 +317,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 3–4. **More sources and accuracy, built together (D17, amended 2026-10-12)** in six PRs, each with its SPEC amendment as the first commit and a live preview:
    1. Locked suggestions (D15) and the frozen week record, badge and tier logs, per-step error isolation.
    2. Stats page v0 and the breakdown UI on Sleeper alone (D19, D20); frozen per-week players file; compact storage.
-   3. Multi-source core and ESPN: per-host request spacing, matching and crosswalk, imputation, the observation rule, list-scoped merges, the backfill runner.
+   3. Multi-source core and ESPN: per-host request spacing, matching, imputation, the observation rule, the backfill runner (ESPN weeks 1–5), ESPN in the consensus, breakdown and Stats page (per source). The crosswalk and list-scoped merges move to PR 4, where the first multi-list source arrives.
    4. FantasyPros ECR and rank → value mapping; FantasyPros D/ST captured as a D18 signal.
    5. RotoBaller and FantasyData; the Thursday window (D13).
    6. Accuracy weights, calibrated START/UPGRADE odds, the full Stats page, archive-integrity checks, the D18 team-defense backtest.
@@ -302,7 +325,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 6. **Polish:** accuracy and `z` tuning, UI refinements.
 
 ## 9. Config tunables (`config/sadl.toml`)
-`league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
+`league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=1.0`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `sources.shrink_guard=0.6`, `sources.<name>.{archive, late_rows}`, `backfill.{budget_s=300, max_requests}`, `net.host_interval_s.<host>`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`.
 
 ## 10. Verification
 - **Unit tests** (pytest, offline fixtures):
@@ -356,6 +379,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **2026-10-12 · D22 added (owner request):** scored results on the page, a Sunday-evening results window, and late rows for projections first seen after kickoff (§2, §4.3, §6.5).
 - **2026-10-12 · Phase 3+4 plan approved (owner):** D16 closed (FantasyPros ECR stored like other free sources); D15, D17, D18 amended; D19 (per-player breakdown), D20 (Stats page) and D21 (source list after live checks: FantasyData in; Razzball, Fantasy Sharks, CBS, FFToday out) added; §8 rewritten as six PRs. PR 1: locked suggestions as *for reference*, comparable players and the frozen week record (§6.5, §6.7), badge and tier logs, error isolation (§7), nflverse schedule read from raw.githubusercontent.com.
 - **2026-10-12 · PR 2 (Stats v0 + breakdown):** per-player breakdown on every card (D19, §6.4); `stats.html` (§6.8) from data already committed; `players.json` frozen per week replaces `players_idp.json` (§3.3); compact source files with `schema_version` 2 and a `fetches` list, unchanged rows keep their first-seen `fetched_at` (§6.5); residual σ_out behind `sigma_out.method` (§6.7). CI previews are per branch: the branch's committed data is copied to a scratch directory, a forced live sync runs on top, and the result is published to `previews/<branch>`. `sync.yml` also runs (forced) on a push to `main` that changes `src/`, `config/`, the lockfile or the workflow, so merged features reach the page without waiting for a window (owner request).
+- **2026-10-12 · PR 3 (multi-source core + ESPN):** `fetch(ctx)` adapters (§5.1); ESPN adapter re-verified live (paging 1,511 IDPs, archive via `scoringPeriodId`, §5.2); observation rule, backfill runner and replays from saved sources (§5.3); matching precedence with TOML overrides and nickname table (§6.1); imputation anchors and empirical-Bayes priors (§6.2); per-host spacing and challenge breaker (§7); per-source Stats rows (§6.8). Crosswalk and list-scoped merges move to PR 4.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

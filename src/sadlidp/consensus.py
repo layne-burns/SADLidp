@@ -50,6 +50,7 @@ def consensus(
             "n_sources": len(covering),
             "min": min(public) if public else None,
             "max": max(public) if public else None,
+            "eff": {src: round(w, 4) for src, w in eff.items()},  # each source's share of μ (D19 breakdown)
         }
 
     s0_sq: dict[str | None, float] = {}

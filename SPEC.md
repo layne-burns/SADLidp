@@ -84,12 +84,12 @@ config/aliases/                # team and position code alias tables per source
 src/sadlidp/...                # §3.2
 data/<season>/league.json      # resolved league id, scoring_settings, settings (per sync)
 data/<season>/week<NN>/
-    players_idp.json           # slim IDP subset of the players DB (never the full ~5 MB file)
+    players.json               # slim IDP subset of the players DB, frozen per player at his kickoff (§6.5)
     rosters.json  run.json  consensus.json  actuals.json
     sources/<src>.json         # normalized rows only, never raw payloads
     frozen.json                # each player's μ/σ/range/status at his last sync before kickoff (§6.5)
     badges.json  tiers_log.json  # START/UPGRADE and tier logs for evaluation (§6.5, §6.7)
-data/<season>/accuracy.json
+site/stats.html, stats.json   # the Stats page (§6.8), rebuilt from the committed week files on every build
 tests/  tests/fixtures/        # offline; recorded and scrubbed responses
 .github/workflows/{sync.yml, ci.yml, probe.yml}
 ```
@@ -194,14 +194,15 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 - **Mean:** P_i and R_i are the weighted means of the covering sources within each group (weights renormalized over those sources). μ_i = α·P_i + (1−α)·R_i when both exist, otherwise whichever exists. If a group has no sources at all that week, the page says so.
 - **No projection:** a player with no value from any source has no μ. He isn't tiered and is listed under "no projection" below the tiers. A rostered player with no μ shows as "no projection" and is not eligible as S or B (§6.7).
 - **Projection uncertainty** (used for tiers): s_i² = Σ_s w̃_s (x_si − μ_i)², where w̃ are the effective weights normalized to sum to 1 over covering sources. This is shrunk with s̃_i² = (ν0·s0_p² + (n_i−1)·s_i²)/(ν0 + n_i − 1). s0_p² is the median s_i² over players at position p with ≥3 sources this week, or a config default when no such players exist, e.g. in the single-source MVP. **σ_μ,i = max(s̃_i, σ_floor,p).** It is **not** divided by n_eff, because sources are correlated (aggregates, shared inputs, shared imputation). It **never** includes game-outcome variance.
-- **Displayed per player:** μ, σ_μ, the min–max range over non-private sources, and the number of sources (counting censored values separately). `consensus.json` and the site's JSON copy contain only these fields plus position, tier and flags. They never contain P_i, R_i, per-source values or per-player weights.
+- **Displayed per player:** μ, σ_μ, the min–max range over non-private sources, and the number of sources (counting censored values separately), plus (D19, amended 2026-10-12) a breakdown: per enabled source, his SADL points from it, the projected stats behind them (projection sources) or the rank and its mapped points (rank sources), its share of μ (its effective weight, `eff`), and, when it has nothing for him, why (nothing posted yet, too old, no projection for him). A zero-filled player (§6.4 absence rules) is marked as such. The page ends each breakdown with "weighted average = μ".
 
 ### 6.5 Snapshots, freezing and accuracy
 - **Storage:** `sources/<src>.json` holds normalized rows (sleeper_id, stats or rank, SADL value, fetched_at).
+  - *File format (amended 2026-10-12, PR 2):* `schema_version` 2; per-player maps are written one player per line, so a sync's diff shows only the players that changed. A row whose content is unchanged by a fetch keeps its `fetched_at` (when that content was first seen); the file's `fetches` list records every successful fetch, and "the value as of a time" is the row plus the latest fetch at or before it.
   - **On a successful fetch,** every player whose kickoff is after the new fetch's `fetched_at` takes the new fetch's state: his row is updated if he is listed and **deleted** if he isn't, so the §6.4 absence rules apply.
   - **Rows of players whose game kicked off** before the new `fetched_at` are never modified or deleted. The file is therefore the frozen snapshot.
   - **On a failed fetch** the file is left untouched. Staleness is recorded per source in `run.json` (time of the last successful fetch), not per row. A stale source stays in the live consensus up to `max_source_age_h`.
-  - For accuracy, a value fetched more than 4 days before kickoff counts as missing.
+  - For accuracy, a value counts as missing when the source's last successful fetch (the file's `fetches`) before the player's kickoff was more than 4 days before it.
   - The kickoff rule applies to syncs. `sadlidp backfill` writes past weeks from archived pre-game projections and marks those rows `backfill: true`.
 - **Late rows (added 2026-10-12, D22):** for a source configured with `late_rows = true` (Sleeper projections), a player first seen after his kickoff is kept once with `late: true` instead of being skipped, then frozen like any other row. Sleeper's 47 pre-kickoff MNF rows of week 5 were unchanged after its batch restamp; whether its rows ever change after kickoff is re-checked post-game, and until that check passes, late rows are display-only and never used for accuracy weights. The page marks a late projection with "*".
 - **Frozen week record (added 2026-10-12):** `frozen.json` holds, per player with a μ, his μ, σ_μ, range, source count and status as of his last sync before kickoff, under the same rule as the source files (updated while unlocked, never after kickoff). Every frozen row stores the kickoff it was written for, so a player cut or traded after playing stays frozen. For a locked player, the page, the My IDPs comparison and later evaluation of "the consensus as shown" read this record, so his numbers can't drift after he locks.
@@ -223,6 +224,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 
 ### 6.7 My IDPs panel (D15)
 - **Outcome probabilities use predictive σ:** σ_pred,i² = σ_μ,i² + σ_out,p². σ_out,p is the RMS of (actual − frozen μ) for evaluated pool players at position p once 3 evaluated weeks exist. Before that, it is last season's within-player SD of weekly SADL points (players with ≥8 games) under the current scoring.
+  - *Residual σ_out (added 2026-10-12, PR 2):* with `sigma_out.method = "residuals"`, σ_out,p² = mean(e²) − σ_μ,p², where e = actual − predicted over each settled week's evaluation pool, demeaned within the position-week (a level offset changes no decision; it is shown on the Stats page instead). Week N uses settled weeks ≤ N−2 only, and a position with fewer than 3 such weeks keeps last season's value. The method stays `last_season` until Sleeper's archived projections pass the integrity check (§13), because weeks 1–4 are backfilled.
 - **Comparable** (amended 2026-10-12; formerly "eligible") = your rostered players at the position (D14) who are not in `reserve`, have a μ, and pass every §2 waiver-pool filter **except** the locked rule: the same injury codes, `status`, `active`, `team` and bye rules. A locked player is judged on his μ and status from the frozen week record (§6.5) at his kickoff, so a later injury tag can't empty the slot.
 - **Limit count** = your rostered players at the position, excluding `reserve` (IR), which Phase 1 showed Sleeper doesn't count (§13); `taxi` players are counted.
 - **S (projected starter)** = the comparable player with the highest μ. If there is none, μ_S = 0 and σ_pred,S = 0.
@@ -238,6 +240,16 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - A locked rostered player with no frozen record but a pre-kickoff projection (the first week only) is judged as playable at kickoff; later injury tags are ignored.
   - Waiver players whose game has started stay out of the pool.
 - **Context shown:** each rostered player's μ, σ, tier placement and status, plus the league's waiver type. There is no FAAB advice in v1.
+
+### 6.8 Stats page (D20; v0 in PR 2, full in PR 6)
+`stats.html` is rebuilt from the committed week files on every site build; nothing on it feeds back into the numbers on the main page.
+- **Evaluation pool:** per week with final stats (`actuals.json`) and a projection snapshot, the top `N_eval` (50) per position by prediction among players who played (no stat line = didn't play, left out). Late rows are included and counted; backfilled weeks are marked. A position-week whose pool has fewer than `N_eval` players (a snapshot that misses games) is shown as *partial* and left out of the season numbers, the residual σ_out and top-12 hits. σ_pred uses the σ_out the week's page used.
+- **Tiers as shown:** the tiers at the pre-waiver sync (`tiers_log.json`), when the owner sets waivers; for a rebuilt week, its page. A live week without a pre-waiver log is skipped (its final page lists only players yet to play).
+- **Top-12 hits** count a player tied with the 12th-best score as in the top 12.
+- **Metrics (per position, weekly and season to date):** avg miss (MAE) against a naive baseline on the same players (his average SADL points over his earlier games this season, 2+ games), RMSE, bias (predicted − actual: positive = our number runs high), share within ±1σ and ±2σ of σ_pred, top-12 hits (our top 12 vs the actual top 12 among everyone at the position), Pearson, Spearman and out-of-sample R² (season to date only, n ≥ 100), Brier score of the pairwise "who outscores whom" odds (n ≥ 30 pairs) with calibration buckets, START/UPGRADE results ("x of y"; reference badges and void ones apart; live from the decision log, rebuilt for replayed weeks, shown separately), and average actual points per tier as shown.
+- **Weights:** the share of each source (v0: Sleeper 100%); PR 6 adds the recorded weights in force each week.
+- **Readability:** each section opens with a one-line plain headline; at most four default columns with plain labels; the rest under "More stats"; a "What these mean" glossary says what no skill looks like for each metric. The newest week is marked provisional until its stat corrections close (last kickoff + 4 d 4 h). Small samples show "not enough games yet" instead of a number.
+- `stats.json` is the same data without internals.
 
 ## 7. Failure handling and security
 - **Fatal:** a failure of the documented Sleeper /v1 endpoints (state, user, leagues, league, rosters, players). The job fails, nothing deploys, and the last good site stays live.
@@ -340,9 +352,10 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - *No usable source:* the page still publishes, with a banner, but the window stays open so the next slot retries.
   - *Backfill:* runs inside every sync for this season's past weeks that have no Sleeper snapshot yet (rows marked `backfill: true`). There is no separate `sadlidp backfill` command.
   - *No-projection players:* available players with no μ are shown as a count per position, not listed.
-  - *CI:* `ci.yml` adds a live preview on claude/** pushes. It runs a forced sync into a scratch directory and publishes it to the `preview` branch.
+  - *CI:* `ci.yml` adds a live preview on claude/** pushes. It runs a forced sync into a scratch directory and publishes it to the `preview` branch. (Amended in PR 2: per-branch previews, below.)
 - **2026-10-12 · D22 added (owner request):** scored results on the page, a Sunday-evening results window, and late rows for projections first seen after kickoff (§2, §4.3, §6.5).
 - **2026-10-12 · Phase 3+4 plan approved (owner):** D16 closed (FantasyPros ECR stored like other free sources); D15, D17, D18 amended; D19 (per-player breakdown), D20 (Stats page) and D21 (source list after live checks: FantasyData in; Razzball, Fantasy Sharks, CBS, FFToday out) added; §8 rewritten as six PRs. PR 1: locked suggestions as *for reference*, comparable players and the frozen week record (§6.5, §6.7), badge and tier logs, error isolation (§7), nflverse schedule read from raw.githubusercontent.com.
+- **2026-10-12 · PR 2 (Stats v0 + breakdown):** per-player breakdown on every card (D19, §6.4); `stats.html` (§6.8) from data already committed; `players.json` frozen per week replaces `players_idp.json` (§3.3); compact source files with `schema_version` 2 and a `fetches` list, unchanged rows keep their first-seen `fetched_at` (§6.5); residual σ_out behind `sigma_out.method` (§6.7). CI previews are per branch: the branch's committed data is copied to a scratch directory, a forced live sync runs on top, and the result is published to `previews/<branch>`. `sync.yml` also runs (forced) on a push to `main` that changes `src/`, `config/`, the lockfile or the workflow, so merged features reach the page without waiting for a window (owner request).
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

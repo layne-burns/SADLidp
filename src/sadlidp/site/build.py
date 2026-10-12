@@ -15,7 +15,7 @@ from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
 
-from .. import storage, weeklog
+from .. import stats, storage, weeklog
 from ..schedule import ET, Schedule
 
 ACTION_TEXT = {
@@ -125,7 +125,7 @@ def _why(badge: dict, names: dict, slot: str) -> str:
     return "; ".join(reasons)
 
 
-def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site") -> Path:
+def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg: dict | None = None) -> Path:
     weeks = week_dirs(data_dir)
     if not weeks:
         raise FileNotFoundError(f"no consensus.json under {data_dir}")
@@ -163,5 +163,13 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site") -> 
         if (season, week) == latest:
             (site / "index.html").write_text(html)
             (site / "data.json").write_text(json.dumps(data, indent=1, sort_keys=True))
+    season = latest[0]
+    league_name = (json.loads((weeks[-1][2] / "consensus.json").read_text()).get("league") or {}).get("name")
+    ev = stats.evaluate(data_dir, season, cfg or {})
+    (site / "stats.html").write_text(
+        env.get_template("stats.html.j2").render(s=ev, slots=("DL", "LB", "DB"), league_name=league_name)
+    )
+    public = {k: v for k, v in (ev or {}).items() if not k.startswith("_")} if ev else None
+    (site / "stats.json").write_text(json.dumps(public, indent=1, sort_keys=True, default=list))
     (site / ".nojekyll").write_text("")
     return site / "index.html"

@@ -14,6 +14,7 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 
 ## The sync button and the schedule
 - **Button:** Actions → sync → Run workflow. It also works from the GitHub mobile app, and it always syncs.
+- **New code:** a merge to `main` that changes code or config also syncs and redeploys the page.
 - **Automatic:** the workflow wakes every 3 hours (hourly on Sunday mornings), but it only syncs once in each of these windows per week:
   - **Pre-waiver:** from 12 h to 1 h before SADL's waivers process at 00:00 Pacific on Wednesday, so Tuesday noon to 11 PM PT.
   - **Saturday:** 12:00 to 6:00 PM ET, after the final injury reports.
@@ -25,6 +26,8 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 ## Reading the page
 - **Week N · data as of …:** a yellow banner appears when the data is more than 36 hours old.
 - **Points** are SADL points. **±** is how much the sources disagree about a player, not week-to-week luck. With one source it's a fixed default.
+- **Where a number comes from:** tap a player to see each source's points for him, the projected stats behind them, and its share of his number. A source with nothing for him says why.
+- **How the numbers did →** (the Stats page): how far off the projections were each week and season to date, by position, against a naive guess (each player's own average), plus whether the START/UPGRADE odds held up. Small samples say "not enough games yet".
 - **Tiers** group players who are statistically indistinguishable from the tier's top player (`z = 1` in the config). With one source every ± is the same, so for now the tiers are equal-width point bands.
 - **My IDPs** places your DL, LB and DB against the waiver tiers.
   - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
@@ -58,7 +61,7 @@ uv run sadlidp sync --force --data-dir /tmp/sadl       # live: needs network acc
 uv run sadlidp build --data-dir /tmp/sadl --site-dir /tmp/site
 uv run sadlidp gate
 ```
-Pushes to `claude/**` branches also run a live preview in CI: a forced sync into a scratch directory, published to the `preview` branch, which each run replaces.
+Pushes to `claude/**` branches also run a live preview in CI: the branch's committed data is copied to a scratch directory, a forced sync runs on top of it, and the site is published to the `previews/<branch>` branch, which each run of that branch replaces.
 
 ## Layout
 | Path | What |
@@ -66,5 +69,5 @@ Pushes to `claude/**` branches also run a live preview in CI: a forced sync into
 | `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/`, `scoring`, `consensus`, `tiers`, `roster`, `gate`, `site/` |
 | `config/sadl.toml` | all tunables (SPEC §9) |
 | `data/<season>/` | `league.json`, `schedule.json`, `gate.json` (windows already run) |
-| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json`, `rosters.json`, `players_idp.json`, `actuals.json`, `sources/<source>.json` (projections frozen at kickoff) |
+| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json`, `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections frozen at kickoff), `frozen.json`, `badges.json`, `tiers_log.json` |
 | `probe/` | the Phase 1 data-source probe (SPEC §13) |

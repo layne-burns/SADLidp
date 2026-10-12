@@ -1,11 +1,15 @@
 name: sync
 
 # The SADL IDP sync (SPEC.md §3.1, §4.3). The schedule only wakes the Python gate, which syncs when a
-# window is due (pre-waiver, Saturday, Sunday morning). "Run workflow" is the sync button: it always
-# syncs. Commits made with GITHUB_TOKEN don't retrigger workflows. A failed sync deploys nothing, so
-# the last good site stays live.
+# window is due (pre-waiver, Saturday, Sunday morning, Sunday evening). "Run workflow" is the sync
+# button: it always syncs. A merge to main that changes code or config also syncs and redeploys, so
+# the page picks up new features right away. Commits made with GITHUB_TOKEN (this workflow's data
+# commits) don't retrigger workflows. A failed sync deploys nothing, so the last good site stays live.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["src/**", "config/**", "pyproject.toml", "uv.lock", ".github/workflows/sync.yml"]
   schedule:
     - cron: "17 */3 * * *"
     - cron: "17 10,11,13,14,16 * * 0" # with the line above: hourly Sunday slots 09:17-16:17 UTC
@@ -47,7 +51,7 @@ jobs:
       - name: Sync
         id: sync
         env:
-          FORCE: ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
+          FORCE: ${{ github.event_name != 'schedule' && '--force' || '' }}
         run: uv run --frozen --no-dev sadlidp sync $FORCE
 
       - name: Build site

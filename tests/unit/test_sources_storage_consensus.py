@@ -61,7 +61,15 @@ def test_merge_rows_freeze_rule():
     assert merged["thu"] == existing["thu"]
     assert merged["sun"]["stats"] == {"idp_tkl_solo": 4} and merged["sun"]["fetched_at"] == NOW.isoformat()
     assert "gone" not in merged and "late" not in merged and "new" in merged
-    assert counts == {"frozen": 1, "updated": 1, "added": 1, "deleted": 1, "skipped_after_kickoff": 1, "late": 0}
+    assert counts == {
+        "frozen": 1,
+        "updated": 1,
+        "added": 1,
+        "deleted": 1,
+        "skipped_after_kickoff": 1,
+        "late": 0,
+        "unchanged": 0,
+    }
     # a source whose rows don't change after games may keep the late row, flagged, then frozen
     merged, counts = storage.merge_rows(existing, fetched, NOW, kickoffs.get, accept_late=True)
     assert merged["late"]["late"] is True and counts["late"] == 1 and counts["skipped_after_kickoff"] == 0
@@ -104,3 +112,27 @@ def test_within_player_sd():
     pts = [2.0 * (w % 3) for w in range(1, 9)]
     assert out["LB"] == round(statistics.stdev(pts), 3) and out["DL"] == 0.0 and out["DB"] is None
     assert out["players"] == {"DL": 1, "LB": 1, "DB": 0}
+
+
+def test_unchanged_rows_keep_their_first_seen_time_and_files_are_one_row_per_line(tmp_path):
+    kick = {"a": NOW + timedelta(days=2), "b": NOW + timedelta(days=2)}.get
+    first, _ = storage.merge_rows({}, {"a": {"stats": {"x": 1}}, "b": {"stats": {"x": 2}}}, NOW, kick)
+    later = NOW + timedelta(hours=3)
+    again, counts = storage.merge_rows(first, {"a": {"stats": {"x": 1}}, "b": {"stats": {"x": 5}}}, later, kick)
+    assert again["a"]["fetched_at"] == NOW.isoformat() and again["b"]["fetched_at"] == later.isoformat()
+    assert counts["unchanged"] == 1 and counts["updated"] == 1
+    path = tmp_path / "s.json"
+    storage.write_json(path, {"rows": again, "week": 5})
+    lines = path.read_text().splitlines()
+    assert sum(1 for line in lines if line.startswith('  "a": {')) == 1 and len(lines) == 7
+    assert storage.read_json(path) == {"rows": again, "week": 5}
+
+
+def test_an_old_format_file_keeps_its_last_fetch_in_fetches(tmp_path):
+    from sadlidp.sources.base import AdapterResult
+
+    path = tmp_path / "s.json"
+    path.write_text(json.dumps({"last_success": "2026-10-11T09:00:00-04:00", "rows": {}}))  # schema 1
+    res = AdapterResult(name="x", kind="projection", status="ok", week=5, fetched_at="2026-10-12T05:00:00-04:00")
+    storage.save_source(path, res, {})
+    assert json.loads(path.read_text())["fetches"] == ["2026-10-11T09:00:00-04:00", "2026-10-12T05:00:00-04:00"]

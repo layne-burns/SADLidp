@@ -29,7 +29,7 @@ from .tiers import build_tiers, place
 
 SLIM_FIELDS = (
     "full_name", "first_name", "last_name", "position", "fantasy_positions",
-    "team", "status", "active", "injury_status", "espn_id",
+    "team", "status", "active", "injury_status", "espn_id", "fantasy_data_id",
 )  # fmt: skip
 SOURCES = {sleeper_proj.NAME: (sleeper_proj, "projection")}
 
@@ -67,9 +67,17 @@ def fetch_schedule(client: Client, cfg: dict, season: int, data_dir: Path) -> tu
 
 
 def sigma_out_for(
-    sleeper: Sleeper, cfg: dict, data_dir: Path, season: int, players: dict, sc: dict, warnings: list
+    sleeper: Sleeper, cfg: dict, data_dir: Path, season: int, players: dict, sc: dict, warnings: list, week: int = 0
 ) -> dict:
-    """σ_out per position from last season's actuals, cached once per season (SPEC §6.7)."""
+    """σ_out per position (SPEC §6.7): this season's residuals once enabled (`sigma_out.method =
+    "residuals"`) and 3 settled weeks exist; otherwise last season's within-player SD, cached per season."""
+    residual = {}
+    if (cfg.get("sigma_out") or {}).get("method") == "residuals":
+        from .stats import residual_sigma_out
+
+        residual = residual_sigma_out(data_dir, season, cfg, week) or {}
+        if all(s in residual for s in IDP_SLOTS):
+            return residual
     prev = season - 1
     path = data_dir / str(prev) / "sigma_out.json"
     est = storage.read_json(path)
@@ -85,7 +93,7 @@ def sigma_out_for(
             est = {**within_player_sd(weekly, players, sc), "season": prev}
             storage.write_json(path, est)
     fallback = cfg.get("sigma_out") or {}
-    return {s: float((est or {}).get(s) or fallback.get(s, 5.0)) for s in IDP_SLOTS}
+    return {s: float(residual.get(s) or (est or {}).get(s) or fallback.get(s, 5.0)) for s in IDP_SLOTS}
 
 
 def refresh_actuals(
@@ -233,6 +241,56 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     }
 
 
+SOURCE_LABELS = {"sleeper_proj": "Sleeper"}
+STAT_LABELS = (
+    ("idp_tkl_solo", "solo"), ("idp_tkl_ast", "ast"), ("idp_tkl_loss", "TFL"), ("idp_sack", "sack"),
+    ("idp_qb_hit", "QB hit"), ("idp_pass_def", "PD"), ("idp_int", "INT"), ("idp_ff", "FF"), ("idp_fum_rec", "FR"),
+    ("idp_def_td", "TD"), ("idp_safe", "safety"), ("idp_blk_kick", "blocked kick"),
+)  # fmt: skip
+
+
+def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, groups: dict, info: dict,
+              sc: dict) -> dict:  # fmt: skip
+    """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
+    them, the share of μ, or why a source has nothing for him."""
+    eff = (cons_row or {}).get("eff") or {}
+    frozen_pts = (cons_row or {}).get("parts") or {}  # a locked player: each source's points at his kickoff
+    parts = []
+    for name in SOURCES:
+        label = SOURCE_LABELS.get(name, name)
+        src = info.get(name) or {}
+        pts = values.get(name, {}).get(pid, frozen_pts.get(name))
+        if pts is not None:
+            row = (source_rows.get(name) or {}).get(pid)
+            stats = (row or {}).get("stats") or {}
+            shown = [[lbl, round(scoring.num(stats.get(k)), 2)] for k, lbl in STAT_LABELS
+                     if scoring.num(sc.get(k)) and scoring.num(stats.get(k)) >= 0.05]  # fmt: skip
+            parts.append({"source": label, "kind": groups.get(name), "pts": round(pts, 2),
+                          "share": eff.get(name), "stats": shown, "late": bool(row and row.get("late")),
+                          "zero": row is None})  # fmt: skip
+        elif not src.get("last_success"):
+            parts.append({"source": label, "missing": "nothing posted for this week yet"})
+        elif src.get("stale"):
+            parts.append({"source": label, "missing": "not used this week (its data is too old)"})
+        elif not src.get("rows_used"):
+            parts.append({"source": label, "missing": "nothing posted for this week yet"})
+        else:
+            parts.append({"source": label, "missing": "no projection for him"})
+    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None}
+
+
+def attach_breakdowns(site_part, make: Callable[[str], dict]) -> None:
+    """Add a `breakdown` to every player card in the site data (cards carry id, mu and slot)."""
+    if isinstance(site_part, dict):
+        if "id" in site_part and "mu" in site_part and "slot" in site_part:
+            site_part["breakdown"] = make(site_part["id"])
+        for v in site_part.values():
+            attach_breakdowns(v, make)
+    elif isinstance(site_part, list):
+        for v in site_part:
+            attach_breakdowns(v, make)
+
+
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
     return {
         "id": pid,
@@ -340,6 +398,7 @@ def run_sync(
     values: dict[str, dict[str, float]] = {}
     groups: dict[str, str] = {}
     late_rows: dict[str, dict] = {}
+    source_rows: dict[str, dict] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
     fetched_ok: set[str] = set()
@@ -382,6 +441,7 @@ def run_sync(
             continue
         groups[name] = kind
         late_rows[name] = {pid: r for pid, r in rows.items() if r.get("late")}
+        source_rows[name] = rows
         values[name] = {
             pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp
         }
@@ -408,6 +468,8 @@ def run_sync(
             "min": c["min"],
             "max": c["max"],
             "n_sources": c["n_sources"],
+            "eff": c.get("eff") or {},
+            "parts": {name: round(v[pid], 3) for name, v in values.items() if pid in v},
             "reasons": list(status_of(pid).reasons),
             "flags": list(status_of(pid).flags),
         }
@@ -417,7 +479,7 @@ def run_sync(
     for pid, rec in frozen.items():
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
-            cons[pid] = {k: rec[k] for k in ("mu", "sigma", "min", "max", "n_sources")}
+            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff", "parts")}
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)
@@ -440,8 +502,13 @@ def run_sync(
     if unset:
         warnings.append(f"league has no position limit for {', '.join(unset)}; assuming the config fallback")
     sigma_fallback = {s: float((cfg.get("sigma_out") or {}).get(s, 5.0)) for s in IDP_SLOTS}
-    sigma_out = _guard("σ_out estimate", lambda: sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings),
-                       sigma_fallback, warnings, log)  # fmt: skip
+    sigma_out = _guard(
+        "σ_out estimate",
+        lambda: sigma_out_for(sleeper, cfg, data_dir, season, players, sc, warnings, week),
+        sigma_fallback,
+        warnings,
+        log,
+    )
     matchups = _guard("matchups", lambda: sleeper.matchups(league["league_id"], week)[0], None, warnings, log)
     my_matchup = next((m for m in (matchups or []) if me and m.get("roster_id") == me.get("roster_id")), {})
     lineup = starter_slots(league.get("roster_positions") or [], my_matchup.get("starters"))
@@ -602,6 +669,9 @@ def run_sync(
         "sources": run["sources"],
         "warnings": warnings,
     }
+    attach_breakdowns(
+        site_data, lambda pid: breakdown(pid, cons.get(pid), source_rows, values, groups, run["sources"], sc)
+    )
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})
     if badge_doc is not None:
@@ -609,9 +679,11 @@ def run_sync(
         storage.write_json(wdir / "tiers_log.json", tiers_doc)
     storage.write_json(wdir / "run.json", run)
     storage.write_json(wdir / "rosters.json", rosters)
-    storage.write_json(
-        wdir / "players_idp.json", {pid: {k: p.get(k) for k in SLIM_FIELDS} for pid, p in idp.items() if p.get("team")}
-    )
+    # the week's players as of each one's kickoff (teamless included): what later replays read (SPEC §6.5)
+    slim = {pid: {k: p.get(k) for k in SLIM_FIELDS} for pid, p in idp.items()}
+    week_players = (storage.read_json(wdir / "players.json") or {}).get("players", {})
+    week_players, _ = storage.merge_rows(week_players, slim, now, kickoff_of)
+    storage.write_json(wdir / "players.json", {"schema_version": 1, "players": week_players})
     storage.write_json(season_dir / "schedule.json", sched.to_json())
     storage.write_json(
         season_dir / "league.json",

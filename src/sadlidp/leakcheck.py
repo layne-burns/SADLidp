@@ -20,7 +20,7 @@ PATTERNS = {
     # `Cookie: x` at line start, or a quoted key in JSON / Python dicts: "Cookie": / 'Authorization':
     "http_credential_header": re.compile(rb"(?im)(?:^[ \t]*|[\"'])(cookie|set-cookie|authorization)[\"']?[ \t]*:"),
 }
-PRIVATE_SOURCES = ("fantasypros",)
+PRIVATE_SOURCES: tuple[str, ...] = ()  # none since D16 closed: FantasyPros ECR rows are committed like any free source
 MIN_SECRET_LEN = 8
 
 

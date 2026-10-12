@@ -69,6 +69,28 @@ def test_source_id_must_land_on_an_idp():
     assert m.match("x", source_id="556", id_field="yahoo_id", name="Travis Hunter", team=None) == Match(None, "no_team")
 
 
+def test_crosswalk_is_step_three():
+    players = {
+        "1": _p("Will Anderson", "HOU", "DE", espn_id=100),
+        "2": _p("Will Anderson", "NYJ", "LB"),
+        "3": _p("Bill Anderson", "HOU", "DE"),
+        "4": _p("Travis Hunter", "JAX", "WR", ["WR"]),
+    }
+    xw = {"fantasypros_id": {"9": "3", "8": "4", "7": "404"}, "espn_id": {"100": "3", "200": "1", "300": "2"}}
+    m = Matcher(players, {"fp_ecr": {"9": "2"}}, crosswalk=xw)
+    row = {"id_field": "fantasypros_id", "name": "Will Anderson", "team": "NYJ", "slot": "LB"}
+    assert m.match("fp_ecr", source_id="9", **row) == Match("2", "override")  # step 1 beats the crosswalk
+    assert m.match("other", source_id="9", **row) == Match("3", "source_id")  # crosswalk beats names
+    assert m.match("other", source_id="8", **row) == Match("2", "name_team_slot")  # lands on a non-IDP
+    assert m.match("other", source_id="7", **row) == Match("2", "name_team_slot")  # not in the players DB
+    assert m.match("other", source_id="9", **row | {"id_field": "espn_id"}) == Match("2", "name_team_slot")
+    # Sleeper's own espn_id (step 2) wins; the crosswalk can't move an id onto a record carrying another one
+    assert m.match("other", source_id="100", **row | {"id_field": "espn_id"}) == Match("1", "source_id")
+    assert m.match("other", source_id="200", **row | {"id_field": "espn_id"}) == Match("2", "name_team_slot")
+    assert m.match("other", source_id="300", **row | {"id_field": "espn_id", "team": None}) == Match("2", "source_id")
+    assert Matcher(players).match("other", source_id="9", **row) == Match("2", "name_team_slot")
+
+
 def test_name_only_uniqueness_and_slot_guards():
     players = {
         "20": _p("Jordan Smith", "DAL", "LB"),

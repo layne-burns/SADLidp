@@ -85,7 +85,9 @@ def replay_week(
         for m in matchups
     ]
     players = dict(players_db)
-    for path in reversed(saved.values()):  # the first source's team wins (Sleeper's rows carry that week's team)
+    for name, path in reversed(saved.items()):  # the first source's team wins (Sleeper's rows carry that week's team)
+        if SOURCES[name][1] == "signal":
+            continue  # D/ST rows are keyed by team, not player
         for pid, row in (storage.load_source(path).get("rows") or {}).items():
             team = row.get("team") or players.get(pid, {}).get("team")
             players[pid] = {**players.get(pid, {}), "team": team, "status": "Active", "active": True,

@@ -1,8 +1,11 @@
 """Season accuracy for the Stats page (D20, SPEC §6.8), computed from the committed week files.
 
-Per week with final stats (actuals.json) and a projection snapshot (every saved projection source):
-- prediction = the equal-weight mean of the sources' SADL points for each projected player (the PR 3
-  consensus; with one source, that source), σ_pred = √(σ_μ² + σ_out²);
+Per week with final stats (actuals.json) and a source snapshot (every saved projection and rank source):
+- each source's SADL points as the sync computes them (sync.source_values: zero-fill, rank → value mapping and
+  censoring, §6.4); a rank source is evaluated after mapping, from the frozen per-source parts at kickoff when
+  the week has frozen.json, else recomputed from the saved files;
+- prediction = the consensus of those values with prior weights (projection sources equal; with one source,
+  that source; with ranks, α·P + (1−α)·R), σ_pred = √(σ_μ² + σ_out²);
 - evaluation pool per position = the top `N_eval` by prediction among players who played (a player
   with no stat line didn't play: a late scratch, out or on bye, and is left out);
 - each source is scored on the pool players it covers, so no source picks its own pool (§6.8 per source);
@@ -18,9 +21,11 @@ from datetime import datetime
 from pathlib import Path
 
 from . import metrics, scoring, storage, weeklog
+from .consensus import consensus
+from .pool import PlayerStatus
 from .positions import IDP_SLOTS, slot_of
 from .schedule import Schedule
-from .sync import SOURCE_LABELS
+from .sync import SOURCE_LABELS, prior_weights, source_values
 
 N_EVAL = 50
 MIN_CORR_N = 100  # correlations and R² only season to date, and only with this many player-games
@@ -49,16 +54,40 @@ def _positions(season_dir: Path) -> dict[str, str]:
     return slots
 
 
-def _projection_sources(wd: Path) -> dict[str, dict]:
-    """name -> rows of every projection source saved for the week, in the sync's source order."""
+def _sources(wd: Path) -> dict[str, dict]:
+    """name -> file of every blended source (projection or rank) saved for the week, in the sync's source order.
+    Signals (D/ST) are never blended and left out."""
     order = list(SOURCE_LABELS)
     out = {}
     for path in sorted((wd / "sources").glob("*.json"), key=lambda p: (order.index(p.stem) if p.stem in order
                                                                        else len(order), p.stem)):  # fmt: skip
         doc = storage.read_json(path) or {}
-        if doc.get("kind", "projection") == "projection":
-            out[path.stem] = doc.get("rows") or {}
+        kind = doc.get("kind", "projection")
+        if kind in ("projection", "rank"):
+            out[path.stem] = {**doc, "kind": kind, "rows": doc.get("rows") or {}}
     return out
+
+
+def week_values(
+    wd: Path, week: int, sources: dict[str, dict], sched: Schedule, slots: dict[str, str], sc: dict, cfg: dict
+) -> tuple[dict[str, dict[str, float]], dict[str, str]]:
+    """Each source's SADL points for one past week, by the sync's own code path (sync.source_values), every
+    player treated as locked at his kickoff (team from the week's players.json). A rank source takes the frozen
+    per-source parts at kickoff (frozen.json) when it has any (§6.8: rank sources are evaluated after mapping)."""
+    week_players = (storage.read_json(wd / "players.json") or {}).get("players") or {}
+    idp = {pid: {**(week_players.get(pid) or {}), "position": slot} for pid, slot in slots.items()}
+
+    def status_of(pid: str) -> PlayerStatus:
+        game = sched.game_for((idp.get(pid) or {}).get("team"), week)
+        return PlayerStatus(["locked"], [], game.kickoff if game else None)
+
+    values, groups, _ = source_values(sources, idp, sc, cfg, status_of)
+    frozen = (storage.read_json(wd / "frozen.json") or {}).get("players") or {}
+    for name, doc in sources.items():
+        parts = {pid: rec["parts"][name] for pid, rec in frozen.items() if name in (rec.get("parts") or {})}
+        if doc["kind"] == "rank" and parts:
+            values[name], groups[name] = parts, "rank"
+    return values, groups
 
 
 def _naive(history: dict[str, list[float]], pid: str) -> float | None:
@@ -104,24 +133,21 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     season_rows = {s: {"pred": [], "act": [], "sig": [], "base": [], "pairs": []} for s in IDP_SLOTS}
     by_source: dict[str, dict[str, dict]] = {}  # source -> slot -> pooled pred/act/sig/base, covered, pool
     weekly, suggestions, tiers = [], [], {s: {} for s in IDP_SLOTS}
+    weights_seen: dict[str, str] = {}  # source -> group, for the shares line
     for week, wd in weeks:
         act_doc = storage.read_json(wd / "actuals.json") or {}
         lines = act_doc.get("stats") or {}
         played = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
         settles, captured = sched.settles_at(week), act_doc.get("captured_at")
         provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
-        sources = _projection_sources(wd)
-        preds = {
-            name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
-            for name, rows in sources.items()
-        }
-        covering: dict[str, list[float]] = {}
-        for pred_s in preds.values():
-            for pid, v in pred_s.items():
-                covering.setdefault(pid, []).append(v)
-        pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
-        late = sum(1 for rows in sources.values() for r in rows.values() if r.get("late"))
-        backfill = sum(1 for rows in sources.values() for r in rows.values() if r.get("backfill"))
+        sources = _sources(wd)
+        preds, groups = week_values(wd, week, sources, sched, slots, sc, cfg)
+        cons = consensus(preds, groups, slots, cfg, weights=prior_weights(cfg))
+        pred_all = {pid: c["mu"] for pid, c in cons.items()}  # the consensus with prior weights (§6.8)
+        for name, g in groups.items():
+            weights_seen.setdefault(name, g)
+        late = sum(1 for doc in sources.values() for r in doc["rows"].values() if r.get("late"))
+        backfill = sum(1 for doc in sources.values() for r in doc["rows"].values() if r.get("backfill"))
         row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {},
                "by_source": {}}  # fmt: skip
         page = storage.read_json(wd / "consensus.json") or {}
@@ -179,8 +205,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         row["partial_slots"] = [slot for slot in IDP_SLOTS if row["by_slot"][slot]["partial"]]
         # a source read live for the first time partway through the week covers only the games still to come
         row["joined_midweek"] = sorted(
-            name for name, rows in sources.items()
-            if not any(r.get("backfill") for r in rows.values())
+            name for name, doc in sources.items()
+            if not any(r.get("backfill") for r in (doc.get("rows") or {}).values())
             and any(x["pool"] and x["covered"] < x["pool"] / 2 for x in row["by_source"].get(name, {}).values())
         )  # fmt: skip
         weekly.append(row)
@@ -256,15 +282,34 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "tiers": tier_rows,
         "season_by_source": season_by_source,
         "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
-        # equal priors within the projection group (PR 3); PR 6 records the accuracy weights in force each week
-        "sources": [{"name": SOURCE_LABELS.get(n, n), "share": 1 / len(season_by_source)} for n in season_by_source]
+        # prior weights (§6.4: equal within the projection group, α : 1−α between groups); PR 6 records the
+        # accuracy weights in force each week
+        "sources": _shares([n for n in season_by_source if n in weights_seen], weights_seen, cfg)
         or [{"name": "Sleeper", "share": 1.0}],
+        "group_split": float((cfg.get("weights") or {}).get("prior_split", 0.6))
+        if {"projection", "rank"} <= set(weights_seen.values())
+        else None,
         "sigma_out": so,
         "n_eval": N_EVAL,
         "min_corr_n": MIN_CORR_N,
         "sigma_mu": s_mu,
         "_resid": resid,  # internal (σ_out from residuals); not written to stats.json
     }
+
+
+def _shares(names: list[str], groups: dict[str, str], cfg: dict) -> list[dict]:
+    """Each source's prior share of a number all of them cover (§6.4)."""
+    w = prior_weights(cfg)
+    by = {g: [n for n in names if groups.get(n) == g] for g in ("projection", "rank")}
+    alpha = float((cfg.get("weights") or {}).get("prior_split", 0.6)) if all(by.values()) else 1.0
+    out = []
+    for n in names:
+        g = groups[n]
+        split = alpha if g == "projection" or not by["projection"] else 1 - alpha
+        out.append(
+            {"name": SOURCE_LABELS.get(n, n), "share": split * w.get(n, 1.0) / sum(w.get(m, 1.0) for m in by[g])}
+        )
+    return out
 
 
 def residual_sigma_out(

@@ -73,7 +73,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     from .impute import load_or_build_priors
     from .positions import slot_of
     from .sleeper import Sleeper, season_of
-    from .sync import SOURCES, build_matcher, fetch_schedule, make_client
+    from .sync import SOURCES, build_matcher, fetch_schedule, load_crosswalk, make_client
 
     cfg = load_config(args.config)
     if args.source and args.source not in SOURCES:
@@ -90,7 +90,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     players = {str(k): v for k, v in sleeper.players(now.date().isoformat()).items()}
     idp = {pid: p for pid, p in players.items() if slot_of(p)}
     priors = load_or_build_priors(sleeper, data_dir, season, players)
-    matcher = build_matcher(cfg, players)
+    matcher = build_matcher(cfg, players, load_crosswalk(cfg, client, args.cache_dir, now.date()))
     done = backfill.run(
         SOURCES,
         cfg,
@@ -105,6 +105,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
         priors=priors,
         only=args.source,
         redo=args.redo,
+        schedule=sched,
     )
     written = "; ".join(f"{name} weeks {ws}" for name, ws in done.items()) or "nothing written"
     print(f"backfill: season {season}, weeks before {target}: {written}")

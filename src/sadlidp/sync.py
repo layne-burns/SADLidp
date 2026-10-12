@@ -13,8 +13,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from . import backfill as backfillmod
+from . import crosswalk as crosswalkmod
 from . import gate as gatemod
-from . import scoring, storage, weeklog
+from . import rankmap, scoring, storage, weeklog
 from .backfill import imputer_for, source_cfg
 from .config import load_alias
 from .consensus import consensus
@@ -27,7 +28,7 @@ from .roster import panel, starter_slots
 from .schedule import ET, NFLVERSE_GAMES, Schedule
 from .sigma import within_player_sd
 from .sleeper import Sleeper, my_roster, position_limits, resolve_league, season_of
-from .sources import espn_proj, sleeper_proj
+from .sources import espn_proj, fantasypros, fp_dst, sleeper_proj
 from .sources.base import SUSPECT, AdapterResult, FetchContext
 from .tiers import build_tiers, place
 
@@ -35,7 +36,12 @@ SLIM_FIELDS = (
     "full_name", "first_name", "last_name", "position", "fantasy_positions",
     "team", "status", "active", "injury_status", "espn_id", "fantasy_data_id",
 )  # fmt: skip
-SOURCES = {sleeper_proj.NAME: (sleeper_proj, "projection"), espn_proj.NAME: (espn_proj, "projection")}
+SOURCES = {
+    sleeper_proj.NAME: (sleeper_proj, "projection"),
+    espn_proj.NAME: (espn_proj, "projection"),
+    fantasypros.NAME: (fantasypros, "rank"),
+    fp_dst.NAME: (fp_dst, "signal"),  # fetched and saved, never blended (D18)
+}
 
 
 @dataclass
@@ -63,11 +69,23 @@ def make_client(cfg: dict) -> Client:
     return Client(host_intervals=(cfg.get("net") or {}).get("host_interval_s") or {})
 
 
-def build_matcher(cfg: dict, players: dict) -> Matcher:
-    """One §6.1 matcher per run: the players DB, `player_overrides.toml` and the nickname table."""
+def build_matcher(cfg: dict, players: dict, crosswalk: dict | None = None) -> Matcher:
+    """One §6.1 matcher per run: the players DB, `player_overrides.toml`, the nickname table and the crosswalk."""
     root = Path(cfg.get("_root", "config"))
     return Matcher(players, load_overrides(root / "player_overrides.toml"),
-                   load_nicknames(root / "aliases" / "nicknames.json"))  # fmt: skip
+                   load_nicknames(root / "aliases" / "nicknames.json"), crosswalk)  # fmt: skip
+
+
+def load_crosswalk(cfg: dict, client, cache_dir: Path | str, today) -> dict:
+    """The §6.1 step-3 crosswalk, fetched only when an enabled source matches by it (FantasyPros)."""
+    if not ((cfg.get("sources") or {}).get(fantasypros.NAME) or {}).get("enabled", True):
+        return {}
+    return crosswalkmod.load(client, cache_dir, today)
+
+
+def prior_weights(cfg: dict) -> dict[str, float]:
+    """Within-group prior weights, `sources.<name>.prior_weight` (default 1.0; §6.4)."""
+    return {name: float(((cfg.get("sources") or {}).get(name) or {}).get("prior_weight", 1.0)) for name in SOURCES}
 
 
 def fetch_schedule(client: Client, cfg: dict, season: int, data_dir: Path) -> tuple[Schedule, str]:
@@ -166,6 +184,116 @@ def zero_fill(
     return out
 
 
+def observed_ids(source: dict, idp: dict, status_of: Callable[[str], PlayerStatus], published_at=None) -> set[str]:
+    """The players a source observed this week (§5.3): kickoff after `observed_after` (no fetch recorded: the
+    players whose game is still to come)."""
+    since = observed_after(source, published_at)
+    out = set()
+    for pid in idp:
+        st = status_of(pid)
+        if st.kickoff is not None and (not st.locked if since is None else st.kickoff > since):
+            out.add(pid)
+    return out
+
+
+def _mean(values: dict[str, dict[str, float]]) -> dict[str, float]:
+    acc: dict[str, list[float]] = {}
+    for vals in values.values():
+        for pid, v in vals.items():
+            acc.setdefault(pid, []).append(v)
+    return {pid: sum(vs) / len(vs) for pid, vs in acc.items()}
+
+
+def source_values(
+    docs: dict[str, dict],
+    idp: dict[str, dict],
+    sc: dict,
+    cfg: dict,
+    status_of: Callable[[str], PlayerStatus],
+    published: dict[str, str | None] | None = None,
+) -> tuple[dict[str, dict[str, float]], dict[str, str], dict[str, dict]]:
+    """Each source's SADL points per player (SPEC §6.4): the one code path for the sync and the Stats page.
+
+    `docs` are the source files as stored (kind, rows, universe, fetches, published_at). A projection source gives
+    its rows' points plus the zero-fill of observed players (§5.3). A rank source, once some projection source has
+    values, maps each list's effective ranks onto P, the projection-group mean (equal weights; rankmap); a player
+    in several lists takes his D14 slot's list (else DL, LB, DB), and an observed, unlisted player in a list whose
+    last fetch was ok is censored at max(D+1, P⁰-rank) when that P⁰-rank is ≤ D + `censor.M`. Returns (values,
+    groups, details); details[name] is what run.json and the breakdown show."""
+    published = published or {}
+    M = int((cfg.get("censor") or {}).get("M", 10))
+    values: dict[str, dict[str, float]] = {}
+    groups: dict[str, str] = {}
+    details: dict[str, dict] = {}
+    listed: dict[str, dict[str, float]] = {}
+    for name, doc in docs.items():
+        if doc.get("kind", "projection") != "projection":
+            continue
+        rows = doc.get("rows") or {}
+        vals = {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp}
+        listed[name] = dict(vals)
+        since = observed_after(doc, published.get(name))
+        zeros = zero_fill(doc, vals, idp, status_of, published.get(name))
+        vals.update(zeros)
+        values[name], groups[name] = vals, "projection"
+        details[name] = {"zero_filled": len(zeros), "observed_after": since.isoformat() if since else None}
+    # zero-fills alone don't make a number for a player another source explicitly lists with no projection
+    # (e.g. a retired player Sleeper still carries as a placeholder and ESPN no longer lists): §6.4
+    empty = {pid for name, doc in docs.items() for pid in doc.get("no_projection_ids") or []}
+    zeros_by = {name: set(values[name]) - set(listed[name]) for name in values}
+    only_zero = {pid for zs in zeros_by.values() for pid in zs if pid in empty
+                 and all(pid in zeros_by[n] for n in values if pid in values[n])}  # fmt: skip
+    for vals in values.values():
+        for pid in only_zero:
+            vals.pop(pid, None)
+    P, P0 = _mean(values), _mean(listed)  # P⁰: listed values only, before any zero-fill or censoring
+    slots = {pid: slot_of(p) for pid, p in idp.items()}
+    for name, doc in docs.items():
+        if doc.get("kind") != "rank":
+            continue
+        since = observed_after(doc, published.get(name))
+        det = details[name] = {"observed_after": since.isoformat() if since else None, "converted": bool(P)}
+        if not P:
+            continue  # §6.4: no fallback curve until Phase 6, so ranks aren't converted this week
+        members: dict[str, dict[str, float]] = {}
+        for pid, row in (doc.get("rows") or {}).items():
+            if pid in idp:
+                for lst, r in storage.list_ranks(row).items():
+                    members.setdefault(lst, {})[pid] = float(r)
+        universe = doc.get("universe") or {}
+        curves = {}
+        for lst, ranks in members.items():
+            Q = sorted((P[pid] for pid in P if slots.get(pid) == lst), reverse=True)
+            vals, info = rankmap.list_values(ranks, P, Q)
+            curves[lst] = (vals, info, Q, (universe.get(lst) or {}).get("depth") or len(ranks))
+        listed_any = {pid for ranks in members.values() for pid in ranks}
+        out: dict[str, float] = {}
+        parts: dict[str, dict] = {}
+        for pid in sorted(listed_any):
+            mine = {lst: ranks[pid] for lst, ranks in members.items() if pid in ranks}
+            lst = rankmap.pick_list(mine, slots.get(pid))
+            vals, info, _, of = curves[lst]
+            if pid in vals:
+                out[pid] = vals[pid]
+                parts[pid] = {"rank": mine[lst], "list": lst, "of": of, "eff_rank": info["effective"][pid]}
+        observed = observed_ids(doc, idp, status_of, published.get(name)) - listed_any
+        lists = {}
+        for lst, (_, info, Q, of) in curves.items():
+            ok = bool((universe.get(lst) or {}).get("ok"))
+            cens = {}
+            if ok:  # censoring only in lists fetched successfully this week (§6.4)
+                p0r = rankmap.p0_ranks(P0, slots, lst)
+                cens = rankmap.censored_values(listed_any, info["V_len"], p0r, observed, M, info["V"], Q)
+            for pid, (r, x) in cens.items():
+                out[pid] = x
+                parts[pid] = {"censored": True, "rank": r, "depth": info["V_len"], "list": lst, "of": of}
+            lists[lst] = {"ok": ok, "members": len(members[lst]), "valued": info["V_len"], "used_Q": info["used_Q"],
+                          "censored": len(cens)}  # fmt: skip
+        values[name], groups[name] = out, "rank"
+        det.update(lists=lists, ranks=parts)
+    return values, groups, details
+
+
 def build_week_logs(
     wdir: Path,
     my_panel: dict,
@@ -260,7 +388,8 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     }
 
 
-SOURCE_LABELS = {"sleeper_proj": "Sleeper", "espn_proj": "ESPN"}
+SOURCE_LABELS = {"sleeper_proj": "Sleeper", "espn_proj": "ESPN", "fantasypros": "FantasyPros",
+                 "fp_dst": "FantasyPros D/ST"}  # fmt: skip
 STAT_LABELS = (
     ("idp_tkl_solo", "solo"), ("idp_tkl_ast", "ast"), ("idp_tkl_loss", "TFL"), ("idp_sack", "sack"),
     ("idp_qb_hit", "QB hit"), ("idp_pass_def", "PD"), ("idp_int", "INT"), ("idp_ff", "FF"), ("idp_fum_rec", "FR"),
@@ -269,21 +398,31 @@ STAT_LABELS = (
 
 
 def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, groups: dict, info: dict,
-              sc: dict, kickoff: datetime | None = None, now: datetime | None = None,
+              sc: dict, kickoff: datetime | None = None, ranks: dict | None = None,
+              dst: dict | None = None, now: datetime | None = None,
               placeholders: dict | None = None) -> dict:  # fmt: skip
     """Per-source parts of a player's number for the page (D19): SADL points, the projected stats behind
-    them (each [label, value, imputed], §6.2), the share of μ, or why an enabled source has nothing for him."""
+    them (each [label, value, imputed], §6.2) or the rank behind them (§6.4), the share of μ, or why an enabled
+    source has nothing for him. `ranks[name][pid]` is his rank part; `dst` his team's D/ST signal row (not used)."""
     eff = (cons_row or {}).get("eff") or {}
     frozen_pts = (cons_row or {}).get("parts") or {}  # a locked player: each source's points at his kickoff
+    frozen_ranks = (cons_row or {}).get("ranks") or {}
     parts = []
-    for name in SOURCES:
-        if name not in info:
-            continue  # disabled
+    for name, (_, kind) in SOURCES.items():
+        if name not in info or kind == "signal":
+            continue  # disabled, or never blended
         label = SOURCE_LABELS.get(name, name)
         src = info[name] or {}
         since = src.get("observed_after")
-        pts = values.get(name, {}).get(pid, frozen_pts.get(name))
-        if pts is not None:
+        # a locked player shows his parts at kickoff: a rank's points move with everyone else's projections
+        pts = frozen_pts.get(name) if frozen_pts else values.get(name, {}).get(pid)
+        if pts is not None and kind == "rank":
+            rk = frozen_ranks.get(name) if frozen_pts else ((ranks or {}).get(name) or {}).get(pid)
+            rk = rk or {}
+            parts.append({"source": label, "kind": "rank", "pts": round(pts, 2), "share": eff.get(name),
+                          **{k: rk.get(k) for k in ("rank", "list", "of", "eff_rank", "censored", "depth") if
+                             k in rk}})  # fmt: skip
+        elif pts is not None:
             row = (source_rows.get(name) or {}).get(pid)
             stats, est = (row or {}).get("stats") or {}, set((row or {}).get("imputed") or ())
             shown = [[lbl, round(scoring.num(stats.get(k)), 2), k in est] for k, lbl in STAT_LABELS
@@ -297,6 +436,9 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
                           else "couldn't be read this sync"})  # fmt: skip
         elif src.get("stale"):
             parts.append({"source": label, "missing": "not used this week (its data is too old)"})
+        elif kind == "rank" and src.get("converted") is False:
+            parts.append({"source": label, "missing": "its ranks can't be turned into points this week (no "
+                          "projections to map them onto)"})  # fmt: skip
         elif pid in (placeholders or {}).get(name, ()):
             parts.append({"source": label, "missing": "no projection for him"})
         elif (
@@ -307,15 +449,26 @@ def breakdown(pid: str, cons_row: dict | None, source_rows: dict, values: dict, 
         ):
             parts.append({"source": label, "missing": "first read this week after his game started"})  # §5.3
         else:
-            parts.append({"source": label, "missing": "no projection for him"})
+            parts.append({"source": label, "missing": "not in its rankings" if kind == "rank"
+                          else "no projection for him"})  # fmt: skip
     est = any(st[2] for part in parts for st in part.get("stats") or ())
-    return {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None, "est": est}
+    out = {"parts": parts, "mu": round(cons_row["mu"], 2) if cons_row else None, "est": est}
+    share = {g: sum(p.get("share") or 0 for p in parts if p.get("kind") == g) for g in ("projection", "rank")}
+    if all(share.values()):
+        out["split"] = {g: round(v, 2) for g, v in share.items()}  # "(projections 60% / rankings 40%)"
+    if dst and dst.get("rank") is not None:
+        out["dst"] = {"rank": dst["rank"], "experts": dst.get("experts")}  # context only, never blended (D18)
+    return out
 
 
 def footer_info(info: dict) -> dict:
     """A source's run.json entry as the page footer shows it: the adapter's report shrinks to its match
-    rate and the unmatched players, counted and listed (SPEC §6.1)."""
-    out = {k: v for k, v in info.items() if k != "report"}
+    rate and the unmatched players, counted and listed (SPEC §6.1), and a multi-list source's status per list."""
+    out = {k: v for k, v in info.items() if k not in ("report", "lists")}
+    lists = (info.get("report") or {}).get("lists")
+    if lists and len(lists) > 1:
+        out["lists"] = {name: {k: x.get(k) for k in ("status", "players", "experts", "week")} for name, x in
+                        lists.items()}  # fmt: skip
     match = (info.get("report") or {}).get("match")
     if match:
         by = match.get("by_method") or {}
@@ -435,10 +588,16 @@ def run_sync(
     actuals = _guard("actuals refresh", lambda: refresh_actuals(sleeper, data_dir, season, sched, now, players), [],
                      warnings, log)  # fmt: skip
     # one matcher (§6.1) and one imputer (§6.2: last season's priors, this season's actuals before the week)
-    matcher = _guard("player matching", lambda: build_matcher(cfg, players), None, warnings, log)
+    xw = _guard("crosswalk", lambda: load_crosswalk(cfg, client, cache_dir, now.astimezone(ET).date()), {}, warnings,
+                log)  # fmt: skip
+    matcher = _guard("player matching", lambda: build_matcher(cfg, players, xw), None, warnings, log)
     priors = _guard("imputation priors", lambda: load_or_build_priors(sleeper, data_dir, season, players, log), None,
                     warnings, log)  # fmt: skip
     imputer = imputer_for(cfg, priors, data_dir, season, week, players)
+
+    def team_kickoff(team: str) -> datetime | None:
+        game = sched.game_for(team, week)
+        return game.kickoff if game else None
 
     # sources -> frozen snapshots
     wdir = storage.week_dir(data_dir, season, week)
@@ -450,18 +609,18 @@ def run_sync(
         "schedule": sched_source,
         "sources": {},
     }
-    values: dict[str, dict[str, float]] = {}
-    groups: dict[str, str] = {}
+    docs: dict[str, dict] = {}  # usable sources' files as stored, for source_values
+    published: dict[str, str | None] = {}
+    signals: dict[str, dict] = {}
     late_rows: dict[str, dict] = {}
     source_rows: dict[str, dict] = {}
-    placeholders: dict[str, set[str]] = {}  # per source: players it explicitly lists with no projection
-    zero_filled: dict[str, set[str]] = {}
     max_age = timedelta(hours=float((cfg.get("sources") or {}).get("max_source_age_h", 96)))
     shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
     fetched_ok: set[str] = set()
     for name, (module, kind) in SOURCES.items():
         if not ((cfg.get("sources") or {}).get(name) or {}).get("enabled", True):
             continue
+        label = SOURCE_LABELS.get(name, name)
         path = wdir / "sources" / f"{name}.json"
         existing = storage.load_source(path)
         ctx = FetchContext(client, sleeper, season, week, now, idp, source_cfg(cfg, name), matcher, imputer)
@@ -471,25 +630,51 @@ def run_sync(
             log(traceback.format_exc())
             res = AdapterResult(name=name, kind=kind, status="failed", week=week, fetched_at=now.isoformat(),
                                 error=f"{type(e).__name__} in fetch")  # fmt: skip
-        before = len(existing.get("rows") or {})
-        if res.ok and before and len(res.rows) < shrink * before:  # SPEC §7: a shrunken fetch isn't merged
-            res.status, res.error = SUSPECT, f"{len(res.rows)} rows against {before} before"
-        info = {**res.summary(), "label": SOURCE_LABELS.get(name, name), "published_at": res.published_at,
-                "report": res.report}  # fmt: skip
+        old_rows = existing.get("rows") or {}
+        lists_ok = {lst: bool(u.get("ok")) for lst, u in (res.universe or {}).items() if "ok" in (u or {})}
+        if res.ok and len(lists_ok) > 1:  # list-scoped (§6.5): the shrink guard applies per list (§7)
+            before, after = storage.list_counts(old_rows), storage.list_counts(res.rows)
+            shrunk = []
+            for lst, ok in lists_ok.items():
+                if ok and before.get(lst) and after.get(lst, 0) < shrink * before[lst]:
+                    lists_ok[lst] = False
+                    res.rows = storage.without_list(res.rows, lst)
+                    res.universe[lst] = {**res.universe[lst], "ok": False, "suspect": True}
+                    shrunk.append(f"{lst}: {after.get(lst, 0)} rows against {before[lst]} before")
+            if shrunk and not any(lists_ok.values()):
+                res.status, res.error = SUSPECT, "; ".join(shrunk)
+            elif shrunk:
+                warnings.append(f"{name}: {'; '.join(shrunk)}; that list looked incomplete and keeps its earlier rows")
+        elif res.ok and old_rows and len(res.rows) < shrink * len(old_rows):  # §7: a shrunken fetch isn't merged
+            res.status, res.error = SUSPECT, f"{len(res.rows)} rows against {len(old_rows)} before"
+        info = {**res.summary(), "label": label, "published_at": res.published_at, "report": res.report}
         late_ok = bool(((cfg.get("sources") or {}).get(name) or {}).get("late_rows"))
         if res.ok:
-            fetched_ok.add(name)
-            merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of, late_ok)
+            if kind != "signal":
+                fetched_ok.add(name)
+            fetched = res.rows
+            if len(lists_ok) > 1:  # failed lists keep their earlier rows (§6.5 list-scoped merge)
+                fetched = storage.list_scoped(old_rows, res.rows, {lst for lst, ok in lists_ok.items() if ok})
+                failed = [lst for lst, ok in lists_ok.items() if not ok]
+                if failed and res.error:
+                    warnings.append(f"{name}: {res.error}; " + ("its earlier rows of that list are used" if
+                                    len(failed) == 1 else "earlier rows of those lists are used"))  # fmt: skip
+            freeze = team_kickoff if kind == "signal" else kickoff_of  # D/ST rows are keyed by team
+            merged, counts = storage.merge_rows(old_rows, fetched, now, freeze, late_ok)
             storage.save_source(path, res, merged)
             info.update(merge=counts, last_success=res.fetched_at)
             rows = merged
         else:
             info["last_success"] = existing.get("last_success")
-            rows = existing.get("rows", {})
-            why = {"not_yet_published": f"week {week} not posted yet",
-                   SUSPECT: "this fetch looked incomplete and was skipped"}.get(res.status, res.status)  # fmt: skip
+            rows = old_rows
+            if res.status == "not_yet_published":  # named plainly: it's a page banner (§5.2)
+                why = f"{label}: week {week} not posted yet"
+            else:
+                why = f"{name}: " + {SUSPECT: "this fetch looked incomplete and was skipped"}.get(
+                    res.status, res.status
+                )
             why += f" ({res.error})" if res.error else ""
-            warnings.append(f"{name}: {why}" + ("; using earlier rows" if rows else ""))
+            warnings.append(why + ("; using earlier rows" if rows else ""))
         info["rows_used"] = len(rows)
         last = info.get("last_success")
         if not last or now - datetime.fromisoformat(last) > max_age:
@@ -498,34 +683,27 @@ def run_sync(
             info["stale"] = True
             run["sources"][name] = info
             continue
-        groups[name] = kind
+        run["sources"][name] = info
+        if kind == "signal":
+            signals[name] = rows  # shown as context, never blended (D18)
+            continue
         late_rows[name] = {pid: r for pid, r in rows.items() if r.get("late")}
         source_rows[name] = rows
-        values[name] = {
-            pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items() if pid in idp
-        }
-        if kind == "projection":  # zero-fill only players the source observed this week (§5.3)
-            stored = storage.load_source(path)
-            since = observed_after(stored, res.published_at)
-            zeros = zero_fill(stored, values[name], idp, status_of, res.published_at)
-            values[name].update(zeros)
-            zero_filled[name] = set(zeros)
-            placeholders[name] = set(stored.get("no_projection_ids") or [])
-            info.update(zero_filled=len(zeros), observed_after=since.isoformat() if since else None)
-        run["sources"][name] = info
+        docs[name] = {**storage.load_source(path), "kind": kind, "rows": rows}
+        published[name] = res.published_at
 
-    # zero-fills alone don't make a number for a player another source explicitly lists with no projection
-    # (e.g. a retired player Sleeper still carries as a placeholder and ESPN no longer lists): he stays
-    # "no projection", as before ESPN joined (§6.4)
-    listed_empty = set().union(*placeholders.values()) if placeholders else set()
-    only_zero = {pid for zf in zero_filled.values() for pid in zf if pid in listed_empty
-                 and all(pid in zero_filled.get(n, ()) for n in values if pid in values[n])}  # fmt: skip
-    for vals in values.values():
-        for pid in only_zero:
-            vals.pop(pid, None)
+    # values: projection sources first (P, P⁰), then each rank source mapped onto them (§6.4)
+    values, groups, details = source_values(docs, idp, sc, cfg, status_of, published)
+    for name, det in details.items():
+        run["sources"][name].update({k: v for k, v in det.items() if k != "ranks"})
+        if det.get("converted") is False:
+            warnings.append(f"{SOURCE_LABELS.get(name, name)}: ranks not converted to points this week (no "
+                            "projection source has values to map them onto)")  # fmt: skip
+    rank_parts = {name: det.get("ranks") or {} for name, det in details.items() if groups.get(name) == "rank"}
+    placeholders = {name: set(doc.get("no_projection_ids") or []) for name, doc in docs.items()}
     if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
-    cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg)
+    cons = consensus(values, groups, {pid: slot_of(idp[pid]) for pid in idp}, cfg, weights=prior_weights(cfg))
     late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
     for pid in late & cons.keys():
         cons[pid]["late"] = True  # projection first captured after his kickoff (SPEC §6.5)
@@ -542,6 +720,7 @@ def run_sync(
             "n_sources": c["n_sources"],
             "eff": c.get("eff") or {},
             "parts": {name: round(v[pid], 3) for name, v in values.items() if pid in v},
+            "ranks": {name: rp[pid] for name, rp in rank_parts.items() if pid in rp},  # rank sources (§6.4)
             "reasons": list(status_of(pid).reasons),
             "flags": list(status_of(pid).flags),
         }
@@ -551,7 +730,7 @@ def run_sync(
     for pid, rec in frozen.items():
         stored = rec.get("kickoff")
         if pid in idp and (status_of(pid).locked or (stored and datetime.fromisoformat(stored) <= now)):
-            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff", "parts")}
+            cons[pid] = {k: rec.get(k) for k in ("mu", "sigma", "min", "max", "n_sources", "eff", "parts", "ranks")}
 
     # waiver pool and tiers
     rostered = rostered_ids(rosters)
@@ -709,9 +888,11 @@ def run_sync(
             "names": names,
         }
 
+    backfill_notes: dict[str, dict] = {}
     backfilled = _guard("backfill", lambda: backfillmod.run(SOURCES, cfg, data_dir, season, range(1, week), now,
                                                            client=client, sleeper=sleeper, players=idp,
-                                                           matcher=matcher, priors=priors, log=log),
+                                                           matcher=matcher, priors=priors, log=log, schedule=sched,
+                                                           notes=backfill_notes),
                         {}, warnings, log)  # fmt: skip
     for name, weeks in backfilled.items():
         log(f"sync: backfilled {SOURCE_LABELS.get(name, name)} weeks {weeks}")  # a note, not a page banner
@@ -724,6 +905,7 @@ def run_sync(
         settles_at=settles.isoformat() if settles else None,
         warnings=warnings,
         backfilled=backfilled,
+        backfill_notes=backfill_notes,  # e.g. archived rank rows dropped as touched after kickoff (§5.2)
         actuals_written=actuals,
         impute_priors=(priors or {}).get("season"),  # None: built-in position rates (§6.2)
         window=window.id if window else "forced",
@@ -744,11 +926,23 @@ def run_sync(
         "sources": {name: footer_info(info) for name, info in run["sources"].items()},
         "warnings": warnings,
     }
+    dst_rows = next(iter(signals.values()), {})  # FantasyPros D/ST: "Team defense: #k this week (not used)"
     attach_breakdowns(
         site_data,
         lambda pid: breakdown(
-            pid, cons.get(pid), source_rows, values, groups, run["sources"], sc, kickoff_of(pid), now, placeholders
-        ),
+            pid,
+            cons.get(pid),
+            source_rows,
+            values,
+            groups,
+            run["sources"],
+            sc,
+            kickoff_of(pid),
+            rank_parts,
+            dst_rows.get((players.get(pid) or {}).get("team") or ""),
+            now,
+            placeholders,
+        ),  # fmt: skip
     )
     storage.write_json(wdir / "consensus.json", site_data)
     storage.write_json(frozen_path, {"schema_version": 1, "players": frozen})

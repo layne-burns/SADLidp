@@ -18,7 +18,9 @@ from sadlidp.sync import run_sync
 
 ROOT = Path(__file__).parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
-CFG = load_config(ROOT / "config" / "sadl.toml")
+FULL_CFG = load_config(ROOT / "config" / "sadl.toml")
+# these tests predate FantasyPros (PR 4): they run Sleeper (and ESPN) only; test_ranksources runs FULL_CFG
+CFG = {**FULL_CFG, "sources": {**FULL_CFG["sources"], "fantasypros": {"enabled": False}, "fp_dst": {"enabled": False}}}
 NOW = datetime(2026, 10, 6, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: inside the week-5 pre-waiver window
 LEAGUE = json.loads((FIXTURES / "sleeper_league.json").read_text())
 LID = LEAGUE["league_id"]

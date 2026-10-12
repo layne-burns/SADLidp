@@ -79,8 +79,10 @@ class Matcher:
         players: dict[str, dict],
         overrides: dict[str, dict[str, str]] | None = None,
         nicknames: dict[str, list[str]] | None = None,
+        crosswalk: dict[str, dict[str, str]] | None = None,
     ):
         self.players = players
+        self.crosswalk = crosswalk or {}  # id_field -> {source id: Sleeper id} (crosswalk.load, §6.1 step 3)
         self.nicknames = _symmetric(nicknames)
         self._idp: set[str] = set()
         self._by_name: dict[str, list[str]] = {}
@@ -115,9 +117,13 @@ class Matcher:
             self._by_id[field] = index
         return self._by_id[field]
 
-    def _crosswalk(self, source: str, source_id: str) -> str | None:
-        """§6.1 step 3, the crosswalk id (FantasyPros, PR 4): same IDP guard as step 2. Not wired up yet."""
-        return None
+    def _crosswalk(self, id_field: str, source_id: str) -> str | None:
+        """§6.1 step 3: the crosswalk's Sleeper id for `source_id`, only if it is an IDP whose own record lacks
+        `id_field` (where Sleeper carries the field, step 2 is authoritative)."""
+        pid = self.crosswalk.get(id_field, {}).get(source_id)
+        if pid is None or pid not in self._idp or self.players[pid].get(id_field) not in (None, ""):
+            return None
+        return pid
 
     def _eligible(self, pid: str, slot: str | None) -> bool:
         p = self.players[pid]
@@ -165,7 +171,7 @@ class Matcher:
             hits = self._id_index(id_field).get(sid, [])  # IDPs only: an id landing on a non-IDP is ignored
             if len(hits) == 1:
                 return Match(hits[0], "source_id")
-        if sid is not None and (pid := self._crosswalk(source, sid)) is not None:
+        if sid is not None and id_field and (pid := self._crosswalk(id_field, sid)) is not None:
             return Match(pid, "source_id")
         if team is None:
             return Match(None, "no_team")

@@ -50,6 +50,19 @@ enabled = true
 archive = true              # past weeks through scoringPeriodId
 late_rows = false
 
+[sources.fantasypros]       # free weekly ECR, DL/LB/DB pages (SPEC §5.2); ranks mapped onto projections (§6.4)
+enabled = true
+archive = true              # past weeks through ?week=N; rows touched after kickoff are dropped
+late_rows = false
+prior_weight = 0.5          # within the rank group (a 26-expert aggregate; §6.4)
+
+[sources.fp_dst]            # FantasyPros D/ST ECR: a signal shown as context, never blended (D18)
+enabled = true
+archive = true
+
+[censor]
+M = 10                      # an unlisted player with P⁰-rank ≤ D+M gets the rank max(D+1, P⁰-rank) (SPEC §6.4)
+
 [backfill]                  # per sync, after the live fetches (SPEC §5.3); the rest waits for the next sync
 budget_s = 300
 max_requests = 40           # per host

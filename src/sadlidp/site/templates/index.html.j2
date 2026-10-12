@@ -23,10 +23,13 @@
 {%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
 {%- macro bdbody(p) -%}{% if p.breakdown %}<div class="bdbody">
 {% for part in p.breakdown.parts %}{% if part.missing %}<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
+{% elif part.kind == 'rank' %}<div class="part"><b>{{ part.source }}</b> · {% if part.censored %}not in its {{ part.list }} list → counted as #{{ '%g'|format(part.rank) }}{% elif part.list %}{{ part.list }} #{{ '%g'|format(part.rank) }}{% if part.of %} of {{ part.of }}{% endif %}{% else %}ranked{% endif %} → {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}
+{% if part.censored %}<div class="sub">It ranks {{ part.depth }} {{ part.list }}s we project; he projects inside its range, so he counts just below its last listed player.</div>{% elif part.eff_rank is defined and part.eff_rank != part.rank %}<div class="sub">#{{ '%g'|format(part.eff_rank) }} among its players we project; a rank takes the points of the player we project at that rank.</div>{% endif %}</div>
 {% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.late %} · captured after kickoff{% endif %}
 {% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
 {% endif %}{% endfor %}
-{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.mu) }} pts{% if kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}.</div>{% endif %}
+{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.mu) }} pts{% if p.breakdown.split %} (projections {{ (p.breakdown.split.projection * 100)|round|int }}% / rankings {{ (p.breakdown.split.rank * 100)|round|int }}%){% elif kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}.</div>{% endif %}
+{% if p.breakdown.dst %}<div class="sub">Team defense: #{{ '%g'|format(p.breakdown.dst.rank) }} this week (not used)</div>{% endif %}
 {% if p.breakdown.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
 </div>{% endif %}{%- endmacro %}
 {%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
@@ -156,7 +159,7 @@
   <div class="scroll"><table class="sources">
     <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
     {% for name, s in d.sources.items() %}
-    <tr><td>{{ s.label or name }}</td><td>{{ 'from saved data' if s.status == 'saved' else s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
+    <tr><td>{{ s.label or name }}</td><td>{{ 'from saved data' if s.status == 'saved' else s.status }}{% if s.stale %} (stale, not used){% endif %}{% if s.lists %}<br><small>{% for n in (slots|list + s.lists|list)|unique if n in s.lists %}{% set x = s.lists[n] %}{{ n }} {{ 'not posted yet' if x.status == 'not_yet_published' else x.status }}{% if x.experts %} ({{ x.experts }} experts){% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
       <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
       <td>{% if s.match and s.match.rate is not none %}{{ '%.1f'|format(s.match.rate * 100) }}%{% if s.match.unmatched %}{% if s.match.names %}<details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>{% else %} <small>{{ s.match.unmatched }} unmatched</small>{% endif %}{% endif %}{% else %}—{% endif %}</td>
       <td>{{ s.last_success|et }}</td></tr>

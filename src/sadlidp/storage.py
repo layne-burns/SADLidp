@@ -102,6 +102,64 @@ def merge_rows(
     return merged, counts
 
 
+def list_ranks(row: dict) -> dict[str, float]:
+    """A rank row's lists: {list: rank} from its own `list`/`rank` and `other_lists` (§6.4 multi-list)."""
+    if not row.get("list") or row.get("rank") is None:
+        return {}
+    return {row["list"]: row["rank"], **(row.get("other_lists") or {})}
+
+
+def without_list(rows: dict[str, dict], name: str) -> dict[str, dict]:
+    """Rank rows with list `name` taken out: a row whose own list it was moves to its next list, or goes."""
+    out = {}
+    for pid, row in rows.items():
+        ranks = list_ranks(row)
+        if name not in ranks:
+            out[pid] = row
+            continue
+        ranks.pop(name)
+        if ranks:
+            out[pid] = _with_lists(row, ranks)
+    return out
+
+
+def _with_lists(row: dict, ranks: dict[str, float], order: tuple[str, ...] = ("DL", "LB", "DB")) -> dict:
+    """`row` holding exactly `ranks`; its own list stays if still there, else the first in `order`. Per-list
+    fields (rank_ave ...) belong to the old list and are dropped when the own list changes."""
+    home = row.get("list") if row.get("list") in ranks else next(n for n in (*order, *ranks) if n in ranks)
+    out = {k: v for k, v in row.items() if k != "other_lists"}
+    if home != row.get("list"):
+        out = {k: v for k, v in out.items() if not k.startswith("rank_")}
+    out.update(list=home, rank=ranks[home])
+    others = {n: r for n, r in ranks.items() if n != home}
+    return {**out, "other_lists": others} if others else out
+
+
+def list_scoped(existing: dict[str, dict], fetched: dict[str, dict], ok_lists: set[str]) -> dict[str, dict]:
+    """The rows a multi-list fetch stands for (SPEC §6.5 list-scoped merge): the fetched rows of its ok lists, plus
+    every earlier rank of the lists that failed, so merge_rows keeps those (stale) instead of deleting them."""
+    out = dict(fetched)
+    for pid, old in existing.items():
+        stale = {n: r for n, r in list_ranks(old).items() if n not in ok_lists}
+        if not stale:
+            continue
+        fresh = {n: r for n, r in list_ranks(out[pid]).items() if n in ok_lists} if pid in out else {}
+        base = out.get(pid)
+        if base is None or old.get("list") in stale:  # his own list failed: its row stays as it was
+            base = {k: v for k, v in old.items() if k not in ("fetched_at", "kickoff", "late")}
+        out[pid] = _with_lists(base, {**stale, **fresh})
+    return out
+
+
+def list_counts(rows: dict[str, dict]) -> dict[str, int]:
+    """Members per list of a rank source's rows."""
+    counts: dict[str, int] = {}
+    for row in rows.values():
+        for name in list_ranks(row):
+            counts[name] = counts.get(name, 0) + 1
+    return counts
+
+
 def load_source(path: Path) -> dict:
     return read_json(path, {"rows": {}})
 

@@ -54,6 +54,21 @@ def host_of(module) -> str:
     return getattr(module, "HOST", None) or urllib.parse.urlsplit(getattr(module, "URL", "")).hostname or module.NAME
 
 
+def drop_touched_after_kickoff(rows: dict[str, dict], players: dict, schedule, week: int):
+    """§5.2 archive rule: an archived list last touched at or after a player's kickoff (`list_published_at`) can't
+    be pre-game for him, so his row is dropped. Returns (kept rows, {list: dropped count})."""
+    kept, dropped = {}, {}
+    for pid, row in rows.items():
+        stamp = row.get("list_published_at")
+        game = schedule.game_for(row.get("team") or (players.get(pid) or {}).get("team"), week) if stamp else None
+        if game and game.kickoff and game.kickoff <= datetime.fromisoformat(stamp):
+            key = row.get("list") or "rows"
+            dropped[key] = dropped.get(key, 0) + 1
+        else:
+            kept[pid] = row
+    return kept, dropped
+
+
 def _all_backfilled(path: Path) -> bool:
     rows = storage.load_source(path).get("rows") or {}
     return all(r.get("backfill") for r in rows.values())
@@ -76,11 +91,15 @@ def run(
     redo: bool = False,
     log: Callable[[str], None] = print,
     clock: Callable[[], float] = time.monotonic,
+    schedule=None,
+    notes: dict | None = None,
 ) -> dict[str, list[int]]:
     """Fetch and save the missing past `weeks` of every archive source (`only` one, if named): {name: [weeks]}.
 
     `sources` is the sync's registry (name -> (module, kind)); `players` the IDP players. With `redo`, a week
-    that was backfilled before is fetched again; a week with live rows is never overwritten.
+    that was backfilled before is fetched again; a week with live rows is never overwritten. With a `schedule`,
+    rows stamped `list_published_at` are dropped for players whose kickoff is at or before it (§5.2); the counts
+    go to the adapter's report and to `notes[name][week]`.
     """
     bcfg = cfg.get("backfill") or {}
     budget_s = float(bcfg.get("budget_s", BUDGET_S))
@@ -130,11 +149,19 @@ def run(
                 log(f"backfill: {name} week {w}: {why}; retried next sync")
                 continue
             path = storage.week_dir(data_dir, season, w) / "sources" / f"{name}.json"
+            rows = res.rows
+            if schedule is not None:
+                rows, dropped = drop_touched_after_kickoff(rows, players, schedule, w)
+                if dropped:
+                    res.report["archive_dropped"] = dropped
+                    if notes is not None:
+                        notes.setdefault(name, {})[str(w)] = {"archive_dropped": dropped}
+                    log(f"backfill: {name} week {w}: dropped {sum(dropped.values())} rows listed after kickoff")
             stored = len(storage.load_source(path).get("rows") or {})
             shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
-            if stored and len(res.rows) < shrink * stored:  # a --redo never shrinks a week (SPEC §7)
-                log(f"backfill: {name} week {w}: {len(res.rows)} rows against {stored}; kept the stored rows")
+            if stored and len(rows) < shrink * stored:  # a --redo never shrinks a week (SPEC §7)
+                log(f"backfill: {name} week {w}: {len(rows)} rows against {stored}; kept the stored rows")
                 continue
-            storage.save_source(path, res, {pid: {**row, "backfill": True} for pid, row in res.rows.items()})
+            storage.save_source(path, res, {pid: {**row, "backfill": True} for pid, row in rows.items()})
             done.setdefault(name, []).append(w)
     return done

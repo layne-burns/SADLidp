@@ -4,6 +4,7 @@ sadlidp sync [--force] [--now ISO]   # gate, fetch, score, tier; writes data/<se
 sadlidp build                        # render the latest week into site/
 sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the sources' archives (§5.3)
 sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
+sadlidp replay --weeks 5 --season YYYY --fill-frozen     # add missing frozen records to a live week
 sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
 sadlidp backtest fetch|run --season YYYY                 # last season's archive: store it, test ideas on it
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
@@ -131,7 +132,8 @@ def cmd_replay(args: argparse.Namespace) -> int:
         if not matchups:
             print(f"replay: week {week}: no matchups ({err}); skipped")
             continue
-        out = replay_week(cfg, data_dir, args.season, week, matchups, players, log=lambda m: None)
+        out = replay_week(cfg, data_dir, args.season, week, matchups, players, log=print if args.fill_frozen else
+                          lambda m: None, fill_frozen=args.fill_frozen)  # fmt: skip
         print(f"replay: week {week} -> {out}")
     return 0
 
@@ -247,6 +249,11 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("replay", parents=[common], help="rebuild past weeks' pages from saved data")
     p.add_argument("--weeks", required=True, help="e.g. 1-4")
     p.add_argument("--season", type=int, required=True)
+    p.add_argument(
+        "--fill-frozen",
+        action="store_true",
+        help="only add rebuilt records for players a live week's frozen record lacks (page kept)",
+    )
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_replay)
     p = sub.add_parser("tune", parents=[common], help="measure the tiers against final scores (read-only)")

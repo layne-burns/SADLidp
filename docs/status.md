@@ -1,71 +1,62 @@
-# SADL IDP streamer: open goals (written 2026-10-12 10:06 UTC, before the pause)
+# SADL IDP streamer: open goals (updated 2026-10-14)
 
-Work resumes at **14:30 UTC (8:30 AM owner time)**. Everything below is not done yet, in the order it will
-be worked. Done so far: Phase 2 MVP (#2), locked suggestions + scored results + week picker + weeks 1–4
-rebuilt (#3), Stats page + per-player breakdown + deploy-on-merge (#4). The live page updates by itself
-after every merge to `main` that changes code or config.
+The two working sessions are now one. Merged on `main`:
+- #2–#5: MVP; locked suggestions and results; Stats page with per-player breakdown; ESPN.
+- #7: FantasyPros.
+- #8: tier tuning.
+- #9: methods review.
+- #10: 2025 backtest harness.
+- #11: form term.
+- #12: per-player swing with floor–ceiling.
 
-## 1. Finish PR 3: ESPN as a second projection source (#5: reviewed, fixes pushed; merging)
-State: committed and pushed on `claude/compassionate-archimedes-fqrz1j` (5e8a636), rebased on main,
-204 tests pass. A live run worked: ESPN 1,511 IDPs, 99.7% matched to Sleeper, weeks 1–4 backfilled for
-both sources, 50/50 blend with ESPN's estimated stats (TFL, QB hits) marked `*`.
-To do:
-- [ ] My own read of the diff (matching, imputation, ESPN adapter, backfill runner, observation rule).
-- [ ] Fix what the integration agent flagged:
-  - ESPN week files are ~450–500 KB: round the stored values.
-  - `published_at` is not saved in source files.
-  - 3 unmatched players (Jeremiah Moon, Victor Dimukeje, Keshawn Banks): add `player_overrides.toml` entries.
-  - Week 5: ESPN was first read after most week-5 games, so ESPN's week 5 holds only the Monday-night
-    players (by design: no post-game values). Say so on the Stats page.
-- [ ] Adversarial review workflow (several lenses), fix the confirmed findings.
-- [ ] Open the PR, CI + live preview checked, merge. **Must merge before Tue Oct 13, 3 PM ET**, so the
-  pre-waiver sync captures ESPN's live week-6 rows. They are needed for ESPN's archive-integrity check.
+The live page updates itself after every merge that changes code or config.
 
-## 2. Sleeper archive-integrity check (scheduled)
-- 00:05 UTC Oct 13: snapshot of the Monday-night (BUF @ LAR) projections just before kickoff, pushed to the
-  `integrity-checks` branch.
-- 09:30 UTC Oct 13: compare with Sleeper's rows after the game. If they match, Sleeper's archive is
-  trustworthy:
-  - record it in SPEC §13;
-  - switch `sigma_out.method` to `residuals` (calibrated START/UPGRADE odds);
-  - allow late and backfilled rows in accuracy weights.
-  If not, keep them display-only.
+Data review (weeks 1–5): a private report for the owner. Findings, in short:
+- Suggestions paid off 21 of 25.
+- The blend beats a player's season average at every position.
+- Tiers work at LB; at DL and DB they are noise so far.
+- The three sources tie on accuracy.
+- The floor–ceiling ranges are the right width.
+- Sleeper's archive passed the integrity check.
 
-## 3. PR 4: FantasyPros ECR + rank → value mapping (built 2026-10-12, draft PR open)
-- [x] FantasyPros DL/LB/DB ranking pages (free ECR, `?week=N` for past weeks, crawl-delay 5 s).
-- [x] Crosswalk ids (DynastyProcess) and list-scoped merges.
-- [x] Rank → points mapping (SPEC §6.4: V/Q curves, the two-list rule, censoring of observed players only).
-- [x] Projections/rankings group split with the 60:40 prior.
-- [x] FantasyPros D/ST ranks captured as a signal only (D18), never blended.
-- [ ] CI + live preview checked, merge.
+## 1. Week-5 frozen gap (this PR)
+- [x] `sadlidp replay --fill-frozen`, and week 5 filled: 581 rebuilt records, 50 live records kept.
+- [x] Snap share by role tested on 2025 and rejected: it predicted worse.
 
-## 4. PR 5: RotoBaller + FantasyData + a Thursday sync window
-- RotoBaller weekly IDP article:
-  - found through its search RSS;
-  - three 50-row tables;
-  - team nicknames;
-  - opponent taken from the schedule;
-  - posted Thursday morning.
-- FantasyData DL/LB/DB rankings (100 deep, matched by `fantasy_data_id`).
-- Thursday 11:00 ET window so RotoBaller makes it in before TNF (amends D13).
+## 2. Interface PR (owner's asks, 2026-10-14)
+- [ ] Stats page views: Last week / All season / any single week.
+- [ ] Weekly report card at the top of the main page:
+  - your players vs projection;
+  - suggestions paid off x of y;
+  - biggest hit and miss.
+- [ ] DB note: projections can't separate waiver DBs (2026 r 0.04, 2025 r 0.01); lean on snaps and form.
+- [ ] Plainer card wording for the form term and the floor–ceiling.
 
-## 5. PR 6: accuracy weights + full Stats + team-defense backtest
+## 3. PR 6: accuracy weights + team-defense backtest
 - Per-source weights from measured accuracy:
   - shrunk toward the priors with k = 4;
-  - uses evaluated weeks up to N−2;
-  - the weights in force each week are recorded.
-- Calibrated START/UPGRADE odds.
-- Weights over time on the Stats page.
-- Archive-integrity gates per source.
-- `sadlidp backtest dst` on 2025: does the owner's team-defense rank idea add anything? It is used only
-  if it passes.
+  - computed from weeks up to N−2;
+  - recorded each week.
+- `sadlidp backtest dst` on 2025: used only if it passes.
+- Expect small changes: the sources tie on accuracy so far.
 
-## 6. Later
-- Phase 5, Vegas odds (D18). Needs owner decisions:
-  - which signal: game lines, props, or both;
-  - how it enters the tiers;
-  - whether to get an Odds API key.
-- Phase 6, polish: tune `z`, UI refinements.
+## 4. PR 5: RotoBaller + FantasyData + Thursday window
+- Spec drafted at `../SADLidp-pr5` (ffdd6d6) on an old base; rebuild it on `main`, where FantasyPros is `fp_ecr`.
+
+## 5. Research (2025 archive first)
+- Does the form term still help for players whose projections already moved after their big games?
+  Greg Rousseau is the example.
+
+## How parameters get tuned (owner question, 2026-10-14)
+Nothing re-fits itself today:
+- the form and swing coefficients were fitted on 2025;
+- z was set with `sadlidp tune`;
+- the source shares are priors.
+
+Plan:
+- **Weekly, automatic (PR 6):** only the source weights. They are shrunk toward the priors, lagged two weeks and recorded.
+- **Checkpoints (around week 9 and week 13):** re-fit the form, swing and z on 2025 + 2026 pooled. A new value is adopted only if it beats the current one on held-out weeks.
+- **Never:** a weekly re-fit of everything. Five weeks is about 250 games per position, too few to re-fit without chasing noise.
 
 ## Owner questions still open
-- The Vegas odds questions above (no rush; after PR 6).
+- Vegas odds (game lines, props, or both; an Odds API key): after PR 6.

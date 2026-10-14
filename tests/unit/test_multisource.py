@@ -351,7 +351,11 @@ def test_stats_score_each_source_on_the_consensus_pool(tmp_path):
     env = Environment(loader=PackageLoader("sadlidp.site", "templates"), autoescape=True)
     html = env.get_template("stats.html.j2").render(s=ev, slots=("DL", "LB", "DB"), league_name="SADL")
     assert "Each source on the same players" in html and "<td>ESPN</td><td>LB</td>" in html
-    assert "Sleeper and ESPN have an equal say (50% each)" in html and "60% <small>(90)</small>" in html
+    assert (
+        "Sleeper 50%, ESPN 50%" in html
+        and "starting shares: sources equal." in html
+        and "60% <small>(90)</small>" in html
+    )
     single = env.get_template("stats.html.j2").render(s=ev1, slots=("DL", "LB", "DB"), league_name="SADL")
     assert "Each source on the same players" not in single and "Only Sleeper so far" in single
 

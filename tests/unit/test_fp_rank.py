@@ -280,7 +280,7 @@ def test_stats_score_fp_on_its_mapped_points(tmp_path):
     assert w1["mae"] == pytest.approx(sum(abs(fp[p] - actual[p]) for p in covered) / len(covered))
     env = Environment(loader=PackageLoader("sadlidp.site", "templates"), autoescape=True)
     html = env.get_template("stats.html.j2").render(s=ev, slots=("DL", "LB", "DB"), league_name="SADL")
-    assert "rankings (FantasyPros) 40%" in html and "Sleeper 60%" in html
+    assert "Sleeper 60%, FantasyPros 40%" in html and "projections 60%, rankings 40%" in html
 
 
 def test_replay_reads_fp_from_its_saved_file_and_skips_the_signal(tmp_path):

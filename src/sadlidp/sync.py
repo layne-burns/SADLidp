@@ -12,11 +12,11 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from . import accuracy, scoring, storage, swing, weeklog
 from . import backfill as backfillmod
 from . import crosswalk as crosswalkmod
 from . import form as formmod
 from . import gate as gatemod
-from . import scoring, storage, swing, weeklog
 from .backfill import imputer_for, source_cfg
 from .config import load_alias
 from .consensus import consensus
@@ -644,7 +644,12 @@ def run_sync(
     if not any(values.values()):
         warnings.append("no source has usable rows for this week yet; the tiers are empty until one does")
     slots = {pid: slot_of(idp[pid]) for pid in idp}
-    cons = consensus(values, groups, slots, cfg)
+    rec = _guard("source weights", lambda: accuracy.in_force(data_dir, season, week, sched, cfg, now), None,
+                 warnings, log)  # fmt: skip
+    if rec is None:  # a failure falls back to the priors for this sync and records nothing
+        rec = accuracy.weights({"from_weeks": [], "sources": {}, "alpha_hat_raw": None, "alpha_n": 0}, cfg)
+    run["weights"] = rec
+    cons = consensus(values, groups, slots, cfg, weights=accuracy.source_weights(rec), alpha=float(rec["alpha"]))
     coef = formmod.coefficients(cfg)
     if coef:  # the form term (SPEC §6.4): his earlier misses this season and his last game's snap share
         run["form"] = {**coef, **formmod.apply(cons, slots, formmod.history(data_dir, season, week, sc), coef)}

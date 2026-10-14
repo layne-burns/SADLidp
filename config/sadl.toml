@@ -50,6 +50,10 @@ DB = 5.0
 
 [weights]
 prior_split = 0.6           # projection : rank group prior (D11)
+k = 4                       # shrinkage of the accuracy weights, in weeks: after n weeks the data counts n/(n+k) (§6.5)
+
+[accuracy]                  # accuracy weights (SPEC §6.5 Implementation)
+untrusted = []              # sources whose archived/late rows don't count yet; Sleeper, ESPN and FP have passed (§13)
 
 [form]                      # the form term added to μ (SPEC §6.4): his earlier misses this season and his last game's snaps
 enabled = true

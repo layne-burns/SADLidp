@@ -19,10 +19,13 @@ def consensus(
     cfg: dict,
     weights: dict[str, float] | None = None,
     private: frozenset[str] = frozenset(),
+    alpha: float | None = None,
 ) -> dict[str, dict]:
-    """values[source][player] = SADL points; groups[source] in {"projection", "rank"}."""
+    """values[source][player] = SADL points; groups[source] in {"projection", "rank"}. `weights` are the
+    within-group source weights and `alpha` the projection group's share (§6.5); both default to the priors."""
     tcfg = cfg.get("tiers") or {}
-    alpha = float((cfg.get("weights") or {}).get("prior_split", 0.6))
+    if alpha is None:
+        alpha = float((cfg.get("weights") or {}).get("prior_split", 0.6))
     nu0 = float(tcfg.get("nu0", 2))
     s0_default = float(tcfg.get("s0_default", 1.0))
     floors = tcfg.get("sigma_floor") or {}

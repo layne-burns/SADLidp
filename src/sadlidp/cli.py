@@ -6,7 +6,7 @@ sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the 
 sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
 sadlidp replay --weeks 5 --season YYYY --fill-frozen     # add missing frozen records to a live week
 sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
-sadlidp backtest fetch|run --season YYYY                 # last season's archive: store it, test ideas on it
+sadlidp backtest fetch|run|dst-fetch|dst --season YYYY   # last season's archive: store it, test ideas on it
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -166,7 +166,7 @@ def cmd_tune(args: argparse.Namespace) -> int:
 
 def cmd_backtest(args: argparse.Namespace) -> int:
     """Last season's Sleeper archive: `fetch` stores it compactly, `run` scores the standard checks."""
-    from . import backtest
+    from . import backtest, storage
     from .sleeper import Sleeper
     from .sync import make_client
 
@@ -177,6 +177,21 @@ def cmd_backtest(args: argparse.Namespace) -> int:
     if not sc:
         print(f"backtest: no league.json for {season + 1} to score {season} with")
         return 1
+    if args.what == "dst-fetch":
+        from . import dstbacktest
+
+        print(f"backtest dst: wrote {dstbacktest.fetch(make_client(cfg), data_dir, season, cfg)}")
+        return 0
+    if args.what == "dst":
+        from . import dstbacktest
+
+        rep = dstbacktest.run(data_dir, season, sc)
+        if not rep:
+            print("backtest dst: no D/ST archive; run `sadlidp backtest dst-fetch` first")
+            return 1
+        print(dstbacktest.format_report(rep))
+        storage.write_json(data_dir / str(season) / "dst_backtest.json", dstbacktest.summary(rep))
+        return 0
     if args.what == "fetch":
         sleeper = Sleeper(make_client(cfg), args.cache_dir)
         players = {str(k): v for k, v in sleeper.players(datetime.now(ET).date().isoformat()).items()}
@@ -261,7 +276,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_tune)
     p = sub.add_parser("backtest", parents=[common], help="last season's archive: fetch it, run the checks")
-    p.add_argument("what", choices=["fetch", "run"])
+    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst"])
     p.add_argument("--season", type=int, help="the archived season (default: last year)")
     p.add_argument("--redo", action="store_true", help="refetch weeks already archived")
     p.add_argument("--cache-dir", default=".cache")

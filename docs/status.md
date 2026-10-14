@@ -33,12 +33,12 @@ Data review (weeks 1–5): a private report for the owner. Findings, in short:
 - [x] Plainer card wording for the form term and the floor–ceiling.
 
 ## 3. PR 6: accuracy weights + team-defense backtest
-- Per-source weights from measured accuracy:
-  - shrunk toward the priors with k = 4;
-  - computed from weeks up to N−2;
-  - recorded each week.
-- `sadlidp backtest dst` on 2025: used only if it passes.
-- Expect small changes: the sources tie on accuracy so far.
+- [x] 6a, accuracy weights (#16, merged): week 7 on, the source shares follow accuracy (expected: projections 70%, rankings 30%; Sleeper and ESPN about equal). Recorded per week in `weights.json`.
+- [x] ESPN archive integrity: passed, 37 of 37 Monday-night rows.
+- [x] 6b, team-defense backtest: neither D/ST rank nor opponent implied points helps (2025 and 2026 weeks 1–5); not used.
+- [ ] Checkpoints at week 9 and week 13:
+  - re-run `sadlidp backtest dst` with 2026 added;
+  - re-fit form, swing and z on 2025 + 2026 (adopt only if held-out improves).
 
 ## 4. PR 5: RotoBaller + FantasyData + Thursday window
 - Spec drafted at `../SADLidp-pr5` (ffdd6d6) on an old base; rebuild it on `main`, where FantasyPros is `fp_ecr`.

@@ -414,6 +414,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "sources": _shares(kinds, season_by_source, float((cfg.get("weights") or {}).get("prior_split", 0.6)))
         or [{"name": "Sleeper", "share": 1.0, "kind": "projection"}],
         "prior_split": float((cfg.get("weights") or {}).get("prior_split", 0.6)),
+        "dst_backtest": storage.read_json(Path(data_dir) / str(season - 1) / "dst_backtest.json"),
         "weights_history": weights_history(season_dir, float((cfg.get("weights") or {}).get("prior_split", 0.6))),
         "sigma_out": so,
         "n_eval": N_EVAL,

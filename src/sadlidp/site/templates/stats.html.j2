@@ -190,6 +190,26 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     </div>
   </section>
 
+  {% set dst = s.dst_backtest %}
+  {% if dst and dst.positions %}
+  <section aria-labelledby="dst-h">
+    <h2 id="dst-h">Your team-defense idea: tested, not used</h2>
+    <div class="slot">
+      <p>{% if dst.passes %}At least one signal passed on last season; see the table. It isn't used until it also helps this season.{% else %}Neither signal helped on last season ({{ dst.season }}, weeks {{ dst.weeks[0] }}–{{ dst.weeks[-1] }}), so neither is used.{% endif %}
+        For each position's 60 best-projected players every week, we checked whether a player beat his projection more often when his defense was ranked better by FantasyPros, or when Vegas expected the other team to score less.</p>
+      <div class="scroll"><table>
+        <tr><th>Pos</th><th>Team D/ST rank</th><th>Opponent's expected points</th><th class="num">Avg miss without → with</th></tr>
+        {% for slot in slots %}{% set p = dst.positions.get(slot) %}{% if p %}
+        <tr><td>{{ slot }}</td>
+          {% for key in ('rank', 'opp_implied') %}{% set x = p.signals[key] %}<td>{{ '%+.2f'|format(x.per_unit) }} per {{ 'place' if key == 'rank' else 'point' }} <small>({{ 'clear' if x.t|abs >= 2 else 'within noise' }}{% if not x.halves_agree %}; flips between halves{% endif %})</small></td>{% endfor %}
+          <td class="num">{{ '%.2f'|format(p.mae.projection) }} → {{ '%.2f'|format(p.mae['with signals']) }}</td></tr>
+        {% endif %}{% endfor %}
+      </table></div>
+      <p class="note">Points per place of rank (a positive number means a worse-ranked defense's players beat their projection more) and per point of the opponent's expected score. "Within noise" means less than two standard errors from zero. "Avg miss" is on weeks the fit didn't see. It's re-checked with this season's games at weeks 9 and 13.</p>
+    </div>
+  </section>
+  {% endif %}
+
   <details class="slot"><summary><b>What these mean</b></summary>
     <ul class="glossary">
       <li><b>Avg miss</b>: the average gap between our number and what the player scored. Lower is better.</li>

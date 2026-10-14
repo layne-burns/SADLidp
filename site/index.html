@@ -1,0 +1,2378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SADL IDP Streamer</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+  --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
+    --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 18px; }
+h1 { font-size: 1.35rem; margin: 0 0 2px; }
+h2 { font-size: 1.1rem; margin: 22px 0 8px; }
+h3 { font-size: 1rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.meta, .count, .sub, small, .note, .hidden-note { color: var(--muted); }
+.count { font-size: .85rem; font-weight: normal; }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.card, .slot { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 0; }
+li.item { border-top: 1px solid var(--line); }
+li.item:first-child { border-top: 0; }
+.bd > summary { list-style: none; cursor: pointer; }
+.bd > summary::-webkit-details-marker { display: none; }
+.bd > summary .name::before { content: "▸ "; color: var(--muted); font-weight: normal; }
+.bd[open] > summary .name::before { content: "▾ "; }
+.bdbody { padding: 2px 0 10px 14px; font-size: .88rem; }
+.part { padding: 3px 0; }
+.part.missing { color: var(--muted); }
+.mini > summary { list-style: none; cursor: pointer; color: var(--accent); font-size: .85rem; }
+.mini > summary::-webkit-details-marker { display: none; }
+.name { font-weight: 600; }
+.sub { font-size: .85rem; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pts small { font-weight: normal; margin-left: 2px; }
+.pts .band { font-size: .72rem; font-weight: normal; color: var(--muted); }
+.tag, .chip { display: inline-block; font-size: .72rem; border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+  border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.tag.q { color: var(--warn); border-color: var(--warn); }
+.tag.bad { color: var(--bad); border-color: var(--bad); }
+.chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
+.chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
+.sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
+.res { display: block; font-size: .8rem; font-weight: 600; color: var(--text); }
+.res.live { color: var(--warn); }
+.res.dnp { color: var(--muted); font-weight: normal; }
+.out { font-weight: 700; }
+.out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
+.card.played { opacity: .95; border-style: dashed; }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
+.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .85rem; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabpanel { display: none; margin-top: 12px; }
+#tab-DL:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DL:checked ~ #panel-DL { display: block; }
+#tab-LB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-LB:checked ~ #panel-LB { display: block; }
+#tab-DB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DB:checked ~ #panel-DB { display: block; }
+
+.tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+footer { padding-bottom: 30px; font-size: .85rem; }
+a { color: var(--accent); }
+.scroll { overflow-x: auto; }
+table.sources td, table.sources th { overflow-wrap: normal; word-break: normal; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SADL IDP streamer</h1>
+  <p class="meta"><a href="stats.html">How the numbers did →</a></p>
+  <p class="meta">Slow Ass Draft League · 2026 Week 6 · data as of <time id="asof" datetime="2026-10-14T14:52:02-04:00">Wed Oct 14, 2:52 PM ET</time> · FAAB waivers</p>
+  <nav class="weeks" aria-label="Weeks"><a href="week-2026-01.html">Week 1</a><a href="week-2026-02.html">Week 2</a><a href="week-2026-03.html">Week 3</a><a href="week-2026-04.html">Week 4</a><a href="week-2026-05.html">Week 5</a><a href="week-2026-06.html" class="here" aria-current="page">Week 6 · now</a></nav>
+  
+  
+  <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
+  
+  
+</header>
+<main>
+  <section aria-labelledby="my-h">
+    <h2 id="my-h">My IDPs</h2>
+    
+    <div class="slot">
+      <h3>DL <span class="count">1/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Greg Rousseau</span>
+            <span class="tag">projected starter</span>
+            
+            <span class="tag">also LB</span>
+
+
+
+            <div class="sub">BUF @ LV · above Tier 1 · 80% of snaps last game</div></div>
+          <div class="pts">17.8<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–26</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 14.8 pts · 30% of his number
+<div class="sub">2.2 solo · 1.2 ast · 0.9 TFL · 0.8 sack · 1.5 QB hit · 0.3 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 14.9 pts · 30% of his number
+<div class="sub">2.2 solo · 1.6 ast · 0.9 TFL* · 0.6 sack · 1.8 QB hit* · 0.1 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · DL rank #9
+</div>
+
+<div class="part"><b>Form</b> · +4.1 pts
+<div class="sub">beat his projection by 12.6 per game over 5 games this season, counted as +7.0 after shrinking: +3.1</div>
+<div class="sub">80% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +1.0</div>
+</div>
+<div class="sub">Weighted average = 13.7 pts; with form +4.1 = 17.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±10.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 26.</div>
+</div></details></li>
+        
+      </ul>
+      
+      
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>LB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Roquan Smith</span>
+            <span class="tag">projected starter</span>
+            
+            
+
+
+
+            <div class="sub">BAL @ CLE · Tier 1 · 100% of snaps last game</div></div>
+          <div class="pts">17.1<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">11–23</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 15.3 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.3 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.3 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 16.4 pts · 40% of his number · LB rank #5
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">beat his projection by 0.6 per game over 4 games this season, counted as +0.3 after shrinking: +0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 16.3 pts; with form +0.8 = 17.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 11 and 23.</div>
+</div></details></li>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Alex Singleton</span>
+            
+            
+            
+
+
+
+            <div class="sub">DEN vs SEA · Tier 1 · 100% of snaps last game</div></div>
+          <div class="pts">16.8<small>±2.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">11–22</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.5 pts · 30% of his number
+<div class="sub">3.2 solo · 3.5 ast · 0.2 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 17.1 pts · 30% of his number
+<div class="sub">5.1 solo · 4.1 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 16.9 pts · 40% of his number · LB rank #3
+</div>
+
+<div class="part"><b>Form</b> · +1.5 pts
+<div class="sub">beat his projection by 3.9 per game over 4 games this season, counted as +1.9 after shrinking: +0.8</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 15.4 pts; with form +1.5 = 16.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 11 and 22.</div>
+</div></details></li>
+        
+      </ul>
+      
+      
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>DB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Jaquan Brisker</span>
+            
+            
+            
+
+
+
+            <div class="sub">PIT @ TB · Tier 2 · 100% of snaps last game</div></div>
+          <div class="pts">12.6<small>±1.6</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.6 pts · 30% of his number
+<div class="sub">3.0 solo · 2.3 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.6 pts · 30% of his number
+<div class="sub">4.2 solo · 2.4 ast · 0.1 TFL* · 0.1 QB hit* · 0.6 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.0 pts · 40% of his number · DB rank #24
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">trailed his projection by 0.1 per game over 4 games this season, counted as -0.0 after shrinking: -0.0</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 12.3 pts; with form +0.2 = 12.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 18.</div>
+</div></details></li>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Evan Williams</span>
+            <span class="tag">projected starter</span>
+            
+            
+
+
+
+            <div class="sub">GB vs DAL · Tier 1 · 100% of snaps last game</div></div>
+          <div class="pts">15.1<small>±1.9</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.8 pts · 30% of his number
+<div class="sub">2.9 solo · 2.9 ast · 0.2 TFL · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 15.5 pts · 30% of his number
+<div class="sub">4.4 solo · 2.6 ast · 0.3 TFL* · 0.1 sack · 0.2 QB hit* · 0.6 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 15.1 pts · 40% of his number · DB rank #3
+</div>
+
+<div class="part"><b>Form</b> · +1.2 pts
+<div class="sub">beat his projection by 9.1 per game over 4 games this season, counted as +4.5 after shrinking: +0.9</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 13.9 pts; with form +1.2 = 15.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 20.</div>
+</div></details></li>
+        
+      </ul>
+      <p class="note">DB odds are the weakest: among waiver DBs the projections barely separate players (see the DB tab).</p>
+      
+      
+      
+    </div>
+    
+  </section>
+
+  <section aria-labelledby="tiers-h">
+    <h2 id="tiers-h">Streaming tiers (available players)</h2>
+    <div class="tabs">
+      <input type="radio" name="pos" id="tab-DL" checked><label for="tab-DL">DL</label><input type="radio" name="pos" id="tab-LB"><label for="tab-LB">LB</label><input type="radio" name="pos" id="tab-DB"><label for="tab-DB">DB</label>
+      
+      <div class="tabpanel" id="panel-DL">
+        
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chase Young</span>
+                
+                
+
+
+
+                <div class="sub">NO @ NYG · range 9.0–11.6 (3 sources) · 72% of snaps last game</div></div>
+              <div class="pts">11.8<small>±1.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.0 pts · 30% of his number
+<div class="sub">1.3 solo · 0.8 ast · 0.6 TFL · 0.5 sack · 1.0 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.2 pts · 30% of his number
+<div class="sub">1.4 solo · 1.1 ast · 0.6 TFL* · 0.6 sack · 1.0 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.6 pts · 40% of his number · DL rank #11
+</div>
+
+<div class="part"><b>Form</b> · +1.1 pts
+<div class="sub">beat his projection by 3.5 per game over 4 games this season, counted as +1.8 after shrinking: +0.8</div>
+<div class="sub">72% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.3</div>
+</div>
+<div class="sub">Weighted average = 10.7 pts; with form +1.1 = 11.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±9.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Travon Walker</span>
+                
+                
+
+
+
+                <div class="sub">JAX vs HOU · range 9.2–12.1 (3 sources) · 87% of snaps last game</div></div>
+              <div class="pts">11.5<small>±1.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">4–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.2 pts · 30% of his number
+<div class="sub">1.5 solo · 1.3 ast · 0.6 TFL · 0.4 sack · 0.9 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.1 pts · 30% of his number
+<div class="sub">1.9 solo · 1.4 ast · 0.6 TFL* · 0.5 sack · 1.6 QB hit* · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 10.5 pts · 40% of his number · DL rank #20
+</div>
+
+<div class="part"><b>Form</b> · +0.9 pts
+<div class="sub">trailed his projection by 2.4 per game over 4 games this season, counted as -1.2 after shrinking: -0.5</div>
+<div class="sub">87% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +1.5</div>
+</div>
+<div class="sub">Weighted average = 10.6 pts; with form +0.9 = 11.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 4 and 18.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Donovan Ezeiruaku</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">DAL @ GB · range 9.2–11.3 (3 sources) · 75% of snaps last game</div></div>
+              <div class="pts">10.8<small>±1.0</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">4–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.3 pts · 30% of his number
+<div class="sub">2.1 solo · 2.4 ast · 0.8 TFL · 0.4 sack · 0.9 QB hit · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 10.3 pts · 30% of his number
+<div class="sub">2.0 solo · 1.5 ast · 0.5 TFL* · 0.3 sack · 0.9 QB hit* · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 9.2 pts · 40% of his number · DL rank #29
+</div>
+
+<div class="part"><b>Form</b> · +0.7 pts
+<div class="sub">beat his projection by 0.4 per game over 4 games this season, counted as +0.2 after shrinking: +0.1</div>
+<div class="sub">75% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.6</div>
+</div>
+<div class="sub">Weighted average = 10.2 pts; with form +0.7 = 10.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.2 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 4 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Leonard Williams</span>
+                
+                
+<span class="tag q">Q</span>
+
+
+                <div class="sub">SEA @ DEN · range 8.7–10.4 (3 sources) · 73% of snaps last game</div></div>
+              <div class="pts">10.8<small>±1.0</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.9 pts · 30% of his number
+<div class="sub">1.7 solo · 1.5 ast · 0.5 TFL · 0.3 sack · 1.0 QB hit · 0.1 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.7 pts · 30% of his number
+<div class="sub">1.5 solo · 1.6 ast · 0.7 TFL* · 0.3 sack · 0.8 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 10.4 pts · 40% of his number · DL rank #21
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">beat his projection by 4.0 per game over 4 games this season, counted as +2.0 after shrinking: +0.9</div>
+<div class="sub">73% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.4</div>
+</div>
+<div class="sub">Weighted average = 9.4 pts; with form +1.3 = 10.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 16.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Lukas Van Ness</span>
+                
+                
+
+
+
+                <div class="sub">GB vs DAL · range 8.0–10.3 (3 sources) · 58% of snaps last game</div></div>
+              <div class="pts">10.4<small>±1.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">4–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.0 pts · 30% of his number
+<div class="sub">1.4 solo · 0.9 ast · 0.4 TFL · 0.5 sack · 0.8 QB hit</div></div>
+<div class="part"><b>ESPN</b> · 9.9 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.6 TFL* · 0.4 sack · 1.1 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 10.3 pts · 40% of his number · DL rank #22
+</div>
+
+<div class="part"><b>Form</b> · +0.9 pts
+<div class="sub">beat his projection by 6.9 per game over 4 games this season, counted as +3.5 after shrinking: +1.6</div>
+<div class="sub">58% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.7</div>
+</div>
+<div class="sub">Weighted average = 9.5 pts; with form +0.9 = 10.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 4 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tavius Robinson</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">BAL @ CLE · range 5.3–12.4 (3 sources) · 75% of snaps last game</div></div>
+              <div class="pts">10.0<small>±2.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 5.3 pts · 30% of his number
+<div class="sub">0.8 solo · 0.7 ast · 0.1 TFL · 0.4 sack · 0.4 QB hit · 0.1 PD</div></div>
+<div class="part"><b>ESPN</b> · 12.4 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.5 TFL* · 0.6 sack · 1.5 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 9.1 pts · 40% of his number · DL rank #34
+</div>
+
+<div class="part"><b>Form</b> · +1.1 pts
+<div class="sub">beat his projection by 2.2 per game over 4 games this season, counted as +1.1 after shrinking: +0.5</div>
+<div class="sub">75% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.6</div>
+</div>
+<div class="sub">Weighted average = 8.9 pts; with form +1.1 = 10.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Deone Walker</span>
+                
+                
+
+
+
+                <div class="sub">BUF @ LV · range 7.5–8.1 (3 sources) · 77% of snaps last game</div></div>
+              <div class="pts">9.4<small>±0.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">4–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.1 pts · 30% of his number
+<div class="sub">1.3 solo · 1.4 ast · 0.5 TFL · 0.2 sack · 0.4 QB hit · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 7.5 pts · 30% of his number
+<div class="sub">1.4 solo · 1.5 ast · 0.5 TFL* · 0.2 sack · 0.7 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 7.7 pts · 40% of his number · DL rank #54
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">beat his projection by 3.7 per game over 5 games this season, counted as +2.0 after shrinking: +0.9</div>
+<div class="sub">77% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 7.8 pts; with form +1.6 = 9.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 4 and 15.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 3</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chris Jones</span>
+                
+                
+
+
+
+                <div class="sub">KC vs LAC · range 8.2–8.9 (3 sources) · 81% of snaps last game</div></div>
+              <div class="pts">9.3<small>±0.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.9 pts · 30% of his number
+<div class="sub">1.0 solo · 0.8 ast · 0.7 TFL · 0.4 sack · 1.4 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 8.2 pts · 30% of his number
+<div class="sub">1.1 solo · 1.2 ast · 0.5 TFL* · 0.4 sack · 1.3 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 8.6 pts · 40% of his number · DL rank #43
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">trailed his projection by 1.1 per game over 4 games this season, counted as -0.6 after shrinking: -0.2</div>
+<div class="sub">81% of his team's defensive snaps last game (week 4), against 67% for the position's 60 best-projected: +1.0</div>
+</div>
+<div class="sub">Weighted average = 8.6 pts; with form +0.8 = 9.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 15.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Quinnen Williams</span>
+                
+                
+
+
+
+                <div class="sub">DAL @ GB · range 8.7–9.2 (3 sources) · 69% of snaps last game</div></div>
+              <div class="pts">9.3<small>±0.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.7 pts · 30% of his number
+<div class="sub">1.4 solo · 1.4 ast · 0.5 TFL · 0.3 sack · 1.0 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.0 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.6 TFL* · 0.3 sack · 0.8 QB hit* · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 9.2 pts · 40% of his number · DL rank #30
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">beat his projection by 0.8 per game over 4 games this season, counted as +0.4 after shrinking: +0.2</div>
+<div class="sub">69% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 9.0 pts; with form +0.3 = 9.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 15.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Cameron Heyward</span>
+                
+                
+
+
+
+                <div class="sub">PIT @ TB · range 8.5–10.1 (3 sources) · 62% of snaps last game</div></div>
+              <div class="pts">9.1<small>±1.0</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–14</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.5 pts · 30% of his number
+<div class="sub">1.9 solo · 1.8 ast · 0.4 TFL · 0.2 sack · 0.3 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.8 pts · 30% of his number
+<div class="sub">1.8 solo · 1.9 ast · 0.4 TFL* · 0.2 sack · 0.6 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 10.1 pts · 40% of his number · DL rank #23
+</div>
+
+<div class="part"><b>Form</b> · -0.2 pts
+<div class="sub">beat his projection by 0.9 per game over 4 games this season, counted as +0.5 after shrinking: +0.2</div>
+<div class="sub">62% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.4</div>
+</div>
+<div class="sub">Weighted average = 9.2 pts; with form -0.2 = 9.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.2 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 14.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kobie Turner</span>
+                
+                
+
+
+
+                <div class="sub">LAR vs ARI · range 7.7–10.9 (3 sources) · 67% of snaps last game</div></div>
+              <div class="pts">8.7<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.9 pts · 30% of his number
+<div class="sub">1.8 solo · 1.6 ast · 0.6 TFL · 0.5 sack · 1.0 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.3 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.4 TFL* · 0.3 sack · 0.7 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 7.7 pts · 40% of his number · DL rank #55
+</div>
+
+<div class="part"><b>Form</b> · -0.5 pts
+<div class="sub">trailed his projection by 1.8 per game over 5 games this season, counted as -1.0 after shrinking: -0.5</div>
+<div class="sub">67% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.0</div>
+</div>
+<div class="sub">Weighted average = 9.1 pts; with form -0.5 = 8.7 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 15.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Nnamdi Madubuike</span>
+                
+                
+
+
+
+                <div class="sub">BAL @ CLE · range 4.1–8.8 (3 sources) · 83% of snaps last game</div></div>
+              <div class="pts">8.5<small>±1.7</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–14</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 4.1 pts · 30% of his number
+<div class="sub">0.6 solo · 0.5 ast · 0.2 TFL · 0.2 sack · 0.5 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 8.8 pts · 30% of his number
+<div class="sub">1.5 solo · 1.6 ast · 0.3 TFL* · 0.3 sack · 0.9 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.4 pts · 40% of his number · DL rank #44
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">beat his projection by 1.0 per game over 2 games this season, counted as +0.3 after shrinking: +0.2</div>
+<div class="sub">83% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +1.2</div>
+</div>
+<div class="sub">Weighted average = 7.2 pts; with form +1.3 = 8.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 14.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kayvon Thibodeaux</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">NYG vs NO · range 7.3–9.5 (3 sources) · 87% of snaps last game</div></div>
+              <div class="pts">8.5<small>±1.0</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–14</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 7.3 pts · 30% of his number
+<div class="sub">1.1 solo · 1.1 ast · 0.3 TFL · 0.3 sack · 0.7 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.5 pts · 30% of his number
+<div class="sub">1.6 solo · 1.1 ast · 0.5 TFL* · 0.3 sack · 0.9 QB hit* · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 8.0 pts · 40% of his number · DL rank #49
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">trailed his projection by 5.3 per game over 4 games this season, counted as -2.7 after shrinking: -1.2</div>
+<div class="sub">87% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +1.5</div>
+</div>
+<div class="sub">Weighted average = 8.2 pts; with form +0.3 = 8.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 14.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 4</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Derrick Brown</span>
+                
+                
+
+
+
+                <div class="sub">CAR @ PHI · range 7.5–8.1 (3 sources) · 76% of snaps last game</div></div>
+              <div class="pts">8.2<small>±0.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">3–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.1 pts · 30% of his number
+<div class="sub">1.6 solo · 1.9 ast · 0.3 TFL · 0.1 sack · 0.6 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.1 pts · 30% of his number
+<div class="sub">1.8 solo · 1.9 ast · 0.3 TFL* · 0.2 sack · 0.6 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 7.5 pts · 40% of his number · DL rank #56
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">trailed his projection by 1.6 per game over 4 games this season, counted as -0.8 after shrinking: -0.4</div>
+<div class="sub">76% of his team's defensive snaps last game (week 4), against 67% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 7.9 pts; with form +0.3 = 8.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.9 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 3 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kingsley Enagbare</span>
+                
+                
+
+
+
+                <div class="sub">NYJ @ NE · range 4.0–11.7 (3 sources) · 79% of snaps last game</div></div>
+              <div class="pts">8.1<small>±2.6</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–14</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 4.0 pts · 30% of his number
+<div class="sub">0.5 solo · 1.0 ast · 0.2 TFL · 0.3 sack · 0.1 QB hit</div></div>
+<div class="part"><b>ESPN</b> · 11.7 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.6 TFL* · 0.5 sack · 1.4 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 4.2 pts · 40% of his number · not on its DL list, so ranked just past its end (#84)
+</div>
+
+<div class="part"><b>Form</b> · +1.7 pts
+<div class="sub">beat his projection by 4.2 per game over 3 games this season, counted as +1.8 after shrinking: +0.8</div>
+<div class="sub">79% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.9</div>
+</div>
+<div class="sub">Weighted average = 6.4 pts; with form +1.7 = 8.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 14.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kwity Paye</span>
+                
+                
+
+
+
+                <div class="sub">LV vs BUF · range 7.0–8.6 (3 sources) · 65% of snaps last game</div></div>
+              <div class="pts">7.9<small>±0.9</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–14</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.6 pts · 30% of his number
+<div class="sub">1.7 solo · 0.9 ast · 0.4 TFL · 0.4 sack · 0.5 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 7.0 pts · 30% of his number
+<div class="sub">1.3 solo · 1.0 ast · 0.4 TFL* · 0.2 sack · 0.6 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 7.9 pts · 40% of his number · DL rank #50
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">beat his projection by 1.0 per game over 4 games this season, counted as +0.5 after shrinking: +0.2</div>
+<div class="sub">65% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 7.8 pts; with form +0.1 = 7.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 14.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Isaiah McGuire</span>
+                
+                
+
+
+
+                <div class="sub">CLE vs BAL · range 5.4–9.1 (3 sources) · 66% of snaps last game</div></div>
+              <div class="pts">7.9<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 5.4 pts · 30% of his number
+<div class="sub">0.9 solo · 0.8 ast · 0.4 TFL · 0.2 sack · 0.4 QB hit · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.1 pts · 30% of his number
+<div class="sub">1.6 solo · 1.2 ast · 0.6 TFL* · 0.3 sack · 0.8 QB hit* · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 7.4 pts · 40% of his number · DL rank #57
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">beat his projection by 3.3 per game over 4 games this season, counted as +1.6 after shrinking: +0.7</div>
+<div class="sub">66% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.1</div>
+</div>
+<div class="sub">Weighted average = 7.3 pts; with form +0.6 = 7.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Byron Murphy</span>
+                
+                
+
+
+
+                <div class="sub">SEA @ DEN · range 7.8–8.1 (3 sources) · 68% of snaps last game</div></div>
+              <div class="pts">7.9<small>±0.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.1 pts · 30% of his number
+<div class="sub">1.3 solo · 2.3 ast · 0.4 TFL · 0.3 sack · 0.7 QB hit</div></div>
+<div class="part"><b>ESPN</b> · 7.8 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.5 TFL* · 0.2 sack · 0.4 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 8.1 pts · 40% of his number · DL rank #48
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">trailed his projection by 0.9 per game over 4 games this season, counted as -0.4 after shrinking: -0.2</div>
+<div class="sub">68% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.1</div>
+</div>
+<div class="sub">Weighted average = 8.0 pts; with form -0.1 = 7.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Gabe Jacas</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">NE vs NYJ · range 4.8–8.3 (3 sources) · 65% of snaps last game</div></div>
+              <div class="pts">7.7<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 4.8 pts · 30% of his number
+<div class="sub">0.6 solo · 0.9 ast · 0.3 TFL · 0.3 sack · 0.3 QB hit · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 8.3 pts · 30% of his number
+<div class="sub">1.6 solo · 1.2 ast · 0.5 TFL* · 0.3 sack · 0.4 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 6.6 pts · 40% of his number · DL rank #63
+</div>
+
+<div class="part"><b>Form</b> · +1.1 pts
+<div class="sub">beat his projection by 5.6 per game over 4 games this season, counted as +2.8 after shrinking: +1.3</div>
+<div class="sub">65% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 6.6 pts; with form +1.1 = 7.7 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Akheem Mesidor</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">LAC @ KC · range 5.8–8.2 (3 sources) · 63% of snaps last game</div></div>
+              <div class="pts">7.6<small>±1.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 5.8 pts · 30% of his number
+<div class="sub">0.8 solo · 0.7 ast · 0.2 TFL · 0.3 sack · 0.8 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 8.1 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.4 TFL* · 0.3 sack · 0.6 QB hit* · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 8.2 pts · 40% of his number · DL rank #47
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">beat his projection by 2.0 per game over 4 games this season, counted as +1.0 after shrinking: +0.5</div>
+<div class="sub">63% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.3</div>
+</div>
+<div class="sub">Weighted average = 7.5 pts; with form +0.1 = 7.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">DeMarcus Lawrence</span>
+                
+                
+
+
+
+                <div class="sub">SEA @ DEN · range 6.5–9.7 (3 sources) · 65% of snaps last game</div></div>
+              <div class="pts">7.4<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">1–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.0 pts · 30% of his number
+<div class="sub">1.2 solo · 1.4 ast · 0.4 TFL · 0.3 sack · 0.8 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.7 pts · 30% of his number
+<div class="sub">1.7 solo · 1.2 ast · 0.6 TFL* · 0.2 sack · 0.9 QB hit* · 0.1 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 6.5 pts · 40% of his number · DL rank #64
+</div>
+
+<div class="part"><b>Form</b> · -0.5 pts
+<div class="sub">trailed his projection by 1.6 per game over 4 games this season, counted as -0.8 after shrinking: -0.4</div>
+<div class="sub">65% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 7.9 pts; with form -0.5 = 7.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 1 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Josaiah Stewart</span>
+                
+                
+
+
+
+                <div class="sub">LAR vs ARI · range 2.6–10.1 (3 sources) · 83% of snaps last game</div></div>
+              <div class="pts">7.4<small>±2.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–12</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 2.6 pts · 30% of his number
+<div class="sub">0.7 solo · 1.3 ast</div></div>
+<div class="part"><b>ESPN</b> · 10.1 pts · 30% of his number
+<div class="sub">1.7 solo · 1.2 ast · 0.5 TFL* · 0.4 sack · 0.9 QB hit* · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 6.3 pts · 40% of his number · DL rank #68
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">trailed his projection by 0.6 per game over 5 games this season, counted as -0.3 after shrinking: -0.1</div>
+<div class="sub">83% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +1.2</div>
+</div>
+<div class="sub">Weighted average = 6.3 pts; with form +1.0 = 7.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 12.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Cameron Thomas</span>
+                
+                
+
+
+
+                <div class="sub">ATL vs CHI · range 2.2–9.8 (3 sources) · 64% of snaps last game</div></div>
+              <div class="pts">7.1<small>±2.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">2–12</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 2.2 pts · 30% of his number
+<div class="sub">0.8 solo · 0.6 ast · 0.1 TFL</div></div>
+<div class="part"><b>ESPN</b> · 9.8 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.4 TFL* · 0.3 sack · 1.1 QB hit* · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 6.4 pts · 40% of his number · DL rank #67
+</div>
+
+<div class="part"><b>Form</b> · +0.9 pts
+<div class="sub">beat his projection by 5.0 per game over 4 games this season, counted as +2.5 after shrinking: +1.1</div>
+<div class="sub">64% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 6.2 pts; with form +0.9 = 7.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.2 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 2 and 12.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 5</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Yaya Diaby</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">TB vs PIT · range 8.3–9.2 (3 sources) · 57% of snaps last game</div></div>
+              <div class="pts">7.1<small>±0.9</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">1–13</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.2 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.6 TFL · 0.4 sack · 1.0 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.2 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.6 TFL* · 0.3 sack · 1.0 QB hit* · 0.2 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.3 pts · 40% of his number · DL rank #46
+</div>
+
+<div class="part"><b>Form</b> · -1.8 pts
+<div class="sub">trailed his projection by 4.4 per game over 4 games this season, counted as -2.2 after shrinking: -1.0</div>
+<div class="sub">57% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: -0.8</div>
+</div>
+<div class="sub">Weighted average = 8.8 pts; with form -1.8 = 7.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 1 and 13.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Samson Ebukam</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">ATL vs CHI · range 4.2–8.4 (3 sources) · 76% of snaps last game</div></div>
+              <div class="pts">7.0<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">1–12</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 6.1 pts · 30% of his number
+<div class="sub">1.2 solo · 0.8 ast · 0.2 TFL · 0.2 sack · 0.5 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 8.4 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.5 TFL* · 0.3 sack · 0.9 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 4.2 pts · 40% of his number · not on its DL list, so ranked just past its end (#84)
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">beat his projection by 1.6 per game over 3 games this season, counted as +0.7 after shrinking: +0.3</div>
+<div class="sub">76% of his team's defensive snaps last game (week 5), against 67% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 6.0 pts; with form +1.0 = 7.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 1 and 12.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">198 more available DL not shown.</p>
+        <p class="hidden-note">112 available DL have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-LB">
+        
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Zack Baun</span>
+                
+                
+
+
+
+                <div class="sub">PHI vs CAR · range 13.4–19.4 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">17.2<small>±2.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">11–23</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.4 pts · 30% of his number
+<div class="sub">3.5 solo · 3.1 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 19.4 pts · 30% of his number
+<div class="sub">5.0 solo · 3.9 ast · 0.8 TFL* · 0.1 sack · 0.3 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 15.7 pts · 40% of his number · LB rank #9
+</div>
+
+<div class="part"><b>Form</b> · +1.1 pts
+<div class="sub">beat his projection by 2.6 per game over 3 games this season, counted as +1.1 after shrinking: +0.4</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 16.1 pts; with form +1.1 = 17.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 11 and 23.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Foyesade Oluokun</span>
+                
+                
+
+
+
+                <div class="sub">JAX vs HOU · range 14.1–16.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">16.6<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–22</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 14.1 pts · 30% of his number
+<div class="sub">3.9 solo · 3.7 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.3 TFL* · 0.2 sack · 0.2 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 16.3 pts · 40% of his number · LB rank #8
+</div>
+
+<div class="part"><b>Form</b> · +0.7 pts
+<div class="sub">beat his projection by 0.2 per game over 4 games this season, counted as +0.1 after shrinking: +0.0</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 15.8 pts; with form +0.7 = 16.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.9 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 22.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tremaine Edmunds</span>
+                
+                
+
+
+
+                <div class="sub">NYG vs NO · range 12.2–16.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">16.3<small>±1.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–22</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.2 pts · 30% of his number
+<div class="sub">3.5 solo · 2.4 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.5 TFL* · 0.2 sack · 0.3 QB hit* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 15.5 pts · 40% of his number · LB rank #11
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">beat his projection by 3.5 per game over 4 games this season, counted as +1.8 after shrinking: +0.7</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 14.9 pts; with form +1.4 = 16.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 22.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Nate Landman</span>
+                
+                
+
+
+
+                <div class="sub">LAR vs ARI · range 15.6–17.1 (3 sources) · 89% of snaps last game</div></div>
+              <div class="pts">16.1<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–22</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 15.6 pts · 30% of his number
+<div class="sub">4.2 solo · 2.8 ast · 0.5 TFL · 0.1 sack · 0.3 QB hit · 0.4 PD · 0.1 INT · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.1 pts · 30% of his number
+<div class="sub">4.6 solo · 3.7 ast · 0.5 TFL* · 0.1 sack · 0.3 QB hit* · 0.3 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 15.6 pts · 40% of his number · LB rank #10
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">trailed his projection by 0.1 per game over 5 games this season, counted as -0.0 after shrinking: -0.0</div>
+<div class="sub">89% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.1</div>
+</div>
+<div class="sub">Weighted average = 16.1 pts; with form +0.1 = 16.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.1 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 22.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Azeez Al-Shaair</span>
+                
+                
+
+
+
+                <div class="sub">HOU @ JAX · range 13.8–16.4 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">15.9<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–22</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.8 pts · 30% of his number
+<div class="sub">4.3 solo · 2.9 ast · 0.3 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.4 pts · 30% of his number
+<div class="sub">4.8 solo · 3.8 ast · 0.2 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.8 pts · 40% of his number · LB rank #16
+</div>
+
+<div class="part"><b>Form</b> · +0.9 pts
+<div class="sub">beat his projection by 1.5 per game over 3 games this season, counted as +0.7 after shrinking: +0.3</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 15.0 pts; with form +0.9 = 15.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 22.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Demario Davis</span>
+                
+                
+
+
+
+                <div class="sub">NYJ @ NE · range 10.2–16.4 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">15.6<small>±2.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">10–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.2 pts · 30% of his number
+<div class="sub">2.9 solo · 3.1 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.1 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.4 pts · 30% of his number
+<div class="sub">4.5 solo · 3.5 ast · 0.5 TFL* · 0.2 sack · 0.4 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.7 pts · 40% of his number · LB rank #18
+</div>
+
+<div class="part"><b>Form</b> · +1.7 pts
+<div class="sub">beat his projection by 5.0 per game over 4 games this season, counted as +2.5 after shrinking: +1.0</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 13.9 pts; with form +1.7 = 15.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 10 and 21.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Quay Walker</span>
+                
+                
+
+
+
+                <div class="sub">LV vs BUF · range 13.7–15.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">15.4<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.7 pts · 30% of his number
+<div class="sub">3.5 solo · 3.4 ast · 0.5 TFL · 0.2 sack · 0.4 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 15.9 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.5 TFL* · 0.2 sack · 0.3 QB hit* · 0.2 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 15.0 pts · 40% of his number · LB rank #14
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">trailed his projection by 0.9 per game over 4 games this season, counted as -0.5 after shrinking: -0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 14.9 pts; with form +0.5 = 15.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Anthony Hill</span>
+                
+                
+
+
+
+                <div class="sub">TEN @ IND · range 9.8–16.7 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">15.4<small>±2.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.8 pts · 30% of his number
+<div class="sub">3.1 solo · 2.1 ast · 0.1 TFL · 0.1 sack · 0.3 QB hit · 0.1 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.7 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 15.1 pts · 40% of his number · LB rank #12
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">beat his projection by 3.5 per game over 4 games this season, counted as +1.7 after shrinking: +0.7</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 14.0 pts; with form +1.4 = 15.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kaden Elliss</span>
+                
+                
+<span class="tag q">Q</span>
+
+
+                <div class="sub">NO @ NYG · range 12.0–17.8 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">15.1<small>±2.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.6 pts · 30% of his number
+<div class="sub">3.4 solo · 2.7 ast · 0.5 TFL · 0.2 sack · 0.5 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 17.8 pts · 30% of his number
+<div class="sub">4.4 solo · 3.5 ast · 0.7 TFL* · 0.2 sack · 0.8 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 12.0 pts · 40% of his number · LB rank #40
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">beat his projection by 0.9 per game over 3 games this season, counted as +0.4 after shrinking: +0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 3), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 14.2 pts; with form +0.8 = 15.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±8.2 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Payton Wilson</span>
+                
+                
+
+
+
+                <div class="sub">PIT @ TB · range 11.5–16.5 (3 sources) · 89% of snaps last game</div></div>
+              <div class="pts">15.0<small>±1.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.5 pts · 30% of his number
+<div class="sub">3.9 solo · 1.5 ast · 0.3 TFL · 0.1 sack · 0.3 QB hit · 0.1 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.5 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.8 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.6 pts · 40% of his number · LB rank #20
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">beat his projection by 3.5 per game over 4 games this season, counted as +1.8 after shrinking: +0.7</div>
+<div class="sub">89% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.1</div>
+</div>
+<div class="sub">Weighted average = 14.2 pts; with form +0.8 = 15.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Akeem Davis-Gaither</span>
+                
+                
+
+
+
+                <div class="sub">IND vs TEN · range 13.3–15.4 (3 sources) · 87% of snaps last game</div></div>
+              <div class="pts">14.8<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.3 pts · 30% of his number
+<div class="sub">4.4 solo · 2.8 ast · 0.1 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.4 pts · 30% of his number
+<div class="sub">4.6 solo · 3.6 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.3 pts · 40% of his number · LB rank #24
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 2.4 per game over 4 games this season, counted as +1.2 after shrinking: +0.5</div>
+<div class="sub">87% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.0</div>
+</div>
+<div class="sub">Weighted average = 14.3 pts; with form +0.4 = 14.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 20.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Terrel Bernard</span>
+                
+                
+
+
+
+                <div class="sub">BUF @ LV · range 14.1–15.2 (3 sources) · 95% of snaps last game</div></div>
+              <div class="pts">14.8<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 15.2 pts · 30% of his number
+<div class="sub">4.7 solo · 2.8 ast · 0.4 TFL · 0.1 sack · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 14.1 pts · 30% of his number
+<div class="sub">4.0 solo · 3.2 ast · 0.6 TFL* · 0.1 sack · 0.1 QB hit* · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.6 pts · 40% of his number · LB rank #21
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">trailed his projection by 1.1 per game over 5 games this season, counted as -0.6 after shrinking: -0.2</div>
+<div class="sub">95% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.4</div>
+</div>
+<div class="sub">Weighted average = 14.6 pts; with form +0.2 = 14.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Devin Bush</span>
+                
+                
+
+
+
+                <div class="sub">CHI @ ATL · range 13.2–17.6 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">14.8<small>±1.9</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–21</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.5 pts · 30% of his number
+<div class="sub">3.7 solo · 3.0 ast · 0.4 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.6 pts · 30% of his number
+<div class="sub">4.6 solo · 3.7 ast · 0.9 TFL* · 0.1 sack · 0.3 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.2 pts · 40% of his number · LB rank #31
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">trailed his projection by 2.6 per game over 4 games this season, counted as -1.3 after shrinking: -0.5</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 14.6 pts; with form +0.2 = 14.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.9 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 21.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Zaire Franklin</span>
+                
+                
+
+
+
+                <div class="sub">GB vs DAL · range 13.1–16.3 (3 sources) · 93% of snaps last game</div></div>
+              <div class="pts">14.3<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.1 pts · 30% of his number
+<div class="sub">3.3 solo · 3.1 ast · 0.3 TFL · 0.2 sack · 0.3 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 16.3 pts · 30% of his number
+<div class="sub">4.6 solo · 3.6 ast · 0.5 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.5 pts · 40% of his number · LB rank #22
+</div>
+
+<div class="part"><b>Form</b> · -0.4 pts
+<div class="sub">trailed his projection by 3.3 per game over 4 games this season, counted as -1.7 after shrinking: -0.7</div>
+<div class="sub">93% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.3</div>
+</div>
+<div class="sub">Weighted average = 14.6 pts; with form -0.4 = 14.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 20.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Patrick Queen</span>
+                
+                
+
+
+
+                <div class="sub">PIT @ TB · range 11.3–15.0 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">14.1<small>±1.6</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.3 pts · 30% of his number
+<div class="sub">2.9 solo · 3.0 ast · 0.4 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.0 pts · 30% of his number
+<div class="sub">4.2 solo · 3.3 ast · 0.4 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.8 pts · 40% of his number · LB rank #28
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">trailed his projection by 0.4 per game over 4 games this season, counted as -0.2 after shrinking: -0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 13.4 pts; with form +0.6 = 14.1 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 20.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Robert Spillane</span>
+                
+                
+
+
+
+                <div class="sub">NE vs NYJ · range 13.2–15.8 (3 sources) · 83% of snaps last game</div></div>
+              <div class="pts">14.0<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.2 pts · 30% of his number
+<div class="sub">3.5 solo · 3.3 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 15.8 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.2 TFL* · 0.2 sack · 0.1 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.8 pts · 40% of his number · LB rank #17
+</div>
+
+<div class="part"><b>Form</b> · -0.6 pts
+<div class="sub">trailed his projection by 2.0 per game over 4 games this season, counted as -1.0 after shrinking: -0.4</div>
+<div class="sub">83% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 14.6 pts; with form -0.6 = 14.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 20.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Mack Wilson</span>
+                
+                
+
+
+
+                <div class="sub">ARI @ LAR · range 10.7–15.4 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">13.9<small>±1.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.7 pts · 30% of his number
+<div class="sub">2.5 solo · 2.3 ast · 0.2 TFL · 0.1 sack · 0.3 QB hit · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 15.4 pts · 30% of his number
+<div class="sub">4.2 solo · 3.4 ast · 0.4 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.0 pts · 40% of his number · LB rank #27
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">trailed his projection by 1.1 per game over 4 games this season, counted as -0.5 after shrinking: -0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 13.4 pts; with form +0.5 = 13.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 20.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 3</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jihaad Campbell</span>
+                
+                
+
+
+
+                <div class="sub">PHI vs CAR · range 10.7–14.2 (3 sources) · 86% of snaps last game</div></div>
+              <div class="pts">13.6<small>±1.6</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.7 pts · 30% of his number
+<div class="sub">2.8 solo · 2.4 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 14.2 pts · 30% of his number
+<div class="sub">4.2 solo · 3.3 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.1 pts · 40% of his number · LB rank #32
+</div>
+
+<div class="part"><b>Form</b> · +0.9 pts
+<div class="sub">beat his projection by 5.0 per game over 4 games this season, counted as +2.5 after shrinking: +1.0</div>
+<div class="sub">86% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.1</div>
+</div>
+<div class="sub">Weighted average = 12.7 pts; with form +0.9 = 13.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.3 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Daiyan Henley</span>
+                
+                
+
+
+
+                <div class="sub">LAC @ KC · range 11.1–14.6 (3 sources) · 95% of snaps last game</div></div>
+              <div class="pts">13.6<small>±1.6</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">8–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.1 pts · 30% of his number
+<div class="sub">3.1 solo · 2.3 ast · 0.3 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 14.6 pts · 30% of his number
+<div class="sub">4.1 solo · 3.2 ast · 0.3 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.0 pts · 40% of his number · LB rank #26
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">trailed his projection by 0.9 per game over 4 games this season, counted as -0.5 after shrinking: -0.2</div>
+<div class="sub">95% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.4</div>
+</div>
+<div class="sub">Weighted average = 13.3 pts; with form +0.2 = 13.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 8 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Quincy Williams</span>
+                
+                
+
+
+
+                <div class="sub">CLE vs BAL · range 12.5–15.7 (3 sources) · 91% of snaps last game</div></div>
+              <div class="pts">13.5<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.5 pts · 30% of his number
+<div class="sub">3.7 solo · 1.9 ast · 0.5 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.7 pts · 30% of his number
+<div class="sub">3.9 solo · 3.1 ast · 0.6 TFL* · 0.1 sack · 0.3 QB hit* · 0.4 PD · 0.2 FF · 0.2 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.2 pts · 40% of his number · LB rank #30
+</div>
+
+<div class="part"><b>Form</b> · -0.3 pts
+<div class="sub">trailed his projection by 2.5 per game over 4 games this season, counted as -1.3 after shrinking: -0.5</div>
+<div class="sub">91% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 13.8 pts; with form -0.3 = 13.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Ventrell Miller</span>
+                
+                
+
+
+
+                <div class="sub">JAX vs HOU · range 11.9–14.3 (3 sources) · 73% of snaps last game</div></div>
+              <div class="pts">13.0<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.4 pts · 30% of his number
+<div class="sub">3.5 solo · 3.4 ast · 0.3 TFL · 0.1 sack · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.3 pts · 30% of his number
+<div class="sub">3.7 solo · 3.0 ast · 0.4 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · LB rank #42
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">beat his projection by 3.8 per game over 4 games this season, counted as +1.9 after shrinking: +0.8</div>
+<div class="sub">73% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.8</div>
+</div>
+<div class="sub">Weighted average = 13.1 pts; with form -0.1 = 13.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Christian Elliss</span>
+                
+                
+
+
+
+                <div class="sub">NE vs NYJ · range 9.3–16.8 (3 sources) · 83% of snaps last game</div></div>
+              <div class="pts">12.9<small>±2.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–19</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.3 pts · 30% of his number
+<div class="sub">2.6 solo · 2.6 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 16.8 pts · 30% of his number
+<div class="sub">4.6 solo · 3.6 ast · 0.2 TFL* · 0.3 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 12.8 pts · 40% of his number · LB rank #35
+</div>
+
+<div class="part"><b>Form</b> · -0.0 pts
+<div class="sub">beat his projection by 1.0 per game over 4 games this season, counted as +0.5 after shrinking: +0.2</div>
+<div class="sub">83% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 13.0 pts; with form -0.0 = 12.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 19.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Drake Thomas</span>
+                
+                
+<span class="tag q">Q</span>
+
+
+                <div class="sub">SEA @ DEN · range 10.5–13.5 (3 sources) · 77% of snaps last game</div></div>
+              <div class="pts">12.9<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.5 pts · 30% of his number
+<div class="sub">2.4 solo · 2.3 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.4 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.5 pts · 30% of his number
+<div class="sub">3.6 solo · 2.8 ast · 0.7 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.3 pts · 40% of his number · LB rank #29
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 4.8 per game over 4 games this season, counted as +2.4 after shrinking: +1.0</div>
+<div class="sub">77% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: -0.6</div>
+</div>
+<div class="sub">Weighted average = 12.5 pts; with form +0.4 = 12.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.3 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 18.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Pete Werner</span>
+                
+                
+
+
+
+                <div class="sub">NO @ NYG · range 9.2–13.3 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">12.6<small>±1.7</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.2 pts · 30% of his number
+<div class="sub">2.9 solo · 2.0 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.3 pts · 30% of his number
+<div class="sub">3.8 solo · 3.0 ast · 0.5 TFL* · 0.1 sack · 0.2 QB hit* · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.0 pts · 40% of his number · LB rank #47
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">beat his projection by 3.6 per game over 4 games this season, counted as +1.8 after shrinking: +0.7</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 11.2 pts; with form +1.4 = 12.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.0 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 18.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Frankie Luvu</span>
+                
+                
+
+
+
+                <div class="sub">WAS @ SF · range 8.5–13.6 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">12.3<small>±1.9</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.5 pts · 30% of his number
+<div class="sub">2.6 solo · 1.2 ast · 0.3 TFL · 0.2 sack · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.6 pts · 30% of his number
+<div class="sub">3.4 solo · 2.7 ast · 0.5 TFL* · 0.2 sack · 0.4 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · LB rank #39
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">beat his projection by 0.6 per game over 2 games this season, counted as +0.2 after shrinking: +0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 88% for the position's 60 best-projected: +0.7</div>
+</div>
+<div class="sub">Weighted average = 11.5 pts; with form +0.8 = 12.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.3 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 18.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">117 more available LB not shown.</p>
+        <p class="hidden-note">65 available LB have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-DB">
+        <p class="note posnote">Among the DBs usually on waivers, the projections barely separate players: on 2025, the 15th to 60th best-projected DBs scored almost without regard to their projections (within-week r 0.08, against 0.18 for LB and 0.13 for DL). What helped, a little, was a full snap share last game and a run of results above projection, which each number here already carries. Treat these tiers as one rough group and prefer the DB who plays every snap.</p>
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Amik Robertson</span>
+                
+                
+
+
+
+                <div class="sub">WAS @ SF · range 11.3–15.2 (2 sources) · 98% of snaps last game</div></div>
+              <div class="pts">14.4<small>±1.7</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">9–20</div></div>
+</div></summary><div class="bdbody">
+<div class="part missing"><b>Sleeper</b> · no projection for him</div>
+<div class="part"><b>ESPN</b> · 15.2 pts · 60% of his number
+<div class="sub">3.8 solo · 1.5 ast · 0.1 TFL* · 1.3 PD · 0.2 INT · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.3 pts · 40% of his number · DB rank #32
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">beat his projection by 6.4 per game over 4 games this season, counted as +3.2 after shrinking: +0.6</div>
+<div class="sub">98% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 13.6 pts; with form +0.8 = 14.4 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±7.2 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 9 and 20.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Cole Bishop</span>
+                
+                
+
+
+
+                <div class="sub">BUF @ LV · range 12.1–12.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">12.7<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.9 pts · 30% of his number
+<div class="sub">3.5 solo · 2.2 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.5 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.1 pts · 30% of his number
+<div class="sub">4.1 solo · 2.4 ast · 0.2 TFL* · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.5 pts · 40% of his number · DB rank #17
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">trailed his projection by 0.7 per game over 5 games this season, counted as -0.4 after shrinking: -0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 12.5 pts; with form +0.2 = 12.7 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 18.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Dane Belton</span>
+                
+                
+
+
+
+                <div class="sub">NYJ @ NE · range 8.1–16.2 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">12.5<small>±2.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–18</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.1 pts · 30% of his number
+<div class="sub">2.1 solo · 1.9 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.2 pts · 30% of his number
+<div class="sub">4.8 solo · 2.8 ast · 0.2 TFL* · 0.1 QB hit* · 0.5 PD · 0.2 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 12.0 pts · 40% of his number · DB rank #25
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 1.9 per game over 4 games this season, counted as +0.9 after shrinking: +0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 12.1 pts; with form +0.4 = 12.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 18.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Amani Hooker</span>
+                
+                
+<span class="tag q">Q</span>
+
+
+                <div class="sub">TEN @ IND · range 8.9–13.7 (3 sources) · 98% of snaps last game</div></div>
+              <div class="pts">12.3<small>±1.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.9 pts · 30% of his number
+<div class="sub">2.7 solo · 1.4 ast · 0.2 TFL · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.7 pts · 30% of his number
+<div class="sub">3.9 solo · 2.2 ast · 0.2 TFL* · 0.5 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · DB rank #20
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">beat his projection by 4.2 per game over 4 games this season, counted as +2.1 after shrinking: +0.4</div>
+<div class="sub">98% of his team's defensive snaps last game (week 4), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.7 pts; with form +0.6 = 12.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Keisean Nixon</span>
+                
+                
+
+
+
+                <div class="sub">GB vs DAL · range 10.9–13.5 (3 sources) · 88% of snaps last game</div></div>
+              <div class="pts">12.2<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.9 pts · 30% of his number
+<div class="sub">3.4 solo · 1.2 ast · 0.2 TFL · 0.1 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.5 pts · 30% of his number
+<div class="sub">3.9 solo · 1.5 ast · 0.3 TFL* · 0.1 QB hit* · 0.8 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 11.4 pts · 40% of his number · DB rank #30
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">beat his projection by 5.5 per game over 4 games this season, counted as +2.7 after shrinking: +0.5</div>
+<div class="sub">88% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 11.9 pts; with form +0.3 = 12.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Reed Blankenship</span>
+                
+                
+
+
+
+                <div class="sub">HOU @ JAX · range 9.0–13.6 (3 sources) · 97% of snaps last game</div></div>
+              <div class="pts">12.2<small>±1.8</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.0 pts · 30% of his number
+<div class="sub">2.9 solo · 1.6 ast · 0.3 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.6 pts · 30% of his number
+<div class="sub">4.0 solo · 2.4 ast · 0.1 TFL* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · DB rank #19
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">beat his projection by 4.1 per game over 4 games this season, counted as +2.1 after shrinking: +0.4</div>
+<div class="sub">97% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.1</div>
+</div>
+<div class="sub">Weighted average = 11.7 pts; with form +0.5 = 12.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kam Curl</span>
+                
+                
+
+
+
+                <div class="sub">LAR vs ARI · range 11.1–12.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">12.2<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.1 pts · 30% of his number
+<div class="sub">2.9 solo · 2.6 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.9 pts · 30% of his number
+<div class="sub">3.8 solo · 2.2 ast · 0.2 TFL* · 0.1 sack · 0.1 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 12.6 pts · 40% of his number · DB rank #14
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">trailed his projection by 2.8 per game over 5 games this season, counted as -1.5 after shrinking: -0.3</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 12.3 pts; with form -0.1 = 12.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Minkah Fitzpatrick</span>
+                
+                
+
+
+
+                <div class="sub">NYJ @ NE · range 7.8–13.7 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.9<small>±2.1</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">7–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 7.8 pts · 30% of his number
+<div class="sub">2.6 solo · 1.3 ast · 0.1 TFL · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.7 pts · 30% of his number
+<div class="sub">4.0 solo · 2.4 ast · 0.2 TFL* · 0.1 QB hit* · 0.5 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 12.0 pts · 40% of his number · DB rank #22
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">beat his projection by 5.9 per game over 2 games this season, counted as +2.0 after shrinking: +0.4</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.2 pts; with form +0.6 = 11.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 7 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Alontae Taylor</span>
+                
+                
+
+
+
+                <div class="sub">TEN @ IND · range 10.4–11.8 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.7<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.4 pts · 30% of his number
+<div class="sub">2.7 solo · 1.1 ast · 0.3 TFL · 0.1 sack · 0.2 QB hit · 0.6 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.8 pts · 30% of his number
+<div class="sub">3.7 solo · 1.4 ast · 0.5 TFL* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.5 pts · 40% of his number · DB rank #29
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 1.6 per game over 4 games this season, counted as +0.8 after shrinking: +0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.3 pts; with form +0.4 = 11.7 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Xavier McKinney</span>
+                
+                
+
+
+
+                <div class="sub">GB vs DAL · range 11.5–12.1 (3 sources) · 88% of snaps last game</div></div>
+              <div class="pts">11.7<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.0 pts · 30% of his number
+<div class="sub">3.0 solo · 2.8 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.6 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 11.5 pts · 30% of his number
+<div class="sub">3.2 solo · 1.9 ast · 0.1 TFL* · 0.6 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.1 pts · 40% of his number · DB rank #21
+</div>
+
+<div class="part"><b>Form</b> · -0.2 pts
+<div class="sub">trailed his projection by 0.3 per game over 4 games this season, counted as -0.1 after shrinking: -0.0</div>
+<div class="sub">88% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: -0.2</div>
+</div>
+<div class="sub">Weighted average = 11.9 pts; with form -0.2 = 11.7 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Malik Mustapha</span>
+                
+                
+
+
+
+                <div class="sub">SF vs WAS · range 10.2–13.2 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.5<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.3 pts · 30% of his number
+<div class="sub">4.2 solo · 1.8 ast · 0.2 TFL · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 13.2 pts · 30% of his number
+<div class="sub">4.0 solo · 2.3 ast · 0.2 TFL* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.2 pts · 40% of his number · DB rank #54
+</div>
+
+<div class="part"><b>Form</b> · -0.2 pts
+<div class="sub">trailed his projection by 4.5 per game over 4 games this season, counted as -2.2 after shrinking: -0.4</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.7 pts; with form -0.2 = 11.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jessie Bates</span>
+                
+                
+
+
+
+                <div class="sub">ATL vs CHI · range 11.2–11.9 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.5<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.2 pts · 30% of his number
+<div class="sub">3.2 solo · 2.2 ast · 0.1 TFL · 0.1 QB hit · 0.4 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.9 pts · 30% of his number
+<div class="sub">3.6 solo · 2.1 ast · 0.1 TFL* · 0.1 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 11.8 pts · 40% of his number · DB rank #27
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">trailed his projection by 3.8 per game over 4 games this season, counted as -1.9 after shrinking: -0.4</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.6 pts; with form -0.1 = 11.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jacob Parrish</span>
+                
+                
+
+
+
+                <div class="sub">TB vs PIT · range 7.9–15.0 (3 sources) · 97% of snaps last game</div></div>
+              <div class="pts">11.5<small>±2.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 7.9 pts · 30% of his number
+<div class="sub">2.2 solo · 1.0 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 15.0 pts · 30% of his number
+<div class="sub">3.9 solo · 1.5 ast · 0.4 TFL* · 1.2 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.3 pts · 40% of his number · DB rank #51
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">beat his projection by 4.5 per game over 3 games this season, counted as +1.9 after shrinking: +0.4</div>
+<div class="sub">97% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.1</div>
+</div>
+<div class="sub">Weighted average = 11.0 pts; with form +0.5 = 11.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Trent McDuffie</span>
+                
+                
+
+
+
+                <div class="sub">LAR vs ARI · range 10.1–13.0 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.5<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–17</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.1 pts · 30% of his number
+<div class="sub">2.8 solo · 0.8 ast · 0.1 TFL · 0.1 sack · 0.3 QB hit · 0.6 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.0 pts · 30% of his number
+<div class="sub">3.2 solo · 1.2 ast · 0.2 TFL* · 1.1 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.4 pts · 40% of his number · DB rank #49
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 1.4 per game over 5 games this season, counted as +0.8 after shrinking: +0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.1 pts; with form +0.4 = 11.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.8 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 17.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Grant Delpit</span>
+                
+                
+
+
+
+                <div class="sub">CLE vs BAL · range 9.1–12.1 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.3<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.1 pts · 30% of his number
+<div class="sub">2.5 solo · 2.1 ast · 0.2 TFL · 0.1 sack · 0.3 QB hit · 0.2 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.1 pts · 30% of his number
+<div class="sub">3.5 solo · 2.0 ast · 0.2 TFL* · 0.1 sack · 0.1 QB hit* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.4 pts · 40% of his number · DB rank #31
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 1.5 per game over 4 games this season, counted as +0.8 after shrinking: +0.1</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 10.9 pts; with form +0.4 = 11.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 3</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Ji&#39;Ayir Brown</span>
+                
+                
+
+
+
+                <div class="sub">SF vs WAS · range 9.5–12.2 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.3<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.5 pts · 30% of his number
+<div class="sub">2.7 solo · 1.9 ast · 0.1 TFL · 0.3 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.2 pts · 30% of his number
+<div class="sub">3.7 solo · 2.2 ast · 0.2 TFL* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.3 pts · 40% of his number · DB rank #34
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">beat his projection by 0.4 per game over 4 games this season, counted as +0.2 after shrinking: +0.0</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.0 pts; with form +0.3 = 11.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chamarri Conner</span>
+                
+                
+
+
+
+                <div class="sub">KC vs LAC · range 11.1–12.9 (3 sources) · 75% of snaps last game</div></div>
+              <div class="pts">11.2<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.9 pts · 30% of his number
+<div class="sub">4.1 solo · 1.5 ast · 0.2 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.1 pts · 30% of his number
+<div class="sub">3.3 solo · 1.9 ast · 0.2 TFL* · 0.1 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · DB rank #26
+</div>
+
+<div class="part"><b>Form</b> · -0.8 pts
+<div class="sub">trailed his projection by 0.4 per game over 1 game this season, counted as -0.1 after shrinking: -0.0</div>
+<div class="sub">75% of his team's defensive snaps last game (week 4), against 94% for the position's 60 best-projected: -0.8</div>
+</div>
+<div class="sub">Weighted average = 11.9 pts; with form -0.8 = 11.2 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.7 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tre&#39;von Moehrig</span>
+                
+                
+
+
+
+                <div class="sub">CAR @ PHI · range 10.5–12.0 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">11.0<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.8 pts · 30% of his number
+<div class="sub">3.4 solo · 2.0 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 12.0 pts · 30% of his number
+<div class="sub">3.5 solo · 2.0 ast · 0.5 TFL* · 0.1 sack · 0.2 QB hit* · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.5 pts · 40% of his number · DB rank #44
+</div>
+
+<div class="part"><b>Form</b> · -0.3 pts
+<div class="sub">trailed his projection by 5.8 per game over 4 games this season, counted as -2.9 after shrinking: -0.6</div>
+<div class="sub">100% of his team's defensive snaps last game (week 4), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.3 pts; with form -0.3 = 11.0 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Camryn Bynum</span>
+                
+                
+
+
+
+                <div class="sub">IND vs TEN · range 10.3–12.1 (3 sources) · 98% of snaps last game</div></div>
+              <div class="pts">10.9<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.1 pts · 30% of his number
+<div class="sub">4.2 solo · 0.8 ast · 0.1 TFL · 0.5 PD · 0.2 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 10.3 pts · 30% of his number
+<div class="sub">3.2 solo · 1.9 ast · 0.1 TFL* · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.7 pts · 40% of his number · DB rank #41
+</div>
+
+<div class="part"><b>Form</b> · -0.0 pts
+<div class="sub">trailed his projection by 2.0 per game over 4 games this season, counted as -1.0 after shrinking: -0.2</div>
+<div class="sub">98% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 11.0 pts; with form -0.0 = 10.9 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">C.J. Gardner-Johnson</span>
+                
+                
+
+
+
+                <div class="sub">BUF @ LV · range 10.0–11.1 (3 sources) · 95% of snaps last game</div></div>
+              <div class="pts">10.8<small>±1.2</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">6–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.0 pts · 30% of his number
+<div class="sub">2.8 solo · 1.6 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.0 pts · 30% of his number
+<div class="sub">3.1 solo · 1.8 ast · 0.2 TFL* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.1 pts · 40% of his number · DB rank #36
+</div>
+
+<div class="part"><b>Form</b> · +0.0 pts
+<div class="sub">trailed his projection by 0.1 per game over 5 games this season, counted as -0.1 after shrinking: -0.0</div>
+<div class="sub">95% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.0</div>
+</div>
+<div class="sub">Weighted average = 10.8 pts; with form +0.0 = 10.8 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.5 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 6 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Marlon Humphrey</span>
+                
+                
+
+
+
+                <div class="sub">BAL @ CLE · range 8.9–11.7 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">10.6<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.9 pts · 30% of his number
+<div class="sub">2.2 solo · 0.7 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.7 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 11.7 pts · 30% of his number
+<div class="sub">3.2 solo · 1.2 ast · 0.1 TFL* · 0.1 QB hit* · 0.8 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 10.4 pts · 40% of his number · DB rank #47
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">beat his projection by 0.1 per game over 4 games this season, counted as +0.1 after shrinking: +0.0</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 10.3 pts; with form +0.3 = 10.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Christian Benford</span>
+                
+                
+
+
+
+                <div class="sub">BUF @ LV · range 8.7–12.0 (3 sources) · 94% of snaps last game</div></div>
+              <div class="pts">10.6<small>±1.5</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.7 pts · 30% of his number
+<div class="sub">2.1 solo · 0.8 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.0 pts · 30% of his number
+<div class="sub">3.5 solo · 1.3 ast · 0.2 TFL* · 0.7 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 9.9 pts · 40% of his number · DB rank #57
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">beat his projection by 4.0 per game over 4 games this season, counted as +2.0 after shrinking: +0.4</div>
+<div class="sub">94% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: -0.0</div>
+</div>
+<div class="sub">Weighted average = 10.2 pts; with form +0.4 = 10.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Ronnie Hickman</span>
+                
+                
+
+
+
+                <div class="sub">CLE vs BAL · range 8.7–11.8 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">10.6<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.7 pts · 30% of his number
+<div class="sub">2.3 solo · 2.5 ast · 0.1 TFL · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 11.8 pts · 30% of his number
+<div class="sub">3.7 solo · 2.1 ast · 0.1 TFL* · 0.1 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 9.9 pts · 40% of his number · DB rank #58
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">beat his projection by 2.4 per game over 4 games this season, counted as +1.2 after shrinking: +0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 10.1 pts; with form +0.5 = 10.6 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 15.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kevin Byard</span>
+                
+                
+
+
+
+                <div class="sub">NE vs NYJ · range 10.6–12.3 (3 sources) · 83% of snaps last game</div></div>
+              <div class="pts">10.5<small>±1.3</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–16</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.3 pts · 30% of his number
+<div class="sub">4.1 solo · 2.3 ast · 0.2 TFL · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 11.8 pts · 30% of his number
+<div class="sub">3.5 solo · 2.1 ast · 0.2 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.6 pts · 40% of his number · DB rank #43
+</div>
+
+<div class="part"><b>Form</b> · -0.9 pts
+<div class="sub">trailed his projection by 5.0 per game over 4 games this season, counted as -2.5 after shrinking: -0.5</div>
+<div class="sub">83% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: -0.4</div>
+</div>
+<div class="sub">Weighted average = 11.4 pts; with form -0.9 = 10.5 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.6 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 16.</div>
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Justin Reid</span>
+                
+                
+
+
+
+                <div class="sub">NO @ NYG · range 9.0–11.5 (3 sources) · 100% of snaps last game</div></div>
+              <div class="pts">10.3<small>±1.4</small><div class="band" title="one game in five lands below the floor, one in five above the ceiling">5–15</div></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.0 pts · 30% of his number
+<div class="sub">2.4 solo · 2.2 ast · 0.2 TFL · 0.1 QB hit · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 11.5 pts · 30% of his number
+<div class="sub">3.7 solo · 2.2 ast · 0.2 TFL* · 0.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.3 pts · 40% of his number · DB rank #52
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">trailed his projection by 1.9 per game over 4 games this season, counted as -0.9 after shrinking: -0.2</div>
+<div class="sub">100% of his team's defensive snaps last game (week 5), against 94% for the position's 60 best-projected: +0.2</div>
+</div>
+<div class="sub">Weighted average = 10.3 pts; with form +0.1 = 10.3 pts.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+<div class="sub">Game-to-game swing ±6.4 from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between 5 and 15.</div>
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">212 more available DB not shown.</p>
+        <p class="hidden-note">133 available DB have no projection this week.</p>
+        
+      </div>
+      
+    </div>
+  </section>
+  
+  
+</main>
+<footer>
+  <h2>Sources</h2>
+  <div class="scroll"><table class="sources">
+    <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
+    
+    <tr><td>ESPN</td><td>ok</td>
+      <td>531 <small>+704 without a projection</small></td>
+      <td>99.7%<details class="mini"><summary>3 unmatched</summary><small>Jeremiah Moon CAR DL, Keshawn Banks ATL DL, Victor Dimukeje SF DL</small></details></td>
+      <td>Wed Oct 14, 2:52 PM ET</td></tr>
+    
+    <tr><td>FantasyPros D/ST</td><td>ok</td>
+      <td>28</td>
+      <td>—</td>
+      <td>Wed Oct 14, 2:52 PM ET</td></tr>
+    
+    <tr><td>FantasyPros</td><td>ok</td>
+      <td>234</td>
+      <td>100.0%</td>
+      <td>Wed Oct 14, 2:52 PM ET</td></tr>
+    
+    <tr><td>Sleeper</td><td>ok</td>
+      <td>656 <small>+3701 without a projection</small></td>
+      <td>—</td>
+      <td>Wed Oct 14, 2:52 PM ET</td></tr>
+    
+  </table></div>
+  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or the position's typical spread (σ<sub>out</sub> DL 5.681, LB 5.625, DB 5.228).
+  Tiers group players statistically indistinguishable from each tier's best.
+  Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.
+  Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).
+  * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="data-2026-06.json">data.json</a></p>
+</footer>
+<script>
+(function () {
+  var t = document.getElementById("asof");
+  var age = (Date.now() - Date.parse(t.getAttribute("datetime"))) / 36e5;
+  if (age > 36) document.getElementById("stale").hidden = false;
+})();
+</script>
+</body>
+</html>

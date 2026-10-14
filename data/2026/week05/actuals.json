@@ -1,5 +1,5 @@
 {
- "captured_at": "2026-10-14T15:05:08-04:00",
+ "captured_at": "2026-10-14T15:15:10-04:00",
  "stats": {
   "1052": {"def_snp":68.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_qb_hit":1.0,"idp_tkl":4.0,"idp_tkl_ast":3.0,"idp_tkl_solo":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":6.0,"tm_def_snp":68.0,"tm_off_snp":70.0,"tm_st_snp":30.0},
   "10873": {"def_snp":58.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_tkl":1.0,"idp_tkl_ast":1.0,"penalty":1.0,"penalty_yd":5.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":1.0,"tm_def_snp":72.0,"tm_off_snp":62.0,"tm_st_snp":27.0},
@@ -785,7 +785,7 @@
   "6314": {"def_snp":36.0,"gms_active":1.0,"gp":1.0,"idp_tkl":5.0,"idp_tkl_ast":1.0,"idp_tkl_solo":4.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":9.0,"tm_def_snp":61.0,"tm_off_snp":69.0,"tm_st_snp":24.0},
   "6333": {"def_snp":61.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_pass_def":1.0,"idp_tkl":6.0,"idp_tkl_ast":2.0,"idp_tkl_loss":1.0,"idp_tkl_solo":4.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":15.0,"tm_def_snp":69.0,"tm_off_snp":61.0,"tm_st_snp":24.0},
   "6348": {"def_snp":42.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_qb_hit":1.0,"idp_tkl":6.0,"idp_tkl_ast":6.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":7.0,"st_snp":11.0,"tm_def_snp":62.0,"tm_off_snp":67.0,"tm_st_snp":30.0},
-  "6353": {"gms_active":1.0,"gp":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0},
+  "6353": {"gms_active":1.0,"gp":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"st_snp":23.0,"tm_def_snp":68.0,"tm_off_snp":70.0,"tm_st_snp":30.0},
   "6419": {"gms_active":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0},
   "6485": {"bonus_tkl_10p":1.0,"def_snp":63.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_pass_def":1.0,"idp_qb_hit":1.0,"idp_tkl":11.0,"idp_tkl_ast":6.0,"idp_tkl_solo":5.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":20.0,"tm_def_snp":63.0,"tm_off_snp":66.0,"tm_st_snp":22.0},
   "6612": {"def_snp":19.0,"gms_active":1.0,"gp":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"st_snp":27.0,"tm_def_snp":63.0,"tm_off_snp":60.0,"tm_st_snp":33.0},

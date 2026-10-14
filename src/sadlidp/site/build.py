@@ -88,6 +88,50 @@ def overlay_results(data: dict, results: dict) -> None:
             s["outcome"] = weeklog.outcome(s["player"]["result"], over, s["over_result"])
 
 
+def report_card(data: dict, view: dict | None, week: int, provisional: bool) -> dict:
+    """The week's report card (SPEC §6.8): your rostered IDPs projected vs scored, the suggestions that paid
+    off (from the Stats page's view of the week: the decision log, or the rebuilt page), and the biggest
+    beat, shortfall, best and worst call. `data` is the week's page with its final scores overlaid."""
+    mine = []
+    for slot, m in (data.get("my_idps") or {}).items():
+        for p in m.get("players") or []:
+            if p.get("reserve") or p.get("taxi"):
+                continue
+            r = p.get("result") or {}
+            pts = r.get("pts") if r.get("state") == "final" else None
+            mine.append({"name": p.get("name"), "slot": slot, "mu": p.get("mu"), "pts": pts, "state": r.get("state"),
+                         "diff": pts - p["mu"] if pts is not None and p.get("mu") is not None else None})  # fmt: skip
+    mine.sort(key=lambda x: ("DL LB DB".split().index(x["slot"]) if x["slot"] in ("DL", "LB", "DB") else 3,
+                             -(x["pts"] or -1.0)))  # fmt: skip
+    both = [x for x in mine if x["diff"] is not None]
+    sugg = (view or {}).get("suggestions") or {}
+    calls = [e for e in sugg.get("list") or [] if not e.get("reference") and e.get("outcome") in ("hit", "miss")]
+
+    def margin(e):
+        return (e.get("pts") or 0.0) - (e.get("over_pts") or 0.0)
+
+    hits = [e for e in calls if e["outcome"] == "hit"]
+    misses = [e for e in calls if e["outcome"] == "miss"]
+    tally = [sugg.get(k) or {} for k in ("live", "rebuilt")]
+    beat = max(both, key=lambda x: x["diff"], default=None)
+    short = min(both, key=lambda x: x["diff"], default=None)
+    return {
+        "week": week,
+        "provisional": provisional,
+        "players": mine,
+        "projected": sum(x["mu"] for x in both),
+        "scored": sum(x["pts"] for x in both),
+        "counted": len(both),
+        "hits": sum(t.get("hits", 0) for t in tally),
+        "decided": sum(t.get("decided", 0) for t in tally),
+        "rebuilt": bool((sugg.get("rebuilt") or {}).get("decided")),
+        "beat": beat if beat and beat["diff"] > 0 else None,
+        "short": short if short and short["diff"] < 0 else None,
+        "best_call": max(hits, key=margin, default=None),
+        "worst_call": max(misses, key=lambda e: -margin(e), default=None),
+    }
+
+
 def _et(iso: str | None, fmt: str = "%a %b %-d, %-I:%M %p ET") -> str:
     if not iso:
         return "—"
@@ -144,28 +188,44 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
          "label": f"{s} · Week {w}" if many else f"Week {w}"}
         for s, w, _ in weeks
     ]  # fmt: skip
-    for season, week, wdir in weeks:
+    ev = stats.evaluate(data_dir, latest[0], cfg or {})
+    views = {v["key"]: v for v in (ev or {}).get("views") or []}
+    dbr = ((ev or {}).get("season_by_slot") or {}).get("DB", {}).get("spearman")
+
+    def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
         data = json.loads((wdir / "consensus.json").read_text())
-        final = None
+        sc = (storage.read_json(Path(data_dir) / str(season) / "league.json") or {}).get("scoring_settings") or {}
+        results, provisional = final_results(wdir, sc)
+        if results is None:
+            return data, None
+        overlay_results(data, results)
+        return data, {"provisional": provisional}
+
+    by_week = {(s, w): d for s, w, d in weeks}
+    for season, week, wdir in weeks:
+        final, card = None, None
         if (season, week) != latest:
-            sc = (storage.read_json(Path(data_dir) / str(season) / "league.json") or {}).get("scoring_settings") or {}
-            results, provisional = final_results(wdir, sc)
-            if results is not None:
-                overlay_results(data, results)
-                final = {"provisional": provisional}
+            data, final = scored_page(season, wdir)
+            if final and season == latest[0]:
+                card = report_card(data, views.get(f"w{week}"), week, final["provisional"])
+        else:
+            data = json.loads((wdir / "consensus.json").read_text())
+            prev = by_week.get((season, week - 1))
+            if prev is not None:  # the newest week with stats: last week's card (§6.8)
+                prev_data, prev_final = scored_page(season, prev)
+                if prev_final:
+                    card = report_card(prev_data, views.get(f"w{week - 1}"), week - 1, prev_final["provisional"])
         data_name = f"data-{season}-{week:02d}.json"
         html = template.render(
             d=data, slots=("DL", "LB", "DB"), nav=nav, here=(season, week), latest=(season, week) == latest,
-            final=final, data_href=data_name,
+            final=final, data_href=data_name, card=card, dbr=dbr,
         )  # fmt: skip
         (site / page_name(season, week)).write_text(html)
         (site / data_name).write_text(json.dumps(data, indent=1, sort_keys=True))
         if (season, week) == latest:
             (site / "index.html").write_text(html)
             (site / "data.json").write_text(json.dumps(data, indent=1, sort_keys=True))
-    season = latest[0]
     league_name = (json.loads((weeks[-1][2] / "consensus.json").read_text()).get("league") or {}).get("name")
-    ev = stats.evaluate(data_dir, season, cfg or {})
     (site / "stats.html").write_text(
         env.get_template("stats.html.j2").render(s=ev, slots=("DL", "LB", "DB"), league_name=league_name)
     )

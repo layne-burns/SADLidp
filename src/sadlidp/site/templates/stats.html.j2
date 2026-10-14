@@ -13,6 +13,15 @@ td:first-child, th:first-child { white-space: nowrap; }
 .scroll table { min-width: 520px; }
 .scroll td:first-child, .scroll th:first-child { position: sticky; left: 0; background: var(--card); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.views > label { margin: 0 6px 8px 0; }
+.views > label.wk { padding: 4px 11px; font-size: .85rem; font-weight: 500; }
+{% for v in (s.views if s else []) %}#view-{{ v.key }}:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#view-{{ v.key }}:checked ~ #vpanel-{{ v.key }} { display: block; }
+{% endfor %}.headline { font-size: 1rem; margin: 4px 0 0; }
+.calls li { display: grid; grid-template-columns: 1.2em 1fr; gap: 4px; padding: 5px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.calls li:first-child { border-top: 0; }
+.calls li.hit .mark { color: var(--start); font-weight: 700; } .calls li.miss .mark { color: var(--bad); font-weight: 700; }
+.calls li.ref { color: var(--ref); }
 </style>
 </head>
 <body>
@@ -20,6 +29,98 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 {%- macro pct(x) -%}{% if x is none %}—{% else %}{{ (x * 100)|round|int }}%{% endif %}{%- endmacro %}
 {%- macro runs(b) -%}{% if b is none %}—{% elif b|abs < 0.5 %}about right{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{% else %}{{ '%.1f'|format(-b) }} pts low{% endif %}{%- endmacro %}
 {%- macro ranks(r, n) -%}{% if r is none %}not enough games yet{% elif r < 0.1 %}barely ({{ '%.2f'|format(r) }}){% elif r < 0.3 %}weakly ({{ '%.2f'|format(r) }}){% elif r < 0.5 %}moderately ({{ '%.2f'|format(r) }}){% else %}well ({{ '%.2f'|format(r) }}){% endif %}{%- endmacro %}
+{%- macro view(v, dbr) -%}
+  {% set ss = v.by_slot %}{% set single = v.weeks|length == 1 %}
+  {% set live = v.suggestions.live %}{% set reb = v.suggestions.rebuilt %}
+  <p class="headline">{% if single %}Week {{ v.weeks[0] }}{% else %}Weeks {{ v.weeks[0] }}–{{ v.weeks[-1] }}{% endif %}:
+    {% if live.decided or reb.decided %}suggestions paid off {{ live.hits + reb.hits }} of {{ live.decided + reb.decided }}{% if reb.decided and not live.decided %} (rebuilt){% endif %}{% else %}no suggestions decided{% endif %};
+    projections missed by {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
+    {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}</p>
+  <section aria-labelledby="close-h-{{ v.key }}">
+    <h2 id="close-h-{{ v.key }}">How close were the projections?</h2>
+    <div class="slot">
+      <p>For the {{ s.n_eval }} best-projected players at each position{{ '' if single else ' each week' }}, our number missed by
+        {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
+        {% if not single %}{% set part = s.weekly|selectattr('week', 'in', v.weeks)|selectattr('partial_slots')|map(attribute='week')|list %}{% if part %}Week{{ 's' if part|length > 1 else '' }} {{ part|join(', ') }} {{ 'are' if part|length > 1 else 'is' }} only partly covered (the projections saved before kickoff cover some games only), so {{ 'they are' if part|length > 1 else 'it is' }} left out of these numbers.{% endif %}{% endif %}
+        {% if ss.DL.mae_base %}A simple guess, each player's own average so far, missed by {{ f1(ss.DL.mae_base) }} / {{ f1(ss.LB.mae_base) }} / {{ f1(ss.DB.mae_base) }} on the same players (ours: {{ f1(ss.DL.mae_ours_on_base) }} / {{ f1(ss.LB.mae_ours_on_base) }} / {{ f1(ss.DB.mae_ours_on_base) }}).{% endif %}</p>
+      <table>
+        <tr><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th>{{ 'Top-12 hits' if single else 'Ranks players right' }}</th></tr>
+        {% for slot in slots %}{% set x = ss[slot] %}
+        <tr><td>{{ slot }}{% if x.partial %} <small>partial</small>{% endif %}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td><td>{% if single %}{{ top12(x.top12) }}{% else %}{{ ranks(x.spearman, x.n) }}{% endif %}</td></tr>
+        {% endfor %}
+      </table>
+      {% if single %}<p class="note">Top-12 hits: of our 12 best-projected, how many finished in the actual top 12 (random picks from the 50 would land about 3). How well the order matches is shown season-long only, once there are enough games.</p>{% endif %}
+      {% for slot in slots %}{% set b = ss[slot].bias %}{% if b is not none and b|abs >= 1 %}
+      <p class="note">{{ slot }} numbers run about {{ '%.1f'|format(b|abs) }} pts {{ 'high' if b > 0 else 'low' }} on average. Suggestions only compare {{ slot }}s with other {{ slot }}s, so a shift shared by all of them changes no suggestion; it isn't corrected.</p>
+      {% endif %}{% endfor %}
+      {% if dbr is not none and dbr < 0.1 %}<p class="note dbnote"><b>DBs:</b> so far this season, the order of the DB projections barely matches the order of the scores (r {{ '%.2f'|format(dbr) }}; last season's waiver DBs: 0.01). Treat DB tiers as rough. A DB's snap share and form, both in his breakdown on the main page, say more than a point or two of projection.</p>{% endif %}
+      <details><summary>More stats</summary>
+        <div class="scroll"><table>
+          <tr><th>Pos</th><th class="num">Player-games</th><th class="num">Typical miss (RMSE)</th><th class="num">Inside ±1 range (aim 68%)</th><th class="num">Inside ±2 (aim 95%)</th><th class="num">Top-12 hits</th><th class="num">R²</th><th class="num">Correlation</th></tr>
+          {% for slot in slots %}{% set x = ss[slot] %}
+          <tr><td>{{ slot }}</td><td class="num">{{ x.n }}</td><td class="num">{{ f1(x.rmse) }}</td><td class="num">{{ pct(x.within1) }}</td><td class="num">{{ pct(x.within2) }}</td>
+            <td class="num">{{ top12(x.top12) }}</td><td class="num">{{ '%.2f'|format(x.r2) if x.r2 is not none else '—' }}</td><td class="num">{{ '%.2f'|format(x.pearson) if x.pearson is not none else '—' }}</td></tr>
+          {% endfor %}
+        </table></div>
+      </details>
+    </div>
+  </section>
+
+  {% set srcs = v.by_source or {} %}
+  {% if srcs|length > 1 %}
+  <section aria-labelledby="src-h-{{ v.key }}">
+    <h2 id="src-h-{{ v.key }}">Each source on the same players</h2>
+    <div class="slot">
+      <p>The players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly if w.week in v.weeks %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
+      <div class="scroll"><table>
+        <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
+        {% for slot in slots %}
+        {% for name, by_slot in srcs.items() %}{% set x = by_slot.get(slot) %}{% if x %}
+        <tr><td>{{ s.source_labels.get(name, name) }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td>
+          <td class="num">{{ pct(x.covered / x.pool) if x.pool else '—' }} <small>({{ x.covered }})</small></td></tr>
+        {% endif %}{% endfor %}
+        <tr><td><b>All together</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
+        {% endfor %}
+      </table></div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="sugg-h-{{ v.key }}">
+    <h2 id="sugg-h-{{ v.key }}">Did the suggestions pay off?</h2>
+    <div class="slot">
+      <p>{% if live.decided %}Live suggestions: {{ live.hits }} of {{ live.decided }} paid off (the suggested player outscored the one he was compared with).{% elif not reb.decided %}No suggestions were decided {{ 'this week' if single else 'yet' }}.{% endif %}
+        {% if reb.decided %}{{ 'This week was rebuilt after the fact' if single else 'On the rebuilt weeks' }}: {{ reb.hits }} of {{ reb.decided }} would have paid off.{% endif %}
+        Suggestions shown only for reference aren't counted, and a void one (a player who didn't play) isn't either.</p>
+      {% if single and v.suggestions.list %}
+      <ul class="calls">
+        {% for e in v.suggestions.list %}
+        <li class="{{ e.outcome or '' }}{% if e.reference %} ref{% endif %}"><span class="mark">{% if e.outcome == 'hit' %}✓{% elif e.outcome == 'miss' %}✗{% else %}·{% endif %}</span>
+          <span>{{ e.badge }} <b>{{ e.name }}</b> <small>{{ e.slot }}</small> {{ f1(e.pts) }}{% if e.over_name %} vs {{ e.over_name }} {{ f1(e.over_pts) }}{% endif %}{% if e.p is not none %} <small>({{ [(e.p * 100)|round|int, 99]|min }}% said)</small>{% endif %}{% if e.reference %} <small>for reference</small>{% endif %}{% if e.outcome == 'void' %} <small>void</small>{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  <section aria-labelledby="tiers-h-{{ v.key }}">
+    <h2 id="tiers-h-{{ v.key }}">Do the tiers mean anything?</h2>
+    <div class="slot">
+      {% set nums = (v.tiers.DL + v.tiers.LB + v.tiers.DB)|map(attribute='tier')|unique|sort %}
+      {% if nums %}
+      <p>Average score of the players in each tier as shown when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), with the number of player-games. Higher tiers should score more.</p>
+      <p class="note">The ± is the margin of error (about 95%): one game swings a player's score by around 7 points, while the waiver players a position shows are usually projected within 2 to 4 points of each other. Where two tiers' ranges overlap, the games {{ 'this week' if single else 'so far' }} can't tell them apart, even if the tiers are right.</p>
+      <div class="scroll"><table>
+        <tr><th>Tier</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
+        {% for n in nums %}
+        <tr><td>Tier {{ n }}</td>{% for slot in slots %}{% set t = v.tiers[slot]|selectattr('tier', 'equalto', n)|first %}<td class="num">{% if t %}{{ f1(t.avg) }}{% if t.margin is not none %} <small>±{{ f1(t.margin) }}</small>{% endif %} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
+        {% endfor %}
+      </table></div>
+      {% else %}<p class="note">No tiers were saved from before the waiver run {{ 'this week' if single else 'yet' }}.</p>{% endif %}
+    </div>
+  </section>
+{%- endmacro %}
+{%- macro top12(t) -%}{% if t and t[1] %}{{ t[0] }} of {{ t[1] }}{% else %}—{% endif %}{%- endmacro %}
 <header>
   <h1>How the numbers did</h1>
   <p class="meta">{{ league_name }} · {{ s.season }} season · <a href="index.html">← back to this week</a></p>
@@ -29,62 +130,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <p class="note">No week has final stats yet.</p>
 {% else %}
   {% set ss = s.season_by_slot %}
-  <section aria-labelledby="close-h">
-    <h2 id="close-h">How close were the projections?</h2>
-    <div class="slot">
-      <p>Weeks {{ s.weeks[0] }}–{{ s.weeks[-1] }}: for the {{ s.n_eval }} best-projected players at each position each week, our number missed by
-        {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
-        {% set part = s.weekly|selectattr('partial_slots')|map(attribute='week')|list %}{% if part %}Week{{ 's' if part|length > 1 else '' }} {{ part|join(', ') }} {{ 'are' if part|length > 1 else 'is' }} only partly covered (the projections saved before kickoff cover some games only), so {{ 'they are' if part|length > 1 else 'it is' }} shown week by week below but left out of these numbers.{% endif %}
-        {% if ss.DL.mae_base %}A simple guess, each player's own average so far, missed by {{ f1(ss.DL.mae_base) }} / {{ f1(ss.LB.mae_base) }} / {{ f1(ss.DB.mae_base) }} on the same players (ours: {{ f1(ss.DL.mae_ours_on_base) }} / {{ f1(ss.LB.mae_ours_on_base) }} / {{ f1(ss.DB.mae_ours_on_base) }}).{% endif %}</p>
-      <table>
-        <tr><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th>Ranks players right</th></tr>
-        {% for slot in slots %}{% set x = ss[slot] %}
-        <tr><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td><td>{{ ranks(x.spearman, x.n) }}</td></tr>
-        {% endfor %}
-      </table>
-      {% for slot in slots %}{% set b = ss[slot].bias %}{% if b is not none and b|abs >= 1 %}
-      <p class="note">{{ slot }} numbers run about {{ '%.1f'|format(b|abs) }} pts {{ 'high' if b > 0 else 'low' }} on average. Suggestions only compare {{ slot }}s with other {{ slot }}s, so a shift shared by all of them changes no suggestion; it isn't corrected. How far individual players miss is the "avg miss" above.</p>
-      {% endif %}{% endfor %}
-      <details><summary>More stats</summary>
-        <div class="scroll"><table>
-          <tr><th>Pos</th><th class="num">Player-games</th><th class="num">Typical miss (RMSE)</th><th class="num">Inside ±1 range (aim 68%)</th><th class="num">Inside ±2 (aim 95%)</th><th class="num">Top-12 hits</th><th class="num">R²</th><th class="num">Correlation</th></tr>
-          {% for slot in slots %}{% set x = ss[slot] %}
-          <tr><td>{{ slot }}</td><td class="num">{{ x.n }}</td><td class="num">{{ f1(x.rmse) }}</td><td class="num">{{ pct(x.within1) }}</td><td class="num">{{ pct(x.within2) }}</td>
-            <td class="num">{{ x.top12[0] }} of {{ x.top12[1] }}</td><td class="num">{{ '%.2f'|format(x.r2) if x.r2 is not none else '—' }}</td><td class="num">{{ '%.2f'|format(x.pearson) if x.pearson is not none else '—' }}</td></tr>
-          {% endfor %}
-        </table></div>
-      </details>
-    </div>
-  </section>
-
-  {% set srcs = s.season_by_source or {} %}
-  {% if srcs|length > 1 %}
-  <section aria-labelledby="src-h">
-    <h2 id="src-h">Each source on the same players</h2>
-    <div class="slot">
-      <p>Each week's players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
-      <div class="scroll"><table>
-        <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
-        {% for slot in slots %}
-        {% for name, by_slot in srcs.items() %}{% set x = by_slot.get(slot) %}{% if x %}
-        <tr><td>{{ s.source_labels[name] }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td>
-          <td class="num">{{ pct(x.covered / x.pool) if x.pool else '—' }} <small>({{ x.covered }})</small></td></tr>
-        {% endif %}{% endfor %}
-        <tr><td><b>All together</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
-        {% endfor %}
-      </table></div>
-      <details><summary>Each source, week by week</summary>
-        <div class="scroll"><table>
-          <tr><th>Wk</th><th>Source</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
-          {% for w in s.weekly %}{% for name, by_slot in (w.by_source or {}).items() %}
-          <tr><td>{{ w.week }}</td><td>{{ s.source_labels.get(name, name) }}</td>{% for slot in slots %}{% set x = by_slot.get(slot) %}<td class="num">{% if x and x.covered %}{{ f1(x.mae) }} <small>({{ x.covered }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
-          {% endfor %}{% endfor %}
-        </table></div>
-        <p class="note">Average miss in points, with the number of players each source covered in brackets.</p>
-      </details>
-    </div>
-  </section>
-  {% endif %}
+  {% set dbr = ss.DB.spearman %}
+  <div class="tabs views">
+    {% for v in s.views %}<input type="radio" name="view" id="view-{{ v.key }}"{% if loop.first %} checked{% endif %}><label for="view-{{ v.key }}" class="{{ 'wk' if v.key.startswith('w') else 'main' }}">{{ v.label }}</label>{% endfor %}
+    {% for v in s.views %}
+    <div class="tabpanel" id="vpanel-{{ v.key }}">{{ view(v, dbr) }}</div>
+    {% endfor %}
+  </div>
 
   <section aria-labelledby="weeks-h">
     <h2 id="weeks-h">Week by week</h2>
@@ -118,31 +170,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     </div>
   </section>
 
-  <section aria-labelledby="sugg-h">
-    <h2 id="sugg-h">Did the suggestions pay off?</h2>
-    <div class="slot">
-      {% set live = s.suggestions.live %}{% set reb = s.suggestions.rebuilt %}
-      <p>{% if live.decided %}Live suggestions: {{ live.hits }} of {{ live.decided }} paid off (the suggested player outscored the one he was compared with).{% else %}No live suggestions have been decided yet; they're tracked from week 6 on.{% endif %}
-        {% if reb.decided %}On the rebuilt weeks, {{ reb.hits }} of {{ reb.decided }} would have paid off.{% endif %}
-        Suggestions shown only for reference aren't counted, and a void one (a player who didn't play) isn't either.</p>
-    </div>
-  </section>
-
-  <section aria-labelledby="tiers-h">
-    <h2 id="tiers-h">Do the tiers mean anything?</h2>
-    <div class="slot">
-      <p>Average score of the players in each tier as shown when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), all weeks together, with the number of player-games. Higher tiers should score more.</p>
-      <p>The ± is the margin of error (about 95%): one game swings a player's score by around 7 points, while the waiver players a position shows are usually projected within 2 to 4 points of each other. Where two tiers' ranges overlap, the games so far can't tell them apart yet, even if the tiers are right.</p>
-      <div class="scroll"><table>
-        <tr><th>Tier</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
-        {% set nums = (s.tiers.DL + s.tiers.LB + s.tiers.DB)|map(attribute='tier')|unique|sort %}
-        {% for n in nums %}
-        <tr><td>Tier {{ n }}</td>{% for slot in slots %}{% set t = s.tiers[slot]|selectattr('tier', 'equalto', n)|first %}<td class="num">{% if t %}{{ f1(t.avg) }}{% if t.margin is not none %} <small>±{{ f1(t.margin) }}</small>{% endif %} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
-        {% endfor %}
-      </table></div>
-    </div>
-  </section>
-
   <section aria-labelledby="weights-h">
     <h2 id="weights-h">Who gets how much say</h2>
     <div class="slot">
@@ -167,5 +194,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 {% endif %}
 </main>
 <footer><p>Computed from the weeks saved in the repo; nothing here changes the numbers on the main page yet. Weeks marked "archive" use projections fetched after the fact from each source's archive.</p></footer>
+<script>
+(function () {
+  var el = location.hash && document.getElementById("view-" + location.hash.slice(1));
+  if (el) el.checked = true;
+})();
+</script>
 </body>
 </html>

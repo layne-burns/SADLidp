@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 import re
 import statistics
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from . import metrics, scoring, storage, swing, weeklog
@@ -50,6 +50,21 @@ def _positions(season_dir: Path) -> dict[str, str]:
                 if s:
                     slots[pid] = s
     return slots
+
+
+def _names(season_dir: Path) -> dict[str, str]:
+    """pid -> name, from every saved players file (the latest week wins)."""
+    names: dict[str, str] = {}
+    for d in sorted(season_dir.glob("week*")):
+        for name in ("players_idp.json", "players.json"):
+            data = storage.read_json(d / name) or {}
+            data = data.get("players", data) if isinstance(data, dict) else {}
+            for pid, p in data.items():
+                full = (p or {}).get("full_name") or " ".join(x for x in ((p or {}).get("first_name"),
+                                                                          (p or {}).get("last_name")) if x)  # fmt: skip
+                if full:
+                    names[pid] = full
+    return names
 
 
 def _projection_sources(wd: Path, kind: str = "projection") -> dict[str, dict]:
@@ -128,6 +143,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         return None
     sched = Schedule.from_json(storage.read_json(season_dir / "schedule.json") or {"season": season, "games": []})
     slots = _positions(season_dir)
+    names = _names(season_dir)
     tcfg = cfg.get("tiers") or {}
     floor = tcfg.get("sigma_floor") or {}
     so_saved = storage.read_json(Path(data_dir) / str(season - 1) / "sigma_out.json") or {}
@@ -136,9 +152,13 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
 
     history: dict[str, list[float]] = {}  # pid -> SADL points of earlier games this season
     resid: dict[str, dict[int, tuple[bool, list[float]]]] = {}  # slot -> week -> (provisional, actual − predicted)
-    season_rows = {s: {"pred": [], "act": [], "sig": [], "base": [], "pairs": []} for s in IDP_SLOTS}
-    by_source: dict[str, dict[str, dict]] = {}  # source -> slot -> pooled pred/act/sig/base, covered, pool
-    weekly, suggestions, tiers = [], [], {s: {} for s in IDP_SLOTS}
+    # per week, what every view (a single week, last week, the season) is summed from (§6.8 views)
+    raw: dict[int, dict[str, dict]] = {}  # week -> slot -> pool pred/act/sig/base/pairs/top12/partial
+    raw_src: dict[int, dict[str, dict[str, dict]]] = {}  # week -> source -> slot -> pred/act/sig/base/covered/pool
+    tiers_wk: dict[int, dict[str, dict]] = {}  # week -> slot -> tier -> [points]
+    provisional_wk: dict[int, bool] = {}
+    played_out: dict[int, bool] = {}  # week -> every game over (last kickoff + 4 h) when its stats were captured
+    weekly, suggestions = [], []
     kinds: dict[str, str] = {}  # source -> projection or rank
     for week, wd in weeks:
         act_doc = storage.read_json(wd / "actuals.json") or {}
@@ -178,6 +198,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             summ = _summary(pred, act, sig, base)
             summ.update(top12=top, pearson=None, spearman=None, r2=None, partial=partial)  # weekly: no correlations
             row["by_slot"][slot] = summ
+            pairs = metrics.pairwise(dict(zip(pool, pred, strict=True)), dict(zip(pool, sig, strict=True)),
+                                     dict(zip(pool, act, strict=True)))  # fmt: skip
+            raw.setdefault(week, {})[slot] = {"pred": pred, "act": act, "sig": sig, "base": base, "pairs": pairs,
+                                              "top12": top, "partial": partial}  # fmt: skip
             for name, pred_s in preds.items():  # each source on the pool players it covers
                 cov = [pid for pid in pool if pid in pred_s]
                 p_s, a_s = [pred_s[pid] for pid in cov], [played[pid] for pid in cov]
@@ -186,31 +210,12 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 summ_s = _summary(p_s, a_s, sig_s, base_s)
                 summ_s.update(covered=len(cov), pool=len(pool), pearson=None, spearman=None, r2=None)
                 row["by_source"].setdefault(name, {})[slot] = summ_s
-                if partial:
-                    continue
-                acc = by_source.setdefault(name, {}).setdefault(
-                    slot, {"pred": [], "act": [], "sig": [], "base": [], "covered": 0, "pool": 0}
-                )
-                acc["pred"] += p_s
-                acc["act"] += a_s
-                acc["sig"] += sig_s
-                acc["base"] += base_s
-                acc["covered"] += len(cov)
-                acc["pool"] += len(pool)
-            if partial:
-                continue
-            resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
-            agg = season_rows[slot]
-            agg["pred"] += pred
-            agg["act"] += act
-            agg["sig"] += sig
-            agg["base"] += base
-            agg["pairs"] += metrics.pairwise(dict(zip(pool, pred, strict=True)), dict(zip(pool, sig, strict=True)),
-                                             dict(zip(pool, act, strict=True)))  # fmt: skip
-            agg.setdefault("top12", [0, 0])
-            if top:
-                agg["top12"][0] += top[0]
-                agg["top12"][1] += top[1]
+                raw_src.setdefault(week, {}).setdefault(name, {})[slot] = {
+                    "pred": p_s, "act": a_s, "sig": sig_s, "base": base_s, "covered": len(cov), "pool": len(pool),
+                    "partial": partial,
+                }  # fmt: skip
+            if not partial:
+                resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
         row["partial_slots"] = [slot for slot in IDP_SLOTS if row["by_slot"][slot]["partial"]]
         # a source read live for the first time partway through the week covers only the games still to come
         row["joined_midweek"] = sorted(
@@ -219,6 +224,11 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             and any(x["pool"] and x["covered"] < x["pool"] / 2 for x in row["by_source"].get(name, {}).values())
         )  # fmt: skip
         weekly.append(row)
+        provisional_wk[week] = provisional
+        kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
+        played_out[week] = bool(kicks and captured) and datetime.fromisoformat(captured) >= max(kicks) + timedelta(
+            hours=4
+        )
 
         # suggestions: issued live (decision log) or rebuilt (replayed page)
         res = {pid: weeklog.stat_result(line, sc, final=True) for pid, line in lines.items()}
@@ -230,15 +240,20 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         badge_doc = (storage.read_json(wd / "badges.json") or {}).get("badges") or {}
         if badge_doc:
             issued = [{"w": e["w"], "over": e.get("over"), "badge": e["badge"], "reference": e.get("reference"),
-                       "p": e.get("p"), "kind": "live"} for e in badge_doc.values() if e.get("active")]  # fmt: skip
+                       "p": e.get("p"), "slot": e.get("slot"), "kind": "live"}
+                      for e in badge_doc.values() if e.get("active")]  # fmt: skip
         elif page.get("replayed"):
-            for m in (page.get("my_idps") or {}).values():
+            for slot_m, m in (page.get("my_idps") or {}).items():
                 for s in m.get("suggestions") or []:
                     issued.append({"w": s["player"]["id"], "over": s.get("over"), "badge": s["badge"],
-                                   "reference": s.get("reference"), "p": s.get("p"), "kind": "rebuilt"})  # fmt: skip
+                                   "reference": s.get("reference"), "p": s.get("p"), "slot": slot_m,
+                                   "kind": "rebuilt"})  # fmt: skip
         for e in issued:
+            w_res, o_res = result(e["w"]), result(e["over"]) if e["over"] else None
             e["week"] = week
-            e["outcome"] = weeklog.outcome(result(e["w"]), e["over"], result(e["over"]) if e["over"] else None)
+            e["outcome"] = weeklog.outcome(w_res, e["over"], o_res)
+            e.update(name=names.get(e["w"], e["w"]), over_name=names.get(e["over"]) if e["over"] else None,
+                     pts=w_res.get("pts"), over_pts=(o_res or {}).get("pts"))  # fmt: skip
             suggestions.append(e)
 
         # tiers as shown when you set waivers (the pre-waiver sync's log); a rebuilt week's page is that
@@ -249,57 +264,119 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
                     shown.update({p["id"]: {"slot": slot, "tier": t["tier"]} for p in t["players"]})
         for pid, r in shown.items():
-            if pid in played and r.get("slot") in tiers:
-                tiers[r["slot"]].setdefault(r["tier"], []).append(played[pid])
+            if pid in played and r.get("slot") in IDP_SLOTS:
+                tiers_wk.setdefault(week, {}).setdefault(r["slot"], {}).setdefault(r["tier"], []).append(played[pid])
 
         for pid, pts in played.items():
             history.setdefault(pid, []).append(pts)
 
-    season_by_source = {}
-    order = list(SOURCE_LABELS)
-    for name, slots_acc in sorted(by_source.items(), key=lambda kv: (order.index(kv[0]) if kv[0] in order
-                                                                     else len(order), kv[0])):  # fmt: skip
-        season_by_source[name] = {}
-        for slot, acc in slots_acc.items():
+    def view(sel: list[int]) -> dict:
+        """The Stats page's numbers over the weeks in `sel`: a single week keeps a partial position-week
+        (shown, marked), a span of weeks leaves it out (§6.8)."""
+        keep_partial = len(sel) == 1
+        by_slot = {}
+        for slot in IDP_SLOTS:
+            acc = {"pred": [], "act": [], "sig": [], "base": [], "pairs": []}
+            top12, partial = [0, 0], False
+            for w in sel:
+                r = (raw.get(w) or {}).get(slot)
+                if not r or (r["partial"] and not keep_partial):
+                    continue
+                partial = partial or r["partial"]
+                for k in acc:
+                    acc[k] += r[k]
+                if r["top12"]:
+                    top12 = [top12[0] + r["top12"][0], top12[1] + r["top12"][1]]
             summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
-            summ.update(covered=acc["covered"], pool=acc["pool"])
-            season_by_source[name][slot] = summ
+            summ.update(top12=tuple(top12), brier=metrics.brier(acc["pairs"]), pairs=len(acc["pairs"]),
+                        calibration=metrics.calibration(acc["pairs"]), partial=partial)  # fmt: skip
+            by_slot[slot] = summ
+        by_src: dict[str, dict] = {}
+        order = list(SOURCE_LABELS)
+        names_src = sorted({n for w in sel for n in raw_src.get(w) or {}},
+                           key=lambda n: (order.index(n) if n in order else len(order), n))  # fmt: skip
+        for name in names_src:
+            for slot in IDP_SLOTS:
+                acc = {"pred": [], "act": [], "sig": [], "base": [], "covered": 0, "pool": 0}
+                for w in sel:
+                    r = ((raw_src.get(w) or {}).get(name) or {}).get(slot)
+                    if not r or (r["partial"] and not keep_partial):
+                        continue
+                    for k in acc:
+                        acc[k] += r[k]
+                if acc["pool"]:
+                    summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
+                    summ.update(covered=acc["covered"], pool=acc["pool"])
+                    by_src.setdefault(name, {})[slot] = summ
+        picked = [e for e in suggestions if e["week"] in sel]
 
-    season_out = {}
-    for slot, agg in season_rows.items():
-        summ = _summary(agg["pred"], agg["act"], agg["sig"], agg["base"])
-        summ["top12"] = tuple(agg.get("top12") or (0, 0))
-        summ["brier"] = metrics.brier(agg["pairs"])
-        summ["pairs"] = len(agg["pairs"])
-        summ["calibration"] = metrics.calibration(agg["pairs"])
-        season_out[slot] = summ
+        def tally(kind):
+            mine = [e for e in picked if e["kind"] == kind and not e.get("reference")]
+            decided = [e for e in mine if e["outcome"] in ("hit", "miss", "push")]
+            return {"hits": sum(e["outcome"] == "hit" for e in decided), "decided": len(decided),
+                    "void": sum(e["outcome"] == "void" for e in mine)}  # fmt: skip
 
-    def tally(kind):
-        sel = [e for e in suggestions if e["kind"] == kind and not e.get("reference")]
-        decided = [e for e in sel if e["outcome"] in ("hit", "miss", "push")]
-        return {"hits": sum(e["outcome"] == "hit" for e in decided), "decided": len(decided),
-                "void": sum(e["outcome"] == "void" for e in sel)}  # fmt: skip
+        tier_rows = {}
+        for slot in IDP_SLOTS:  # margin = 2 standard errors of the tier's average (None below 2 player-games)
+            pts: dict = {}
+            for w in sel:
+                for t, v in ((tiers_wk.get(w) or {}).get(slot) or {}).items():
+                    pts.setdefault(t, []).extend(v)
+            tier_rows[slot] = [
+                {"tier": t, "n": len(v), "avg": sum(v) / len(v),
+                 "margin": 2 * statistics.stdev(v) / math.sqrt(len(v)) if len(v) >= 2 else None}
+                for t, v in sorted(pts.items()) if v
+            ]  # fmt: skip
+        listed = sorted(picked, key=lambda e: (e["week"], bool(e.get("reference")), e.get("slot") or "",
+                                               -(e.get("pts") or -1.0)))  # fmt: skip
+        return {
+            "weeks": sel,
+            "provisional": any(provisional_wk.get(w) for w in sel),
+            "by_slot": by_slot,
+            "by_source": by_src,
+            "suggestions": {
+                "live": tally("live"),
+                "rebuilt": tally("rebuilt"),
+                "list": [
+                    {
+                        k: e.get(k)
+                        for k in (
+                            "week",
+                            "slot",
+                            "badge",
+                            "kind",
+                            "reference",
+                            "p",
+                            "name",
+                            "pts",
+                            "over_name",
+                            "over_pts",
+                            "outcome",
+                        )
+                    }
+                    for e in listed
+                ],
+            },  # fmt: skip
+            "tiers": tier_rows,
+        }
 
-    tier_rows = {  # margin = 2 standard errors of the tier's average (None below 2 player-games)
-        slot: [
-            {
-                "tier": t,
-                "n": len(v),
-                "avg": sum(v) / len(v),
-                "margin": 2 * statistics.stdev(v) / math.sqrt(len(v)) if len(v) >= 2 else None,
-            }
-            for t, v in sorted(tiers[slot].items())
-            if v
-        ]
-        for slot in IDP_SLOTS
-    }
+    all_weeks = [w for w, _ in weeks]
+    season_view = view(all_weeks)
+    last = max((w for w in all_weeks if played_out.get(w)), default=all_weeks[-1])  # not a week still being played
+    views = [{"key": "last", "label": f"Last week (week {last})", **view([last])},
+             {"key": "season", "label": "All season", **season_view}]  # fmt: skip
+    views += [{"key": f"w{w}", "label": f"Week {w}", **view([w])} for w in all_weeks]
+    season_out = season_view["by_slot"]
+    season_by_source = season_view["by_source"]
+    tier_rows = season_view["tiers"]
     return {
         "season": season,
         "weeks": [w for w, _ in weeks],
         "weekly": weekly,
         "season_by_slot": season_out,
-        "suggestions": {"live": tally("live"), "rebuilt": tally("rebuilt")},
+        "suggestions": {k: season_view["suggestions"][k] for k in ("live", "rebuilt")},
         "tiers": tier_rows,
+        "views": views,
         "season_by_source": season_by_source,
         "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
         # equal priors within each group, 60:40 between them (D11); PR 6 records the accuracy weights in force

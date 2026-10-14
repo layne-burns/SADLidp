@@ -581,7 +581,13 @@ def test_form_term_from_earlier_weeks(tmp_path):
     other = _card(d["positions"]["LB"], "4118")  # Anzalone: no week-4 line, so no term and no form in his card
     assert "form" not in other["breakdown"] and other["mu"] == other["breakdown"]["mu"]
     html = build_site(data, tmp_path / "site", CFG).read_text()
-    assert "<b>Form</b>" in html and "with form" in html and "of his team's defensive snaps last game (week 4)" in html
+    assert (
+        "<b>Form</b>" in html
+        and "from the sources" in html
+        and "of his team's defensive snaps last game (week 4)" in html
+    )
+    tk = html[html.index("Tykee") :]
+    assert f"{'+' if f['pts'] >= 0 else '−'} {abs(f['pts']):.1f} form." in tk[: tk.index("</details>")]
     # off: nothing changes and nothing is recorded
     run_sync(CFG_PLAIN, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)
     assert "form" not in json.loads((data / "2026" / "week05" / "run.json").read_text())
@@ -616,7 +622,7 @@ def test_per_player_swing_on_cards_odds_and_the_record(tmp_path):
     badge = json.loads((week / "badges.json").read_text())["badges"][f"4118|START|{s['over']}"]
     assert badge["swing_w"] == anz["swing"] and badge["swing_over"] == me["swing"]
     html = build_site(data, tmp_path / "site", CFG).read_text()
-    assert 'class="band"' in html and "Game-to-game swing" in html and "each player's own" in html
+    assert 'class="band">range ' in html and "3 games in 5 land inside it" in html and "each player's own" in html
     # off: σ_out alone, as before
     off = {**CFG, "swing": {**CFG["swing"], "enabled": False}}
     run_sync(off, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)

@@ -17,7 +17,7 @@
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
 {%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
-{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{% if p.floor is defined and p.floor is not none and not p.result %}<div class="band" title="one game in five lands below the floor, one in five above the ceiling">{{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>{% endif %}{%- endmacro %}
+{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{% if not p.result %}{% if p.breakdown and p.breakdown.form and p.breakdown.form.pts|abs >= 0.5 %}<div class="band">form {{ '%+.1f'|format(p.breakdown.form.pts) }}</div>{% endif %}{% if p.floor is defined and p.floor is not none %}<div class="band">range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>{% endif %}{% endif %}{%- endmacro %}
 {%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
 {%- macro card_open(p) -%}{% if p.breakdown %}<li class="item"><details class="bd"><summary><div class="row">{% else %}<li class="item"><div class="row">{% endif %}{%- endmacro %}
 {%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
@@ -27,12 +27,12 @@
 {% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
 {% endif %}{% endfor %}
 {% if p.breakdown.form %}{% set f = p.breakdown.form %}<div class="part"><b>Form</b> · {{ '%+.1f'|format(f.pts) }} pts
-{% if f.miss %}<div class="sub">{{ 'beat' if f.miss.mean >= 0 else 'trailed' }} his projection by {{ '%.1f'|format(f.miss.mean|abs) }} per game over {{ f.miss.games }} game{{ 's' if f.miss.games != 1 }} this season, counted as {{ '%+.1f'|format(f.miss.shrunk) }} after shrinking: {{ '%+.1f'|format(f.miss.pts) }}</div>{% endif %}
-{% if f.snap %}<div class="sub">{{ (f.snap.share * 100)|round|int }}% of his team's defensive snaps last game (week {{ f.snap.week }}), against {{ (f.snap.avg * 100)|round|int }}% for the position's 60 best-projected: {{ '%+.1f'|format(f.snap.pts) }}</div>{% endif %}
+{% if f.miss %}<div class="sub">{{ '%+.1f'|format(f.miss.pts) }} · he has {{ 'beaten' if f.miss.mean >= 0 else 'trailed' }} his projection by {{ '%.1f'|format(f.miss.mean|abs) }} pts a game over {{ f.miss.games }} game{{ 's' if f.miss.games != 1 }}. Part of that is luck, so it counts as {{ '%+.1f'|format(f.miss.shrunk) }} a game{% if f.miss.shrunk %}, and {{ (f.miss.pts / f.miss.shrunk * 100)|round|int }}% of that carries into this week{% endif %}.</div>{% endif %}
+{% if f.snap %}<div class="sub">{{ '%+.1f'|format(f.snap.pts) }} · he played {{ (f.snap.share * 100)|round|int }}% of his team's defensive snaps last game (week {{ f.snap.week }}); the top 60 {{ p.slot }}s averaged {{ (f.snap.avg * 100)|round|int }}%.</div>{% endif %}
 </div>
-{% endif %}{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.base if p.breakdown.form else p.breakdown.mu) }} pts{% if kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}{% if p.breakdown.form %}; with form {{ '%+.1f'|format(p.breakdown.form.pts) }} = {{ '%.1f'|format(p.breakdown.mu) }} pts{% endif %}.</div>{% endif %}
+{% endif %}{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sum"><b>{{ '%.1f'|format(p.breakdown.mu) }} pts</b> = {{ '%.1f'|format(p.breakdown.base if p.breakdown.form else p.breakdown.mu) }} from the sources{% if kinds|length == 1 %} ({{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}{% if p.breakdown.form %} {{ '+' if p.breakdown.form.pts >= 0 else '−' }} {{ '%.1f'|format(p.breakdown.form.pts|abs) }} form{% endif %}.</div>{% endif %}
 {% if p.breakdown.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
-{% if p.swing is defined and p.swing is not none and not p.result %}<div class="sub">Game-to-game swing ±{{ '%.1f'|format(p.swing) }} from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between {{ '%.0f'|format(p.floor) }} and {{ '%.0f'|format(p.ceiling) }}.</div>{% endif %}
+{% if p.swing is defined and p.swing is not none and not p.result %}<div class="sub">Range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}: 3 games in 5 land inside it, 1 in 5 below and 1 in 5 above. It comes from his projected stat mix; players whose points lean on sacks and turnovers swing more (±{{ '%.1f'|format(p.swing) }} here).</div>{% endif %}
 </div>{% endif %}{%- endmacro %}
 {%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
 {%- macro pts_text(r) -%}{% if r %}{% if r.state == 'final' %}scored {{ '%.1f'|format(r.pts) }}{% elif r.state == 'live' %}{{ '%.1f'|format(r.pts) }} so far{% elif r.state == 'unavailable' %}score unavailable{% else %}did not play{% endif %}{% else %}not played yet{% endif %}{%- endmacro %}
@@ -48,6 +48,28 @@
   {% if d.last_week and d.last_week.summary.decided %}<p class="meta"><a href="#lw-h">Last week: {{ d.last_week.summary.hits }} of {{ d.last_week.summary.decided }} suggestions paid off ↓</a></p>{% endif %}
 </header>
 <main>
+  {% if card %}{% set c = card %}
+  <section aria-labelledby="rc-h">
+    <h2 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h2>
+    <div class="slot report">
+      <p class="headline">{% if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).{% else %}None of your IDPs had both a projection and a final score.{% endif %}
+        {% if c.decided %}Suggestions paid off <b>{{ c.hits }} of {{ c.decided }}</b>{% if c.rebuilt %} (rebuilt){% endif %}.{% else %}No suggestions were decided that week.{% endif %}</p>
+      <ul class="rc">
+        {% for x in c.players %}
+        <li><span>{{ x.name }} <small>{{ x.slot }}</small></span>
+          <span class="num">{% if x.mu is not none %}{{ '%.1f'|format(x.mu) }}{% else %}<small>no projection</small>{% endif %} → {% if x.pts is not none %}<b>{{ '%.0f'|format(x.pts) }}</b>{% elif x.state == 'dnp' %}<small>did not play</small>{% else %}<small>—</small>{% endif %}{% if x.diff is not none %} <small class="{{ 'up' if x.diff >= 0 else 'down' }}">{{ '%+.1f'|format(x.diff) }}</small>{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+      {% if c.beat or c.short or c.best_call or c.worst_call %}<dl class="rcx">
+        {% if c.beat %}<dt>Biggest beat</dt><dd>{{ c.beat.name }}: {{ '%.0f'|format(c.beat.pts) }} vs {{ '%.1f'|format(c.beat.mu) }} projected</dd>{% endif %}
+        {% if c.short %}<dt>Biggest shortfall</dt><dd>{{ c.short.name }}: {{ '%.0f'|format(c.short.pts) }} vs {{ '%.1f'|format(c.short.mu) }} projected</dd>{% endif %}
+        {% if c.best_call %}<dt>Best call</dt><dd>{{ c.best_call.badge }} {{ c.best_call.name }} {{ '%.0f'|format(c.best_call.pts or 0) }}{% if c.best_call.over_name %} over {{ c.best_call.over_name }} {{ '%.0f'|format(c.best_call.over_pts or 0) }}{% endif %}</dd>{% endif %}
+        {% if c.worst_call %}<dt>Worst call</dt><dd>{{ c.worst_call.badge }} {{ c.worst_call.name }} {{ '%.0f'|format(c.worst_call.pts or 0) }}{% if c.worst_call.over_name %} over {{ c.worst_call.over_name }} {{ '%.0f'|format(c.worst_call.over_pts or 0) }}{% endif %}</dd>{% endif %}
+      </dl>{% endif %}
+      <p class="meta"><a href="stats.html#w{{ c.week }}">All of week {{ c.week }}'s numbers →</a></p>
+    </div>
+  </section>
+  {% endif %}
   <section aria-labelledby="my-h">
     <h2 id="my-h">My IDPs</h2>
     {% for slot in slots %}{% set m = d.my_idps[slot] %}
@@ -99,6 +121,7 @@
       {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
       {% for slot in slots %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
+        {% if slot == 'DB' and dbr is defined and dbr is not none and dbr < 0.1 %}<p class="note dbnote">Projections barely tell waiver DBs apart (this season r {{ '%.2f'|format(dbr) }}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>{% endif %}
         {% for t in pos.tiers %}
         <div class="card">
           <p class="tierhead">Tier {{ t.tier }}</p>

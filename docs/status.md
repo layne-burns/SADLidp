@@ -19,18 +19,18 @@ Data review (weeks 1–5): a private report for the owner. Findings, in short:
 - The floor–ceiling ranges are the right width.
 - Sleeper's archive passed the integrity check.
 
-## 1. Week-5 frozen gap (this PR)
+## 1. Week-5 frozen gap (#14, merged)
 - [x] `sadlidp replay --fill-frozen`, and week 5 filled: 581 rebuilt records, 50 live records kept.
 - [x] Snap share by role tested on 2025 and rejected: it predicted worse.
 
-## 2. Interface PR (owner's asks, 2026-10-14)
-- [ ] Stats page views: Last week / All season / any single week.
-- [ ] Weekly report card at the top of the main page:
+## 2. Interface PR (owner's asks, 2026-10-14; #15)
+- [x] Stats page views: Last week / All season / any single week.
+- [x] Weekly report card at the top of the main page:
   - your players vs projection;
   - suggestions paid off x of y;
   - biggest hit and miss.
-- [ ] DB note: projections can't separate waiver DBs (2026 r 0.04, 2025 r 0.01); lean on snaps and form.
-- [ ] Plainer card wording for the form term and the floor–ceiling.
+- [x] DB note: projections can't separate waiver DBs (2026 r 0.04, 2025 r 0.01); lean on snaps and form.
+- [x] Plainer card wording for the form term and the floor–ceiling.
 
 ## 3. PR 6: accuracy weights + team-defense backtest
 - Per-source weights from measured accuracy:

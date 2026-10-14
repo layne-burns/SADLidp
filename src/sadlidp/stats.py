@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 import re
 import statistics
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from . import metrics, scoring, storage, swing, weeklog
@@ -157,6 +157,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     raw_src: dict[int, dict[str, dict[str, dict]]] = {}  # week -> source -> slot -> pred/act/sig/base/covered/pool
     tiers_wk: dict[int, dict[str, dict]] = {}  # week -> slot -> tier -> [points]
     provisional_wk: dict[int, bool] = {}
+    played_out: dict[int, bool] = {}  # week -> every game over (last kickoff + 4 h) when its stats were captured
     weekly, suggestions = [], []
     kinds: dict[str, str] = {}  # source -> projection or rank
     for week, wd in weeks:
@@ -224,6 +225,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         )  # fmt: skip
         weekly.append(row)
         provisional_wk[week] = provisional
+        kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
+        played_out[week] = bool(kicks and captured) and datetime.fromisoformat(captured) >= max(kicks) + timedelta(
+            hours=4
+        )
 
         # suggestions: issued live (decision log) or rebuilt (replayed page)
         res = {pid: weeklog.stat_result(line, sc, final=True) for pid, line in lines.items()}
@@ -357,7 +362,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
 
     all_weeks = [w for w, _ in weeks]
     season_view = view(all_weeks)
-    views = [{"key": "last", "label": f"Last week (week {all_weeks[-1]})", **view(all_weeks[-1:])},
+    last = max((w for w in all_weeks if played_out.get(w)), default=all_weeks[-1])  # not a week still being played
+    views = [{"key": "last", "label": f"Last week (week {last})", **view([last])},
              {"key": "season", "label": "All season", **season_view}]  # fmt: skip
     views += [{"key": f"w{w}", "label": f"Week {w}", **view([w])} for w in all_weeks]
     season_out = season_view["by_slot"]

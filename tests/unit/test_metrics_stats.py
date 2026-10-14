@@ -144,3 +144,13 @@ def test_report_card_totals_beats_and_calls():
     assert (c["projected"], c["scored"], c["counted"]) == (22.0, 23.0, 2)
     assert c["beat"]["name"] == "A" and c["short"]["name"] == "B" and (c["hits"], c["decided"]) == (2, 3)
     assert c["best_call"]["name"] == "W" and c["worst_call"]["name"] == "Y" and not c["rebuilt"]
+
+
+def test_last_week_skips_a_week_still_being_played(tmp_path):
+    data = _season(tmp_path)
+    act = data / "2026" / "week03" / "actuals.json"
+    doc = json.loads(act.read_text())
+    doc["captured_at"] = "2026-09-27T20:00:00+00:00"  # Sunday afternoon of week 3: games still to come
+    act.write_text(json.dumps(doc))
+    ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
+    assert ev["views"][0]["weeks"] == [2] and ev["views"][-1]["key"] == "w3"

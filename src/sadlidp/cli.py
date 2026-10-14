@@ -109,6 +109,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
         priors=priors,
         only=args.source,
         redo=args.redo,
+        sched=sched,
     )
     written = "; ".join(f"{name} weeks {ws}" for name, ws in done.items()) or "nothing written"
     print(f"backfill: season {season}, weeks before {target}: {written}")

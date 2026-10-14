@@ -184,7 +184,7 @@
   <div class="scroll"><table class="sources">
     <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
     {% for name, s in d.sources.items() %}
-    <tr><td>{{ s.label or name }}</td><td>{{ 'from saved data' if s.status == 'saved' else s.status }}{% if s.stale %} (stale, not used){% endif %}</td>
+    <tr><td>{{ s.label or name }}</td><td>{% if s.pending %}not posted yet{% if s.expected_by %} <small>(usually by {{ s.expected_by|et('%a %-I:%M %p ET') }})</small>{% endif %}{% elif s.late %}late{% if s.expected_by %} <small>(usually by {{ s.expected_by|et('%a %-I:%M %p ET') }})</small>{% endif %}{% elif s.status == 'not_yet_published' %}not posted yet{% else %}{{ 'from saved data' if s.status == 'saved' else s.status }}{% endif %}{% if s.stale %} (stale, not used){% endif %}</td>
       <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
       <td>{% if s.match and s.match.rate is not none %}{{ '%.1f'|format(s.match.rate * 100) }}%{% if s.match.unmatched %}{% if s.match.names %}<details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>{% else %} <small>{{ s.match.unmatched }} unmatched</small>{% endif %}{% endif %}{% else %}—{% endif %}</td>
       <td>{{ s.last_success|et }}</td></tr>

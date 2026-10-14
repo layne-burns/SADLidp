@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -24,6 +25,7 @@ class FetchContext:
     matcher: object | None = None  # matching.Matcher (§6.1)
     imputer: object | None = None  # impute.Imputer (§6.2)
     archive: bool = False  # the backfill runner is asking for a past week (§5.3)
+    kickoff_of: Callable[[str], datetime | None] | None = None  # a player's kickoff that week, if known
 
 
 @dataclass

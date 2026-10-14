@@ -54,6 +54,18 @@ def host_of(module) -> str:
     return getattr(module, "HOST", None) or urllib.parse.urlsplit(getattr(module, "URL", "")).hostname or module.NAME
 
 
+def week_kickoffs(sched, players: dict[str, dict], week: int) -> Callable[[str], datetime | None] | None:
+    """A player's kickoff in `week` from his current team's game (None without a schedule or a game)."""
+    if sched is None:
+        return None
+
+    def kickoff_of(pid: str) -> datetime | None:
+        game = sched.game_for((players.get(pid) or {}).get("team"), week)
+        return game.kickoff if game else None
+
+    return kickoff_of
+
+
 def _all_backfilled(path: Path) -> bool:
     rows = storage.load_source(path).get("rows") or {}
     return all(r.get("backfill") for r in rows.values())
@@ -76,6 +88,7 @@ def run(
     redo: bool = False,
     log: Callable[[str], None] = print,
     clock: Callable[[], float] = time.monotonic,
+    sched=None,
 ) -> dict[str, list[int]]:
     """Fetch and save the missing past `weeks` of every archive source (`only` one, if named): {name: [weeks]}.
 
@@ -117,7 +130,8 @@ def run(
                 break
             before = getattr(client, "request_count", None)
             ctx = FetchContext(client, sleeper, season, w, now, players, source_cfg(cfg, name), matcher,
-                               imputer_for(cfg, priors, data_dir, season, w, players), archive=True)  # fmt: skip
+                               imputer_for(cfg, priors, data_dir, season, w, players), archive=True,
+                               kickoff_of=week_kickoffs(sched, players, w))  # fmt: skip
             try:
                 res = module.fetch(ctx)
                 why = None if res.ok else res.status + (f" ({res.error})" if res.error else "")

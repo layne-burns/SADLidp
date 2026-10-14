@@ -32,6 +32,17 @@ ACTIVATE = 3  # evaluated weeks before the data weights apply
 LAG = 2  # week N uses weeks ≤ N − 2
 
 
+def prior_weights(cfg: dict) -> dict[str, float]:
+    """Each source's starting weight within its group (§6.5 "Prior weights"); a source not named is 1."""
+    return {name: float(w) for name, w in ((cfg.get("weights") or {}).get("prior") or {}).items()}
+
+
+def _wmean(pairs: list[tuple[float, float]]) -> float | None:
+    """Weighted mean of (value, weight) pairs, or None."""
+    tot = sum(w for _, w in pairs)
+    return sum(v * w for v, w in pairs) / tot if pairs and tot > 0 else None
+
+
 def core_scoring(sc: dict) -> dict:
     return {k: v for k, v in sc.items() if k not in CORE_DROP}
 
@@ -51,6 +62,7 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
     prior = float((cfg.get("weights") or {}).get("prior_split", 0.6))
     untrusted = set((cfg.get("accuracy") or {}).get("untrusted") or [])
     slots = stats._positions(season_dir)
+    pw = prior_weights(cfg)
     ratios: dict[str, dict[int, list[float]]] = {}  # source -> week -> r per position
     kinds: dict[str, str] = {}
     num = den = 0.0
@@ -74,9 +86,9 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
         kinds.update(kd)
 
         def groups(pid, preds=preds, kd=kd):
-            p = [v[pid] for n, v in preds.items() if kd[n] == "projection" and pid in v]
-            r = [v[pid] for n, v in preds.items() if kd[n] == "rank" and pid in v]
-            return (statistics.fmean(p) if p else None), (statistics.fmean(r) if r else None)
+            p = [(v[pid], pw.get(n, 1.0)) for n, v in preds.items() if kd[n] == "projection" and pid in v]
+            r = [(v[pid], pw.get(n, 1.0)) for n, v in preds.items() if kd[n] == "rank" and pid in v]
+            return _wmean(p), _wmean(r)
 
         def blend(pid):
             p, r = groups(pid)
@@ -129,8 +141,9 @@ def weights(m: dict, cfg: dict) -> dict:
     wcfg = cfg.get("weights") or {}
     k = float(wcfg.get("k", 4))
     prior = float(wcfg.get("prior_split", 0.6))
+    pw = prior_weights(cfg)
     out = {"method": "prior", "alpha": prior, "alpha_hat": None, "alpha_n": m["alpha_n"],
-           "from_weeks": m["from_weeks"], "k": k, "prior_split": prior, "sources": {}}  # fmt: skip
+           "from_weeks": m["from_weeks"], "k": k, "prior_split": prior, "priors": pw, "sources": {}}  # fmt: skip
     if len(m["from_weeks"]) < ACTIVATE:
         out["reason"] = f"{len(m['from_weeks'])} evaluated week(s); data weights start at {ACTIVATE}"
         return out
@@ -144,7 +157,8 @@ def weights(m: dict, cfg: dict) -> dict:
         for n in names:
             s = m["sources"][n]
             w_data = inv[n] / scale if n in inv else 1.0
-            w = s["n"] / (s["n"] + k) * w_data + k / (s["n"] + k) * 1.0
+            p = pw.get(n, 1.0)  # data move a share relative to its prior: w = p·(n/(n+k)·w_data + k/(n+k))
+            w = p * (s["n"] / (s["n"] + k) * w_data + k / (s["n"] + k))
             out["sources"][n] = {"w": round(w, 4), "w_data": round(w_data, 4), "n": s["n"],
                                  "mean_r": round(s["mean_r"], 4)}  # fmt: skip
     raw, n = m["alpha_hat_raw"], m["alpha_n"]
@@ -174,5 +188,8 @@ def in_force(data_dir: Path | str, season: int, week: int, sched: Schedule, cfg:
     return rec
 
 
-def source_weights(rec: dict) -> dict[str, float]:
-    return {name: float(s["w"]) for name, s in (rec.get("sources") or {}).items()}
+def source_weights(rec: dict, cfg: dict | None = None) -> dict[str, float]:
+    """The within-group weights to apply: the record's, else each source's prior (1 if it has none)."""
+    out = prior_weights(cfg or {})
+    out.update({name: float(s["w"]) for name, s in (rec.get("sources") or {}).items()})
+    return out

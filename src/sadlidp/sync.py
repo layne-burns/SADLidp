@@ -396,6 +396,19 @@ def attach_breakdowns(site_part, make: Callable[[str], dict]) -> None:
             attach_breakdowns(v, make)
 
 
+# What the data say about a position's waiver pool, shown on its tab (SPEC §6.6; docs/methods-review.md step 4)
+POSITION_NOTES = {
+    "DB": "Among the DBs usually on waivers, the projections barely separate players: on 2025, the 15th to 60th "
+    "best-projected DBs scored almost without regard to their projections (within-week r 0.08, against 0.18 "
+    "for LB and 0.13 for DL). What helped, a little, was a full snap share last game and a run of results "
+    "above projection, which each number here already carries. Treat these tiers as one rough group and "
+    "prefer the DB who plays every snap.",
+}
+PANEL_NOTES = {
+    "DB": "DB odds are the weakest: among waiver DBs the projections barely separate players (see the DB tab).",
+}
+
+
 def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool) -> dict:
     return {
         "id": pid,
@@ -416,6 +429,7 @@ def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool
         "badge": badge,
         "mine": mine,
         "late": bool(cons_row and cons_row.get("late")),
+        "snap": ((cons_row.get("form") or {}).get("snap") or {}).get("share") if cons_row else None,  # last game
         "swing": cons_row.get("swing") if cons_row else None,  # his game-to-game swing and 1-in-5 band (§6.7)
         "floor": cons_row.get("floor") if cons_row else None,
         "ceiling": cons_row.get("ceiling") if cons_row else None,
@@ -786,6 +800,7 @@ def run_sync(
             "no_projection": no_projection,
             "played": played,
             "played_hidden": max(0, len(played_ids) - depth),
+            "note": POSITION_NOTES.get(slot),
         }
     my_out = {}
     for slot in IDP_SLOTS:
@@ -837,6 +852,7 @@ def run_sync(
             "played_suggestions": played_sugg[:6],
             "played_suggestions_hidden": max(0, len(played_sugg) - 6),
             "names": names,
+            "note": PANEL_NOTES.get(slot),
         }
 
     archives = {**SOURCES, **SIGNALS}

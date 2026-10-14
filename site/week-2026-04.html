@@ -1,0 +1,2514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SADL IDP Streamer</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+  --accent: #2f5fb3; --start: #1f7a4d; --start-bg: #e3f4ea; --up: #7a5a1f; --up-bg: #f6eedc;
+  --warn-bg: #fff4d6; --warn: #6b5200; --bad: #9b2c2c; --ref: #5c5c62; --ref-bg: #ececea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #a0a0a8; --line: #2e2e33;
+    --accent: #8ab0ff; --start: #7fd6a4; --start-bg: #173326; --up: #e6c27a; --up-bg: #3a2f17;
+    --warn-bg: #3a3214; --warn: #f1d77a; --bad: #ff9a9a; --ref: #b4b4bc; --ref-bg: #2c2c31;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 18px; }
+h1 { font-size: 1.35rem; margin: 0 0 2px; }
+h2 { font-size: 1.1rem; margin: 22px 0 8px; }
+h3 { font-size: 1rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.meta, .count, .sub, small, .note, .hidden-note { color: var(--muted); }
+.count { font-size: .85rem; font-weight: normal; }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.card, .slot { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+ul { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 0; }
+li.item { border-top: 1px solid var(--line); }
+li.item:first-child { border-top: 0; }
+.bd > summary { list-style: none; cursor: pointer; }
+.bd > summary::-webkit-details-marker { display: none; }
+.bd > summary .name::before { content: "▸ "; color: var(--muted); font-weight: normal; }
+.bd[open] > summary .name::before { content: "▾ "; }
+.bdbody { padding: 2px 0 10px 14px; font-size: .88rem; }
+.part { padding: 3px 0; }
+.part.missing { color: var(--muted); }
+.mini > summary { list-style: none; cursor: pointer; color: var(--accent); font-size: .85rem; }
+.mini > summary::-webkit-details-marker { display: none; }
+.name { font-weight: 600; }
+.sub { font-size: .85rem; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.pts small { font-weight: normal; margin-left: 2px; }
+.pts .band { font-size: .72rem; font-weight: normal; color: var(--muted); }
+.tag, .chip { display: inline-block; font-size: .72rem; border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+  border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.tag.q { color: var(--warn); border-color: var(--warn); }
+.tag.bad { color: var(--bad); border-color: var(--bad); }
+.chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
+.chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
+.sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
+.sugg.ref { color: var(--ref); }
+.chip.ref { background: var(--ref-bg); color: var(--ref); border-color: transparent; font-weight: 700; }
+.why { font-size: .85rem; font-style: italic; }
+.res { display: block; font-size: .8rem; font-weight: 600; color: var(--text); }
+.res.live { color: var(--warn); }
+.res.dnp { color: var(--muted); font-weight: normal; }
+.out { font-weight: 700; }
+.out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
+.card.played { opacity: .95; border-style: dashed; }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
+.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .85rem; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
+.tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabpanel { display: none; margin-top: 12px; }
+#tab-DL:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DL:checked ~ #panel-DL { display: block; }
+#tab-LB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-LB:checked ~ #panel-LB { display: block; }
+#tab-DB:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-DB:checked ~ #panel-DB { display: block; }
+
+.tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+footer { padding-bottom: 30px; font-size: .85rem; }
+a { color: var(--accent); }
+.scroll { overflow-x: auto; }
+.sum { padding: 4px 0 2px; }
+.report .headline { margin: 0 0 6px; }
+.rc li { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.rc li:first-child { border-top: 0; }
+.rc .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rc .up { color: var(--start); } .rc .down { color: var(--bad); }
+.rcx { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; margin: 8px 0 4px; font-size: .88rem; }
+.rcx dt { color: var(--muted); } .rcx dd { margin: 0; min-width: 0; }
+.dbnote { border-left: 3px solid var(--warn); padding-left: 8px; margin: 0 0 10px; }
+table.sources td, table.sources th { overflow-wrap: normal; word-break: normal; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SADL IDP streamer</h1>
+  <p class="meta"><a href="stats.html">How the numbers did →</a></p>
+  <p class="meta">Slow Ass Draft League · 2026 Week 4 · data as of <time id="asof" datetime="2026-10-01T20:14:00-04:00">Thu Oct 1, 8:14 PM ET</time> · FAAB waivers</p>
+  <nav class="weeks" aria-label="Weeks"><a href="week-2026-01.html">Week 1</a><a href="week-2026-02.html">Week 2</a><a href="week-2026-03.html">Week 3</a><a href="week-2026-04.html" class="here" aria-current="page">Week 4</a><a href="week-2026-05.html">Week 5</a><a href="week-2026-06.html">Week 6 · now</a></nav>
+  <p class="pastweek">Rebuilt after the fact: tiers and suggestions as they would have looked before the week&#39;s first game, from the projections saved for that week (from each source&#39;s archive) and that week&#39;s rosters. That week&#39;s injury news isn&#39;t known, so everyone projected to play is treated as available.</p>
+  <p class="pastweek">You're looking at a past week. All scores are final.</p>
+  <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
+  
+  
+</header>
+<main>
+  
+  <section aria-labelledby="rc-h">
+    <h2 id="rc-h">Week 4 report card</h2>
+    <div class="slot report">
+      <p class="headline">Your IDPs scored <b>71</b> against <b>72</b> projected (5 who played and had a projection).
+        Suggestions paid off <b>5 of 5</b> (rebuilt).</p>
+      <ul class="rc">
+        
+        <li><span>Greg Rousseau <small>DL</small></span>
+          <span class="num">19.2 → <b>16</b> <small class="down">-3.2</small></span></li>
+        
+        <li><span>Roquan Smith <small>LB</small></span>
+          <span class="num">18.7 → <b>7</b> <small class="down">-11.7</small></span></li>
+        
+        <li><span>Nik Bonitto <small>LB</small></span>
+          <span class="num">8.6 → <b>5</b> <small class="down">-3.6</small></span></li>
+        
+        <li><span>Evan Williams <small>DB</small></span>
+          <span class="num">13.0 → <b>32</b> <small class="up">+19.0</small></span></li>
+        
+        <li><span>Jaquan Brisker <small>DB</small></span>
+          <span class="num">12.2 → <b>11</b> <small class="down">-1.2</small></span></li>
+        
+      </ul>
+      <dl class="rcx">
+        <dt>Biggest beat</dt><dd>Evan Williams: 32 vs 13.0 projected</dd>
+        <dt>Biggest shortfall</dt><dd>Roquan Smith: 7 vs 18.7 projected</dd>
+        <dt>Best call</dt><dd>UPGRADE Jacob Rodriguez 27 over Nik Bonitto 5</dd>
+        
+      </dl>
+      <p class="meta"><a href="stats.html#w4">All of week 4's numbers →</a></p>
+    </div>
+  </section>
+  
+  <section aria-labelledby="my-h">
+    <h2 id="my-h">My IDPs</h2>
+    
+    <div class="slot">
+      <h3>DL <span class="count">1/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Greg Rousseau</span>
+            <span class="tag">projected starter</span>
+            
+            <span class="tag">also LB</span>
+
+
+
+            <div class="sub">BUF vs NE · above Tier 1</div></div>
+          <div class="pts">19.2<small>±0.9</small><span class="res">scored 16.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 14.6 pts · 30% of his number
+<div class="sub">2.2 solo · 1.2 ast · 0.9 TFL · 0.8 sack · 1.5 QB hit · 0.3 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 14.4 pts · 30% of his number
+<div class="sub">1.9 solo · 1.4 ast · 0.8 TFL* · 0.7 sack · 1.8 QB hit* · 0.1 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 12.9 pts · 40% of his number · DL rank #7
+</div>
+
+<div class="part"><b>Form</b> · +5.3 pts
+<div class="sub">+4.5 · he has beaten his projection by 23.1 pts a game over 3 games. Part of that is luck, so it counts as +9.9 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.8 · he played 81% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>19.2 pts</b> = 13.9 from the sources + 5.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+        
+      </ul>
+      
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>LB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Roquan Smith</span>
+            <span class="tag">projected starter</span>
+            
+            
+
+
+
+            <div class="sub">BAL vs TEN · Tier 1</div></div>
+          <div class="pts">18.7<small>±1.2</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 16.1 pts · 30% of his number
+<div class="sub">4.7 solo · 3.8 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.9 pts · 30% of his number
+<div class="sub">5.1 solo · 4.0 ast · 0.4 TFL* · 0.2 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 17.9 pts · 40% of his number · LB rank #2
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">+0.7 · he has beaten his projection by 4.3 pts a game over 3 games. Part of that is luck, so it counts as +1.8 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>18.7 pts</b> = 17.4 from the sources + 1.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Nik Bonitto</span>
+            
+            
+            <span class="tag">also DL</span>
+
+
+
+            <div class="sub">DEN @ SF · Tier 6</div></div>
+          <div class="pts">8.6<small>±1.3</small><span class="res">scored 5.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.0 pts · 30% of his number
+<div class="sub">1.7 solo · 0.8 ast · 0.8 TFL · 0.7 sack · 1.4 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.4 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.5 TFL* · 0.4 sack · 0.9 QB hit* · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 10.2 pts · 40% of his number · LB rank #69
+</div>
+
+<div class="part"><b>Form</b> · -1.9 pts
+<div class="sub">-0.7 · he has trailed his projection by 4.2 pts a game over 3 games. Part of that is luck, so it counts as -1.8 a game, and 40% of that carries into this week.</div>
+<div class="sub">-1.2 · he played 67% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>8.6 pts</b> = 10.5 from the sources − 1.9 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+        
+      </ul>
+      
+      
+      <div class="sugg">
+        <span class="chip upgrade">UPGRADE</span>
+        <b>Blake Cashman</b> <span class="sub">MIN vs MIA</span>
+        · 18.2 pts, 79% to outscore Nik Bonitto.
+        
+        <details class="mini"><summary>sources ▾</summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.1 pts · 30% of his number
+<div class="sub">3.6 solo · 2.7 ast · 0.3 TFL · 0.3 sack · 0.3 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 19.8 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.6 TFL* · 0.4 sack · 0.8 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 17.0 pts · 40% of his number · LB rank #3
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+1.1 · he has beaten his projection by 6.6 pts a game over 3 games. Part of that is luck, so it counts as +2.8 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.5 · he played 97% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>18.2 pts</b> = 16.7 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details>
+        <div class="sub">Result: scored 15.0 vs Nik Bonitto scored 5.0</div><div class="out hit">✓ paid off</div>
+      </div>
+      
+      <div class="sugg">
+        <span class="chip upgrade">UPGRADE</span>
+        <b>Jacob Rodriguez</b> <span class="sub">MIA @ MIN</span>
+        · 16.8 pts, 76% to outscore Nik Bonitto.
+        
+        <details class="mini"><summary>sources ▾</summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.3 pts · 30% of his number
+<div class="sub">3.4 solo · 2.0 ast · 0.4 TFL · 0.1 sack · 0.1 QB hit · 0.1 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.4 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.8 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 16.4 pts · 40% of his number · LB rank #6
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+1.0 · he has beaten his projection by 5.6 pts a game over 3 games. Part of that is luck, so it counts as +2.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>16.8 pts</b> = 15.2 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details>
+        <div class="sub">Result: scored 27.0 vs Nik Bonitto scored 5.0</div><div class="out hit">✓ paid off</div>
+      </div>
+      
+      <div class="sugg">
+        <span class="chip upgrade">UPGRADE</span>
+        <b>Alex Singleton</b> <span class="sub">DEN @ SF</span>
+        · 16.1 pts, 75% to outscore Nik Bonitto.
+        
+        <details class="mini"><summary>sources ▾</summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.4 pts · 30% of his number
+<div class="sub">3.4 solo · 3.7 ast · 0.2 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">5.1 solo · 4.1 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 15.6 pts · 40% of his number · LB rank #12
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">+0.4 · he has beaten his projection by 2.5 pts a game over 3 games. Part of that is luck, so it counts as +1.1 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>16.1 pts</b> = 15.0 from the sources + 1.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details>
+        <div class="sub">Result: scored 23.0 vs Nik Bonitto scored 5.0</div><div class="out hit">✓ paid off</div>
+      </div>
+      
+      <div class="sugg">
+        <span class="chip upgrade">UPGRADE</span>
+        <b>Demetrius Knight</b> <span class="sub">CIN vs JAX</span>
+        · 15.8 pts, 74% to outscore Nik Bonitto.
+        
+        <details class="mini"><summary>sources ▾</summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 16.5 pts · 30% of his number
+<div class="sub">4.9 solo · 2.3 ast · 0.3 TFL · 0.2 sack · 0.4 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.7 pts · 30% of his number
+<div class="sub">4.5 solo · 3.5 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.3 pts · 40% of his number · LB rank #26
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">+0.4 · he has beaten his projection by 2.3 pts a game over 3 games. Part of that is luck, so it counts as +1.0 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 90% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.8 pts</b> = 15.4 from the sources + 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details>
+        <div class="sub">Result: scored 11.0 vs Nik Bonitto scored 5.0</div><div class="out hit">✓ paid off</div>
+      </div>
+      
+      <div class="sugg">
+        <span class="chip upgrade">UPGRADE</span>
+        <b>Akeem Davis-Gaither</b> <span class="sub">IND @ WAS</span>
+        · 15.8 pts, 74% to outscore Nik Bonitto.
+        
+        <details class="mini"><summary>sources ▾</summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.4 pts · 30% of his number
+<div class="sub">4.5 solo · 2.8 ast · 0.1 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.9 pts · 30% of his number
+<div class="sub">4.7 solo · 3.7 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.3 pts · 40% of his number · LB rank #27
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">+0.6 · he has beaten his projection by 3.8 pts a game over 3 games. Part of that is luck, so it counts as +1.6 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.8 pts</b> = 14.5 from the sources + 1.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details>
+        <div class="sub">Result: scored 13.0 vs Nik Bonitto scored 5.0</div><div class="out hit">✓ paid off</div>
+      </div>
+      
+      
+    </div>
+    
+    <div class="slot">
+      <h3>DB <span class="count">2/2 rostered</span></h3>
+      <ul>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Evan Williams</span>
+            <span class="tag">projected starter</span>
+            
+            
+
+
+
+            <div class="sub">GB @ TB · Tier 1</div></div>
+          <div class="pts">13.0<small>±1.7</small><span class="res">scored 32.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.7 pts · 30% of his number
+<div class="sub">2.6 solo · 2.5 ast · 0.2 TFL · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.5 pts · 30% of his number
+<div class="sub">4.1 solo · 2.4 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.5 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.9 pts · 40% of his number · DB rank #11
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.5 · he has beaten his projection by 5.6 pts a game over 3 games. Part of that is luck, so it counts as +2.4 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>13.0 pts</b> = 12.4 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+        
+        <li class="item"><details class="bd"><summary><div class="row">
+          <div><span class="name">Jaquan Brisker</span>
+            
+            
+            
+
+
+
+            <div class="sub">PIT @ CLE · Tier 1</div></div>
+          <div class="pts">12.2<small>±1.3</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.4 pts · 30% of his number
+<div class="sub">3.0 solo · 2.3 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.3 pts · 30% of his number
+<div class="sub">4.2 solo · 2.4 ast · 0.1 TFL* · 0.1 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · DB rank #20
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">+0.0 · he has beaten his projection by 0.2 pts a game over 3 games. Part of that is luck, so it counts as +0.1 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.2 pts</b> = 12.0 from the sources + 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+        
+      </ul>
+      
+      
+      
+    </div>
+    
+  </section>
+
+  <section aria-labelledby="tiers-h">
+    <h2 id="tiers-h">Streaming tiers (available players)</h2>
+    <div class="tabs">
+      <input type="radio" name="pos" id="tab-DL" checked><label for="tab-DL">DL</label><input type="radio" name="pos" id="tab-LB"><label for="tab-LB">LB</label><input type="radio" name="pos" id="tab-DB"><label for="tab-DB">DB</label>
+      
+      <div class="tabpanel" id="panel-DL">
+        
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">DeForest Buckner</span>
+                
+                
+
+
+
+                <div class="sub">IND @ WAS · range 9.2–11.8 (3 sources)</div></div>
+              <div class="pts">13.4<small>±1.0</small><span class="res">scored 14.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.2 pts · 30% of his number
+<div class="sub">1.7 solo · 1.3 ast · 0.5 TFL · 0.4 sack · 0.8 QB hit · 0.1 PD</div></div>
+<div class="part"><b>ESPN</b> · 11.8 pts · 30% of his number
+<div class="sub">2.2 solo · 2.3 ast · 0.7 TFL* · 0.5 sack · 1.0 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 11.3 pts · 40% of his number · DL rank #14
+</div>
+
+<div class="part"><b>Form</b> · +2.6 pts
+<div class="sub">+1.2 · he has beaten his projection by 6.2 pts a game over 3 games. Part of that is luck, so it counts as +2.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+1.4 · he played 89% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>13.4 pts</b> = 10.8 from the sources + 2.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chase Young</span>
+                
+                
+
+
+
+                <div class="sub">NO vs ATL · range 9.2–10.5 (3 sources)</div></div>
+              <div class="pts">11.4<small>±0.8</small><span class="res">scored 9.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.2 pts · 30% of his number
+<div class="sub">1.3 solo · 0.8 ast · 0.6 TFL · 0.5 sack · 1.0 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 10.5 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.7 TFL* · 0.4 sack · 0.7 QB hit* · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 10.4 pts · 40% of his number · DL rank #24
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">+1.0 · he has beaten his projection by 5.0 pts a game over 3 games. Part of that is luck, so it counts as +2.1 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 76% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>11.4 pts</b> = 10.1 from the sources + 1.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 3</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Zach Allen</span>
+                
+                
+
+
+
+                <div class="sub">DEN @ SF · range 8.4–9.9 (3 sources)</div></div>
+              <div class="pts">10.4<small>±0.8</small><span class="res">scored 13.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.9 pts · 30% of his number
+<div class="sub">1.2 solo · 1.4 ast · 0.3 TFL · 0.5 sack · 2.0 QB hit · 0.2 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.4 pts · 30% of his number
+<div class="sub">1.2 solo · 1.3 ast · 0.5 TFL* · 0.3 sack · 1.4 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 9.2 pts · 40% of his number · DL rank #36
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">+1.2 · he has beaten his projection by 6.2 pts a game over 3 games. Part of that is luck, so it counts as +2.6 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 71% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>10.4 pts</b> = 9.2 from the sources + 1.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tavius Robinson</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">BAL vs TEN · range 5.6–11.6 (3 sources)</div></div>
+              <div class="pts">10.2<small>±1.8</small><span class="res">scored 3.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 5.6 pts · 30% of his number
+<div class="sub">0.8 solo · 0.7 ast · 0.1 TFL · 0.4 sack · 0.4 QB hit · 0.1 PD</div></div>
+<div class="part"><b>ESPN</b> · 11.6 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.6 TFL* · 0.5 sack · 1.3 QB hit* · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 8.6 pts · 40% of his number · DL rank #48
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+0.9 · he has beaten his projection by 4.8 pts a game over 3 games. Part of that is luck, so it counts as +2.1 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 78% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>10.2 pts</b> = 8.6 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Dexter Lawrence</span>
+                
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 8.1–9.1 (3 sources)</div></div>
+              <div class="pts">10.1<small>±0.8</small><span class="res">scored 12.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.1 pts · 30% of his number
+<div class="sub">1.8 solo · 1.6 ast · 0.4 TFL · 0.3 sack · 1.0 QB hit · 0.1 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.1 pts · 30% of his number
+<div class="sub">1.2 solo · 1.3 ast · 0.4 TFL* · 0.3 sack · 1.0 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.6 pts · 40% of his number · DL rank #49
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+0.9 · he has beaten his projection by 4.6 pts a game over 3 games. Part of that is luck, so it counts as +2.0 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.7 · he played 79% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>10.1 pts</b> = 8.6 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jonathan Allen</span>
+                
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 8.1–9.6 (3 sources)</div></div>
+              <div class="pts">10.1<small>±0.8</small><span class="res">scored 6.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.6 pts · 30% of his number
+<div class="sub">2.1 solo · 1.6 ast · 0.5 TFL · 0.4 sack · 0.7 QB hit</div></div>
+<div class="part"><b>ESPN</b> · 8.1 pts · 30% of his number
+<div class="sub">1.3 solo · 1.4 ast · 0.4 TFL* · 0.3 sack · 0.7 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.4 pts · 40% of his number · DL rank #53
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">+1.0 · he has beaten his projection by 5.0 pts a game over 3 games. Part of that is luck, so it counts as +2.2 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 76% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>10.1 pts</b> = 8.7 from the sources + 1.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Elijah Ponder</span>
+                
+                
+
+
+
+                <div class="sub">NE @ BUF · range 3.9–10.3 (3 sources)</div></div>
+              <div class="pts">9.6<small>±1.9</small><span class="res">scored 19.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 3.9 pts · 30% of his number
+<div class="sub">0.7 solo · 1.0 ast · 0.1 TFL · 0.2 sack</div></div>
+<div class="part"><b>ESPN</b> · 10.3 pts · 30% of his number
+<div class="sub">1.7 solo · 1.2 ast · 0.7 TFL* · 0.4 sack · 0.8 QB hit* · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 7.8 pts · 40% of his number · DL rank #61
+</div>
+
+<div class="part"><b>Form</b> · +2.2 pts
+<div class="sub">+1.3 · he has beaten his projection by 6.8 pts a game over 3 games. Part of that is luck, so it counts as +2.9 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.9 · he played 82% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.6 pts</b> = 7.4 from the sources + 2.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Boye Mafe</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">CIN vs JAX · range 8.4–11.6 (3 sources)</div></div>
+              <div class="pts">9.6<small>±1.1</small><span class="res">scored 21.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.6 pts · 30% of his number
+<div class="sub">2.2 solo · 1.1 ast · 0.5 TFL · 0.5 sack · 1.0 QB hit · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.7 pts · 30% of his number
+<div class="sub">1.4 solo · 1.0 ast · 0.4 TFL* · 0.5 sack · 1.0 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 8.4 pts · 40% of his number · DL rank #52
+</div>
+
+<div class="part"><b>Form</b> · -0.2 pts
+<div class="sub">-0.5 · he has trailed his projection by 2.7 pts a game over 3 games. Part of that is luck, so it counts as -1.1 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.3 · he played 74% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.6 pts</b> = 9.8 from the sources − 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 4</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Travon Walker</span>
+                
+                
+
+
+
+                <div class="sub">JAX @ CIN · range 9.6–10.8 (3 sources)</div></div>
+              <div class="pts">9.5<small>±0.8</small><span class="res">scored 5.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.6 pts · 30% of his number
+<div class="sub">1.5 solo · 1.4 ast · 0.6 TFL · 0.4 sack · 1.0 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 10.8 pts · 30% of his number
+<div class="sub">1.8 solo · 1.3 ast · 0.6 TFL* · 0.5 sack · 1.2 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 9.8 pts · 40% of his number · DL rank #31
+</div>
+
+<div class="part"><b>Form</b> · -0.5 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.5 pts a game over 3 games. Part of that is luck, so it counts as -0.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.2 · he played 67% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.5 pts</b> = 10.1 from the sources − 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jalen Redmond</span>
+                
+                
+
+
+
+                <div class="sub">MIN vs MIA · range 8.0–9.2 (3 sources)</div></div>
+              <div class="pts">9.5<small>±0.8</small><span class="res">scored 5.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.0 pts · 30% of his number
+<div class="sub">1.7 solo · 1.4 ast · 0.2 sack · 0.5 QB hit · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.2 pts · 30% of his number
+<div class="sub">1.7 solo · 1.8 ast · 0.6 TFL* · 0.3 sack · 0.5 QB hit* · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 8.9 pts · 40% of his number · DL rank #42
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">-0.1 · he has trailed his projection by 0.4 pts a game over 3 games. Part of that is luck, so it counts as -0.2 a game, and 44% of that carries into this week.</div>
+<div class="sub">+0.8 · he played 81% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.5 pts</b> = 8.7 from the sources + 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Zach Sieler</span>
+                
+                
+
+
+
+                <div class="sub">MIA @ MIN · range 7.8–9.0 (3 sources)</div></div>
+              <div class="pts">9.1<small>±0.8</small><span class="res">scored 24.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 7.8 pts · 30% of his number
+<div class="sub">1.3 solo · 1.0 ast · 0.5 TFL · 0.3 sack · 0.7 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.0 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.6 TFL* · 0.2 sack · 0.5 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.5 pts · 40% of his number · DL rank #51
+</div>
+
+<div class="part"><b>Form</b> · +0.7 pts
+<div class="sub">-0.5 · he has trailed his projection by 2.3 pts a game over 3 games. Part of that is luck, so it counts as -1.0 a game, and 45% of that carries into this week.</div>
+<div class="sub">+1.1 · he played 85% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.1 pts</b> = 8.5 from the sources + 0.7 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Quinnen Williams</span>
+                
+                
+
+
+
+                <div class="sub">DAL @ HOU · range 8.3–9.5 (3 sources)</div></div>
+              <div class="pts">9.1<small>±0.8</small><span class="res">scored 17.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.3 pts · 30% of his number
+<div class="sub">1.4 solo · 1.4 ast · 0.5 TFL · 0.3 sack · 1.0 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 9.5 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.5 TFL* · 0.3 sack · 1.1 QB hit* · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 9.2 pts · 40% of his number · DL rank #37
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.7 pts a game over 3 games. Part of that is luck, so it counts as -0.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 75% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>9.1 pts</b> = 9.0 from the sources + 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Gabe Jacas</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">NE @ BUF · range 4.5–8.4 (3 sources)</div></div>
+              <div class="pts">8.7<small>±1.4</small><span class="res">scored 3.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 4.5 pts · 30% of his number
+<div class="sub">0.6 solo · 0.8 ast · 0.3 TFL · 0.2 sack · 0.3 QB hit · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 5.4 pts · 30% of his number
+<div class="sub">1.1 solo · 0.8 ast · 0.4 TFL* · 0.2 sack · 0.4 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 8.4 pts · 40% of his number · DL rank #55
+</div>
+
+<div class="part"><b>Form</b> · +2.3 pts
+<div class="sub">+1.7 · he has beaten his projection by 8.6 pts a game over 3 games. Part of that is luck, so it counts as +3.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.7 · he played 79% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.7 pts</b> = 6.3 from the sources + 2.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Derrick Brown</span>
+                
+                
+
+
+
+                <div class="sub">CAR vs DET · range 6.8–9.9 (3 sources)</div></div>
+              <div class="pts">8.7<small>±1.1</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.5 pts · 30% of his number
+<div class="sub">1.7 solo · 2.0 ast · 0.3 TFL · 0.2 sack · 0.6 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 6.8 pts · 30% of his number
+<div class="sub">1.5 solo · 1.6 ast · 0.2 TFL* · 0.2 sack · 0.4 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 9.9 pts · 40% of his number · DL rank #30
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.6 pts a game over 3 games. Part of that is luck, so it counts as -0.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 76% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.7 pts</b> = 8.6 from the sources + 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">DJ Wonnum</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">DET @ CAR · range 6.2–10.0 (3 sources)</div></div>
+              <div class="pts">8.6<small>±1.3</small><span class="res">scored 10.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 7.8 pts · 30% of his number
+<div class="sub">1.4 solo · 1.6 ast · 0.3 TFL · 0.2 sack · 0.6 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 10.0 pts · 30% of his number
+<div class="sub">1.7 solo · 1.3 ast · 0.5 TFL* · 0.4 sack · 0.7 QB hit* · 0.2 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 6.2 pts · 40% of his number · DL rank #97
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">+0.8 · he has beaten his projection by 4.0 pts a game over 3 games. Part of that is luck, so it counts as +1.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.0 · he played 70% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.6 pts</b> = 7.8 from the sources + 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 5</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Deone Walker</span>
+                
+                
+
+
+
+                <div class="sub">BUF vs NE · range 6.4–8.0 (3 sources)</div></div>
+              <div class="pts">8.5<small>±0.8</small><span class="res">scored 6.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.0 pts · 30% of his number
+<div class="sub">1.3 solo · 1.3 ast · 0.5 TFL · 0.2 sack · 0.4 QB hit · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 6.4 pts · 30% of his number
+<div class="sub">1.2 solo · 1.2 ast · 0.4 TFL* · 0.2 sack · 0.6 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 7.5 pts · 40% of his number · DL rank #66
+</div>
+
+<div class="part"><b>Form</b> · +1.2 pts
+<div class="sub">+1.2 · he has beaten his projection by 6.3 pts a game over 3 games. Part of that is luck, so it counts as +2.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.0 · he played 70% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.5 pts</b> = 7.3 from the sources + 1.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Arden Key</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">IND @ WAS · range 6.0–10.9 (3 sources)</div></div>
+              <div class="pts">8.5<small>±1.6</small><span class="res">scored 2.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 6.0 pts · 30% of his number
+<div class="sub">0.8 solo · 0.7 ast · 0.2 TFL · 0.3 sack · 0.8 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 10.9 pts · 30% of his number
+<div class="sub">1.6 solo · 1.1 ast · 0.5 TFL* · 0.5 sack · 1.3 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 7.1 pts · 40% of his number · DL rank #77
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.4 pts a game over 3 games. Part of that is luck, so it counts as -0.6 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.9 · he played 82% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.5 pts</b> = 7.9 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">DeMarcus Lawrence</span>
+                
+                
+
+
+
+                <div class="sub">SEA vs LAC · range 8.5–11.1 (3 sources)</div></div>
+              <div class="pts">8.5<small>±1.1</small><span class="res">scored 10.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.5 pts · 30% of his number
+<div class="sub">1.3 solo · 1.5 ast · 0.5 TFL · 0.3 sack · 0.9 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 11.1 pts · 30% of his number
+<div class="sub">1.7 solo · 1.2 ast · 0.6 TFL* · 0.4 sack · 1.6 QB hit* · 0.1 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 8.5 pts · 40% of his number · DL rank #50
+</div>
+
+<div class="part"><b>Form</b> · -0.8 pts
+<div class="sub">-0.5 · he has trailed his projection by 2.3 pts a game over 3 games. Part of that is luck, so it counts as -1.0 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.3 · he played 65% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.5 pts</b> = 9.3 from the sources − 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kobie Turner</span>
+                
+                
+
+
+
+                <div class="sub">LAR @ PHI · range 8.7–9.5 (3 sources)</div></div>
+              <div class="pts">8.4<small>±0.8</small><span class="res">scored 5.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.5 pts · 30% of his number
+<div class="sub">1.5 solo · 1.4 ast · 0.5 TFL · 0.4 sack · 0.8 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 8.7 pts · 30% of his number
+<div class="sub">1.6 solo · 1.7 ast · 0.4 TFL* · 0.3 sack · 0.7 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.9 pts · 40% of his number · DL rank #43
+</div>
+
+<div class="part"><b>Form</b> · -0.6 pts
+<div class="sub">+0.0 · he has beaten his projection by 0.2 pts a game over 3 games. Part of that is luck, so it counts as +0.1 a game, and 43% of that carries into this week.</div>
+<div class="sub">-0.7 · he played 61% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.4 pts</b> = 9.0 from the sources − 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jalyx Hunt</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">PHI vs LAR · range 7.4–9.9 (2 sources)</div></div>
+              <div class="pts">8.4<small>±1.1</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part missing"><b>Sleeper</b> · no projection for him</div>
+<div class="part"><b>ESPN</b> · 7.4 pts · 60% of his number
+<div class="sub">1.4 solo · 1.0 ast · 0.4 TFL* · 0.2 sack · 0.7 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 9.9 pts · 40% of his number · DL rank #29
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.7 pts a game over 3 games. Part of that is luck, so it counts as -0.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.3 · he played 74% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.4 pts</b> = 8.4 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Cameron Heyward</span>
+                
+                
+
+
+
+                <div class="sub">PIT @ CLE · range 8.4–9.1 (3 sources)</div></div>
+              <div class="pts">8.2<small>±0.8</small><span class="res">scored 14.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.4 pts · 30% of his number
+<div class="sub">1.9 solo · 1.8 ast · 0.4 TFL · 0.2 sack · 0.3 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 8.4 pts · 30% of his number
+<div class="sub">1.7 solo · 1.8 ast · 0.3 TFL* · 0.2 sack · 0.7 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 9.1 pts · 40% of his number · DL rank #38
+</div>
+
+<div class="part"><b>Form</b> · -0.5 pts
+<div class="sub">-0.1 · he has trailed his projection by 0.5 pts a game over 3 games. Part of that is luck, so it counts as -0.2 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.4 · he played 65% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.2 pts</b> = 8.7 from the sources − 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chris Jones</span>
+                
+                
+
+
+
+                <div class="sub">KC @ LV · range 7.5–9.1 (3 sources)</div></div>
+              <div class="pts">8.2<small>±0.8</small><span class="res">scored 9.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.1 pts · 30% of his number
+<div class="sub">1.0 solo · 0.8 ast · 0.7 TFL · 0.5 sack · 1.4 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 7.5 pts · 30% of his number
+<div class="sub">1.1 solo · 1.2 ast · 0.5 TFL* · 0.3 sack · 1.0 QB hit*</div></div>
+<div class="part"><b>FantasyPros</b> · 8.3 pts · 40% of his number · DL rank #57
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.3 · he has trailed his projection by 1.7 pts a game over 3 games. Part of that is luck, so it counts as -0.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.2 · he played 73% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.2 pts</b> = 8.3 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Yaya Diaby</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">TB vs GB · range 9.0–9.1 (3 sources)</div></div>
+              <div class="pts">8.2<small>±0.8</small><span class="res">scored 3.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.1 pts · 30% of his number
+<div class="sub">1.5 solo · 1.1 ast · 0.6 TFL · 0.4 sack · 1.0 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 9.1 pts · 30% of his number
+<div class="sub">1.6 solo · 1.2 ast · 0.7 TFL* · 0.3 sack · 0.8 QB hit* · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 9.0 pts · 40% of his number · DL rank #40
+</div>
+
+<div class="part"><b>Form</b> · -0.9 pts
+<div class="sub">-0.7 · he has trailed his projection by 3.9 pts a game over 3 games. Part of that is luck, so it counts as -1.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.2 · he played 68% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.2 pts</b> = 9.1 from the sources − 0.9 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kwity Paye</span>
+                
+                
+
+
+
+                <div class="sub">LV vs KC · range 7.6–8.6 (3 sources)</div></div>
+              <div class="pts">8.0<small>±0.8</small><span class="res">scored 0.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.1 pts · 30% of his number
+<div class="sub">1.6 solo · 0.8 ast · 0.4 TFL · 0.4 sack · 0.5 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 7.6 pts · 30% of his number
+<div class="sub">1.4 solo · 1.0 ast · 0.4 TFL* · 0.3 sack · 0.7 QB hit* · 0.1 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 8.6 pts · 40% of his number · DL rank #47
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">+0.8 · he has beaten his projection by 4.0 pts a game over 3 games. Part of that is luck, so it counts as +1.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">-0.9 · he played 58% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>8.0 pts</b> = 8.1 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Alim McNeill</span>
+                
+                
+
+
+
+                <div class="sub">DET @ CAR · range 3.5–8.4 (3 sources)</div></div>
+              <div class="pts">7.7<small>±1.6</small><span class="res">scored 17.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 3.5 pts · 30% of his number
+<div class="sub">0.5 solo · 0.7 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.1 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 8.4 pts · 30% of his number
+<div class="sub">1.0 solo · 1.1 ast · 0.3 TFL* · 0.4 sack · 0.9 QB hit* · 0.4 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 7.2 pts · 40% of his number · DL rank #71
+</div>
+
+<div class="part"><b>Form</b> · +1.2 pts
+<div class="sub">+0.8 · he has beaten his projection by 4.0 pts a game over 3 games. Part of that is luck, so it counts as +1.7 a game, and 45% of that carries into this week.</div>
+<div class="sub">+0.5 · he played 76% of his team's defensive snaps last game (week 3); the top 60 DLs averaged 70%.</div>
+</div>
+<div class="sum"><b>7.7 pts</b> = 6.4 from the sources + 1.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">220 more available DL not shown.</p>
+        <p class="hidden-note">143 available DL have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-LB">
+        
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Blake Cashman</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">MIN vs MIA · range 13.1–19.8 (3 sources)</div></div>
+              <div class="pts">18.2<small>±2.1</small><span class="res">scored 15.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.1 pts · 30% of his number
+<div class="sub">3.6 solo · 2.7 ast · 0.3 TFL · 0.3 sack · 0.3 QB hit · 0.2 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 19.8 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.6 TFL* · 0.4 sack · 0.8 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 17.0 pts · 40% of his number · LB rank #3
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+1.1 · he has beaten his projection by 6.6 pts a game over 3 games. Part of that is luck, so it counts as +2.8 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.5 · he played 97% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>18.2 pts</b> = 16.7 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jacob Rodriguez</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">MIA @ MIN · range 11.3–17.4 (3 sources)</div></div>
+              <div class="pts">16.8<small>±2.1</small><span class="res">scored 27.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.3 pts · 30% of his number
+<div class="sub">3.4 solo · 2.0 ast · 0.4 TFL · 0.1 sack · 0.1 QB hit · 0.1 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 17.4 pts · 30% of his number
+<div class="sub">4.9 solo · 3.9 ast · 0.8 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 16.4 pts · 40% of his number · LB rank #6
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+1.0 · he has beaten his projection by 5.6 pts a game over 3 games. Part of that is luck, so it counts as +2.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>16.8 pts</b> = 15.2 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Alex Singleton</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">DEN @ SF · range 12.4–16.9 (3 sources)</div></div>
+              <div class="pts">16.1<small>±1.7</small><span class="res">scored 23.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.4 pts · 30% of his number
+<div class="sub">3.4 solo · 3.7 ast · 0.2 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">5.1 solo · 4.1 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 15.6 pts · 40% of his number · LB rank #12
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">+0.4 · he has beaten his projection by 2.5 pts a game over 3 games. Part of that is luck, so it counts as +1.1 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>16.1 pts</b> = 15.0 from the sources + 1.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Demetrius Knight</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 14.3–16.5 (3 sources)</div></div>
+              <div class="pts">15.8<small>±1.3</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 16.5 pts · 30% of his number
+<div class="sub">4.9 solo · 2.3 ast · 0.3 TFL · 0.2 sack · 0.4 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.7 pts · 30% of his number
+<div class="sub">4.5 solo · 3.5 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.3 pts · 40% of his number · LB rank #26
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">+0.4 · he has beaten his projection by 2.3 pts a game over 3 games. Part of that is luck, so it counts as +1.0 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 90% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.8 pts</b> = 15.4 from the sources + 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Akeem Davis-Gaither</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">IND @ WAS · range 13.4–15.9 (3 sources)</div></div>
+              <div class="pts">15.8<small>±1.3</small><span class="res">scored 13.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.4 pts · 30% of his number
+<div class="sub">4.5 solo · 2.8 ast · 0.1 TFL · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.9 pts · 30% of his number
+<div class="sub">4.7 solo · 3.7 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.3 pts · 40% of his number · LB rank #27
+</div>
+
+<div class="part"><b>Form</b> · +1.3 pts
+<div class="sub">+0.6 · he has beaten his projection by 3.8 pts a game over 3 games. Part of that is luck, so it counts as +1.6 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.8 pts</b> = 14.5 from the sources + 1.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Anthony Hill</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">TEN @ BAL · range 9.3–16.9 (3 sources)</div></div>
+              <div class="pts">15.8<small>±2.5</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.3 pts · 30% of his number
+<div class="sub">2.9 solo · 2.0 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.1 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">5.0 solo · 4.0 ast · 0.4 TFL* · 0.1 sack · 0.1 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 15.7 pts · 40% of his number · LB rank #11
+</div>
+
+<div class="part"><b>Form</b> · +1.6 pts
+<div class="sub">+1.0 · he has beaten his projection by 5.7 pts a game over 3 games. Part of that is luck, so it counts as +2.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.8 pts</b> = 14.2 from the sources + 1.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Eric Wilson</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">MIN vs MIA · range 11.3–17.7 (3 sources)</div></div>
+              <div class="pts">15.6<small>±2.1</small><span class="res">scored 4.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.3 pts · 30% of his number
+<div class="sub">2.8 solo · 2.7 ast · 0.6 TFL · 0.2 sack · 0.3 QB hit · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 17.7 pts · 30% of his number
+<div class="sub">3.9 solo · 3.1 ast · 0.8 TFL* · 0.5 sack · 1.0 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.6 pts · 40% of his number · LB rank #22
+</div>
+
+<div class="part"><b>Form</b> · +1.1 pts
+<div class="sub">+0.7 · he has beaten his projection by 4.0 pts a game over 3 games. Part of that is luck, so it counts as +1.7 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 96% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.6 pts</b> = 14.5 from the sources + 1.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Terrel Bernard</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">BUF vs NE · range 14.7–15.7 (3 sources)</div></div>
+              <div class="pts">15.3<small>±1.1</small><span class="res">scored 12.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 15.0 pts · 30% of his number
+<div class="sub">4.6 solo · 2.8 ast · 0.4 TFL · 0.1 sack · 0.1 QB hit · 0.2 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.7 pts · 30% of his number
+<div class="sub">4.3 solo · 3.4 ast · 0.7 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.7 pts · 40% of his number · LB rank #20
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">+0.0 · he has beaten his projection by 0.2 pts a game over 3 games. Part of that is luck, so it counts as +0.1 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.2 · he played 93% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.3 pts</b> = 15.1 from the sources + 0.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Quay Walker</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">LV vs KC · range 12.8–17.0 (3 sources)</div></div>
+              <div class="pts">15.3<small>±1.6</small><span class="res">scored 19.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.8 pts · 30% of his number
+<div class="sub">3.3 solo · 3.2 ast · 0.4 TFL · 0.2 sack · 0.4 QB hit · 0.3 PD</div></div>
+<div class="part"><b>ESPN</b> · 17.0 pts · 30% of his number
+<div class="sub">4.8 solo · 3.8 ast · 0.5 TFL* · 0.2 sack · 0.4 QB hit* · 0.2 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 15.5 pts · 40% of his number · LB rank #14
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">-0.4 · he has trailed his projection by 2.5 pts a game over 3 games. Part of that is luck, so it counts as -1.1 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.3 pts</b> = 15.1 from the sources + 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jihaad Campbell</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">PHI vs LAR · range 10.6–15.4 (3 sources)</div></div>
+              <div class="pts">15.3<small>±1.9</small><span class="res">scored 18.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.6 pts · 30% of his number
+<div class="sub">2.8 solo · 2.4 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.4 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 15.3 pts · 40% of his number · LB rank #16
+</div>
+
+<div class="part"><b>Form</b> · +1.4 pts
+<div class="sub">+0.9 · he has beaten his projection by 5.2 pts a game over 3 games. Part of that is luck, so it counts as +2.2 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.5 · he played 97% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.3 pts</b> = 13.9 from the sources + 1.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Demario Davis</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">NYJ @ CHI · range 10.6–16.9 (3 sources)</div></div>
+              <div class="pts">15.2<small>±2.0</small><span class="res">scored 24.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.6 pts · 30% of his number
+<div class="sub">2.9 solo · 3.2 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.1 PD · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.9 pts · 30% of his number
+<div class="sub">4.7 solo · 3.7 ast · 0.5 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 14.4 pts · 40% of his number · LB rank #25
+</div>
+
+<div class="part"><b>Form</b> · +1.2 pts
+<div class="sub">+0.6 · he has beaten his projection by 3.3 pts a game over 3 games. Part of that is luck, so it counts as +1.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.2 pts</b> = 14.0 from the sources + 1.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Barrett Carter</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 11.7–16.5 (3 sources)</div></div>
+              <div class="pts">15.0<small>±1.7</small><span class="res">scored 21.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.7 pts · 30% of his number
+<div class="sub">3.6 solo · 3.1 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.1 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 16.5 pts · 30% of his number
+<div class="sub">4.5 solo · 3.5 ast · 0.4 TFL* · 0.1 sack · 0.2 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.5 pts · 40% of his number · LB rank #23
+</div>
+
+<div class="part"><b>Form</b> · +0.7 pts
+<div class="sub">+0.1 · he has beaten his projection by 0.7 pts a game over 3 games. Part of that is luck, so it counts as +0.3 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>15.0 pts</b> = 14.2 from the sources + 0.7 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tremaine Edmunds</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">NYG vs ARI · range 11.8–16.0 (3 sources)</div></div>
+              <div class="pts">14.9<small>±1.6</small><span class="res">scored 28.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.8 pts · 30% of his number
+<div class="sub">3.4 solo · 2.4 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.0 pts · 30% of his number
+<div class="sub">4.5 solo · 3.5 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.6 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.9 pts · 40% of his number · LB rank #18
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.0 · he has beaten his projection by 0.1 pts a game over 3 games. Part of that is luck, so it counts as +0.1 a game, and 37% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.9 pts</b> = 14.3 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Foyesade Oluokun</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">JAX @ CIN · range 14.6–16.3 (3 sources)</div></div>
+              <div class="pts">14.6<small>±1.2</small><span class="res">scored 26.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 14.6 pts · 30% of his number
+<div class="sub">4.0 solo · 3.9 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.3 pts · 30% of his number
+<div class="sub">4.5 solo · 3.6 ast · 0.3 TFL* · 0.1 sack · 0.2 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 15.4 pts · 40% of his number · LB rank #15
+</div>
+
+<div class="part"><b>Form</b> · -0.8 pts
+<div class="sub">-0.5 · he has trailed his projection by 3.2 pts a game over 3 games. Part of that is luck, so it counts as -1.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">-0.3 · he played 84% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.6 pts</b> = 15.4 from the sources − 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jack Gibbens</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">ARI @ NYG · range 8.7–18.0 (3 sources)</div></div>
+              <div class="pts">14.4<small>±2.8</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.7 pts · 30% of his number
+<div class="sub">2.3 solo · 2.2 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 18.0 pts · 30% of his number
+<div class="sub">5.0 solo · 4.0 ast · 0.7 TFL* · 0.1 sack · 0.3 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.9 pts · 40% of his number · LB rank #30
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">+0.6 · he has beaten his projection by 3.5 pts a game over 3 games. Part of that is luck, so it counts as +1.5 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.2 · he played 93% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.4 pts</b> = 13.6 from the sources + 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 3</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Bobby Okereke</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">CAR vs DET · range 12.4–14.9 (3 sources)</div></div>
+              <div class="pts">14.4<small>±1.3</small><span class="res">scored 14.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.4 pts · 30% of his number
+<div class="sub">3.5 solo · 3.0 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 14.9 pts · 30% of his number
+<div class="sub">4.2 solo · 3.3 ast · 0.3 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.1 pts · 40% of his number · LB rank #42
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">+0.3 · he has beaten his projection by 2.0 pts a game over 3 games. Part of that is luck, so it counts as +0.8 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.4 pts</b> = 13.4 from the sources + 1.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Drake Thomas</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">SEA vs LAC · range 11.2–16.6 (3 sources)</div></div>
+              <div class="pts">14.3<small>±1.8</small><span class="res">scored 21.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.2 pts · 30% of his number
+<div class="sub">2.5 solo · 2.5 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.4 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 16.6 pts · 30% of his number
+<div class="sub">4.3 solo · 3.4 ast · 0.8 TFL* · 0.1 sack · 0.2 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 14.1 pts · 40% of his number · LB rank #29
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">+0.7 · he has beaten his projection by 4.0 pts a game over 3 games. Part of that is luck, so it counts as +1.7 a game, and 40% of that carries into this week.</div>
+<div class="sub">-0.3 · he played 83% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.3 pts</b> = 13.9 from the sources + 0.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Robert Spillane</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">NE @ BUF · range 12.3–16.2 (3 sources)</div></div>
+              <div class="pts">14.2<small>±1.5</small><span class="res">scored 16.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.3 pts · 30% of his number
+<div class="sub">3.2 solo · 3.1 ast · 0.3 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 16.2 pts · 30% of his number
+<div class="sub">4.7 solo · 3.8 ast · 0.3 TFL* · 0.2 sack · 0.1 QB hit* · 0.3 PD</div></div>
+<div class="part"><b>FantasyPros</b> · 14.6 pts · 40% of his number · LB rank #21
+</div>
+
+<div class="part"><b>Form</b> · -0.2 pts
+<div class="sub">-0.5 · he has trailed his projection by 3.2 pts a game over 3 games. Part of that is luck, so it counts as -1.4 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.4 · he played 95% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.2 pts</b> = 14.4 from the sources − 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Patrick Queen</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">PIT @ CLE · range 11.2–15.3 (3 sources)</div></div>
+              <div class="pts">14.1<small>±1.6</small><span class="res">scored 8.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.2 pts · 30% of his number
+<div class="sub">2.9 solo · 3.0 ast · 0.3 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.3 pts · 30% of his number
+<div class="sub">4.2 solo · 3.4 ast · 0.5 TFL* · 0.1 sack · 0.2 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.4 pts · 40% of his number · LB rank #36
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">+0.2 · he has beaten his projection by 1.2 pts a game over 3 games. Part of that is luck, so it counts as +0.5 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.1 pts</b> = 13.3 from the sources + 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Devin Bush</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">CHI vs NYJ · range 12.8–18.4 (3 sources)</div></div>
+              <div class="pts">14.1<small>±2.0</small><span class="res">scored 15.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.8 pts · 30% of his number
+<div class="sub">3.5 solo · 2.8 ast · 0.4 TFL · 0.1 sack · 0.2 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 18.4 pts · 30% of his number
+<div class="sub">4.6 solo · 3.7 ast · 0.7 TFL* · 0.2 sack · 0.6 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.4 pts · 40% of his number · LB rank #35
+</div>
+
+<div class="part"><b>Form</b> · -0.6 pts
+<div class="sub">-0.6 · he has trailed his projection by 3.5 pts a game over 3 games. Part of that is luck, so it counts as -1.5 a game, and 40% of that carries into this week.</div>
+<div class="sub">-0.0 · he played 88% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>14.1 pts</b> = 14.7 from the sources − 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Derrick Barnes</span>
+                <span class="chip upgrade">UPGRADE</span>
+                <span class="tag">also DL</span>
+
+
+
+                <div class="sub">DET @ CAR · range 9.8–13.2 (3 sources)</div></div>
+              <div class="pts">13.9<small>±1.5</small><span class="res">scored 2.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.8 pts · 30% of his number
+<div class="sub">2.3 solo · 2.1 ast · 0.3 TFL · 0.2 sack · 0.3 QB hit · 0.1 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 12.8 pts · 30% of his number
+<div class="sub">3.0 solo · 2.4 ast · 0.6 TFL* · 0.2 sack · 0.3 QB hit* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 13.2 pts · 40% of his number · LB rank #39
+</div>
+
+<div class="part"><b>Form</b> · +1.8 pts
+<div class="sub">+1.7 · he has beaten his projection by 10.1 pts a game over 3 games. Part of that is luck, so it counts as +4.3 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 90% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>13.9 pts</b> = 12.1 from the sources + 1.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Drue Tranquill</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">KC @ LV · range 13.2–15.9 (3 sources)</div></div>
+              <div class="pts">13.9<small>±1.3</small><span class="res">scored 20.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.9 pts · 30% of his number
+<div class="sub">3.5 solo · 3.1 ast · 0.7 TFL · 0.2 sack · 0.6 QB hit · 0.1 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.9 pts · 30% of his number
+<div class="sub">4.2 solo · 3.3 ast · 0.8 TFL* · 0.2 sack · 0.4 QB hit* · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.2 pts · 40% of his number · LB rank #41
+</div>
+
+<div class="part"><b>Form</b> · -0.3 pts
+<div class="sub">-0.1 · he has trailed his projection by 0.4 pts a game over 3 games. Part of that is luck, so it counts as -0.2 a game, and 40% of that carries into this week.</div>
+<div class="sub">-0.2 · he played 85% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>13.9 pts</b> = 14.2 from the sources − 0.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Nate Landman</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">LAR @ PHI · range 13.5–15.8 (3 sources)</div></div>
+              <div class="pts">13.9<small>±1.2</small><span class="res">scored 13.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.5 pts · 30% of his number
+<div class="sub">3.6 solo · 2.4 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 INT · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.8 pts · 30% of his number
+<div class="sub">4.3 solo · 3.4 ast · 0.5 TFL* · 0.1 sack · 0.3 QB hit* · 0.3 PD · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 14.7 pts · 40% of his number · LB rank #19
+</div>
+
+<div class="part"><b>Form</b> · -0.8 pts
+<div class="sub">-0.8 · he has trailed his projection by 4.4 pts a game over 3 games. Part of that is luck, so it counts as -1.9 a game, and 40% of that carries into this week.</div>
+<div class="sub">-0.0 · he played 88% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>13.9 pts</b> = 14.7 from the sources − 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Zaire Franklin</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">GB @ TB · range 11.7–15.9 (3 sources)</div></div>
+              <div class="pts">13.8<small>±1.6</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.7 pts · 30% of his number
+<div class="sub">2.9 solo · 2.8 ast · 0.3 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 15.9 pts · 30% of his number
+<div class="sub">4.4 solo · 3.5 ast · 0.5 TFL* · 0.1 sack · 0.3 QB hit* · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.7 pts · 40% of his number · LB rank #33
+</div>
+
+<div class="part"><b>Form</b> · +0.0 pts
+<div class="sub">-0.6 · he has trailed his projection by 3.5 pts a game over 3 games. Part of that is luck, so it counts as -1.5 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.6 · he played 100% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>13.8 pts</b> = 13.8 from the sources + 0.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Christian Elliss</span>
+                <span class="chip upgrade">UPGRADE</span>
+                
+
+
+
+                <div class="sub">NE @ BUF · range 8.6–17.5 (3 sources)</div></div>
+              <div class="pts">13.7<small>±2.7</small><span class="res">scored 10.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.6 pts · 30% of his number
+<div class="sub">2.5 solo · 2.5 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 17.5 pts · 30% of his number
+<div class="sub">4.8 solo · 3.8 ast · 0.3 TFL* · 0.2 sack · 0.2 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.2 pts · 40% of his number · LB rank #38
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.4 · he has beaten his projection by 2.4 pts a game over 3 games. Part of that is luck, so it counts as +1.0 a game, and 40% of that carries into this week.</div>
+<div class="sub">+0.2 · he played 92% of his team's defensive snaps last game (week 3); the top 60 LBs averaged 89%.</div>
+</div>
+<div class="sum"><b>13.7 pts</b> = 13.1 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">132 more available LB not shown.</p>
+        <p class="hidden-note">79 available LB have no projection this week.</p>
+        
+      </div>
+      
+      <div class="tabpanel" id="panel-DB">
+        <p class="note dbnote">Projections barely tell waiver DBs apart (this season r -0.01, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>
+        
+        <div class="card">
+          <p class="tierhead">Tier 1</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Amik Robertson</span>
+                
+                
+
+
+
+                <div class="sub">WAS vs IND · range 9.8–15.5 (2 sources)</div></div>
+              <div class="pts">13.8<small>±2.0</small><span class="res">scored 19.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part missing"><b>Sleeper</b> · no projection for him</div>
+<div class="part"><b>ESPN</b> · 15.5 pts · 60% of his number
+<div class="sub">3.8 solo · 1.5 ast · 0.1 TFL* · 1.3 PD · 0.2 INT · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 9.8 pts · 40% of his number · DB rank #83
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.6 · he has beaten his projection by 6.5 pts a game over 3 games. Part of that is luck, so it counts as +2.8 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.0 · he played 97% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>13.8 pts</b> = 13.2 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jordan Battle</span>
+                
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 11.4–14.1 (3 sources)</div></div>
+              <div class="pts">13.3<small>±1.3</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.4 pts · 30% of his number
+<div class="sub">3.7 solo · 2.3 ast · 0.1 TFL · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.1 pts · 30% of his number
+<div class="sub">4.2 solo · 2.5 ast · 0.1 TFL* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 13.5 pts · 40% of his number · DB rank #5
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">+0.1 · he has beaten his projection by 1.7 pts a game over 3 games. Part of that is luck, so it counts as +0.7 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>13.3 pts</b> = 13.1 from the sources + 0.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jeremy Chinn</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">LV vs KC · range 11.0–13.6 (3 sources)</div></div>
+              <div class="pts">13.2<small>±1.3</small><span class="res">scored 8.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.0 pts · 30% of his number
+<div class="sub">3.2 solo · 2.7 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.2 PD · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 13.6 pts · 30% of his number
+<div class="sub">4.3 solo · 2.5 ast · 0.2 TFL* · 0.2 PD · 0.1 INT · 0.2 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 13.5 pts · 40% of his number · DB rank #6
+</div>
+
+<div class="part"><b>Form</b> · +0.4 pts
+<div class="sub">+0.3 · he has beaten his projection by 3.5 pts a game over 3 games. Part of that is luck, so it counts as +1.5 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>13.2 pts</b> = 12.8 from the sources + 0.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Riley Moss</span>
+                
+                
+
+
+
+                <div class="sub">DEN @ SF · range 10.7–13.4 (2 sources)</div></div>
+              <div class="pts">12.8<small>±1.4</small><span class="res">scored 3.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part missing"><b>Sleeper</b> · no projection for him</div>
+<div class="part"><b>ESPN</b> · 13.4 pts · 60% of his number
+<div class="sub">3.6 solo · 1.4 ast · 0.1 TFL* · 1.1 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.7 pts · 40% of his number · DB rank #57
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">+0.4 · he has beaten his projection by 4.1 pts a game over 3 games. Part of that is luck, so it counts as +1.8 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.8 pts</b> = 12.3 from the sources + 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chuck Clark</span>
+                
+                
+
+
+
+                <div class="sub">DET @ CAR · range 9.6–14.1 (3 sources)</div></div>
+              <div class="pts">12.8<small>±1.6</small><span class="res">scored 13.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.6 pts · 30% of his number
+<div class="sub">2.8 solo · 2.5 ast · 0.1 TFL · 0.1 QB hit · 0.1 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.1 pts · 30% of his number
+<div class="sub">4.1 solo · 2.4 ast · 0.3 TFL* · 0.1 QB hit* · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.7 pts · 40% of his number · DB rank #34
+</div>
+
+<div class="part"><b>Form</b> · +1.0 pts
+<div class="sub">+0.7 · he has beaten his projection by 8.1 pts a game over 3 games. Part of that is luck, so it counts as +3.5 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.3 · he played 105% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.8 pts</b> = 11.8 from the sources + 1.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Dax Hill</span>
+                
+                
+
+
+
+                <div class="sub">CIN vs JAX · range 10.4–14.3 (3 sources)</div></div>
+              <div class="pts">12.7<small>±1.5</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.4 pts · 30% of his number
+<div class="sub">3.2 solo · 1.7 ast · 0.1 TFL · 0.1 QB hit · 0.6 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 14.3 pts · 30% of his number
+<div class="sub">4.0 solo · 1.5 ast · 0.1 TFL* · 1.2 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.7 pts · 40% of his number · DB rank #32
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.4 · he has beaten his projection by 5.0 pts a game over 3 games. Part of that is luck, so it counts as +2.2 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.7 pts</b> = 12.1 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Andrew Wingard</span>
+                
+                
+
+
+
+                <div class="sub">ARI @ NYG · range 9.3–13.9 (3 sources)</div></div>
+              <div class="pts">12.4<small>±1.6</small><span class="res">scored 2.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.3 pts · 30% of his number
+<div class="sub">2.6 solo · 2.3 ast · 0.2 TFL · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.9 pts · 30% of his number
+<div class="sub">3.8 solo · 2.2 ast · 0.4 TFL* · 0.5 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 11.8 pts · 40% of his number · DB rank #30
+</div>
+
+<div class="part"><b>Form</b> · +0.7 pts
+<div class="sub">+0.6 · he has beaten his projection by 6.8 pts a game over 3 games. Part of that is luck, so it counts as +2.9 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.4 pts</b> = 11.7 from the sources + 0.7 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Chamarri Conner</span>
+                
+                
+
+
+
+                <div class="sub">KC @ LV · range 10.6–13.9 (3 sources)</div></div>
+              <div class="pts">12.4<small>±1.5</small><span class="res">scored 12.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 13.2 pts · 30% of his number
+<div class="sub">4.2 solo · 1.5 ast · 0.2 TFL · 0.1 sack · 0.3 QB hit · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.9 pts · 30% of his number
+<div class="sub">4.3 solo · 2.5 ast · 0.2 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 10.6 pts · 40% of his number · DB rank #61
+</div>
+
+<div class="sum"><b>12.4 pts</b> = 12.4 from the sources.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Joshua Metellus</span>
+                
+                <span class="tag">also LB</span>
+
+
+
+                <div class="sub">MIN vs MIA · range 10.4–13.2 (3 sources)</div></div>
+              <div class="pts">12.3<small>±1.3</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.4 pts · 30% of his number
+<div class="sub">2.8 solo · 2.5 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 13.2 pts · 30% of his number
+<div class="sub">3.9 solo · 2.3 ast · 0.1 TFL* · 0.1 sack · 0.1 QB hit* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · DB rank #22
+</div>
+
+<div class="part"><b>Form</b> · +0.3 pts
+<div class="sub">+0.2 · he has beaten his projection by 2.1 pts a game over 3 games. Part of that is luck, so it counts as +0.9 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.3 pts</b> = 11.9 from the sources + 0.3 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jalen Pitre</span>
+                
+                
+
+
+
+                <div class="sub">HOU vs DAL · range 10.0–14.3 (3 sources)</div></div>
+              <div class="pts">12.2<small>±1.6</small><span class="res">scored 19.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.0 pts · 30% of his number
+<div class="sub">2.5 solo · 2.2 ast · 0.2 TFL · 0.1 QB hit · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 14.3 pts · 30% of his number
+<div class="sub">4.2 solo · 1.6 ast · 0.2 TFL* · 0.1 sack · 0.8 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.5 pts · 40% of his number · DB rank #15
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.2 · he has trailed his projection by 2.6 pts a game over 3 games. Part of that is luck, so it counts as -1.1 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.2 pts</b> = 12.3 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Cole Bishop</span>
+                
+                
+
+
+
+                <div class="sub">BUF vs NE · range 11.9–12.7 (3 sources)</div></div>
+              <div class="pts">12.2<small>±1.1</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.7 pts · 30% of his number
+<div class="sub">3.4 solo · 2.1 ast · 0.2 TFL · 0.1 sack · 0.1 QB hit · 0.5 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.2 pts · 30% of his number
+<div class="sub">3.9 solo · 2.2 ast · 0.2 TFL* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · DB rank #27
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.2 · he has trailed his projection by 2.5 pts a game over 3 games. Part of that is luck, so it counts as -1.1 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.2 pts</b> = 12.2 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <div class="card">
+          <p class="tierhead">Tier 2</p>
+          <ul>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Jessie Bates</span>
+                
+                
+
+
+
+                <div class="sub">ATL @ NO · range 11.0–12.8 (3 sources)</div></div>
+              <div class="pts">12.0<small>±1.2</small><span class="res">scored 4.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.0 pts · 30% of his number
+<div class="sub">3.1 solo · 2.2 ast · 0.1 TFL · 0.1 QB hit · 0.4 PD · 0.2 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.4 pts · 30% of his number
+<div class="sub">3.6 solo · 2.1 ast · 0.1 TFL* · 0.1 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 12.8 pts · 40% of his number · DB rank #12
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.2 · he has trailed his projection by 2.4 pts a game over 3 games. Part of that is luck, so it counts as -1.0 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 98% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.0 pts</b> = 12.2 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Tre&#39;von Moehrig</span>
+                
+                
+
+
+
+                <div class="sub">CAR vs DET · range 12.2–12.6 (3 sources)</div></div>
+              <div class="pts">12.0<small>±1.0</small><span class="res">scored 8.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.5 pts · 30% of his number
+<div class="sub">3.6 solo · 2.2 ast · 0.4 TFL · 0.1 sack · 0.3 QB hit · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 12.6 pts · 30% of his number
+<div class="sub">3.7 solo · 2.1 ast · 0.6 TFL* · 0.1 sack · 0.1 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.2 pts · 40% of his number · DB rank #19
+</div>
+
+<div class="part"><b>Form</b> · -0.4 pts
+<div class="sub">-0.5 · he has trailed his projection by 6.3 pts a game over 3 games. Part of that is luck, so it counts as -2.7 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>12.0 pts</b> = 12.4 from the sources − 0.4 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kevin Winston</span>
+                
+                
+
+
+
+                <div class="sub">TEN @ BAL · range 9.1–12.9 (3 sources)</div></div>
+              <div class="pts">11.9<small>±1.6</small><span class="res">scored 11.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.1 pts · 30% of his number
+<div class="sub">2.6 solo · 1.6 ast · 0.2 TFL · 0.1 sack · 0.3 QB hit · 0.2 PD · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.9 pts · 30% of his number
+<div class="sub">4.0 solo · 2.3 ast · 0.3 TFL* · 0.2 QB hit* · 0.2 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 12.7 pts · 40% of his number · DB rank #13
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">+0.1 · he has beaten his projection by 0.8 pts a game over 3 games. Part of that is luck, so it counts as +0.3 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.9 pts</b> = 11.7 from the sources + 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Camryn Bynum</span>
+                
+                
+
+
+
+                <div class="sub">IND @ WAS · range 11.1–12.1 (3 sources)</div></div>
+              <div class="pts">11.8<small>±1.1</small><span class="res">scored 6.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 12.1 pts · 30% of his number
+<div class="sub">4.2 solo · 0.8 ast · 0.1 TFL · 0.5 PD · 0.2 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 11.1 pts · 30% of his number
+<div class="sub">3.4 solo · 2.0 ast · 0.1 TFL* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.8 pts · 40% of his number · DB rank #31
+</div>
+
+<div class="part"><b>Form</b> · +0.1 pts
+<div class="sub">-0.1 · he has trailed his projection by 0.8 pts a game over 3 games. Part of that is luck, so it counts as -0.3 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.8 pts</b> = 11.7 from the sources + 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Antoine Winfield</span>
+                
+                
+
+
+
+                <div class="sub">TB vs GB · range 10.0–12.7 (3 sources)</div></div>
+              <div class="pts">11.7<small>±1.3</small><span class="res">scored 14.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.0 pts · 30% of his number
+<div class="sub">2.6 solo · 1.6 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.7 pts · 30% of his number
+<div class="sub">3.9 solo · 2.3 ast · 0.2 TFL* · 0.1 sack · 0.2 QB hit* · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 12.5 pts · 40% of his number · DB rank #14
+</div>
+
+<div class="part"><b>Form</b> · -0.1 pts
+<div class="sub">-0.2 · he has trailed his projection by 2.6 pts a game over 3 games. Part of that is luck, so it counts as -1.1 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.7 pts</b> = 11.8 from the sources − 0.1 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Dane Belton</span>
+                
+                
+
+
+
+                <div class="sub">NYJ @ CHI · range 8.4–15.5 (3 sources)</div></div>
+              <div class="pts">11.6<small>±2.2</small><span class="res">scored 23.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.4 pts · 30% of his number
+<div class="sub">2.1 solo · 2.0 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 15.5 pts · 30% of his number
+<div class="sub">4.7 solo · 2.7 ast · 0.2 TFL* · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.0 pts · 40% of his number · DB rank #48
+</div>
+
+<div class="part"><b>Form</b> · +0.0 pts
+<div class="sub">-0.1 · he has trailed his projection by 1.3 pts a game over 3 games. Part of that is luck, so it counts as -0.6 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.6 pts</b> = 11.5 from the sources + 0.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Kevin Byard</span>
+                
+                
+
+
+
+                <div class="sub">NE @ BUF · range 11.4–12.8 (3 sources)</div></div>
+              <div class="pts">11.5<small>±1.1</small><span class="res">scored 7.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 11.4 pts · 30% of his number
+<div class="sub">3.8 solo · 2.2 ast · 0.2 TFL · 0.3 PD · 0.1 INT</div></div>
+<div class="part"><b>ESPN</b> · 12.8 pts · 30% of his number
+<div class="sub">3.9 solo · 2.2 ast · 0.2 TFL* · 0.1 sack · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · DB rank #28
+</div>
+
+<div class="part"><b>Form</b> · -0.5 pts
+<div class="sub">-0.4 · he has trailed his projection by 5.0 pts a game over 3 games. Part of that is luck, so it counts as -2.2 a game, and 20% of that carries into this week.</div>
+<div class="sub">-0.1 · he played 95% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.5 pts</b> = 12.0 from the sources − 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Alontae Taylor</span>
+                
+                
+
+
+
+                <div class="sub">TEN @ BAL · range 9.8–12.1 (3 sources)</div></div>
+              <div class="pts">11.5<small>±1.2</small><span class="res">scored 12.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.8 pts · 30% of his number
+<div class="sub">2.5 solo · 1.1 ast · 0.3 TFL · 0.1 sack · 0.2 QB hit · 0.6 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 12.1 pts · 30% of his number
+<div class="sub">3.7 solo · 1.4 ast · 0.5 TFL* · 0.5 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.7 pts · 40% of his number · DB rank #33
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">+0.2 · he has beaten his projection by 1.9 pts a game over 3 games. Part of that is luck, so it counts as +0.8 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 98% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.5 pts</b> = 11.2 from the sources + 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Keisean Nixon</span>
+                
+                
+
+
+
+                <div class="sub">GB @ TB · range 9.7–12.3 (3 sources)</div></div>
+              <div class="pts">11.5<small>±1.2</small><span class="res">scored 19.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.7 pts · 30% of his number
+<div class="sub">3.0 solo · 1.1 ast · 0.1 TFL · 0.1 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.3 pts · 30% of his number
+<div class="sub">3.7 solo · 1.4 ast · 0.2 TFL* · 0.1 QB hit* · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>FantasyPros</b> · 11.0 pts · 40% of his number · DB rank #47
+</div>
+
+<div class="part"><b>Form</b> · +0.5 pts
+<div class="sub">+0.4 · he has beaten his projection by 4.6 pts a game over 3 games. Part of that is luck, so it counts as +2.0 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 99% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.5 pts</b> = 11.0 from the sources + 0.5 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Trent McDuffie</span>
+                
+                
+
+
+
+                <div class="sub">LAR @ PHI · range 8.7–13.3 (3 sources)</div></div>
+              <div class="pts">11.5<small>±1.6</small><span class="res">scored 4.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 8.7 pts · 30% of his number
+<div class="sub">2.4 solo · 0.7 ast · 0.1 TFL · 0.1 sack · 0.2 QB hit · 0.5 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.3 pts · 30% of his number
+<div class="sub">3.2 solo · 1.2 ast · 0.2 TFL* · 1.3 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 10.8 pts · 40% of his number · DB rank #53
+</div>
+
+<div class="part"><b>Form</b> · +0.6 pts
+<div class="sub">+0.5 · he has beaten his projection by 5.8 pts a game over 3 games. Part of that is luck, so it counts as +2.5 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 98% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.5 pts</b> = 10.9 from the sources + 0.6 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Xavier McKinney</span>
+                
+                
+
+
+
+                <div class="sub">GB @ TB · range 10.7–11.9 (3 sources)</div></div>
+              <div class="pts">11.4<small>±1.1</small><span class="res">scored 16.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.7 pts · 30% of his number
+<div class="sub">2.7 solo · 2.5 ast · 0.1 TFL · 0.1 sack · 0.1 QB hit · 0.5 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 11.6 pts · 30% of his number
+<div class="sub">3.4 solo · 2.0 ast · 0.1 QB hit* · 0.5 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.9 pts · 40% of his number · DB rank #26
+</div>
+
+<div class="part"><b>Form</b> · -0.0 pts
+<div class="sub">-0.2 · he has trailed his projection by 1.9 pts a game over 3 games. Part of that is luck, so it counts as -0.8 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 100% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.4 pts</b> = 11.5 from the sources − 0.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Christian Izien</span>
+                
+                
+
+
+
+                <div class="sub">DET @ CAR · range 6.6–13.6 (3 sources)</div></div>
+              <div class="pts">11.3<small>±2.2</small><span class="res">scored 24.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 6.6 pts · 30% of his number
+<div class="sub">2.2 solo · 0.9 ast · 0.1 TFL · 0.2 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 13.6 pts · 30% of his number
+<div class="sub">4.0 solo · 2.4 ast · 0.5 TFL* · 0.3 PD · 0.1 INT · 0.1 FF · 0.1 FR</div></div>
+<div class="part"><b>FantasyPros</b> · 11.0 pts · 40% of his number · DB rank #50
+</div>
+
+<div class="part"><b>Form</b> · +0.8 pts
+<div class="sub">+0.6 · he has beaten his projection by 9.5 pts a game over 2 games. Part of that is luck, so it counts as +3.2 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.2 · he played 102% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.3 pts</b> = 10.5 from the sources + 0.8 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">Reed Blankenship</span>
+                
+                
+
+
+
+                <div class="sub">HOU vs DAL · range 10.0–12.2 (3 sources)</div></div>
+              <div class="pts">11.3<small>±1.2</small><span class="res">scored 15.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 10.0 pts · 30% of his number
+<div class="sub">3.2 solo · 1.8 ast · 0.3 PD · 0.1 INT · 0.1 FR</div></div>
+<div class="part"><b>ESPN</b> · 12.2 pts · 30% of his number
+<div class="sub">3.7 solo · 2.2 ast · 0.1 TFL* · 0.4 PD · 0.1 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.6 pts · 40% of his number · DB rank #37
+</div>
+
+<div class="part"><b>Form</b> · -0.0 pts
+<div class="sub">+0.4 · he has beaten his projection by 4.3 pts a game over 3 games. Part of that is luck, so it counts as +1.8 a game, and 20% of that carries into this week.</div>
+<div class="sub">-0.4 · he played 87% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.3 pts</b> = 11.3 from the sources − 0.0 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+            <li class="item"><details class="bd"><summary><div class="row">
+              <div><span class="name">C.J. Gardner-Johnson</span>
+                
+                
+
+
+
+                <div class="sub">BUF vs NE · range 9.9–11.6 (3 sources)</div></div>
+              <div class="pts">11.2<small>±1.2</small><span class="res">scored 6.0</span></div>
+</div></summary><div class="bdbody">
+<div class="part"><b>Sleeper</b> · 9.9 pts · 30% of his number
+<div class="sub">2.8 solo · 1.5 ast · 0.2 TFL · 0.1 sack · 0.2 QB hit · 0.4 PD · 0.1 INT · 0.1 FF</div></div>
+<div class="part"><b>ESPN</b> · 11.5 pts · 30% of his number
+<div class="sub">3.0 solo · 1.8 ast · 0.2 TFL* · 0.6 PD · 0.2 INT</div></div>
+<div class="part"><b>FantasyPros</b> · 11.6 pts · 40% of his number · DB rank #35
+</div>
+
+<div class="part"><b>Form</b> · +0.2 pts
+<div class="sub">+0.1 · he has beaten his projection by 1.3 pts a game over 3 games. Part of that is luck, so it counts as +0.6 a game, and 20% of that carries into this week.</div>
+<div class="sub">+0.1 · he played 99% of his team's defensive snaps last game (week 3); the top 60 DBs averaged 97%.</div>
+</div>
+<div class="sum"><b>11.2 pts</b> = 11.1 from the sources + 0.2 form.</div>
+<div class="sub">* = our estimate (the source doesn't project that stat)</div>
+
+</div></details></li>
+            
+          </ul>
+        </div>
+        
+        <p class="hidden-note">233 more available DB not shown.</p>
+        <p class="hidden-note">168 available DB have no projection this week.</p>
+        
+      </div>
+      
+    </div>
+  </section>
+  
+  
+</main>
+<footer>
+  <h2>Sources</h2>
+  <div class="scroll"><table class="sources">
+    <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
+    
+    <tr><td>ESPN</td><td>from saved data</td>
+      <td>582</td>
+      <td>—</td>
+      <td>Mon Oct 12, 10:54 AM ET</td></tr>
+    
+    <tr><td>FantasyPros</td><td>from saved data</td>
+      <td>481</td>
+      <td>—</td>
+      <td>Mon Oct 12, 3:05 PM ET</td></tr>
+    
+    <tr><td>Sleeper</td><td>from saved data</td>
+      <td>683</td>
+      <td>—</td>
+      <td>Mon Oct 12, 2:45 AM ET</td></tr>
+    
+  </table></div>
+  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or the position's typical spread (σ<sub>out</sub> DL 5.681, LB 5.625, DB 5.228).
+  Tiers group players statistically indistinguishable from each tier's best.
+  Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.
+  Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).
+  * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="data-2026-04.json">data.json</a></p>
+</footer>
+
+</body>
+</html>

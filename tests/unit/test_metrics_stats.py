@@ -98,3 +98,49 @@ def test_partial_weeks_stay_out_of_the_season_and_tiers_come_from_the_prewaiver_
         {"tier": 1, "n": 1, "avg": 6.0, "margin": None},
         {"tier": 3, "n": 1, "avg": 8.0, "margin": None},
     ]
+
+
+def test_views_last_week_season_and_each_week(tmp_path):
+    """§6.8 views: Last week = the newest week, All season = the season numbers, one view per week; a
+    single week keeps its partial position, the season leaves it out; suggestions carry both scores."""
+    data = _season(tmp_path)
+    wd = data / "2026" / "week03"
+    src = json.loads((wd / "sources" / "sleeper_proj.json").read_text())
+    src["rows"] = dict(list(src["rows"].items())[:20])
+    (wd / "sources" / "sleeper_proj.json").write_text(json.dumps(src))
+    badges = {"k": {"w": "p0", "over": "p1", "badge": "UPGRADE", "slot": "LB", "p": 0.7, "active": True}}
+    (data / "2026" / "week02" / "badges.json").write_text(json.dumps({"badges": badges}))
+    ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
+    views = {v["key"]: v for v in ev["views"]}
+    assert [v["key"] for v in ev["views"]] == ["last", "season", "w1", "w2", "w3"]
+    assert views["last"]["weeks"] == [3] and views["last"]["label"] == "Last week (week 3)"
+    assert views["season"]["by_slot"]["LB"]["mae"] == ev["season_by_slot"]["LB"]["mae"]
+    assert views["season"]["by_slot"]["LB"]["n"] == 100 and views["w3"]["by_slot"]["LB"]["n"] == 20
+    assert views["w3"]["by_slot"]["LB"]["partial"] and views["w1"]["by_slot"]["LB"]["spearman"] is None
+    call = views["w2"]["suggestions"]["list"][0]
+    assert (call["name"], call["pts"], call["over_pts"], call["outcome"]) == ("p0", 6.0, 8.0, "miss")
+    assert views["w2"]["suggestions"]["live"] == {"hits": 0, "decided": 1, "void": 0}
+    assert views["w1"]["suggestions"]["list"] == [] and ev["suggestions"]["live"]["decided"] == 1
+
+
+def test_report_card_totals_beats_and_calls():
+    from sadlidp.site.build import report_card
+
+    fin = {"state": "final"}
+    page = {"my_idps": {
+        "LB": {"players": [{"name": "A", "mu": 10.0, "result": {**fin, "pts": 18.0}},
+                           {"name": "B", "mu": 12.0, "result": {**fin, "pts": 5.0}},
+                           {"name": "C", "mu": None, "result": {**fin, "pts": 9.0}},
+                           {"name": "IR", "mu": 8.0, "reserve": True, "result": {**fin, "pts": 0.0}}]},
+        "DB": {"players": [{"name": "D", "mu": 9.0, "result": {"state": "dnp", "pts": None}}]},
+    }}  # fmt: skip
+    calls = [{"name": "W", "pts": 20.0, "over_name": "B", "over_pts": 5.0, "outcome": "hit", "badge": "UPGRADE"},
+             {"name": "X", "pts": 6.0, "over_name": "B", "over_pts": 5.0, "outcome": "hit", "badge": "UPGRADE"},
+             {"name": "Y", "pts": 2.0, "over_name": "A", "over_pts": 18.0, "outcome": "miss", "badge": "START"},
+             {"name": "R", "pts": 30.0, "over_pts": 0.0, "outcome": "hit", "reference": True}]  # fmt: skip
+    view = {"suggestions": {"live": {"hits": 2, "decided": 3}, "rebuilt": {"hits": 0, "decided": 0}, "list": calls}}
+    c = report_card(page, view, 5, True)
+    assert [x["name"] for x in c["players"]] == ["A", "C", "B", "D"]  # IR left out
+    assert (c["projected"], c["scored"], c["counted"]) == (22.0, 23.0, 2)
+    assert c["beat"]["name"] == "A" and c["short"]["name"] == "B" and (c["hits"], c["decided"]) == (2, 3)
+    assert c["best_call"]["name"] == "W" and c["worst_call"]["name"] == "Y" and not c["rebuilt"]

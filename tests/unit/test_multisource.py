@@ -129,7 +129,9 @@ def test_two_sources_blend_equally_and_espn_estimates_are_marked(tmp_path):
     frozen = json.loads((week / "frozen.json").read_text())["players"][TYKEE]
     assert frozen["eff"] == {"sleeper_proj": 0.5, "espn_proj": 0.5} and frozen["n_sources"] == 2
     by = parts(tykee)
-    assert [p["source"] for p in tykee["breakdown"]["parts"]] == ["Sleeper", "ESPN", "FantasyPros"]
+    assert [p["source"] for p in tykee["breakdown"]["parts"]] == [
+        "Sleeper", "ESPN", "FantasyPros", "RotoBaller", "FantasyData"
+    ]  # fmt: skip
     assert by["FantasyPros"]["missing"] == "couldn't be read this sync"  # not served offline
     assert by["Sleeper"]["share"] == by["ESPN"]["share"] == 0.5
     base = tykee["breakdown"].get("base", tykee["mu"])  # the blend; his week-4 snaps add a form term on top

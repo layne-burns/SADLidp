@@ -30,7 +30,7 @@ from .roster import panel, starter_slots
 from .schedule import ET, NFLVERSE_GAMES, Schedule
 from .sigma import within_player_sd
 from .sleeper import Sleeper, my_roster, position_limits, resolve_league, season_of
-from .sources import espn_proj, fp_dst, fp_ecr, sleeper_proj
+from .sources import espn_proj, fantasydata, fp_dst, fp_ecr, rotoballer, sleeper_proj
 from .sources.base import SUSPECT, AdapterResult, FetchContext
 from .tiers import build_tiers, place
 
@@ -42,6 +42,8 @@ SOURCES = {
     sleeper_proj.NAME: (sleeper_proj, "projection"),
     espn_proj.NAME: (espn_proj, "projection"),
     fp_ecr.NAME: (fp_ecr, "rank"),
+    rotoballer.NAME: (rotoballer, "rank"),
+    fantasydata.NAME: (fantasydata, "rank"),
 }
 SIGNALS = {fp_dst.NAME: (fp_dst, "signal")}  # stored and backfilled, never blended (D18)
 
@@ -140,6 +142,26 @@ def refresh_actuals(
             storage.write_json(path, {"week": week, "captured_at": now.isoformat(), "stats": lines})
             written.append(week)
     return written
+
+
+DAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+
+
+def expected_by(spec: str | None, sched: Schedule, week: int) -> datetime | None:
+    """A source's usual posting time for `week` (§5.2 Late sources): the last "<Day> HH:MM" ET at or before
+    the week's first kickoff (e.g. "Thu 12:00" is the morning of a Thursday-night game, or the Thursday before
+    a Sunday-first week). None without a setting or a schedule."""
+    kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
+    if not spec or not kicks:
+        return None
+    try:
+        day, hhmm = spec.split()
+        wd, (h, m) = DAYS.index(day[:3].lower()), (int(x) for x in hhmm.split(":"))
+    except ValueError:
+        return None
+    first = min(kicks).astimezone(ET)
+    at = first.replace(hour=h, minute=m, second=0, microsecond=0) - timedelta(days=(first.weekday() - wd) % 7)
+    return at if at <= first else at - timedelta(days=7)
 
 
 def observed_after(source: dict, published_at: str | None = None) -> datetime | None:
@@ -303,7 +325,8 @@ def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc:
     }
 
 
-SOURCE_LABELS = {"sleeper_proj": "Sleeper", "espn_proj": "ESPN", "fp_ecr": "FantasyPros", "fp_dst": "FantasyPros D/ST"}
+SOURCE_LABELS = {"sleeper_proj": "Sleeper", "espn_proj": "ESPN", "fp_ecr": "FantasyPros", "rotoballer": "RotoBaller",
+                 "fantasydata": "FantasyData", "fp_dst": "FantasyPros D/ST"}  # fmt: skip
 STAT_LABELS = (
     ("idp_tkl_solo", "solo"), ("idp_tkl_ast", "ast"), ("idp_tkl_loss", "TFL"), ("idp_sack", "sack"),
     ("idp_qb_hit", "QB hit"), ("idp_pass_def", "PD"), ("idp_int", "INT"), ("idp_ff", "FF"), ("idp_fum_rec", "FR"),
@@ -528,7 +551,8 @@ def run_sync(
             continue
         path = wdir / "sources" / f"{name}.json"
         existing = storage.load_source(path)
-        ctx = FetchContext(client, sleeper, season, week, now, idp, source_cfg(cfg, name), matcher, imputer)
+        ctx = FetchContext(client, sleeper, season, week, now, idp, source_cfg(cfg, name), matcher, imputer,
+                           kickoff_of=kickoff_of)  # fmt: skip
         try:
             res = module.fetch(ctx)
         except Exception as e:  # a broken adapter is a failed source, never a failed sync (SPEC §7)
@@ -552,10 +576,20 @@ def run_sync(
         else:
             info["last_success"] = existing.get("last_success")
             rows = existing.get("rows", {})
-            why = {"not_yet_published": f"week {week} not posted yet",
-                   SUSPECT: "this fetch looked incomplete and was skipped"}.get(res.status, res.status)  # fmt: skip
-            why += f" ({res.error})" if res.error else ""
-            warnings.append(f"{name}: {why}" + ("; using earlier rows" if rows else ""))
+            due = expected_by(((cfg.get("sources") or {}).get(name) or {}).get("expected_by"), sched, week)
+            if due is not None:
+                info["expected_by"] = due.isoformat()
+            if res.status == "not_yet_published" and due is not None and now < due:
+                info["pending"] = True  # not due yet: a footer note, never a banner (§5.2 Late sources)
+            else:
+                late = res.status == "not_yet_published" and due is not None
+                info["late"] = late
+                why = {"not_yet_published": f"week {week} not posted yet",
+                       SUSPECT: "this fetch looked incomplete and was skipped"}.get(res.status, res.status)  # fmt: skip
+                if late:
+                    why = f"week {week} is late (usually posted by {due.strftime('%a %-I:%M %p')} ET)"
+                why += f" ({res.error})" if res.error and not late else ""
+                warnings.append(f"{name}: {why}" + ("; using earlier rows" if rows else ""))
         info["rows_used"] = len(rows)
         last = info.get("last_success")
         if not last or now - datetime.fromisoformat(last) > max_age:
@@ -649,7 +683,7 @@ def run_sync(
     if rec is None:  # a failure falls back to the priors for this sync and records nothing
         rec = accuracy.weights({"from_weeks": [], "sources": {}, "alpha_hat_raw": None, "alpha_n": 0}, cfg)
     run["weights"] = rec
-    cons = consensus(values, groups, slots, cfg, weights=accuracy.source_weights(rec), alpha=float(rec["alpha"]))
+    cons = consensus(values, groups, slots, cfg, weights=accuracy.source_weights(rec, cfg), alpha=float(rec["alpha"]))
     coef = formmod.coefficients(cfg)
     if coef:  # the form term (SPEC §6.4): his earlier misses this season and his last game's snap share
         run["form"] = {**coef, **formmod.apply(cons, slots, formmod.history(data_dir, season, week, sc), coef)}
@@ -847,7 +881,7 @@ def run_sync(
     archives = {**SOURCES, **SIGNALS}
     backfilled = _guard("backfill", lambda: backfillmod.run(archives, cfg, data_dir, season, range(1, week), now,
                                                            client=client, sleeper=sleeper, players=idp,
-                                                           matcher=matcher, priors=priors, log=log),
+                                                           matcher=matcher, priors=priors, log=log, sched=sched),
                         {}, warnings, log)  # fmt: skip
     for name, weeks in backfilled.items():
         log(f"sync: backfilled {SOURCE_LABELS.get(name, name)} weeks {weeks}")  # a note, not a page banner

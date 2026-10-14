@@ -89,7 +89,7 @@ def test_group_split_moves_toward_the_better_group(tmp_path):
     assert rec["alpha_n"] == 4 and 0.2 <= rec["alpha_hat"] <= 0.8
     k, prior = CFG["weights"]["k"], CFG["weights"]["prior_split"]
     assert rec["alpha"] == pytest.approx(4 / (4 + k) * rec["alpha_hat"] + k / (4 + k) * prior, abs=1e-3)
-    assert rec["sources"]["fp_ecr"]["w"] == 1.0  # alone in its group: nothing to compare it with
+    assert rec["sources"]["fp_ecr"]["w"] == CFG["weights"]["prior"]["fp_ecr"]  # alone in its group: its prior
 
 
 def test_the_record_is_written_once_and_a_week_already_shown_keeps_its_shares(tmp_path):

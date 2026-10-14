@@ -52,6 +52,11 @@ DB = 5.0
 prior_split = 0.6           # projection : rank group prior (D11)
 k = 4                       # shrinkage of the accuracy weights, in weeks: after n weeks the data counts n/(n+k) (§6.5)
 
+[weights.prior]             # each source's starting weight within its group (SPEC §6.5 "Prior weights"); others 1
+fp_ecr = 2.0                # a 26-expert consensus
+rotoballer = 1.0
+fantasydata = 1.0
+
 [accuracy]                  # accuracy weights (SPEC §6.5 Implementation)
 untrusted = []              # sources whose archived/late rows don't count yet; Sleeper, ESPN and FP have passed (§13)
 
@@ -88,6 +93,18 @@ enabled = true
 archive = true              # past weeks through ?week=N
 late_rows = false
 
+[sources.rotoballer]        # RotoBaller's weekly IDP rankings article, found through its search RSS (SPEC §5.2)
+enabled = true
+archive = true              # past weeks' articles through the same feed
+late_rows = false
+expected_by = "Thu 12:00"   # ET; "not posted yet" until then, "late" after (SPEC §5.2 Late sources)
+
+[sources.fantasydata]       # FantasyData's weekly DL/LB/DB rankings, 100 deep (SPEC §5.2)
+enabled = true
+archive = false             # live weeks only
+late_rows = false
+expected_by = "Wed 12:00"
+
 [sources.fp_dst]            # FantasyPros D/ST ranks: a signal, stored and backfilled, never blended (D18)
 enabled = true
 archive = true
@@ -102,6 +119,8 @@ max_requests = 40           # per host
 [net.host_interval_s]       # seconds between requests to one host; others wait net.Client's 2 s (SPEC §7)
 "lm-api-reads.fantasy.espn.com" = 1.0
 "www.fantasypros.com" = 5.0  # its robots.txt crawl delay
+"www.rotoballer.com" = 3.0
+"fantasydata.com" = 3.0
 
 # [impute.m_k]              # overrides the empirical-Bayes m_k in data/<prev>/impute_priors.json (SPEC §6.2)
 # idp_tkl_loss = 50.0
@@ -109,6 +128,8 @@ max_requests = 40           # per host
 [gate]
 pre_waiver_open_h = 12      # window opens this many hours before waivers process
 pre_waiver_close_h = 1
+thursday_open_et = "11:00"     # the Thursday window, until thursday_close_h before the first Thursday kickoff (D13)
+thursday_close_h = 1
 saturday_open_et = "12:00"
 saturday_close_et = "18:00"
 sunday_open_h = 4           # before the first Sunday kickoff

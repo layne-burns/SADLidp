@@ -32,7 +32,7 @@ Data review (weeks 1–5): a private report for the owner. Findings, in short:
 - [x] DB note: projections can't separate waiver DBs (2026 r 0.04, 2025 r 0.01); lean on snaps and form.
 - [x] Plainer card wording for the form term and the floor–ceiling.
 
-## 3. PR 6: accuracy weights + team-defense backtest
+## 3. PR 6: accuracy weights + team-defense backtest (#16, #17, merged)
 - [x] 6a, accuracy weights (#16, merged): week 7 on, the source shares follow accuracy (expected: projections 70%, rankings 30%; Sleeper and ESPN about equal). Recorded per week in `weights.json`.
 - [x] ESPN archive integrity: passed, 37 of 37 Monday-night rows.
 - [x] 6b, team-defense backtest: neither D/ST rank nor opponent implied points helps (2025 and 2026 weeks 1–5); not used.
@@ -40,8 +40,13 @@ Data review (weeks 1–5): a private report for the owner. Findings, in short:
   - re-run `sadlidp backtest dst` with 2026 added;
   - re-fit form, swing and z on 2025 + 2026 (adopt only if held-out improves).
 
-## 4. PR 5: RotoBaller + FantasyData + Thursday window
-- Spec drafted at `../SADLidp-pr5` (ffdd6d6) on an old base; rebuild it on `main`, where FantasyPros is `fp_ecr`.
+## 4. PR 5: RotoBaller + FantasyData + Thursday window (this PR)
+- [x] RotoBaller adapter (RSS discovery, three tables, nickname teams, published_at drop); weeks 1–5 backfill live.
+- [x] FantasyData adapter (100 per list, 100% matched by `fantasy_data_id`); week 6 live.
+- [x] Rank-group priors FantasyPros 2 : RotoBaller 1 : FantasyData 1.
+- [x] Late-source status (`expected_by`).
+- [x] Thursday window, 11:00 ET to 1 h before TNF.
+- [ ] After merge: check Thursday's window run (Oct 15) captured RotoBaller's week-6 article.
 
 ## 5. Research (2025 archive first)
 - Does the form term still help for players whose projections already moved after their big games?

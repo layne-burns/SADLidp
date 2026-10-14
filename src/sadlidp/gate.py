@@ -83,6 +83,14 @@ def windows(schedule: Schedule, season: int, week: int, settings: dict, gcfg: di
                 w - timedelta(hours=float(gcfg.get("pre_waiver_close_h", 1))),
             )
         )
+    thursday = schedule.first_kickoff_on(week, 3)
+    if thursday:  # D13 amended (PR 5): RotoBaller's Thursday-morning rankings, before the Thursday game
+        opens = datetime.combine(
+            thursday.astimezone(ET).date(), _hhmm(gcfg.get("thursday_open_et", "11:00")), tzinfo=ET
+        )
+        closes = thursday - timedelta(hours=float(gcfg.get("thursday_close_h", 1)))
+        if opens < closes:
+            out.append(Window(f"{prefix}-thursday", "thursday", opens, closes))
     sunday = schedule.first_kickoff_on(week, 6)
     if sunday:
         sat = sunday.astimezone(ET).date() - timedelta(days=1)

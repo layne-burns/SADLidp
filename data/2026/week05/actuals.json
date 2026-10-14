@@ -1,5 +1,5 @@
 {
- "captured_at": "2026-10-14T15:36:44-04:00",
+ "captured_at": "2026-10-14T16:04:39-04:00",
  "stats": {
   "1052": {"def_snp":68.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_qb_hit":1.0,"idp_tkl":4.0,"idp_tkl_ast":3.0,"idp_tkl_solo":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":6.0,"tm_def_snp":68.0,"tm_off_snp":70.0,"tm_st_snp":30.0},
   "10873": {"def_snp":58.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_tkl":1.0,"idp_tkl_ast":1.0,"penalty":1.0,"penalty_yd":5.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":1.0,"tm_def_snp":72.0,"tm_off_snp":62.0,"tm_st_snp":27.0},

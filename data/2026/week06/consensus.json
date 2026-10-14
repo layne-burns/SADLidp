@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-14T15:15:10-04:00",
+ "generated_at": "2026-10-14T15:31:15-04:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -176,7 +176,7 @@
      "also": [],
      "badge": null,
      "breakdown": {
-      "base": 13.94,
+      "base": 13.91,
       "est": true,
       "form": {
        "miss": {
@@ -193,7 +193,7 @@
         "week": 5
        }
       },
-      "mu": 15.23,
+      "mu": 15.2,
       "parts": [
        {
         "kind": "projection",
@@ -285,7 +285,7 @@
         "kind": "rank",
         "late": false,
         "list": "DB",
-        "pts": 15.12,
+        "pts": 15.05,
         "rank": 3,
         "share": 0.4,
         "source": "FantasyPros",
@@ -303,14 +303,14 @@
      "max": 15.47,
      "min": 10.83,
      "mine": true,
-     "mu": 15.23,
+     "mu": 15.2,
      "n": 3,
      "name": "Evan Williams",
      "opp": "DAL",
      "reserve": false,
      "result": null,
      "role": "starter",
-     "sigma": 1.86,
+     "sigma": 1.85,
      "slot": "DB",
      "swing": 6.77,
      "taxi": false,
@@ -2294,23 +2294,23 @@
           "week": 5
          }
         },
-        "mu": 11.71,
+        "mu": 11.72,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 11.17,
+          "pts": 11.2,
           "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            3.21,
+            3.22,
             false
            ],
            [
             "ast",
-            2.23,
+            2.24,
             false
            ],
            [
@@ -2407,16 +2407,16 @@
        "kickoff": "2026-10-18T13:00:00-04:00",
        "late": false,
        "max": 11.94,
-       "min": 11.17,
+       "min": 11.2,
        "mine": false,
-       "mu": 11.71,
+       "mu": 11.72,
        "n": 3,
        "name": "Jessie Bates",
        "opp": "CHI",
        "result": null,
        "sigma": 1.2,
        "slot": "DB",
-       "swing": 6.61,
+       "swing": 6.62,
        "team": "ATL",
        "tier": 2,
        "unavailable": []
@@ -7581,7 +7581,7 @@
        ],
        "badge": null,
        "breakdown": {
-        "base": 6.02,
+        "base": 6.03,
         "est": true,
         "form": {
          "miss": {
@@ -7598,18 +7598,18 @@
           "week": 5
          }
         },
-        "mu": 7.35,
+        "mu": 7.36,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 6.13,
+          "pts": 6.15,
           "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            1.21,
+            1.22,
             false
            ],
            [
@@ -7704,7 +7704,7 @@
          }
         ]
        },
-       "ceiling": 12.6,
+       "ceiling": 12.7,
        "flags": [],
        "floor": 1.7,
        "id": "4170",
@@ -7713,14 +7713,14 @@
        "max": 8.41,
        "min": 4.15,
        "mine": false,
-       "mu": 7.35,
+       "mu": 7.36,
        "n": 3,
        "name": "Samson Ebukam",
        "opp": "CHI",
        "result": null,
        "sigma": 1.49,
        "slot": "DL",
-       "swing": 7.05,
+       "swing": 7.06,
        "team": "ATL",
        "tier": 4,
        "unavailable": []
@@ -8183,7 +8183,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
-        "base": 14.95,
+        "base": 14.93,
         "est": true,
         "form": {
          "miss": {
@@ -8200,7 +8200,7 @@
           "week": 5
          }
         },
-        "mu": 16.82,
+        "mu": 16.81,
         "parts": [
          {
           "kind": "projection",
@@ -8302,7 +8302,7 @@
           "kind": "rank",
           "late": false,
           "list": "LB",
-          "pts": 15.53,
+          "pts": 15.5,
           "rank": 11,
           "share": 0.4,
           "source": "FantasyPros",
@@ -8320,7 +8320,7 @@
        "max": 16.95,
        "min": 12.17,
        "mine": false,
-       "mu": 16.82,
+       "mu": 16.81,
        "n": 3,
        "name": "Tremaine Edmunds",
        "opp": "NO",
@@ -8662,7 +8662,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
-        "base": 16.05,
+        "base": 16.04,
         "est": true,
         "form": {
          "miss": {
@@ -8679,7 +8679,7 @@
           "week": 5
          }
         },
-        "mu": 16.13,
+        "mu": 16.11,
         "parts": [
          {
           "kind": "projection",
@@ -8791,7 +8791,7 @@
           "kind": "rank",
           "late": false,
           "list": "LB",
-          "pts": 15.56,
+          "pts": 15.53,
           "rank": 10,
           "share": 0.4,
           "source": "FantasyPros",
@@ -8807,9 +8807,9 @@
        "kickoff": "2026-10-18T16:05:00-04:00",
        "late": false,
        "max": 17.15,
-       "min": 15.56,
+       "min": 15.53,
        "mine": false,
-       "mu": 16.13,
+       "mu": 16.11,
        "n": 3,
        "name": "Nate Landman",
        "opp": "ARI",
@@ -9297,7 +9297,7 @@
           "week": 3
          }
         },
-        "mu": 15.08,
+        "mu": 15.09,
         "parts": [
          {
           "kind": "projection",
@@ -9404,7 +9404,7 @@
           "kind": "rank",
           "late": false,
           "list": "LB",
-          "pts": 12.03,
+          "pts": 12.04,
           "rank": 40,
           "share": 0.4,
           "source": "FantasyPros",
@@ -9422,9 +9422,9 @@
        "kickoff": "2026-10-18T13:00:00-04:00",
        "late": false,
        "max": 17.81,
-       "min": 12.03,
+       "min": 12.04,
        "mine": false,
-       "mu": 15.08,
+       "mu": 15.09,
        "n": 3,
        "name": "Kaden Elliss",
        "opp": "@NYG",
@@ -9578,7 +9578,7 @@
        "also": [],
        "badge": null,
        "breakdown": {
-        "base": 14.61,
+        "base": 14.57,
         "est": true,
         "form": {
          "miss": {
@@ -9595,23 +9595,23 @@
           "week": 5
          }
         },
-        "mu": 14.93,
+        "mu": 14.9,
         "parts": [
          {
           "kind": "projection",
           "late": false,
-          "pts": 13.47,
+          "pts": 13.35,
           "share": 0.3,
           "source": "Sleeper",
           "stats": [
            [
             "solo",
-            3.67,
+            3.63,
             false
            ],
            [
             "ast",
-            2.95,
+            2.91,
             false
            ],
            [
@@ -9716,7 +9716,7 @@
          }
         ]
        },
-       "ceiling": 20.9,
+       "ceiling": 20.8,
        "flags": [],
        "floor": 8.6,
        "id": "5843",
@@ -9725,14 +9725,14 @@
        "max": 17.64,
        "min": 13.19,
        "mine": false,
-       "mu": 14.93,
+       "mu": 14.9,
        "n": 3,
        "name": "Devin Bush",
        "opp": "@ATL",
        "result": null,
-       "sigma": 1.86,
+       "sigma": 1.87,
        "slot": "LB",
-       "swing": 7.89,
+       "swing": 7.88,
        "team": "CHI",
        "tier": 2,
        "unavailable": []
@@ -11932,10 +11932,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-14T15:15:10-04:00",
+   "fetched_at": "2026-10-14T15:31:15-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-14T15:15:10-04:00",
+   "last_success": "2026-10-14T15:31:15-04:00",
    "match": {
     "names": [
      "Jeremiah Moon CAR DL",
@@ -11965,10 +11965,10 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-14T15:15:10-04:00",
+   "fetched_at": "2026-10-14T15:31:15-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-14T15:15:10-04:00",
+   "last_success": "2026-10-14T15:31:15-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
@@ -11988,10 +11988,10 @@
   "fp_ecr": {
    "censored": 74,
    "error": null,
-   "fetched_at": "2026-10-14T15:15:10-04:00",
+   "fetched_at": "2026-10-14T15:31:15-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-14T15:15:10-04:00",
+   "last_success": "2026-10-14T15:31:15-04:00",
    "mapped": 234,
    "match": {
     "names": [],
@@ -12017,18 +12017,18 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-14T15:15:10-04:00",
+   "fetched_at": "2026-10-14T15:31:15-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-14T15:15:10-04:00",
+   "last_success": "2026-10-14T15:31:15-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 656,
-    "updated": 0
+    "unchanged": 617,
+    "updated": 39
    },
    "no_projection": 3701,
    "observed_after": "2026-10-13T15:15:31-04:00",

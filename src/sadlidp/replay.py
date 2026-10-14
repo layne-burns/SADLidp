@@ -11,6 +11,12 @@ Each projected player takes his team from a projection row (Sleeper's first) and
 (that week's injury news isn't known). The result is written as the week's consensus.json, marked
 `replayed`; the site build then re-scores it with the week's final stats like any past week. The rebuilt
 μs are also written as the week's frozen record when it has none, so later weeks' form term can read them.
+
+`fill_frozen` repairs a live week whose first saved sync came after most games (week 5 of 2026: the first
+sync ran Monday, so only the Monday-night players have a record): the rebuilt records are added for the
+players the week's record lacks, marked `rebuilt`, and the week's page is left as it is. A live record is
+never replaced. Sleeper's archive passed its integrity check (SPEC §13), so the rebuilt μs are what the
+page would have shown before each game, less that week's injury news.
 """
 
 from __future__ import annotations
@@ -57,6 +63,7 @@ def replay_week(
     matchups: list[dict],
     players_db: dict[str, dict],
     log: Callable[[str], None] = print,
+    fill_frozen: bool = False,
 ) -> Path:
     data_dir = Path(data_dir)
     wdir = storage.week_dir(data_dir, season, week)
@@ -131,6 +138,14 @@ def replay_week(
         run_sync(run_cfg, tmp, tmp / "cache", now=now, force=True, client=ReplayClient(routes), log=log)
         data = json.loads((storage.week_dir(tmp, season, week) / "consensus.json").read_text())
         frozen = storage.read_json(storage.week_dir(tmp, season, week) / "frozen.json")
+    if fill_frozen:
+        path = wdir / "frozen.json"
+        live = (storage.read_json(path) or {}).get("players") or {}
+        added = {pid: {**rec, "rebuilt": True} for pid, rec in ((frozen or {}).get("players") or {}).items()
+                 if pid not in live}  # fmt: skip
+        storage.write_json(path, {"schema_version": 1, "players": {**live, **added}})
+        log(f"week {week}: {len(added)} rebuilt records added, {len(live)} live records kept")
+        return path
     data["replayed"] = {"as_of": now.isoformat(), "note": NOTE}
     # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows
     noise = ("σ_out", "live stats", *(f"{name}: failed" for name in SOURCES))

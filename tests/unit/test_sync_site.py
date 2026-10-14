@@ -521,6 +521,14 @@ def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
     frozen.write_text(json.dumps({"schema_version": 1, "players": {}}))  # a record already there is kept
     replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None)
     assert json.loads(frozen.read_text())["players"] == {}
+    # --fill-frozen: a live week's record gains the players it lacks; its own rows and the page stay
+    live = {"11705": {"mu": 1.5, "base": 1.5}}
+    frozen.write_text(json.dumps({"schema_version": 1, "players": live}))
+    before = out.read_text()
+    replay_week(CFG, data, 2026, 4, truth["matchups"], players, log=lambda m: None, fill_frozen=True)
+    filled = json.loads(frozen.read_text())["players"]
+    assert filled["11705"] == live["11705"] and len(filled) == len(record)
+    assert all(r.get("rebuilt") for pid, r in filled.items() if pid != "11705") and out.read_text() == before
     rostered = {p for m in truth["matchups"] for p in m["players"]}
     tiered = {p["id"] for s in d["positions"].values() for t in s["tiers"] for p in t["players"]}
     assert tiered and not tiered & rostered  # availability from that week's rosters

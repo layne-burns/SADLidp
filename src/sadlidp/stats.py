@@ -111,6 +111,12 @@ def _shares(kinds: dict[str, str], names, split: float) -> list[dict]:
     ]
 
 
+def _order(path: Path) -> tuple[int, str]:
+    """Sources in the site's order (Sleeper, ESPN, FantasyPros, then any other)."""
+    order = list(SOURCE_LABELS)
+    return (order.index(path.stem) if path.stem in order else len(order), path.stem)
+
+
 def weights_history(season_dir: Path, prior_split: float) -> list[dict]:
     """Per synced week, the shares in force (§6.5 Implementation): each source's share of a player's number
     when every source that week covers him, from the week's `weights.json` ("default shares" before it)."""
@@ -120,7 +126,7 @@ def weights_history(season_dir: Path, prior_split: float) -> list[dict]:
         if not m or not (d / "consensus.json").exists():
             continue
         kinds = {name: (doc.get("kind") or "projection") for name, doc in
-                 ((p.stem, storage.read_json(p) or {}) for p in (d / "sources").glob("*.json"))
+                 ((p.stem, storage.read_json(p) or {}) for p in sorted((d / "sources").glob("*.json"), key=_order))
                  if (doc.get("kind") or "projection") in ("projection", "rank")}  # fmt: skip
         rec = storage.read_json(d / "weights.json") or {}
         w = {n: float(((rec.get("sources") or {}).get(n) or {}).get("w", 1.0)) for n in kinds}

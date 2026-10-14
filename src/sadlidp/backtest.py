@@ -9,8 +9,9 @@ scores both under the current SADL settings and runs the standard checks on ~12,
   the waiver band (ranks 15-60 by projection) and everyone;
 - **form**: whether a player's earlier misses (shrunk by n/(n+k)) and his last game's defensive snap
   share add to the projection, fitted on odd weeks and scored on even weeks;
-- **swing**: a per-player outcome SD from the projected stat mix (Poisson) against one SD per position:
-  calibration by fifth and the pairwise "who outscores whom" Brier score;
+- **swing**: a per-player outcome SD from the projected stat mix (Poisson), swing² = a + b·V fitted per
+  position, against one SD per position: calibration by fifth, the pairwise "who outscores whom" Brier
+  score, and the `[swing]` settings (a, b and the 1-in-5 band) the page applies (SPEC §6.7);
 - **sacks**: whether a player's sack excess persists, and the sack projections' calibration;
 - **coefficients**: the `[form]` settings the page applies (SPEC §6.4), refitted on the whole archive.
 
@@ -31,6 +32,7 @@ from .metrics import brier, pairwise
 from .positions import IDP_SLOTS, slot_of
 from .schedule import ET
 from .sleeper import Sleeper
+from .swing import poisson_var
 
 WEEKS = range(1, 19)
 BANDS = (("top 50", 0, 50), ("ranks 15-60", 15, 60), ("all", 0, None))
@@ -236,11 +238,6 @@ def fit_form(rows: list[dict], k: float = 4.0) -> dict[str, dict]:
     return out
 
 
-def poisson_var(ps: dict, sc: dict) -> float:
-    """Outcome variance if every projected stat were an independent Poisson count: Σ coef² · λ."""
-    return sum(scoring.num(sc.get(k)) ** 2 * scoring.num(v) for k, v in ps.items() if k in sc)
-
-
 # ---- the report ----------------------------------------------------------------------------------
 
 
@@ -268,20 +265,26 @@ def report(rows: list[dict], sc: dict, k: float = 4.0) -> dict:
                 "snap": held_out(gs, [lambda r: r["proj"], lambda r: r["lsnap"]]),
                 "both": held_out(gs, [lambda r: r["proj"], lambda r: r["form"], lambda r: r["lsnap"]]),
             }
-        # swing: players projected 3+ who played
+        # swing: players projected 3+ who played; swing² = a + b·V, V the Poisson variance of the stat mix
         g = [r for r in rows if r["slot"] == slot and r["act"] is not None and r["proj"] >= 3]
         g.sort(key=lambda r: poisson_var(r["ps"], sc))
         e = [r["act"] - r["proj"] for r in g]
         v = [poisson_var(r["ps"], sc) for r in g]
         if len(g) >= 50 and sum(v):
-            c = statistics.fmean(x * x for x in e) / statistics.fmean(v)
+            a, b = lstsq([[1.0, x] for x in v], [x * x for x in e])
+            a, b = max(a, 0.0), max(b, 0.0)
+
+            def swing_of(r: dict, a: float = a, b: float = b) -> float:
+                return math.sqrt(max(a + b * poisson_var(r["ps"], sc), 1e-6))
+
             fifths = []
             step = len(g) / 5
             for i in range(5):
                 sl = slice(int(i * step), int((i + 1) * step))
                 fifths.append(
-                    {"predicted": math.sqrt(c * statistics.fmean(v[sl])), "realized": statistics.pstdev(e[sl])}
+                    {"predicted": math.sqrt(a + b * statistics.fmean(v[sl])), "realized": statistics.pstdev(e[sl])}
                 )
+            z = sorted(x / swing_of(r) for x, r in zip(e, g, strict=True))
             sd0 = statistics.pstdev(e)
             pairs0, pairs1 = [], []
             for w in out["weeks"]:
@@ -289,8 +292,9 @@ def report(rows: list[dict], sc: dict, k: float = 4.0) -> dict:
                 mu = {r["pid"]: r["proj"] for r in gw}
                 act = {r["pid"]: r["act"] for r in gw}
                 pairs0 += pairwise(mu, dict.fromkeys(mu, sd0), act)
-                pairs1 += pairwise(mu, {r["pid"]: math.sqrt(c * poisson_var(r["ps"], sc)) for r in gw}, act)
-            out["swing"][slot] = {"n": len(g), "scale": c, "sd": sd0, "fifths": fifths, "pairs": len(pairs0),
+                pairs1 += pairwise(mu, {r["pid"]: swing_of(r) for r in gw}, act)
+            out["swing"][slot] = {"n": len(g), "a": a, "b": b, "sd": sd0, "fifths": fifths, "pairs": len(pairs0),
+                                  "q20": z[len(z) // 5], "q80": z[len(z) * 4 // 5],
                                   "brier_const": brier(pairs0), "brier_player": brier(pairs1)}  # fmt: skip
     # sacks: DL + LB with 3+ earlier games
     g = [r for r in rows if r["slot"] != "DB" and r["act"] is not None]
@@ -358,7 +362,8 @@ def format_report(rep: dict, season: int) -> str:
             f"  {slot}: n {s['n']}, one SD {s['sd']:.1f}; by fifth of predicted swing [predicted → realized]: {fifths}"
         )
         out.append(f"      top-50 pairwise Brier: one SD {s['brier_const']:.4f}, per player {s['brier_player']:.4f} "
-                   f"({s['pairs']} pairs)")  # fmt: skip
+                   f"({s['pairs']} pairs); config [swing] a {s['a']:.1f} b {s['b']:.2f}, band lo {s['q20']:+.2f} "
+                   f"hi {s['q80']:+.2f}")  # fmt: skip
     s = rep["sacks"]
     out += ["", f"Sacks (DL + LB): earlier sack excess vs this week's: r {_r(s['r'], s['n'])}, "
                 f"slope {s['slope']:+.2f} (n {s['n']})"]  # fmt: skip

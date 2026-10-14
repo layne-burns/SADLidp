@@ -2,15 +2,17 @@
 
 import copy
 import json
+import math
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from sadlidp import cli, scoring
+from sadlidp import cli, scoring, storage, swing
 from sadlidp.config import load_config
 from sadlidp.net import Response
 from sadlidp.positions import slot_of
+from sadlidp.roster import p_outscores as roster_p
 from sadlidp.schedule import NFLVERSE_GAMES, Schedule
 from sadlidp.site.build import build_site, latest_week_dir
 from sadlidp.sleeper import API, V1
@@ -577,6 +579,42 @@ def test_form_term_from_earlier_weeks(tmp_path):
     assert "form" not in json.loads((data / "2026" / "week05" / "run.json").read_text())
     d = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
     assert "form" not in _card(d["my_idps"], "11705")["breakdown"]
+
+
+def test_per_player_swing_on_cards_odds_and_the_record(tmp_path):
+    """SPEC §6.7: every projected player carries his own swing, floor and ceiling; START/UPGRADE odds use it; the
+    frozen record keeps it; off, the cards carry none and the odds use σ_out alone."""
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)
+    week = data / "2026" / "week05"
+    run = json.loads((week / "run.json").read_text())["swing"]
+    assert run["a"] == CFG["swing"]["a"] and run["players"] > 30 and 3 < run["mean"]["LB"] < 12
+    d = json.loads((week / "consensus.json").read_text())
+    assert d["swing"]["lo"] == CFG["swing"]["lo"]
+    anz = _card(d["positions"]["LB"], "4118")
+    assert anz["swing"] > 0
+    assert abs(anz["floor"] - max(0.0, anz["mu"] + CFG["swing"]["lo"] * anz["swing"])) < 0.06
+    assert abs(anz["ceiling"] - (anz["mu"] + CFG["swing"]["hi"] * anz["swing"])) < 0.06
+    line = storage.load_source(week / "sources" / "sleeper_proj.json")["rows"]["4118"]["stats"]  # Sleeper only
+    v = swing.poisson_var(line, LEAGUE["scoring_settings"])
+    assert anz["swing"] == pytest.approx(math.sqrt(CFG["swing"]["a"]["LB"] + CFG["swing"]["b"]["LB"] * v), abs=0.01)
+    frozen = json.loads((week / "frozen.json").read_text())["players"]["4118"]
+    assert frozen["swing"] == anz["swing"] and frozen["floor"] == anz["floor"]
+    # the START odds against my starter use both players' own swings
+    s = next(x for x in d["my_idps"]["LB"]["suggestions"] if x["player"]["id"] == "4118")
+    me = _card(d["my_idps"]["LB"], s["over"])
+    sp = lambda c: math.sqrt(c["sigma"] ** 2 + c["swing"] ** 2)  # noqa: E731
+    assert s["p"] == pytest.approx(roster_p(anz["mu"], sp(anz), me["mu"], sp(me)), abs=0.01)
+    badge = json.loads((week / "badges.json").read_text())["badges"][f"4118|START|{s['over']}"]
+    assert badge["swing_w"] == anz["swing"] and badge["swing_over"] == me["swing"]
+    html = build_site(data, tmp_path / "site", CFG).read_text()
+    assert 'class="band"' in html and "Game-to-game swing" in html and "each player's own" in html
+    # off: σ_out alone, as before
+    off = {**CFG, "swing": {**CFG["swing"], "enabled": False}}
+    run_sync(off, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)
+    d = json.loads((week / "consensus.json").read_text())
+    assert d["swing"] is None and _card(d["positions"]["LB"], "4118")["swing"] is None
+    assert "swing" not in json.loads((week / "run.json").read_text())
 
 
 def test_breakdown_and_stats_page(tmp_path):

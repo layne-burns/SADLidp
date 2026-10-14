@@ -33,7 +33,8 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 - **My IDPs** places your DL, LB and DB against the waiver tiers.
   - **START:** a waiver player has at least a 60% chance to outscore your projected starter.
   - **UPGRADE:** the same test against your other player at that position.
-  - These odds include game-to-game spread (σ<sub>out</sub>, measured from last season's actual SADL points). The suggested move says whether to add only, add and drop, or choose the drop yourself.
+  - These odds include game-to-game swing: each player's own, from his projected stat mix (a sack is 6 points and a solo tackle 2, so a sack-heavy line swings more; fitted on Sleeper's 2025 season, SPEC §6.7), or the position's typical spread (σ<sub>out</sub>) when no source projects his stats. The suggested move says whether to add only, add and drop, or choose the drop yourself.
+  - **Floor–ceiling:** the small range under a player's points. One game in five lands below the floor, one in five above the ceiling; the breakdown says his swing.
   - **For reference** (muted, sorted last): shown even when the move can't be made this week, with the reason: your starter's game has started (SADL starts one player per position, so nothing added there can score), or the player you'd drop is locked.
 - **Scores:** once a game starts, cards show SADL points so far, then the final score (a game counts as final 4 h after kickoff). "Already played this week" lists the waiver players whose games have started, and "This week's suggestions that have played" shows each suggestion's result: ✓ paid off, ✗ didn't, or void if one of the two didn't play. A suggestion you followed counts too. A projection first captured after kickoff is marked \*.
 - **Last week:** a recap of last week's suggestions with final scores, provisional until Sleeper's stat corrections close (Friday night).
@@ -62,7 +63,7 @@ uv run ruff check . && uv run ruff format --check .
 uv run sadlidp sync --force --data-dir /tmp/sadl       # live: needs network access to Sleeper
 uv run sadlidp build --data-dir /tmp/sadl --site-dir /tmp/site
 uv run sadlidp backfill --source espn_proj --weeks 1-5  # past weeks from a source's archive (--redo refetches)
-uv run sadlidp backtest run --season 2025                # last season's Sleeper archive (data/2025/archive): skill, form, swing, sacks, [form] coefficients
+uv run sadlidp backtest run --season 2025                # last season's Sleeper archive (data/2025/archive): skill, form, swing, sacks, [form] and [swing] coefficients
 uv run sadlidp tune --season 2026                        # re-tier this season's settled weeks under candidate z and splits; form term off vs on
 uv run sadlidp gate
 ```
@@ -71,9 +72,9 @@ Pushes to `claude/**` branches also run a live preview in CI: the branch's commi
 ## Layout
 | Path | What |
 |---|---|
-| `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/` (`sleeper_proj`, `espn_proj`, `fp_ecr`, `fp_dst`), `crosswalk`, `rankmap`, `matching`, `impute`, `backfill`, `scoring`, `consensus`, `form`, `tiers`, `roster`, `gate`, `site/`; offline checks: `stats`, `tune`, `backtest`, `replay` |
+| `src/sadlidp/` | the sync: `sleeper`, `schedule`, `sources/` (`sleeper_proj`, `espn_proj`, `fp_ecr`, `fp_dst`), `crosswalk`, `rankmap`, `matching`, `impute`, `backfill`, `scoring`, `consensus`, `form`, `swing`, `tiers`, `roster`, `gate`, `site/`; offline checks: `stats`, `tune`, `backtest`, `replay` |
 | `config/sadl.toml` | all tunables (SPEC §9) |
 | `config/player_overrides.toml`, `config/aliases/` | manual source → Sleeper player fixes, team code and nickname tables (SPEC §6.1) |
 | `data/<season>/` | `league.json`, `schedule.json`, `gate.json` (windows already run) |
-| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json` (with each source's match report), `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections and ranks frozen at kickoff; `fp_dst.json` holds FantasyPros' D/ST ranks, kept for a later test and never blended; `backfill: true` rows came from an archive), `frozen.json` (each player's μ, its `base` before the form term and the term's parts, as of his kickoff), `badges.json`, `tiers_log.json` |
+| `data/<season>/week<NN>/` | `consensus.json` (what the page shows), `run.json` (with each source's match report), `rosters.json`, `players.json` (each player as of his kickoff), `actuals.json`, `sources/<source>.json` (projections and ranks frozen at kickoff; `fp_dst.json` holds FantasyPros' D/ST ranks, kept for a later test and never blended; `backfill: true` rows came from an archive), `frozen.json` (each player's μ, its `base` before the form term, the term's parts and his swing, as of his kickoff), `badges.json`, `tiers_log.json` |
 | `probe/` | the Phase 1 data-source probe (SPEC §13) |

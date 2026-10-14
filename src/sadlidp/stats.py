@@ -19,7 +19,7 @@ import statistics
 from datetime import datetime
 from pathlib import Path
 
-from . import metrics, scoring, storage, weeklog
+from . import metrics, scoring, storage, swing, weeklog
 from .positions import IDP_SLOTS, slot_of
 from .rankmap import rank_values
 from .schedule import Schedule
@@ -154,12 +154,19 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                "by_source": {}}  # fmt: skip
         page = storage.read_json(wd / "consensus.json") or {}
         so_week = {s: float((page.get("sigma_out") or {}).get(s) or so[s]) for s in IDP_SLOTS}  # as the page used
+        swing_cfg = page.get("swing")  # the per-player swing the page used (§6.7), if any
+
+        def sig_of(pid: str, slot: str, rows=sources, kinds_w=week_kinds, cfg_w=swing_cfg, so_w=so_week) -> float:
+            lam = swing.mix(pid, rows, kinds_w, sc) if cfg_w else None
+            out = swing.sigma(lam, slot, cfg_w, sc) if lam is not None else so_w[slot]
+            return (s_mu[slot] ** 2 + out**2) ** 0.5
+
         for slot in IDP_SLOTS:
             cand = {pid: v for pid, v in pred_all.items() if slots.get(pid) == slot and pid in played}
             pool = sorted(cand, key=lambda pid: (-cand[pid], pid))[:N_EVAL]
             pred = [cand[pid] for pid in pool]
             act = [played[pid] for pid in pool]
-            sig = [(s_mu[slot] ** 2 + so_week[slot] ** 2) ** 0.5] * len(pool)
+            sig = [sig_of(pid, slot) for pid in pool]
             partial = 0 < len(pool) < N_EVAL  # a snapshot missing games: shown, but kept out of the season numbers
             base = []
             for pid in pool:
@@ -174,7 +181,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             for name, pred_s in preds.items():  # each source on the pool players it covers
                 cov = [pid for pid in pool if pid in pred_s]
                 p_s, a_s = [pred_s[pid] for pid in cov], [played[pid] for pid in cov]
-                sig_s = [(s_mu[slot] ** 2 + so_week[slot] ** 2) ** 0.5] * len(cov)
+                sig_s = [sig_of(pid, slot) for pid in cov]
                 base_s = [(pred_s[pid], played[pid], b) for pid in cov if (b := _naive(history, pid)) is not None]
                 summ_s = _summary(p_s, a_s, sig_s, base_s)
                 summ_s.update(covered=len(cov), pool=len(pool), pearson=None, spearman=None, r2=None)

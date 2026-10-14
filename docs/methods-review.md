@@ -51,7 +51,10 @@ power; on 5,767 games sack excess does persist, with a slope of 0.37.
    in 2026 with coefficients recorded per week like the source weights. This is where the tiers change.
    *Shipped 2026-10-12 (SPEC §6.4, `[form]` in the config): fitted on each position's 60 best-projected
    with the projection held at 1, miss β DL 0.45, LB 0.40, DB 0.20; snap β per 100% DL 7.5, LB 5.5, DB 4.0.*
-3. **Per-player swing** for START/UPGRADE odds and a floor/ceiling on each card.
+3. **Per-player swing** for START/UPGRADE odds and a floor/ceiling on each card. *Shipped 2026-10-12
+   (SPEC §6.7, `[swing]`): swing² = a + b·V per position, DL 0 + 2.5·V, LB 18 + 1.35·V, DB 27 + 0.65·V,
+   which reproduces the realized spread by fifth at every position (DB barely scales, as found); floor
+   and ceiling at the 20th and 80th percentiles, μ − 0.8·swing and μ + 0.75·swing.*
 4. **DB handling**: say on the page that waiver DBs are not separable by projection, and lean on snap share
    and the form term there.
 

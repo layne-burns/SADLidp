@@ -17,7 +17,7 @@
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
 {%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
-{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{%- endmacro %}
+{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{% if p.floor is defined and p.floor is not none and not p.result %}<div class="band" title="one game in five lands below the floor, one in five above the ceiling">{{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>{% endif %}{%- endmacro %}
 {%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
 {%- macro card_open(p) -%}{% if p.breakdown %}<li class="item"><details class="bd"><summary><div class="row">{% else %}<li class="item"><div class="row">{% endif %}{%- endmacro %}
 {%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
@@ -32,6 +32,7 @@
 </div>
 {% endif %}{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sub">Weighted average = {{ '%.1f'|format(p.breakdown.base if p.breakdown.form else p.breakdown.mu) }} pts{% if kinds|length == 1 %} (from {{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}{% if p.breakdown.form %}; with form {{ '%+.1f'|format(p.breakdown.form.pts) }} = {{ '%.1f'|format(p.breakdown.mu) }} pts{% endif %}.</div>{% endif %}
 {% if p.breakdown.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
+{% if p.swing is defined and p.swing is not none and not p.result %}<div class="sub">Game-to-game swing ±{{ '%.1f'|format(p.swing) }} from his projected stat mix (big-ticket stats such as sacks swing more): 3 games in 5 land between {{ '%.0f'|format(p.floor) }} and {{ '%.0f'|format(p.ceiling) }}.</div>{% endif %}
 </div>{% endif %}{%- endmacro %}
 {%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
 {%- macro pts_text(r) -%}{% if r %}{% if r.state == 'final' %}scored {{ '%.1f'|format(r.pts) }}{% elif r.state == 'live' %}{{ '%.1f'|format(r.pts) }} so far{% elif r.state == 'unavailable' %}score unavailable{% else %}did not play{% endif %}{% else %}not played yet{% endif %}{%- endmacro %}
@@ -166,7 +167,7 @@
       <td>{{ s.last_success|et }}</td></tr>
     {% endfor %}
   </table></div>
-  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
+  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing{% if d.swing %}, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or{% endif %} the position's typical spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
   Tiers group players statistically indistinguishable from each tier's best.
   Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.
   Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).

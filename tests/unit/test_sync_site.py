@@ -572,8 +572,13 @@ def test_form_term_from_earlier_weeks(tmp_path):
     assert frozen["form"] == f
     other = _card(d["positions"]["LB"], "4118")  # Anzalone: no week-4 line, so no term and no form in his card
     assert "form" not in other["breakdown"] and other["mu"] == other["breakdown"]["mu"]
+    assert tykee["snap"] == round(59 / 60, 3) and other["snap"] is None  # last game's share, on the card itself
+    assert d["positions"]["DB"]["note"].startswith("Among the DBs") and d["positions"]["LB"]["note"] is None
+    assert d["my_idps"]["DB"]["note"].startswith("DB odds") and d["my_idps"]["LB"]["note"] is None
     html = build_site(data, tmp_path / "site", CFG).read_text()
     assert "<b>Form</b>" in html and "with form" in html and "of his team's defensive snaps last game (week 4)" in html
+    assert "98% of snaps last game" in html and html.count('class="note posnote"') == 1
+    assert "Among the DBs usually on waivers" in html and "DB odds are the weakest" in html
     # off: nothing changes and nothing is recorded
     run_sync(CFG_PLAIN, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)
     assert "form" not in json.loads((data / "2026" / "week05" / "run.json").read_text())

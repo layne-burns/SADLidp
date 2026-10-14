@@ -56,7 +56,9 @@ power; on 5,767 games sack excess does persist, with a slope of 0.37.
    which reproduces the realized spread by fifth at every position (DB barely scales, as found); floor
    and ceiling at the 20th and 80th percentiles, μ − 0.8·swing and μ + 0.75·swing.*
 4. **DB handling**: say on the page that waiver DBs are not separable by projection, and lean on snap share
-   and the form term there.
+   and the form term there. *Shipped 2026-10-14: a standing note on the DB tab and the My IDPs DB panel with
+   the evidence (2025 waiver-band r 0.08 vs LB 0.18; 2026 weeks 1–5 DB μ order +0.08 ± 0.18), and every card
+   shows the player's last-game snap share.*
 
 ## Caveats
 - The 2025 archive is Sleeper only; ESPN and FantasyPros archives start at 2026 week 1. Adjustments are

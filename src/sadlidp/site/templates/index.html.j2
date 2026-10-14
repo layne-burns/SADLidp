@@ -16,6 +16,7 @@
 {% for f in p.flags if f != 'Q' %}<span class="tag q">{{ f }}</span>{% endfor %}
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
+{%- macro snaps(p) -%}{% if p.snap is defined and p.snap is not none and not p.result %} · {{ (p.snap * 100)|round|int }}% of snaps last game{% endif %}{%- endmacro %}
 {%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
 {%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{% if p.floor is defined and p.floor is not none and not p.result %}<div class="band" title="one game in five lands below the floor, one in five above the ceiling">{{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>{% endif %}{%- endmacro %}
 {%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
@@ -60,11 +61,12 @@
             {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
             {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
             {{ tags(p) }}
-            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(d.positions[slot].tier_count) }}{% endif %}</div></div>
+            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(d.positions[slot].tier_count) }}{% endif %}{{ snaps(p) }}</div></div>
           <div class="pts">{{ pts(p) }}</div>
 {{ card_close(p) }}
         {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
       </ul>
+      {% if m.note %}<p class="note">{{ m.note }}</p>{% endif %}
       {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
       {% for s in m.suggestions %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
@@ -99,6 +101,7 @@
       {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
       {% for slot in slots %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
+        {% if pos.note %}<p class="note posnote">{{ pos.note }}</p>{% endif %}
         {% for t in pos.tiers %}
         <div class="card">
           <p class="tierhead">Tier {{ t.tier }}</p>
@@ -108,7 +111,7 @@
               <div><span class="name">{{ p.name }}</span>
                 {% if p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
-                <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
+                <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}{{ snaps(p) }}</div></div>
               <div class="pts">{{ pts(p) }}</div>
 {{ card_close(p) }}
             {% endfor %}

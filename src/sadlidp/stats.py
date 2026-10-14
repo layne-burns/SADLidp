@@ -111,6 +111,37 @@ def _shares(kinds: dict[str, str], names, split: float) -> list[dict]:
     ]
 
 
+def _order(path: Path) -> tuple[int, str]:
+    """Sources in the site's order (Sleeper, ESPN, FantasyPros, then any other)."""
+    order = list(SOURCE_LABELS)
+    return (order.index(path.stem) if path.stem in order else len(order), path.stem)
+
+
+def weights_history(season_dir: Path, prior_split: float) -> list[dict]:
+    """Per synced week, the shares in force (§6.5 Implementation): each source's share of a player's number
+    when every source that week covers him, from the week's `weights.json` ("default shares" before it)."""
+    out = []
+    for d in sorted(season_dir.glob("week*")):
+        m = re.fullmatch(r"week(\d+)", d.name)
+        if not m or not (d / "consensus.json").exists():
+            continue
+        kinds = {name: (doc.get("kind") or "projection") for name, doc in
+                 ((p.stem, storage.read_json(p) or {}) for p in sorted((d / "sources").glob("*.json"), key=_order))
+                 if (doc.get("kind") or "projection") in ("projection", "rank")}  # fmt: skip
+        rec = storage.read_json(d / "weights.json") or {}
+        w = {n: float(((rec.get("sources") or {}).get(n) or {}).get("w", 1.0)) for n in kinds}
+        alpha = float(rec.get("alpha", prior_split))
+        groups = {g: [n for n in kinds if kinds[n] == g] for g in ("projection", "rank")}
+        share_g = {"projection": alpha, "rank": 1 - alpha} if all(groups.values()) else {g: 1.0 for g in groups}
+        shares = {SOURCE_LABELS.get(n, n): share_g[g] * w[n] / sum(w[x] for x in ns)
+                  for g, ns in groups.items() for n in ns}  # fmt: skip
+        out.append({"week": int(m.group(1)), "method": rec.get("method") or "default", "alpha": alpha,
+                    "alpha_hat": rec.get("alpha_hat"), "from_weeks": rec.get("from_weeks") or [],
+                    "reason": rec.get("reason"), "shares": shares,
+                    "both_groups": all(groups.values())})  # fmt: skip
+    return out
+
+
 def _naive(history: dict[str, list[float]], pid: str) -> float | None:
     """The naive baseline: his average SADL points over his earlier games this season (2+)."""
     past = history.get(pid) or []
@@ -383,6 +414,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "sources": _shares(kinds, season_by_source, float((cfg.get("weights") or {}).get("prior_split", 0.6)))
         or [{"name": "Sleeper", "share": 1.0, "kind": "projection"}],
         "prior_split": float((cfg.get("weights") or {}).get("prior_split", 0.6)),
+        "weights_history": weights_history(season_dir, float((cfg.get("weights") or {}).get("prior_split", 0.6))),
         "sigma_out": so,
         "n_eval": N_EVAL,
         "min_corr_n": MIN_CORR_N,

@@ -681,3 +681,18 @@ def test_a_source_with_no_rows_says_why(tmp_path):
     d = json.loads((tmp_path / "d" / "2026" / "week05" / "consensus.json").read_text())
     part = d["my_idps"]["LB"]["players"][0]["breakdown"]["parts"][0]
     assert out.synced and part == {"source": "Sleeper", "missing": "couldn't be read this sync"}  # an HTTP 404
+
+
+def test_sync_records_the_weights_in_force_once(tmp_path):
+    """SPEC §6.5 Implementation: the first sync of a week writes weights.json (prior here: no scored weeks)
+    and run.json carries it; later syncs read the same record."""
+    data = tmp_path / "d"
+    run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)
+    path = data / "2026" / "week05" / "weights.json"
+    rec = json.loads(path.read_text())
+    assert rec["method"] == "prior" and rec["alpha"] == CFG["weights"]["prior_split"] and rec["week"] == 5
+    run = json.loads((data / "2026" / "week05" / "run.json").read_text())
+    assert run["weights"]["method"] == "prior"
+    path.write_text(json.dumps({**rec, "alpha": 0.7, "method": "accuracy"}))  # a recorded week is never redone
+    run_sync(CFG, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)
+    assert json.loads((data / "2026" / "week05" / "run.json").read_text())["weights"]["alpha"] == 0.7

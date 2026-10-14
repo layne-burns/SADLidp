@@ -244,6 +244,14 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 - **Group split:** α̂ = clamp(Σ(y−R)(P−R)/Σ(P−R)², 0.2, 0.8) over pool pairs where both group means exist, the least-squares mix of the two groups. α = n/(n+k)·α̂ + k/(n+k)·`weights.prior_split`, where **n = the number of evaluated weeks with ≥1 pool pair**. It never counts players.
 - **Activation:** prior weights apply until 3 evaluated weeks exist (backfilled weeks count).
 - **Page:** a table of MAE, coverage and current weight per source per position.
+- **Implementation (PR 6, added 2026-10-14):**
+  - **Errors are demeaned:** r_s and α̂ use errors demeaned within each position-week (§F of the plan). A level offset shared by every player, like Sleeper's LBs running 3 points low, changes no decision, so it doesn't earn or cost weight.
+  - **The evaluation pool** is the Stats page's: top 50 per position by the equal-weight mean of the projection sources, among players who played. c is the prior-weight blend of every source covering the player.
+  - **A position-week counts** for a source when it covers ≥ 15 pool players; for α, when ≥ 15 pool players have both groups.
+  - **Data weights:** w_data,s = (1/mean r_s) divided by the mean of 1/mean r over the evaluated sources of its group, so equal skill gives 1 and only relative skill moves a share.
+  - **Which weeks are used:** for week N, settled weeks ≤ N − 2 only (stat corrections closed, §6.5 Actuals). A source's backfilled and late rows count only if its archive passed its integrity check (`[accuracy] untrusted` lists any that hasn't; all pass so far, §13).
+  - **Recorded write-once:** `weights.json` in the week's directory holds the weights in force: method (`accuracy`, or `prior` before activation or for a week whose first sync came before PR 6), α, α̂ and its n, and per source w, w_data, n_s and mean r_s. It is written at the week's first sync and never recomputed, so a week's numbers don't move as later results come in, and the Stats page shows the history exactly as applied.
+  - **What the weights move:** the consensus μ (the within-group weights and α). Rank sources are still mapped onto the equal-weight projection mean (§6.4), and σ_μ is unchanged apart from the shares.
 
 ### 6.6 Anchored significance tiers (per position)
 Tiers are computed over the available pool after §2 filters, locked players removed, sorted by (−μ, sleeper_id). The first player anchors Tier 1. Each next player i joins the current tier while `μ_anchor − μ_i ≤ z·√(σ_anchor² + σ_i²)`, with σ = σ_μ. Otherwise he starts a new tier as its anchor. Default z = 0.75 (config; 1.0 until it was tuned on weeks 1–4 with `sadlidp tune`, 2026-10-12, see `docs/tier-tuning.md`). Comparing every player to the tier's top player prevents chaining, and the tiers are contiguous and deterministic. Display truncation doesn't change upper tiers. **Rostered players never anchor.** Let a1 be the Tier 1 anchor. A rostered player m is shown as "above Tier 1" if `μ_m − μ_a1 > z·√(σ_a1² + σ_m²)`. Otherwise he is shown in the first tier, top-down, whose anchor a satisfies `μ_a − μ_m ≤ z·√(σ_a² + σ_m²)`. If no tier satisfies it, he is shown as "below Tier N", where N is the last tier. In the single-source MVP every σ equals the default, so tiers are equal-width point bands until more sources arrive.
@@ -407,6 +415,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - Weekly report card on the main page (§6.8).
   - DB note on the Stats page and the DB tab (§6.8).
   - Plainer card wording for form and floor–ceiling (D19).
+- **2026-10-14 · PR 6a, accuracy weights (owner said "proceed"):** the within-group source weights and the projection : ranking split now follow measured accuracy (§6.5 Implementation), recorded write-once per week in `weights.json` and shown week by week on the Stats page. ESPN's archive passed its integrity check (§13). The team-defense backtest follows as PR 6b.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
@@ -443,6 +452,11 @@ Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.
 
   Tackle ids agree about 94% of the time rather than 100%: the two sites' official-stat feeds differ slightly, which doesn't matter for projections. Ids 94, 103 and 105 each matched one defensive TD (too few to confirm); 98 (likely safeties) had no events. Ids 100, 110–112, 155, 156 and 210 match no Sleeper key.
 - **SADL keys ESPN doesn't project:** `idp_tkl_loss` (TFL, 2 pts) and `idp_qb_hit` (1 pt) are imputed for ESPN rows (§6.2). Defensive TDs, safeties and blocked kicks are too rare to confirm and are imputed the same way until confirmed.
+
+**Archive integrity (checked 2026-10-13/14)**
+- **Sleeper:** 42 of 42 Monday-night BUF/LAR rows saved 6 minutes before week 5's kickoff equal Sleeper's archive after the game, and the 581 week-5 rows read late on Monday also match. Evidence is on the `integrity-checks` branch. Sleeper rewrites projections before games (37 of 46 changed in the 15 hours before kickoff), never after.
+- **ESPN:** 37 of 37 live week-5 Monday-night rows, last fetched 4 hours before kickoff, equal ESPN's `scoringPeriodId=5` archive read on Oct 14, after the game.
+- **FantasyPros:** passes by timestamp, because only rows observed before a player's kickoff are kept (§5.3).
 
 **FantasyPros access (D9)**
 - The login page (`secure.fantasypros.com/accounts/login/`) runs **Cloudflare Turnstile**, a browser human-check, plus a hidden `token` field. Scripted auto-login will very likely fail; it's untested because no credentials are configured. Logged-in session cookies are named `fpjwt`, `fptoken`, `fpuserinfo`, `fp_level`.

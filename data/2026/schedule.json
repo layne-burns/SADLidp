@@ -725,7 +725,7 @@
    "game_id": "2026_06_HOU_JAX",
    "home": "JAX",
    "kickoff": "2026-10-18T09:30:00-04:00",
-   "spread_line": 3.0,
+   "spread_line": 2.5,
    "total_line": 42.5,
    "week": 6
   },
@@ -734,8 +734,8 @@
    "game_id": "2026_06_CHI_ATL",
    "home": "ATL",
    "kickoff": "2026-10-18T13:00:00-04:00",
-   "spread_line": -3.0,
-   "total_line": 49.5,
+   "spread_line": -2.5,
+   "total_line": 50.5,
    "week": 6
   },
   {
@@ -743,8 +743,8 @@
    "game_id": "2026_06_BAL_CLE",
    "home": "CLE",
    "kickoff": "2026-10-18T13:00:00-04:00",
-   "spread_line": -4.5,
-   "total_line": 41.5,
+   "spread_line": -5.5,
+   "total_line": 42.5,
    "week": 6
   },
   {
@@ -779,7 +779,7 @@
    "game_id": "2026_06_CAR_PHI",
    "home": "PHI",
    "kickoff": "2026-10-18T13:00:00-04:00",
-   "spread_line": 1.5,
+   "spread_line": -1.5,
    "total_line": 40.5,
    "week": 6
   },
@@ -789,7 +789,7 @@
    "home": "TB",
    "kickoff": "2026-10-18T13:00:00-04:00",
    "spread_line": -2.5,
-   "total_line": 40.5,
+   "total_line": 39.5,
    "week": 6
   },
   {
@@ -798,7 +798,7 @@
    "home": "LAR",
    "kickoff": "2026-10-18T16:05:00-04:00",
    "spread_line": 12.5,
-   "total_line": 52.5,
+   "total_line": 51.5,
    "week": 6
   },
   {
@@ -815,7 +815,7 @@
    "game_id": "2026_06_BUF_LV",
    "home": "LV",
    "kickoff": "2026-10-18T16:25:00-04:00",
-   "spread_line": -4.5,
+   "spread_line": -5.5,
    "total_line": 53.5,
    "week": 6
   },
@@ -825,7 +825,7 @@
    "home": "GB",
    "kickoff": "2026-10-18T20:20:00-04:00",
    "spread_line": 1.5,
-   "total_line": 52.5,
+   "total_line": 53.5,
    "week": 6
   },
   {
@@ -842,8 +842,8 @@
    "game_id": "2026_07_NE_CHI",
    "home": "CHI",
    "kickoff": "2026-10-22T20:15:00-04:00",
-   "spread_line": 2.5,
-   "total_line": 49.5,
+   "spread_line": 1.5,
+   "total_line": 48.5,
    "week": 7
   },
   {
@@ -851,7 +851,7 @@
    "game_id": "2026_07_PIT_NO",
    "home": "NO",
    "kickoff": "2026-10-25T09:30:00-04:00",
-   "spread_line": -1.5,
+   "spread_line": -2.5,
    "total_line": 44.5,
    "week": 7
   },
@@ -860,7 +860,7 @@
    "game_id": "2026_07_SF_ATL",
    "home": "ATL",
    "kickoff": "2026-10-25T13:00:00-04:00",
-   "spread_line": -5.5,
+   "spread_line": -4.5,
    "total_line": 49.5,
    "week": 7
   },
@@ -870,7 +870,7 @@
    "home": "BAL",
    "kickoff": "2026-10-25T13:00:00-04:00",
    "spread_line": 3.5,
-   "total_line": 51.5,
+   "total_line": 50.5,
    "week": 7
   },
   {
@@ -878,8 +878,8 @@
    "game_id": "2026_07_TB_CAR",
    "home": "CAR",
    "kickoff": "2026-10-25T13:00:00-04:00",
-   "spread_line": 2.5,
-   "total_line": 43.5,
+   "spread_line": 3.0,
+   "total_line": 44.5,
    "week": 7
   },
   {
@@ -887,7 +887,7 @@
    "game_id": "2026_07_NYG_HOU",
    "home": "HOU",
    "kickoff": "2026-10-25T13:00:00-04:00",
-   "spread_line": 8.5,
+   "spread_line": 7.0,
    "total_line": 41.5,
    "week": 7
   },
@@ -896,8 +896,8 @@
    "game_id": "2026_07_IND_MIN",
    "home": "MIN",
    "kickoff": "2026-10-25T13:00:00-04:00",
-   "spread_line": 4.5,
-   "total_line": 44.5,
+   "spread_line": 5.5,
+   "total_line": 43.5,
    "week": 7
   },
   {
@@ -906,7 +906,7 @@
    "home": "NYJ",
    "kickoff": "2026-10-25T13:00:00-04:00",
    "spread_line": 4.5,
-   "total_line": 39.5,
+   "total_line": 38.5,
    "week": 7
   },
   {
@@ -923,7 +923,7 @@
    "game_id": "2026_07_DEN_ARI",
    "home": "ARI",
    "kickoff": "2026-10-25T16:05:00-04:00",
-   "spread_line": -4.5,
+   "spread_line": -5.5,
    "total_line": 45.5,
    "week": 7
   },
@@ -932,8 +932,8 @@
    "game_id": "2026_07_GB_DET",
    "home": "DET",
    "kickoff": "2026-10-25T16:25:00-04:00",
-   "spread_line": 3.5,
-   "total_line": 51.5,
+   "spread_line": 3.0,
+   "total_line": 52.5,
    "week": 7
   },
   {
@@ -941,7 +941,7 @@
    "game_id": "2026_07_LA_LV",
    "home": "LV",
    "kickoff": "2026-10-25T16:25:00-04:00",
-   "spread_line": -6.5,
+   "spread_line": -7.0,
    "total_line": 48.5,
    "week": 7
   },
@@ -959,7 +959,7 @@
    "game_id": "2026_07_DAL_PHI",
    "home": "PHI",
    "kickoff": "2026-10-26T20:15:00-04:00",
-   "spread_line": -1.5,
+   "spread_line": 1.5,
    "total_line": 47.5,
    "week": 7
   },

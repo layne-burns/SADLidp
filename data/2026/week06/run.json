@@ -11,8 +11,8 @@
    "LB": 0.4
   },
   "players": {
-   "miss": 647,
-   "snap": 656
+   "miss": 635,
+   "snap": 647
   },
   "snap": {
    "DB": 4.0,
@@ -21,11 +21,11 @@
   },
   "snap_avg": {
    "DB": 0.955,
-   "DL": 0.673,
+   "DL": 0.679,
    "LB": 0.874
   }
  },
- "generated_at": "2026-10-15T12:58:35-04:00",
+ "generated_at": "2026-10-17T16:34:50-04:00",
  "impute_priors": 2025,
  "schedule": "nflverse",
  "season": 2026,
@@ -37,20 +37,20 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-10-15T12:58:35-04:00",
+   "last_success": "2026-10-17T16:34:50-04:00",
    "merge": {
-    "added": 4,
-    "deleted": 5,
-    "frozen": 0,
+    "added": 14,
+    "deleted": 22,
+    "frozen": 38,
     "late": 0,
-    "skipped_after_kickoff": 0,
-    "unchanged": 459,
-    "updated": 67
+    "skipped_after_kickoff": 1,
+    "unchanged": 201,
+    "updated": 269
    },
-   "no_projection": 705,
+   "no_projection": 717,
    "observed_after": "2026-10-13T15:15:31-04:00",
    "published_at": null,
    "report": {
@@ -59,29 +59,29 @@
     "coverage": {
      "DB": 0.725,
      "DL": 0.82,
-     "LB": 0.822
+     "LB": 0.82
     },
     "duplicates": 0,
     "imputed": {
-     "idp_def_td": 530,
-     "idp_qb_hit": 530,
-     "idp_safe": 530,
-     "idp_tkl_loss": 530
+     "idp_def_td": 521,
+     "idp_qb_hit": 521,
+     "idp_safe": 521,
+     "idp_tkl_loss": 521
     },
     "match": {
      "by_method": {
-      "name": 22,
-      "name_team": 12,
-      "name_team_slot": 698,
+      "name": 23,
+      "name_team": 13,
+      "name_team_slot": 699,
       "nickname": 2,
-      "no_team": 273,
+      "no_team": 270,
       "source_id": 501,
       "unmatched": 3
      },
      "conflicts": [],
-     "matched": 1235,
-     "teamed": 1009,
-     "teamed_match_rate": 0.9970267591674926,
+     "matched": 1238,
+     "teamed": 1012,
+     "teamed_match_rate": 0.9970355731225297,
      "unmatched": [
       {
        "how": "unmatched",
@@ -107,30 +107,30 @@
     "players": 1511,
     "unresolved_teams": {},
     "why_incomplete": null,
-    "with_projection": 530
+    "with_projection": 521
    },
-   "rows": 530,
-   "rows_used": 530,
+   "rows": 521,
+   "rows_used": 522,
    "status": "ok",
    "week": 6,
    "zero_filled": 66
   },
   "fantasydata": {
-   "censored": 80,
+   "censored": 74,
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "rank",
    "label": "FantasyData",
-   "last_success": "2026-10-15T12:58:35-04:00",
-   "mapped": 300,
+   "last_success": "2026-10-17T16:34:50-04:00",
+   "mapped": 301,
    "merge": {
-    "added": 8,
-    "deleted": 8,
-    "frozen": 0,
+    "added": 24,
+    "deleted": 23,
+    "frozen": 21,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 52,
-    "updated": 240
+    "unchanged": 22,
+    "updated": 234
    },
    "no_projection": 0,
    "observed_after": "2026-10-14T16:04:39-04:00",
@@ -174,24 +174,24 @@
     "unresolved_teams": {}
    },
    "rows": 300,
-   "rows_used": 300,
+   "rows_used": 301,
    "status": "ok",
    "week": 6
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-10-15T12:58:35-04:00",
+   "last_success": "2026-10-17T16:34:50-04:00",
    "merge": {
     "added": 0,
     "deleted": 0,
-    "frozen": 0,
+    "frozen": 2,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 16,
-    "updated": 12
+    "unchanged": 13,
+    "updated": 13
    },
    "no_projection": 0,
    "rows": 28,
@@ -201,92 +201,92 @@
    "week": 6
   },
   "fp_ecr": {
-   "censored": 86,
+   "censored": 93,
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-10-15T12:58:35-04:00",
-   "mapped": 258,
+   "last_success": "2026-10-17T16:34:50-04:00",
+   "mapped": 496,
    "merge": {
-    "added": 24,
-    "deleted": 0,
-    "frozen": 0,
+    "added": 243,
+    "deleted": 5,
+    "frozen": 20,
     "late": 0,
-    "skipped_after_kickoff": 0,
+    "skipped_after_kickoff": 14,
     "unchanged": 0,
-    "updated": 234
+    "updated": 233
    },
    "no_projection": 0,
-   "observed_after": "2026-10-15T13:36:01+00:00",
-   "published_at": "2026-10-15T13:36:01+00:00",
+   "observed_after": "2026-10-17T18:49:56+00:00",
+   "published_at": "2026-10-17T18:49:56+00:00",
    "report": {
     "archive": false,
     "lists": {
      "DB": {
-      "depth": 95,
+      "depth": 178,
       "error": null,
-      "experts": 11,
-      "players": 95,
+      "experts": 25,
+      "players": 178,
       "status": "ok",
       "week": 6
      },
      "DL": {
-      "depth": 93,
+      "depth": 251,
       "error": null,
-      "experts": 11,
-      "players": 93,
+      "experts": 25,
+      "players": 251,
       "status": "ok",
       "week": 6
      },
      "LB": {
-      "depth": 88,
+      "depth": 173,
       "error": null,
-      "experts": 10,
-      "players": 88,
+      "experts": 25,
+      "players": 173,
       "status": "ok",
       "week": 6
      }
     },
     "match": {
      "by_method": {
-      "name_team": 5,
-      "name_team_slot": 42,
-      "source_id": 229
+      "name_team": 12,
+      "name_team_slot": 142,
+      "source_id": 448
      },
      "conflicts": [],
-     "matched": 276,
-     "teamed": 276,
+     "matched": 602,
+     "teamed": 601,
      "teamed_match_rate": 1.0,
      "unmatched": []
     },
     "unresolved_teams": {}
    },
-   "rows": 258,
-   "rows_used": 258,
+   "rows": 508,
+   "rows_used": 496,
    "status": "ok",
    "week": 6
   },
   "rotoballer": {
    "censored": 54,
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "rank",
    "label": "RotoBaller",
-   "last_success": "2026-10-15T12:58:35-04:00",
+   "last_success": "2026-10-17T16:34:50-04:00",
    "mapped": 150,
    "merge": {
-    "added": 150,
+    "added": 0,
     "deleted": 0,
-    "frozen": 0,
+    "frozen": 14,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 0,
+    "unchanged": 136,
     "updated": 0
    },
    "no_projection": 0,
    "observed_after": "2026-10-15T12:58:35-04:00",
-   "published_at": "2026-10-15T09:40:31-04:00",
+   "published_at": "2026-10-15T12:00:31-04:00",
    "report": {
     "archive": false,
     "article": "https://www.rotoballer.com/week-6-idp-rankings-streamers-start-sit-fantasy-football-2026/1966055",
@@ -330,25 +330,25 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-10-15T12:58:35-04:00",
+   "fetched_at": "2026-10-17T16:34:50-04:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-10-15T12:58:35-04:00",
+   "last_success": "2026-10-17T16:34:50-04:00",
    "merge": {
-    "added": 0,
-    "deleted": 8,
-    "frozen": 0,
+    "added": 2,
+    "deleted": 30,
+    "frozen": 45,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 461,
-    "updated": 187
+    "unchanged": 211,
+    "updated": 362
    },
-   "no_projection": 3709,
+   "no_projection": 3741,
    "observed_after": "2026-10-13T15:15:31-04:00",
    "published_at": null,
    "report": {},
-   "rows": 648,
-   "rows_used": 648,
+   "rows": 616,
+   "rows_used": 620,
    "status": "ok",
    "week": 6,
    "zero_filled": 0
@@ -368,11 +368,11 @@
   "hi": 0.75,
   "lo": -0.8,
   "mean": {
-   "DB": 6.03,
-   "DL": 5.27,
-   "LB": 6.22
+   "DB": 6.05,
+   "DL": 5.36,
+   "LB": 6.23
   },
-  "players": 675
+  "players": 656
  },
  "warnings": [],
  "week": 6,
@@ -390,5 +390,5 @@
   "sources": {},
   "week": 6
  },
- "window": "2026-w06-thursday"
+ "window": "2026-w06-saturday"
 }

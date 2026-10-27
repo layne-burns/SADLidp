@@ -1,6 +1,6 @@
 {
  "badges": {
-  "6217|UPGRADE|4960": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"4960","first_p":0.627,"first_seen":"2026-10-27T15:22:35-04:00","last_seen":"2026-10-27T15:22:35-04:00","lock_at":"2026-11-01T13:00:00-05:00","mu_over":15.996,"mu_w":19.933,"over":"4960","p":0.627,"reference":false,"sigma_out":5.625,"slot":"LB","swing_over":8.0,"swing_w":8.42,"w":"6217","why":[]}
+  "6217|UPGRADE|4960": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"4960","first_p":0.627,"first_seen":"2026-10-27T15:22:35-04:00","last_seen":"2026-10-27T18:11:00-04:00","lock_at":"2026-11-01T13:00:00-05:00","mu_over":15.904,"mu_w":19.965,"over":"4960","p":0.632,"reference":false,"sigma_out":5.625,"slot":"LB","swing_over":8.0,"swing_w":8.42,"w":"6217","why":[]}
  },
  "schema_version": 1
 }

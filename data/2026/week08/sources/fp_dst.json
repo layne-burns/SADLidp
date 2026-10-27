@@ -1,0 +1,49 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-10-27T15:22:35-04:00"
+ ],
+ "kind": "signal",
+ "last_success": "2026-10-27T15:22:35-04:00",
+ "no_projection_ids": [],
+ "published_at": "2026-10-27T19:14:45+00:00",
+ "rows": {
+  "ARI": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"DAL","rank":28},
+  "ATL": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"TB","rank":13},
+  "BAL": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"BUF","rank":22},
+  "BUF": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"BAL","rank":23},
+  "CAR": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-10-29T20:15:00-04:00","opponent":"GB","rank":20},
+  "CHI": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-02T20:15:00-05:00","opponent":"SEA","rank":12},
+  "CIN": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"TEN","rank":5},
+  "CLE": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"PIT","rank":10},
+  "DAL": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"ARI","rank":18},
+  "DEN": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T16:25:00-05:00","opponent":"KC","rank":8},
+  "DET": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"MIN","rank":16},
+  "GB": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-10-29T20:15:00-04:00","opponent":"CAR","rank":15},
+  "IND": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"JAX","rank":24},
+  "JAX": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"IND","rank":1},
+  "KC": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T16:25:00-05:00","opponent":"DEN","rank":7},
+  "LAC": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T16:05:00-05:00","opponent":"LAR","rank":25},
+  "LAR": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T16:05:00-05:00","opponent":"LAC","rank":2},
+  "LV": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"NYJ","rank":14},
+  "MIA": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T16:25:00-05:00","opponent":"NE","rank":26},
+  "MIN": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"DET","rank":6},
+  "NE": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T16:25:00-05:00","opponent":"MIA","rank":4},
+  "NYJ": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"LV","rank":17},
+  "PHI": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T20:20:00-05:00","opponent":"WAS","rank":21},
+  "PIT": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"CLE","rank":3},
+  "SEA": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-02T20:15:00-05:00","opponent":"CHI","rank":11},
+  "TB": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"ATL","rank":19},
+  "TEN": {"fetched_at":"2026-10-27T15:22:35-04:00","home":false,"kickoff":"2026-11-01T13:00:00-05:00","opponent":"CIN","rank":27},
+  "WAS": {"fetched_at":"2026-10-27T15:22:35-04:00","home":true,"kickoff":"2026-11-01T20:20:00-05:00","opponent":"PHI","rank":9}
+ },
+ "schema_version": 2,
+ "source": "fp_dst",
+ "universe": {
+  "DST": {
+   "complete": false,
+   "depth": 28
+  }
+ },
+ "week": 8
+}

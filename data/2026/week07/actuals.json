@@ -1,5 +1,5 @@
 {
- "captured_at": "2026-10-29T14:27:24-04:00",
+ "captured_at": "2026-10-31T15:16:42-04:00",
  "stats": {
   "1052": {"def_snp":65.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_pass_def":2.0,"idp_tkl":3.0,"idp_tkl_ast":1.0,"idp_tkl_solo":2.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":11.0,"tm_def_snp":65.0,"tm_off_snp":59.0,"tm_st_snp":24.0},
   "10872": {"def_snp":38.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"tm_def_snp":69.0,"tm_off_snp":53.0,"tm_st_snp":19.0},

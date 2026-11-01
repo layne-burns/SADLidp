@@ -986,8 +986,8 @@
    "game_id": "2026_08_TEN_CIN",
    "home": "CIN",
    "kickoff": "2026-11-01T13:00:00-05:00",
-   "spread_line": 12.5,
-   "total_line": 46.5,
+   "spread_line": 13.5,
+   "total_line": 45.5,
    "week": 8
   },
   {
@@ -1023,7 +1023,7 @@
    "home": "NYJ",
    "kickoff": "2026-11-01T13:00:00-05:00",
    "spread_line": 1.5,
-   "total_line": 45.5,
+   "total_line": 46.5,
    "week": 8
   },
   {
@@ -1059,7 +1059,7 @@
    "home": "DEN",
    "kickoff": "2026-11-01T16:25:00-05:00",
    "spread_line": -1.5,
-   "total_line": 40.5,
+   "total_line": 41.5,
    "week": 8
   },
   {
@@ -1068,7 +1068,7 @@
    "home": "MIA",
    "kickoff": "2026-11-01T16:25:00-05:00",
    "spread_line": -7.0,
-   "total_line": 43.5,
+   "total_line": 41.5,
    "week": 8
   },
   {

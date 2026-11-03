@@ -1014,7 +1014,7 @@
    "home": "JAX",
    "kickoff": "2026-11-01T13:00:00-05:00",
    "spread_line": 10.0,
-   "total_line": 46.5,
+   "total_line": 45.5,
    "week": 8
   },
   {
@@ -1041,7 +1041,7 @@
    "home": "TB",
    "kickoff": "2026-11-01T13:00:00-05:00",
    "spread_line": 2.5,
-   "total_line": 43.5,
+   "total_line": 42.5,
    "week": 8
   },
   {
@@ -1050,7 +1050,7 @@
    "home": "LAR",
    "kickoff": "2026-11-01T16:05:00-05:00",
    "spread_line": 6.5,
-   "total_line": 45.5,
+   "total_line": 46.5,
    "week": 8
   },
   {
@@ -1058,7 +1058,7 @@
    "game_id": "2026_08_KC_DEN",
    "home": "DEN",
    "kickoff": "2026-11-01T16:25:00-05:00",
-   "spread_line": -1.5,
+   "spread_line": 1.5,
    "total_line": 41.5,
    "week": 8
   },
@@ -1094,8 +1094,8 @@
    "game_id": "2026_09_JAX_BAL",
    "home": "BAL",
    "kickoff": "2026-11-05T20:15:00-05:00",
-   "spread_line": 3.0,
-   "total_line": 48.5,
+   "spread_line": -10.0,
+   "total_line": 40.5,
    "week": 9
   },
   {
@@ -1104,7 +1104,7 @@
    "home": "ATL",
    "kickoff": "2026-11-08T09:30:00-05:00",
    "spread_line": -3.0,
-   "total_line": 49.5,
+   "total_line": 52.5,
    "week": 9
   },
   {
@@ -1113,7 +1113,7 @@
    "home": "CAR",
    "kickoff": "2026-11-08T13:00:00-05:00",
    "spread_line": -2.5,
-   "total_line": 44.5,
+   "total_line": 43.5,
    "week": 9
   },
   {
@@ -1121,7 +1121,7 @@
    "game_id": "2026_09_DAL_IND",
    "home": "IND",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "spread_line": -4.5,
+   "spread_line": -6.0,
    "total_line": 51.5,
    "week": 9
   },
@@ -1131,7 +1131,7 @@
    "home": "KC",
    "kickoff": "2026-11-08T13:00:00-05:00",
    "spread_line": 9.5,
-   "total_line": 43.5,
+   "total_line": 46.5,
    "week": 9
   },
   {
@@ -1140,7 +1140,7 @@
    "home": "MIA",
    "kickoff": "2026-11-08T13:00:00-05:00",
    "spread_line": -7.0,
-   "total_line": 48.5,
+   "total_line": 50.5,
    "week": 9
   },
   {
@@ -1148,8 +1148,8 @@
    "game_id": "2026_09_CLE_NO",
    "home": "NO",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "spread_line": 2.5,
-   "total_line": 43.5,
+   "spread_line": 1.5,
+   "total_line": 42.5,
    "week": 9
   },
   {
@@ -1157,8 +1157,8 @@
    "game_id": "2026_09_NYG_PHI",
    "home": "PHI",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "spread_line": -1.5,
-   "total_line": 40.5,
+   "spread_line": -3.5,
+   "total_line": 39.5,
    "week": 9
   },
   {
@@ -1167,7 +1167,7 @@
    "home": "WAS",
    "kickoff": "2026-11-08T13:00:00-05:00",
    "spread_line": -5.5,
-   "total_line": 48.5,
+   "total_line": 47.5,
    "week": 9
   },
   {
@@ -1175,8 +1175,8 @@
    "game_id": "2026_09_HOU_LAC",
    "home": "LAC",
    "kickoff": "2026-11-08T16:05:00-05:00",
-   "spread_line": -3.5,
-   "total_line": 42.5,
+   "spread_line": -4.5,
+   "total_line": 40.5,
    "week": 9
   },
   {
@@ -1185,7 +1185,7 @@
    "home": "SF",
    "kickoff": "2026-11-08T16:05:00-05:00",
    "spread_line": 10.0,
-   "total_line": 48.5,
+   "total_line": 52.5,
    "week": 9
   },
   {
@@ -1194,7 +1194,7 @@
    "home": "NE",
    "kickoff": "2026-11-08T16:25:00-05:00",
    "spread_line": 3.0,
-   "total_line": 47.5,
+   "total_line": 46.5,
    "week": 9
   },
   {
@@ -1202,8 +1202,8 @@
    "game_id": "2026_09_ARI_SEA",
    "home": "SEA",
    "kickoff": "2026-11-08T16:25:00-05:00",
-   "spread_line": 10.5,
-   "total_line": 44.5,
+   "spread_line": 11.5,
+   "total_line": 41.5,
    "week": 9
   },
   {
@@ -1212,7 +1212,7 @@
    "home": "CHI",
    "kickoff": "2026-11-08T20:20:00-05:00",
    "spread_line": 6.0,
-   "total_line": 47.5,
+   "total_line": 46.5,
    "week": 9
   },
   {
@@ -1220,8 +1220,8 @@
    "game_id": "2026_09_BUF_MIN",
    "home": "MIN",
    "kickoff": "2026-11-09T20:15:00-05:00",
-   "spread_line": -2.5,
-   "total_line": 47.5,
+   "spread_line": -3.5,
+   "total_line": 45.5,
    "week": 9
   },
   {
@@ -1229,8 +1229,8 @@
    "game_id": "2026_10_WAS_NYG",
    "home": "NYG",
    "kickoff": "2026-11-12T20:15:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": 1.5,
+   "total_line": 44.5,
    "week": 10
   },
   {
@@ -1238,8 +1238,8 @@
    "game_id": "2026_10_NE_DET",
    "home": "DET",
    "kickoff": "2026-11-15T09:30:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -1.5,
+   "total_line": 49.5,
    "week": 10
   },
   {
@@ -1247,8 +1247,8 @@
    "game_id": "2026_10_KC_ATL",
    "home": "ATL",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -3.0,
+   "total_line": 46.5,
    "week": 10
   },
   {
@@ -1256,8 +1256,8 @@
    "game_id": "2026_10_HOU_CLE",
    "home": "CLE",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -4.5,
+   "total_line": 39.5,
    "week": 10
   },
   {
@@ -1265,8 +1265,8 @@
    "game_id": "2026_10_MIN_GB",
    "home": "GB",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": 2.5,
+   "total_line": 41.5,
    "week": 10
   },
   {
@@ -1274,8 +1274,8 @@
    "game_id": "2026_10_MIA_IND",
    "home": "IND",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": 2.5,
+   "total_line": 43.5,
    "week": 10
   },
   {
@@ -1283,8 +1283,8 @@
    "game_id": "2026_10_CAR_NO",
    "home": "NO",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -1.5,
+   "total_line": 47.5,
    "week": 10
   },
   {
@@ -1292,8 +1292,8 @@
    "game_id": "2026_10_BUF_NYJ",
    "home": "NYJ",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -7.5,
+   "total_line": 50.5,
    "week": 10
   },
   {
@@ -1301,8 +1301,8 @@
    "game_id": "2026_10_JAX_TEN",
    "home": "TEN",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -8.5,
+   "total_line": 44.5,
    "week": 10
   },
   {
@@ -1310,8 +1310,8 @@
    "game_id": "2026_10_LA_ARI",
    "home": "ARI",
    "kickoff": "2026-11-15T16:05:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -8.5,
+   "total_line": 47.5,
    "week": 10
   },
   {
@@ -1319,8 +1319,8 @@
    "game_id": "2026_10_SEA_LV",
    "home": "LV",
    "kickoff": "2026-11-15T16:05:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -6.0,
+   "total_line": 44.5,
    "week": 10
   },
   {
@@ -1328,8 +1328,8 @@
    "game_id": "2026_10_SF_DAL",
    "home": "DAL",
    "kickoff": "2026-11-15T16:25:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -3.5,
+   "total_line": 53.5,
    "week": 10
   },
   {
@@ -1337,8 +1337,8 @@
    "game_id": "2026_10_PIT_CIN",
    "home": "CIN",
    "kickoff": "2026-11-15T20:20:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": 3.5,
+   "total_line": 47.5,
    "week": 10
   },
   {
@@ -1346,8 +1346,8 @@
    "game_id": "2026_10_LAC_BAL",
    "home": "BAL",
    "kickoff": "2026-11-16T20:15:00-05:00",
-   "spread_line": null,
-   "total_line": null,
+   "spread_line": -1.5,
+   "total_line": 37.5,
    "week": 10
   },
   {

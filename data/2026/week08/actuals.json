@@ -1,5 +1,5 @@
 {
- "captured_at": "2026-11-05T12:22:52-05:00",
+ "captured_at": "2026-11-07T14:25:07-05:00",
  "stats": {
   "1052": {"def_snp":62.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_tkl":7.0,"idp_tkl_ast":6.0,"idp_tkl_solo":1.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":8.0,"tm_def_snp":63.0,"tm_off_snp":64.0,"tm_st_snp":32.0},
   "10872": {"def_snp":33.0,"gms_active":1.0,"gp":1.0,"gs":1.0,"idp_tkl":3.0,"idp_tkl_ast":1.0,"idp_tkl_solo":2.0,"pos_rank_half_ppr":999.0,"pos_rank_ppr":999.0,"pos_rank_std":999.0,"pts_idp":5.0,"tm_def_snp":62.0,"tm_off_snp":69.0,"tm_st_snp":30.0},

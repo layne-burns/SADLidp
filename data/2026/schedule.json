@@ -1230,7 +1230,7 @@
    "home": "NYG",
    "kickoff": "2026-11-12T20:15:00-05:00",
    "spread_line": 2.5,
-   "total_line": 41.5,
+   "total_line": 40.5,
    "week": 10
   },
   {
@@ -1247,8 +1247,8 @@
    "game_id": "2026_10_KC_ATL",
    "home": "ATL",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": -3.5,
-   "total_line": 45.5,
+   "spread_line": -3.0,
+   "total_line": 46.5,
    "week": 10
   },
   {
@@ -1257,7 +1257,7 @@
    "home": "CLE",
    "kickoff": "2026-11-15T13:00:00-05:00",
    "spread_line": -4.5,
-   "total_line": 39.5,
+   "total_line": 40.5,
    "week": 10
   },
   {
@@ -1265,8 +1265,8 @@
    "game_id": "2026_10_MIN_GB",
    "home": "GB",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": 3.5,
-   "total_line": 41.5,
+   "spread_line": 3.0,
+   "total_line": 42.5,
    "week": 10
   },
   {
@@ -1274,8 +1274,8 @@
    "game_id": "2026_10_MIA_IND",
    "home": "IND",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": 3.0,
-   "total_line": 39.5,
+   "spread_line": 3.5,
+   "total_line": 38.5,
    "week": 10
   },
   {
@@ -1283,7 +1283,7 @@
    "game_id": "2026_10_CAR_NO",
    "home": "NO",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": 1.5,
+   "spread_line": 2.5,
    "total_line": 48.5,
    "week": 10
   },
@@ -1311,7 +1311,7 @@
    "home": "ARI",
    "kickoff": "2026-11-15T16:05:00-05:00",
    "spread_line": -9.5,
-   "total_line": 40.5,
+   "total_line": 39.5,
    "week": 10
   },
   {
@@ -1319,7 +1319,7 @@
    "game_id": "2026_10_SEA_LV",
    "home": "LV",
    "kickoff": "2026-11-15T16:05:00-05:00",
-   "spread_line": -6.0,
+   "spread_line": -6.5,
    "total_line": 40.5,
    "week": 10
   },
@@ -1346,7 +1346,7 @@
    "game_id": "2026_10_LAC_BAL",
    "home": "BAL",
    "kickoff": "2026-11-16T20:15:00-05:00",
-   "spread_line": 5.5,
+   "spread_line": 4.5,
    "total_line": 38.5,
    "week": 10
   },
@@ -1365,7 +1365,7 @@
    "home": "BUF",
    "kickoff": "2026-11-22T13:00:00-05:00",
    "spread_line": 16.5,
-   "total_line": 47.5,
+   "total_line": 46.5,
    "week": 11
   },
   {
@@ -1455,7 +1455,7 @@
    "home": "SF",
    "kickoff": "2026-11-22T20:20:00-05:00",
    "spread_line": 3.5,
-   "total_line": 45.5,
+   "total_line": 46.5,
    "week": 11
   },
   {

@@ -1229,7 +1229,7 @@
    "game_id": "2026_10_WAS_NYG",
    "home": "NYG",
    "kickoff": "2026-11-12T20:15:00-05:00",
-   "spread_line": 2.5,
+   "spread_line": 1.5,
    "total_line": 40.5,
    "week": 10
   },
@@ -1239,7 +1239,7 @@
    "home": "DET",
    "kickoff": "2026-11-15T09:30:00-05:00",
    "spread_line": 2.5,
-   "total_line": 51.5,
+   "total_line": 49.5,
    "week": 10
   },
   {
@@ -1248,7 +1248,7 @@
    "home": "ATL",
    "kickoff": "2026-11-15T13:00:00-05:00",
    "spread_line": -3.0,
-   "total_line": 46.5,
+   "total_line": 47.5,
    "week": 10
   },
   {
@@ -1265,8 +1265,8 @@
    "game_id": "2026_10_MIN_GB",
    "home": "GB",
    "kickoff": "2026-11-15T13:00:00-05:00",
-   "spread_line": 3.0,
-   "total_line": 41.5,
+   "spread_line": 2.5,
+   "total_line": 42.5,
    "week": 10
   },
   {
@@ -1328,7 +1328,7 @@
    "game_id": "2026_10_SF_DAL",
    "home": "DAL",
    "kickoff": "2026-11-15T16:25:00-05:00",
-   "spread_line": -3.5,
+   "spread_line": -4.5,
    "total_line": 55.5,
    "week": 10
   },
@@ -1455,7 +1455,7 @@
    "home": "SF",
    "kickoff": "2026-11-22T20:20:00-05:00",
    "spread_line": 3.5,
-   "total_line": 46.5,
+   "total_line": 45.5,
    "week": 11
   },
   {

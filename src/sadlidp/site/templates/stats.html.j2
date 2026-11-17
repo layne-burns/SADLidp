@@ -32,6 +32,33 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 {%- macro ranks(k) -%}{% if k is none or k.r is none or k.weeks < 4 %}not enough weeks yet{% else %}{% set r = k.r %}{% if k.margin is not none and r|abs <= k.margin %}can't tell yet{% elif r < 0.1 %}barely{% elif r < 0.3 %}weakly{% elif r < 0.5 %}moderately{% else %}well{% endif %} ({{ '%.2f'|format(r) }}{% if k.margin is not none %} ± {{ '%.2f'|format(k.margin) }}{% endif %}){% endif %}{%- endmacro %}
 {%- macro vs(x) -%}{% if x is none or x.diff is none %}—{% elif x.margin is none %}{{ '%+.2f'|format(x.diff) }} <small>(one week can't tell)</small>{% elif x.diff|abs <= x.margin %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, can't tell apart</small>{% else %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, {{ 'ours better' if x.diff < 0 else 'ours worse' }}</small>{% endif %}{%- endmacro %}
 {%- macro decisions(t, label) -%}{{ label }} {{ t.hits }} of {{ t.decided }} decision{{ 's' if t.decided != 1 else '' }} paid off{% if t.expected is not none %} (the odds expected {{ '%.1f'|format(t.expected) }}){% endif %}{% if t.net is not none %}, {{ '%+.1f'|format(t.net) }}{% if t.net_margin is not none %} ± {{ '%.1f'|format(t.net_margin) }}{% endif %} pts per decision{% endif %}{% if t.wilson %}; the true hit rate is likely {{ (t.wilson[0] * 100)|round|int }}–{{ (t.wilson[1] * 100)|round|int }}%{% elif t.decided %}; too few to judge yet{% endif %}.{%- endmacro %}
+{%- macro sm(d, fmt='%.2f', plus=false) -%}{% if d is none or d.mean is none %}—{% else %}{{ ('%+' ~ fmt[1:] if plus else fmt)|format(d.mean) }}{% if d.margin is not none %} <small>± {{ fmt|format(d.margin) }}</small>{% endif %}{% endif %}{%- endmacro %}
+{%- macro verdict(d, better, worse) -%}{% if d is none or d.mean is none or d.margin is none %}can't tell yet{% elif d.mean - d.margin > 0 %}{{ better }}{% elif d.mean + d.margin < 0 %}{{ worse }}{% else %}can't tell apart yet{% endif %}{%- endmacro %}
+{%- macro board(sb) -%}
+  {% set a = sb['all'] %}{% set ours = a.rows|selectattr('key', 'equalto', 'form')|first %}{% set t = a.timing %}
+  <section aria-labelledby="board-h">
+    <h2 id="board-h">Do the picks rank the waiver pool right?</h2>
+    <div class="slot">
+      <p class="headline">Among the {{ s.depth }} players each position showed you, our number ranked them {{ verdict(ours.vs_sleeper, 'better than Sleeper alone', 'worse than Sleeper alone') }} ({{ sm(ours.vs_sleeper, plus=true) }} in rank correlation, weeks {{ a.weeks|join(', ') }}).
+        Our top 3 scored {{ sm(ours.top3, '%.1f', true) }} pts a game above the list's average{% set sl = a.rows|first %}; Sleeper's top 3, {{ sm(sl.top3, '%.1f', true) }}.</p>
+      <div class="scroll"><table>
+        <tr><th>Built up from</th><th class="num">Ranks the list</th><th class="num">vs Sleeper alone</th><th class="num">Top 3 vs list</th><th class="num">Top 5 vs list</th></tr>
+        {% for r in a.rows %}
+        <tr><td>{% if r.key == 'form' %}<b>{{ r.label }}</b>{% else %}{{ r.label }}{% endif %}</td><td class="num">{{ sm(r.r) }}</td><td class="num">{% if r.vs_sleeper %}{{ sm(r.vs_sleeper, plus=true) }}{% else %}—{% endif %}</td><td class="num">{{ sm(r.top3, '%.1f', true) }}</td><td class="num">{{ sm(r.top5, '%.1f', true) }}</td></tr>
+        {% endfor %}
+      </table></div>
+      <p class="note">Each row adds one layer to the one above, scored on the same players: the {{ s.depth }} a position showed when you set waivers (weeks 1–4: the rebuilt pages; week 5 had no list saved). "Ranks the list" is the rank correlation between that row's number and the scores, within each week, averaged over the weeks (the three positions count as one week). "Top 3 vs list" is how much that row's top 3 scored above the list's average, counting a player who didn't play as 0, which is what picking him got you. ± is the margin of error (about 95%).</p>
+      {% if t.kick_minus_tue.weeks %}<p><b>Tuesday or kickoff?</b> On the {{ t.kick_minus_tue.weeks }} live weeks, Tuesday's top 5 scored {{ sm(t.tue, '%.1f', true) }} above the list's average and the kickoff order's top 5 {{ sm(t.kick, '%.1f', true) }}. {{ t.dnp_top5_tue }} of the {{ t.top5_tue }} Tuesday top-5 players didn't play. Counting only the players who did play, Tuesday's top 5 scored {{ sm(t.tue_played, '%.1f', true) }} and kickoff's {{ sm(t.kick_played, '%.1f', true) }}.</p>{% endif %}
+      <details><summary>By position</summary>
+        <div class="scroll"><table>
+          <tr><th>Pos</th>{% for r in a.rows %}<th class="num">{{ r.label }}</th>{% endfor %}</tr>
+          {% for slot in slots %}<tr><td>{{ slot }}</td>{% for r in sb[slot].rows %}<td class="num">{{ sm(r.r) }}</td>{% endfor %}</tr>{% endfor %}
+        </table></div>
+        <p class="note">Rank correlation with the scores among the {{ s.depth }} shown, by position. One position over a few weeks is noisy, so read the ± before the number.</p>
+      </details>
+    </div>
+  </section>
+{%- endmacro %}
 {%- macro view(v, dbn) -%}
   {% set ss = v.by_slot %}{% set single = v.weeks|length == 1 %}
   {% set live = v.suggestions.live %}{% set reb = v.suggestions.rebuilt %}
@@ -40,6 +67,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     the number the page showed missed by {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
     {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}
     {% if v.held_back %}<small>Week{{ 's' if v.held_back|length > 1 else '' }} {{ v.held_back|join(', ') }} {{ 'join' if v.held_back|length > 1 else 'joins' }} the season figures once {{ 'their' if v.held_back|length > 1 else 'its' }} stat corrections close; until then {{ 'they are' if v.held_back|length > 1 else 'it is' }} under its own tab.</small>{% endif %}</p>
+  {% if v.scoreboard and v.scoreboard['all'].weeks %}{{ board(v.scoreboard) }}{% endif %}
   <section aria-labelledby="close-h-{{ v.key }}">
     <h2 id="close-h-{{ v.key }}">How close was our number?</h2>
     <div class="slot">

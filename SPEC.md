@@ -338,6 +338,23 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. A pooled value crossing 0.1 by noise no longer switches it off.
   - **Adoption:** a model change is adopted only at a checkpoint and only under the rules of `docs/eval-protocol.md`. Every test is recorded in the ledger of `docs/methods-review.md` before it runs.
   - **Settled weeks only:** the All-season figures (every verdict, margin and the DB note) use the weeks whose stat corrections have closed. A provisional week shows under Last week and its own tab until then.
+  - **Decision scoreboard (PR 23; `scoreboard.py`):** the first section of every multi-week view, "Do the picks rank the waiver pool right?"
+    - **Players:** the 25 each position showed when you set waivers, the band of `docs/eval-protocol.md`. Weeks 1–4 use their rebuilt pages; week 5 saved no list.
+    - **The ladder,** each rung scored from the frozen record:
+      - Sleeper alone;
+      - ESPN alone;
+      - all sources at their starting shares;
+      - with the accuracy shares (`base`);
+      - with the form term (`mu`, the number shown).
+    - **Measures per rung:**
+      - rank skill: the within-week rank correlation with the scores among band players who played;
+      - its paired difference with Sleeper alone;
+      - top-3 and top-5 lift over the band's average, a player who didn't play scoring 0.
+    - **Pooling:** a week's three positions are averaged first, so the week is the unit.
+    - **Pick timing:** on live weeks, Tuesday's top 5 (the pre-waiver log's μ) against the kickoff order's top 5 on the same band. It is also shown among players who played, with the count of Tuesday top-5 players who didn't play.
+    - **Wording:** "better than Sleeper alone" only beyond the margin.
+    - **Calibration of the margin rule:** on the 2025 archive, 400 comparisons of two equally good rungs crossed it 6.2% of the time (aim about 5%).
+    - Nothing here feeds the model. Weekly starters (for points against the player actually started) are not stored yet.
   - **Honest uncertainty (PR 21):**
     - Every season figure carries a week-clustered margin (t-quantile at 9 weeks or fewer, 2 SE beyond). This covers bias, the within-week rank correlation, the paired differences against the reference rows, and the odds score (Brier), whose pairs within a week share that week's surprises.
     - "Better than a coin flip" and "runs high/low" are said only beyond that margin.
@@ -519,6 +536,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - league transactions;
     - a DL matchup term in shadow;
     - "changed since Tuesday", a bye look-ahead, and one factual FAAB line.
+- **2026-11-17 · PR 23 (decision scoreboard):** the waiver band scored rung by rung, from Sleeper alone to the number shown, and Tuesday's picks against kickoff's (§6.8).
 - **2026-11-17 · PR 21 (Stats page grades what you see):** the §6.8 evaluation protocol, implemented.
   - The headline is the frozen μ, with "before form" and the plain average as reference rows.
   - Suggestions are counted as decisions.

@@ -5,8 +5,10 @@ sadlidp build                        # render the latest week into site/
 sadlidp backfill [--source NAME] [--weeks A-B] [--redo]   # past weeks from the sources' archives (§5.3)
 sadlidp replay --weeks A-B --season YYYY                 # rebuild past weeks' pages from saved data
 sadlidp replay --weeks 5 --season YYYY --fill-frozen     # add missing frozen records to a live week
+sadlidp backfill --source S --weeks 5 --fill-gaps        # add archive rows a live week lacks (§5.3)
 sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
-sadlidp backtest fetch|run|dst-fetch|dst --season YYYY   # last season's archive: store it, test ideas on it
+sadlidp audit [--season YYYY]                            # read-only data checks (SPEC §7 Data audit)
+sadlidp backtest fetch|run|dst-fetch|dst|patch-teams --season YYYY   # last season's archive: store it, test ideas on it
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -109,6 +111,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
         priors=priors,
         only=args.source,
         redo=args.redo,
+        fill_gaps=args.fill_gaps,
         sched=sched,
     )
     written = "; ".join(f"{name} weeks {ws}" for name, ws in done.items()) or "nothing written"
@@ -134,8 +137,21 @@ def cmd_replay(args: argparse.Namespace) -> int:
             print(f"replay: week {week}: no matchups ({err}); skipped")
             continue
         out = replay_week(cfg, data_dir, args.season, week, matchups, players, log=print if args.fill_frozen else
-                          lambda m: None, fill_frozen=args.fill_frozen)  # fmt: skip
+                          lambda m: None, fill_frozen=args.fill_frozen,
+                          refresh_rebuilt=args.refresh_rebuilt)  # fmt: skip
         print(f"replay: week {week} -> {out}")
+    return 0
+
+
+def cmd_audit(args: argparse.Namespace) -> int:
+    """Read-only integrity checks over a season's saved weeks (SPEC §7). Writes nothing; always exits 0."""
+    from . import audit
+
+    cfg = load_config(args.config)
+    data_dir = Path(args.data_dir)
+    seasons = sorted(int(d.name) for d in data_dir.glob("[0-9]*") if (d / "league.json").exists())
+    season = args.season or (seasons[-1] if seasons else datetime.now(ET).year)
+    print(audit.report(audit.run(data_dir, season, cfg)))
     return 0
 
 
@@ -192,6 +208,10 @@ def cmd_backtest(args: argparse.Namespace) -> int:
             return 1
         print(dstbacktest.format_report(rep))
         storage.write_json(data_dir / str(season) / "dst_backtest.json", dstbacktest.summary(rep))
+        return 0
+    if args.what == "patch-teams":
+        changed = backtest.patch_teams(Sleeper(make_client(cfg), args.cache_dir), data_dir, season)
+        print(f"backtest: {season}: game-time teams set; rows whose team changed: {sum(changed.values())}")
         return 0
     if args.what == "fetch":
         sleeper = Sleeper(make_client(cfg), args.cache_dir)
@@ -259,6 +279,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--source", help="only this source (e.g. espn_proj)")
     p.add_argument("--weeks", help="e.g. 1-5 (default: every week before the target week)")
     p.add_argument("--redo", action="store_true", help="refetch weeks backfilled before (live weeks are kept)")
+    p.add_argument("--fill-gaps", action="store_true",
+                   help="add archive rows a live week lacks, if the archive matches its live rows")  # fmt: skip
     p.add_argument("--season", type=int)
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_backfill)
@@ -270,14 +292,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="only add rebuilt records for players a live week's frozen record lacks (page kept)",
     )
+    p.add_argument("--refresh-rebuilt", action="store_true",
+                   help="with --fill-frozen: rebuild the records rebuilt before too (live records kept)")  # fmt: skip
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_replay)
+    p = sub.add_parser("audit", parents=[common], help="read-only data checks over a season's saved weeks")
+    p.add_argument("--season", type=int, help="default: the newest season with a league.json")
+    p.set_defaults(func=cmd_audit)
     p = sub.add_parser("tune", parents=[common], help="measure the tiers against final scores (read-only)")
     p.add_argument("--season", type=int, required=True)
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_tune)
     p = sub.add_parser("backtest", parents=[common], help="last season's archive: fetch it, run the checks")
-    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst"])
+    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst", "patch-teams"])
     p.add_argument("--season", type=int, help="the archived season (default: last year)")
     p.add_argument("--redo", action="store_true", help="refetch weeks already archived")
     p.add_argument("--cache-dir", default=".cache")

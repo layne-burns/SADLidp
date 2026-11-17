@@ -22,6 +22,7 @@ class FakeSleeper:
 def _proj(pid, pos, **stats):
     return {
         "player_id": pid,
+        "team": "NYJ",  # the game's team (the embedded player's is today's)
         "player": {"position": pos, "team": "NYJ"},
         "stats": {"gp": 1, "adp_dd_ppr": 999, **stats},
     }
@@ -36,9 +37,9 @@ def test_fetch_week_keeps_projected_and_played_rows_compactly():
     doc = backtest.fetch_week(FakeSleeper({1: proj}, {1: stats}), 2025, 1, players, SC)
     rows = doc["rows"]
     assert set(rows) == {"a", "b", "c"}  # z: no projection; q: not an IDP; b: projected, did not play
-    assert rows["a"] == {"slot": "LB", "team": "NYJ", "proj": {"idp_tkl_solo": 3.46},
+    assert rows["a"] == {"slot": "LB", "team": "NYJ", "opponent": None, "proj": {"idp_tkl_solo": 3.46},
                          "act": {"gp": 1, "idp_tkl_solo": 4.0}, "snap": [50, 60]}  # fmt: skip
-    assert rows["b"] == {"slot": "DL", "team": "NYJ", "proj": {"idp_sack": 0.31}}
+    assert rows["b"] == {"slot": "DL", "team": "NYJ", "opponent": None, "proj": {"idp_sack": 0.31}}
     assert rows["c"]["slot"] == "DB" and rows["c"]["proj"] == {} and rows["c"]["act"] == {"gp": 1, "idp_tkl_solo": 2.0}
     assert backtest.fetch_week(FakeSleeper({}, {1: stats}), 2025, 1, players, SC) is None
 

@@ -70,7 +70,8 @@ def fetch_week(sleeper: Sleeper, season: int, week: int, players: dict, sc: dict
         p = _compact(r.get("stats") or {}, keys)
         if not pid or slot is None or not p:
             continue
-        rows[pid] = {"slot": slot, "team": (r.get("player") or {}).get("team"), "proj": p}
+        # the row's own team and opponent are the game's; the embedded player's team is today's (2026-11-17)
+        rows[pid] = {"slot": slot, "team": r.get("team"), "opponent": r.get("opponent"), "proj": p}
     for pid, line in stats.items():
         if not isinstance(line, dict) or not weeklog.played(line):
             continue
@@ -105,6 +106,38 @@ def fetch(sleeper: Sleeper, data_dir: Path | str, season: int, players: dict, sc
         log(f"backtest: {season} week {week}: {len(doc['rows'])} rows, {played} played")
         written.append(week)
     return written
+
+
+def patch_teams(sleeper: Sleeper, data_dir: Path | str, season: int,
+                log: Callable[[str], None] = print) -> dict[int, int]:  # fmt: skip
+    """Set each archived row's game-time team and opponent from the week's projection rows (2026-11-17).
+
+    Archives written before this fix stored the embedded player's team, which is his team today. Only
+    `team` and `opponent` change: projected stats, results and snaps are left exactly as archived (the form
+    and swing coefficients were fitted on them), and the write is refused if anything else would differ.
+    A row with no projection row (stats only) keeps no team. Returns week -> rows whose team changed."""
+    changed = {}
+    for path in sorted(archive_dir(data_dir, season).glob("week*.json")):
+        doc = storage.read_json(path) or {}
+        week = doc.get("week")
+        proj, _ = sleeper.projections(season, week)
+        if not isinstance(proj, list):
+            log(f"backtest: {season} week {week}: projections unavailable; left as is")
+            continue
+        game = {str(r.get("player_id")): (r.get("team"), r.get("opponent")) for r in proj if r.get("player_id")}
+        before = {pid: {k: v for k, v in r.items() if k not in ("team", "opponent")} for pid, r in doc["rows"].items()}
+        n = 0
+        for pid, row in doc["rows"].items():
+            team, opp = game.get(pid, (None, None)) if row.get("proj") else (None, None)
+            n += row.get("team") != team
+            row["team"], row["opponent"] = team, opp
+        after = {pid: {k: v for k, v in r.items() if k not in ("team", "opponent")} for pid, r in doc["rows"].items()}
+        if before != after:  # never: only the two fields are touched
+            raise RuntimeError(f"week {week}: patch would change more than team and opponent")
+        storage.write_json(path, doc)
+        changed[week] = n
+        log(f"backtest: {season} week {week}: {n} of {len(doc['rows'])} rows had another team")
+    return changed
 
 
 def load(data_dir: Path | str, season: int, sc: dict) -> list[dict]:

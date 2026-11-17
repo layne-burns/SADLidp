@@ -136,3 +136,6 @@ sunday_open_h = 4           # before the first Sunday kickoff
 sunday_close_min = 15
 results_after_h = 4.25      # Sunday-evening results sync: this long after the last daytime kickoff (games final at +4 h)
 results_window_h = 6
+
+[audit]                     # `sadlidp audit` (SPEC §7 Data audit): weeks already looked at and written up
+acknowledged = ["2026-w05"] # first live sync came Monday; ESPN filled from its archive 2026-11-17, FantasyPros' archive didn't match

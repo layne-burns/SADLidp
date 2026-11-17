@@ -28,6 +28,9 @@ jobs:
       - run: uv run --frozen pytest -q
       - name: Leak-guard pattern scan
         run: uv run --frozen sadlidp leakcheck tests/fixtures $(test -d data && echo data)
+      - name: Data audit (read-only; warnings never fail the job, SPEC §7)
+        continue-on-error: true
+        run: uv run --frozen sadlidp audit
 
   preview:
     needs: test

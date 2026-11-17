@@ -572,6 +572,11 @@ def run_sync(
             merged, counts = storage.merge_rows(existing.get("rows", {}), res.rows, now, kickoff_of, late_ok)
             storage.save_source(path, res, merged)
             info.update(merge=counts, last_success=res.fetched_at)
+            lost = counts["skipped_after_kickoff"]
+            if kind != "signal" and lost > 0.5 * len(res.rows) and lost > counts["frozen"]:  # SPEC §7 (2026-11-17)
+                label = SOURCE_LABELS.get(name, name)
+                warnings.append(f"{label}: {lost} of {len(res.rows)} rows were for games already started and "
+                                "can't be used; this week's numbers lean on the other sources")  # fmt: skip
             rows = merged
         else:
             info["last_success"] = existing.get("last_success")

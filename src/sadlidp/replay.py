@@ -64,6 +64,7 @@ def replay_week(
     players_db: dict[str, dict],
     log: Callable[[str], None] = print,
     fill_frozen: bool = False,
+    refresh_rebuilt: bool = False,
 ) -> Path:
     data_dir = Path(data_dir)
     wdir = storage.week_dir(data_dir, season, week)
@@ -140,11 +141,16 @@ def replay_week(
         frozen = storage.read_json(storage.week_dir(tmp, season, week) / "frozen.json")
     if fill_frozen:
         path = wdir / "frozen.json"
-        live = (storage.read_json(path) or {}).get("players") or {}
+        existing = (storage.read_json(path) or {}).get("players") or {}
+        # --refresh-rebuilt (2026-11-17): records rebuilt earlier are rebuilt again from the sources saved now;
+        # a live record is never replaced
+        live = {pid: r for pid, r in existing.items() if not (refresh_rebuilt and r.get("rebuilt"))}
         added = {pid: {**rec, "rebuilt": True} for pid, rec in ((frozen or {}).get("players") or {}).items()
                  if pid not in live}  # fmt: skip
         storage.write_json(path, {"schema_version": 1, "players": {**live, **added}})
-        log(f"week {week}: {len(added)} rebuilt records added, {len(live)} live records kept")
+        replaced = len(existing) - len(live)
+        log(f"week {week}: {len(added)} rebuilt records written ({replaced} earlier rebuilt ones replaced), "
+            f"{len(live)} kept")  # fmt: skip
         return path
     data["replayed"] = {"as_of": now.isoformat(), "note": NOTE}
     # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows

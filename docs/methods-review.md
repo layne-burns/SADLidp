@@ -28,8 +28,8 @@ removed first. On 2025 the margins are about ±0.05; on 2026 they are ±0.20.
 | **Bootstrap** (resampling) for margins | Fine, not needed | Our margins are analytic 2 SE; resampling gives the same picture on 100-game tables and changes no decision. |
 | **Bootstrap percolation** | Not applicable | It is a contagion process on a graph (a node activates when ≥ k neighbours are active). Nothing here is a network of players. |
 | Cross-validation | Already in use | Odd/even weeks and held-out weeks throughout; the 2025 archive now allows a proper walk-forward. |
-| Quantile regression / conformal intervals for floors and ceilings | Untested, promising | A floor/ceiling per card could come from the Poisson swing first; quantiles on 2025 are the check. |
-| Team and opponent effects (scheme, pace, implied total) | Untested | PR 6 already plans the D/ST and implied-total backtest; the 2025 harness is where to run it. |
+| Quantile regression / conformal intervals for floors and ceilings | Not needed (2026-11-17) | Floors and ceilings shipped from the Poisson swing (SPEC §6.7). 2026 weeks 5–9 put 14–18% of games below the floor and 21–23% above the ceiling, against an aim of 20/20, and the spread ratio is 0.95–1.02. |
+| Team and opponent effects (scheme, pace, implied total) | Tested (2026-10-14 and 2026-11-17) | D/ST rank, implied points, spread, game total, home and rest were all rejected; see the ledger below. The DL opponent QB-hit rate is a shadow candidate (`docs/status.md` §6). |
 
 ### The 2026 re-check
 Applying the 2025 coefficients (β 0.5 on the shrunk residual, 8 points per 100% snaps) to 2026 weeks 2–4
@@ -60,7 +60,50 @@ power; on 5,767 games sack excess does persist, with a slope of 0.37.
 
 ## Caveats
 - The 2025 archive is Sleeper only; ESPN and FantasyPros archives start at 2026 week 1. Adjustments are
-  fitted on Sleeper's misses; the consensus misses may differ slightly.
-- Sleeper's archive integrity (whether rows change after kickoff) is still the scheduled check in
-  `docs/status.md` §2. The fractional values and 0.54 correlation make a restated archive very unlikely.
+  fitted on Sleeper's misses, and the consensus misses do differ (2026-11-17). Against the blend, earlier
+  misses barely persist at LB and DB (slope .05 ± .20 and −.08 ± .18, against .42 and .30 against Sleeper), so
+  the LB and DB miss term counted the same thing twice. See the ledger.
+- Sleeper's archive integrity passed: rows don't change after kickoff (2026-10-14). The full review
+  re-checked it: 0 of 581 late rows changed (2026-11-17).
 - Scoring is today's SADL settings applied to 2025 stats, which is what we want.
+
+## Tested and rejected (ledger, started 2026-11-17)
+Every idea tested and its result go here, including the ones that failed, so dead ends aren't re-run and
+anything adopted can be seen to have survived a fair screen. The rules are in `docs/eval-protocol.md`.
+- **The verdict rule** is D18's: |t| ≥ 2 with the same sign in each season or half, *and* a lower miss on held-out
+  weeks.
+- **Chance:** about 20 ideas × 3 positions have been screened, so a few |t| of about 2–3 are expected by chance alone.
+- **Numbers:** only figures a second person reproduced are given. Ideas screened but not reproduced are marked so,
+  with no verdict.
+
+The table uses these abbreviations:
+- t is the regression t, with SEs clustered by team-week or week.
+- ΔMAE is the held-out change in average miss (negative = better).
+- "Band" is ranks 15–60.
+
+| Idea | Seasons, sample | Result | Verdict | Re-test only if |
+|---|---|---|---|---|
+| Opponent D/ST rank; opponent implied points (D18, PR 6b) | 2025; 2026 wk 1–9 | Every \|t\| < 2 in 2026; LB D/ST rank flips sign between seasons; held-out worse at DL (5.57 → 5.80) and DB | Rejected (2026-10-14, re-checked 2026-11-17) | The archive team fix (PR 22) changes the verdict. It is expected not to. |
+| Snap share compared within role (edge LBs vs edge players) | 2025 | Band r .305 → .284; top-50 MAE 5.57 → 5.61 | Rejected (2026-10-14) | — |
+| Recency (last 3 games instead of season to date) | 2025 | β 0.33–0.42 vs 0.5–0.8 for season to date | Rejected (2026-10-12) | — |
+| Level (bias) correction at LB, or any position | 2026 wk 3–10, walk-forward | ΔMAE LB +0.019 ± 0.051, DB +0.031 ± 0.029, DL +0.002 ± 0.017 (± 2 SE). The LB median miss is +0.3 while the mean is −1.1: a skewed tail, not a shift | Rejected | The league adds an IDP flex. With one DL, LB and DB slot a shared offset can't change a decision. |
+| Projection : ranking split by position (per-position α) | 2026 wk 4–10, walk-forward | Per-position minus pooled ΔMSE −0.002 ± 0.014 (band), −0.011 ± 0.022 (top 50) | Rejected | FantasyPros 2025 (PR 26) shows same-sign position shares in both seasons and a walk-forward gain beyond 2 SE. |
+| Other combiners vs the prior blend: median, trimmed, equal weights, rank-only | 2026 wk 4–10, band ΔMSE | +0.66 ± 0.22, +0.38 ± 0.19, +0.36 ± 0.13, +1.55 ± 0.70 (all worse) | Rejected | — |
+| Drop RotoBaller and FantasyData | 2026 wk 4–10 (FantasyData from wk 6) | Band ΔMSE −0.26 ± 0.16; top 50 −0.09 ± 0.21 | Not adopted (under 2 SE, one of about 9 comparisons) | One look at week 17: drop or down-weight only if the band gain is beyond 2 SE then. |
+| Vegas spread (LB, DB) | 2025; 2026 wk 1–9 | 2025 t −2.94 / −2.49, but held-out worse (LB MAE 5.619 → 5.626, DB 4.883 → 4.993); 2026 t +0.30 / −0.20 | Rejected | A third season shows the same sign against the blend's miss. |
+| Vegas game total | 2025; 2026 wk 1–9 | 2025 DL t −3.22, LB −0.99, DB +0.50; 2026 DL −1.61, LB −1.25, DB −0.50 | Rejected at LB and DB; at DL, shadow only inside the DL matchup candidate | The D18 implied-points null is explained. |
+| Home field; days of rest | 2025; 2026 wk 1–9 | Home \|t\| ≤ 0.45 (2025), ≤ 1.65 (2026); rest DL +1.67, LB −0.10, DB −0.02 | Rejected | — |
+| 3-game snap average instead of last game | 2025 | t +0.91 / −1.57 / +0.31 | Rejected | — |
+| Realized team defensive snaps | 2025 | t +3.25 / +6.74 / +5.6 | Not usable: known only after the game. Shows volume matters, not that it can be forecast | — |
+| Team volume tendencies, teammate injuries, PFR pressures and missed tackles, opponent sack rate | 2024–2026 | Screened flat by one analyst; not reproduced | No verdict | — |
+| μ scale-shrink (pull differences between players toward the week's mean) | 2025; 2026 | 2026 top-50 log score −0.0003 ± 0.0009; worse in the band and on START pairs; 2025 band worse at every position. Would have removed 9 badges that went 7–2 | Rejected | — |
+| Re-fit the swing to put 68% within ±1σ | 2025; 2026 | Not run: the spread ratio is already 0.95–1.02, and fat tails explain the 71–78% | Rejected by design (would make the odds overconfident) | — |
+| Form coefficients set automatically at checkpoints (empirical Bayes) | 2026 wk 1–9 | τ² against the blend: LB 0.28 ± 1.55, DB −0.18 ± 1.16 | Rejected: it would switch on and off on noise | — |
+| Tuesday fixes: FantasyPros-unlisted as missing, wider σ on Tuesday, "wait for Thursday" | 2026 wk 6–10 | Top-30 Spearman +0.015 ± 0.022; MAE worse; Thursday minus Tuesday −0.018 | Rejected | — |
+| A Wednesday post-waiver sync window | 2026 wk 6–10 | 0 of the owner's badge targets were lost to Wednesday free-agent adds | Rejected | — |
+| 3-week "hold value" in add/drop odds | 2026 | +0.62 pts/game, t 1.94, gone under other reasonable specs (−0.01, +0.02) | Rejected; only the bye look-ahead display stays | — |
+| P(play) discount from 2026 Questionable rates | 2026 | n = 11 (CI 0.11–0.69); likely double counts what the sources already price in | Rejected for 2026 data; research on 2025 injury reports instead | The 2025 held-out test passes (season end). |
+| DL swing re-fit (adopted 2026-11-17 at 1.46 SE) | 2024; 2025; 2026 | Log score per player-game: 2024 +0.0019 ± 0.0014, 2025 +0.0003 ± 0.0009, 2026 +0.0018 ± 0.0024 | Kept for now; revert candidate at week 13 | Rule in `docs/status.md` §6. |
+
+Previously recorded elsewhere: tier z (`docs/tier-tuning.md`; every z within noise at week 9) and the week-9
+checkpoint (`docs/status.md` §3).

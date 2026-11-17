@@ -313,6 +313,13 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - a link to the Stats page's view of that week.
 
   It is marked provisional until the week's stat corrections close.
+- **Evaluation protocol (added 2026-11-17, full review; `docs/eval-protocol.md`):** the definitions below are fixed before week 10 settles. They change only at a checkpoint, and from then on.
+  - **Headline = the number the page showed.** Every "how close" metric grades the frozen μ (`frozen.json` `mu`). "Before form" (`base`) and the plain average of the projection sources are reference rows. The pool stays the plain average's top 50 among players who played, so no row picks its own pool. σ_pred = √(σ_μ² + swing²) from the frozen record, or the week's σ_out where the record has no swing. Weeks 1–4 are marked replayed and week 5 rebuilt. Comparisons between rows are paired per-week differences ± 2 SE, labelled "can't tell apart" when the interval crosses 0. The old headline (projection sources only) stays in a collapsed table for 2026.
+  - **Suggestions are counted as decisions.** Badges are grouped by (week, position, compared player, kind). The group's highest-p badge stands for it, with ties broken by the waiver player's μ and then his id. A push counts as decided but not paid off, and reference badges are left out. The page shows "x of y decisions, the odds expected z, +p points each", with live and rebuilt decisions apart. A Wilson interval is shown once there are 5 or more decided; below that the page says "too few to judge". The badge count stays as a second line. The report card uses the same rule.
+  - **Tiers as shown means the 25 shown.** The tier table scores only the 25 players per position the pre-waiver page showed, ordered by (tier, −μ), `[display] depth`. It does this every week, so the whole-pool log from week 6 on is cut to the shown 25. It adds rank buckets 1–5, 6–10 and 11–25, and the within-week rank correlation ± SE. Its wording comes from the SE ("no clear order yet" when |r| < 2 SE). This table never reopens tier z.
+  - **Ranges:** the floor–ceiling coverage (below / inside / above, aim 20/60/20) and the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, replace "within ±1σ (aim 68%)". IDP scores are fat-tailed, so honest ranges put 71–78% within ±1σ. The raw within-1σ/2σ values stay in `stats.json`.
+  - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. A pooled value crossing 0.1 by noise no longer switches it off.
+  - **Adoption:** a model change is adopted only at a checkpoint and only under the rules of `docs/eval-protocol.md`. Every test is recorded in the ledger of `docs/methods-review.md` before it runs.
 
 ## 7. Failure handling and security
 - **Fatal:** a failure of the documented Sleeper /v1 endpoints (state, user, leagues, league, rosters, players). The job fails, nothing deploys, and the last good site stays live.
@@ -444,6 +451,24 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - the LB and DB swing;
     - the team-defense idea (D18: still no signal, with 2026 weeks 1–9 added; every |t| < 2).
   - **Pre-registered for the week-13 checkpoint:** whether the form term should be dropped for DL players whose projection has already risen 1+ point above their earlier projections while they beat them (the Rousseau case). Adopted only if pooled |t| ≥ 2 and held-out improves in both seasons.
+- **2026-11-17 · Full review (owner request: "a full analysis… without over-cooking the model"):**
+  - **The review:** a read-only sweep of weeks 1–9 through seven lenses, each finding reproduced by a skeptic. Findings and the plan are in `docs/status.md` §6.
+  - **The model is better than the Stats page showed:** in the waiver band it orders players better than Sleeper alone, by +0.149 ± 0.039 Spearman. The odds and ranges are honest.
+  - **Wrong or overstated on the page:**
+    - The page graded the plain projection average, not the published μ.
+    - It counted badges rather than decisions.
+    - Its tier table scored the whole pool.
+  - **This PR (docs only):**
+    - the evaluation protocol (`docs/eval-protocol.md`, §6.8);
+    - the ledger of tested and rejected ideas (`docs/methods-review.md`);
+    - the week-13 agenda, ordered and pre-registered (`docs/status.md`).
+  - **Owner decisions** (each in its own PR):
+    - the form miss term off at LB and DB;
+    - the source weights tested on 2025 before any change;
+    - Sleeper 2024 and FantasyPros 2025 as test data;
+    - league transactions;
+    - a DL matchup term in shadow;
+    - "changed since Tuesday", a bye look-ahead, and one factual FAAB line.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

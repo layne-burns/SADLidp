@@ -335,7 +335,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - **Suggestions are counted as decisions.** Badges are grouped by (week, position, compared player, kind). The group's highest-p badge stands for it, with ties broken by the waiver player's μ and then his id. A push counts as decided but not paid off, and reference badges are left out. The page shows "x of y decisions, the odds expected z, +p points each", with live and rebuilt decisions apart. A Wilson interval is shown once there are 5 or more decided; below that the page says "too few to judge". The badge count stays as a second line. The report card uses the same rule.
   - **Tiers as shown means the 25 shown.** The tier table scores only the 25 players per position the pre-waiver page showed, ordered by (tier, −μ), `[display] depth`. It does this every week, so the whole-pool log from week 6 on is cut to the shown 25. It adds rank buckets 1–5, 6–10 and 11–25, and the within-week rank correlation ± SE. Its wording comes from the SE ("no clear order yet" when |r| < 2 SE). This table never reopens tier z.
   - **Ranges:** the floor–ceiling coverage (below / inside / above, aim 20/60/20) and the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, replace "within ±1σ (aim 68%)". IDP scores are fat-tailed, so honest ranges put 71–78% within ±1σ. The raw within-1σ/2σ values stay in `stats.json`.
-  - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. A pooled value crossing 0.1 by noise no longer switches it off.
+  - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. It is measured among the 25 DBs the page showed (the scoreboard's band), or on the top-50 pool before a band exists. A pooled value crossing 0.1 by noise no longer switches it off.
   - **Adoption:** a model change is adopted only at a checkpoint and only under the rules of `docs/eval-protocol.md`. Every test is recorded in the ledger of `docs/methods-review.md` before it runs.
   - **Settled weeks only:** the All-season figures (every verdict, margin and the DB note) use the weeks whose stat corrections have closed. A provisional week shows under Last week and its own tab until then.
   - **Decision scoreboard (PR 23; `scoreboard.py`):** the first section of every multi-week view, "Do the picks rank the waiver pool right?"
@@ -357,7 +357,9 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - Nothing here feeds the model. Weekly starters (for points against the player actually started) are not stored yet.
   - **Honest uncertainty (PR 21):**
     - Every season figure carries a week-clustered margin (t-quantile at 9 weeks or fewer, 2 SE beyond). This covers bias, the within-week rank correlation, the paired differences against the reference rows, and the odds score (Brier), whose pairs within a week share that week's surprises.
-    - "Better than a coin flip" and "runs high/low" are said only beyond that margin.
+    - "Better than a coin flip", "runs high/low", "ours better/worse" and "better than Sleeper alone" are said only beyond that margin, and only with 4 or more weeks behind them. A clearly reversed order is called backwards, not unclear.
+    - The headline and every tally keep live and rebuilt decisions apart.
+    - The median miss is shown beside each position's bias. "A few big games pull the average" is said only when the median is nearer 0 than the mean, or on the other side of it.
     - A calibration row resting on fewer than 20 distinct favoured player-weeks shows "too few".
     - The top-12 random baseline is 12·K/50 ± 2 hypergeometric SDs (about 95%, like every ± on the page), K being the pool players who made the actual top 12.
     - Pooled Pearson and R² stay in `stats.json` only.

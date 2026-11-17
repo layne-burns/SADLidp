@@ -470,8 +470,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 if acc["pool"]:
                     summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
                     _, b_se = metrics.cluster_mean(groups)
-                    summ.update(covered=acc["covered"], pool=acc["pool"],
-                                bias_margin=metrics.margin(b_se, len([g for g in groups if g])))  # fmt: skip
+                    n_g = len([g for g in groups if g])
+                    summ.update(covered=acc["covered"], pool=acc["pool"], weeks=n_g,
+                                bias_margin=metrics.margin(b_se, n_g))  # fmt: skip
                     by_src.setdefault(name, {})[slot] = summ
         picked = [e for e in suggestions if e["week"] in sel]
         tallies = {kind: _decisions(picked, kind) for kind in ("live", "rebuilt")}
@@ -542,8 +543,11 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         upto = [e for e in suggestions if e["week"] <= w]
         to_date[w] = {kind: {k: v for k, v in _decisions(upto, kind).items() if k != "reps"}
                       for kind in ("live", "rebuilt")}  # fmt: skip
-    db = season_out["DB"]["rank"]
-    db_note = {"r": db["r"], "margin": db["margin"],
+    # the DB note reads the waiver DBs shown (the scoreboard's band, our number), else the top-50 pool
+    sb_db = ((season_view.get("scoreboard") or {}).get("DB") or {}).get("rows") or []
+    band = next((r["r"] for r in sb_db if r["key"] == "form" and r["r"]["weeks"]), None)
+    db = {"r": band["mean"], "margin": band["margin"]} if band else season_out["DB"]["rank"]
+    db_note = {"r": db["r"], "margin": db["margin"], "band": bool(band),
                "show": db["r"] is None or db["margin"] is None or db["r"] - db["margin"] <= 0.1}  # fmt: skip
     return {
         "season": season,

@@ -49,12 +49,15 @@ def _world(tmp_path, weeks=(1, 2, 3, 4), noisy="espn_proj", rank=False, backfill
     return data, Schedule.from_json(sched)
 
 
+RATIO = {**CFG, "weights": {**CFG["weights"], "projection_rule": "ratio"}}  # the rule before 2026-11-17
+
+
 def test_the_noisier_source_loses_weight_shrunk_toward_equal(tmp_path):
     data, sched = _world(tmp_path)
-    m = accuracy.measure(data, 2026, 4, sched, CFG)
+    m = accuracy.measure(data, 2026, 4, sched, RATIO)
     assert m["from_weeks"] == [1, 2, 3, 4]
     assert m["sources"]["espn_proj"]["mean_r"] > m["sources"]["sleeper_proj"]["mean_r"]
-    rec = accuracy.weights(m, CFG)
+    rec = accuracy.weights(m, RATIO)
     w = {n: s["w"] for n, s in rec["sources"].items()}
     assert rec["method"] == "accuracy" and w["sleeper_proj"] > 1 > w["espn_proj"]
     s = rec["sources"]["sleeper_proj"]  # 4 weeks against k = 4: halfway from 1 to the data weight
@@ -112,3 +115,18 @@ def test_consensus_applies_weights_and_alpha():
     out = consensus(values, groups, {"x": "LB"}, CFG, weights={"a": 3.0, "b": 1.0}, alpha=0.8)
     assert out["x"]["mu"] == pytest.approx(0.8 * (0.75 * 10 + 0.25 * 4) + 0.2 * 1)
     assert out["x"]["eff"] == {"a": 0.6, "b": 0.2, "r": 0.2}
+
+
+def test_the_projection_pair_shares_by_their_least_squares_mix(tmp_path):
+    """§6.5 (PR 26): with `projection_rule = "ls"`, the two projection sources share by the least-squares mix,
+    clamped to .2-.8 and shrunk n/(n+k) toward even. Sleeper misses by ±1 and ESPN by ±6, so the mix is all
+    Sleeper: clamped to .8, after 4 weeks halfway to .5 = .65."""
+    data, sched = _world(tmp_path)
+    m = accuracy.measure(data, 2026, 4, sched, CFG)
+    assert m["pair"]["sources"] == ["sleeper_proj", "espn_proj"] and m["pair"]["raw"] > 0.8 and m["pair"]["n"] == 4
+    rec = accuracy.weights(m, CFG)
+    w = {n: s["w"] for n, s in rec["sources"].items()}
+    assert rec["projection_rule"]["share"] == pytest.approx(0.65) and w["sleeper_proj"] == pytest.approx(1.3)
+    assert w["espn_proj"] == pytest.approx(0.7)
+    ratio = accuracy.weights(m, RATIO)
+    assert "projection_rule" not in ratio  # "ratio" keeps the error-ratio rule (the one-line revert)

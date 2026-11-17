@@ -286,6 +286,15 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
   - **Recorded write-once:** `weights.json` in the week's directory holds the weights in force: method (`accuracy`, or `prior` before activation or for a week whose first sync came before PR 6), α, α̂ and its n, and per source w, w_data, n_s and mean r_s. It is written at the week's first sync and never recomputed, so a week's numbers don't move as later results come in, and the Stats page shows the history exactly as applied.
   - **Prior weights (added 2026-10-14, PR 5):** `[weights.prior]` gives each source a starting weight within its group: FantasyPros 2, RotoBaller 1, FantasyData 1, so 50/25/25 when all three rank a player. FantasyPros is a 26-expert consensus; the others are one analyst each. Projection sources default to 1. These are the shares before activation, the blend c that r_s is measured against, and the target the data weights shrink toward: w_s = n_s/(n_s+k)·w_data,s·p_s + k/(n_s+k)·p_s, with p_s the prior.
   - **What the weights move:** the consensus μ (the within-group weights and α). Rank sources are still mapped onto the equal-weight projection mean (§6.4), and σ_μ is unchanged apart from the shares.
+  - **The projection pair's least-squares share (2026-11-17, owner decision "test on 2025, then adopt"; `[weights] projection_rule = "ls"`):** the error-ratio rule couldn't tell a source from noise. A shuffled, pure-noise copy of Sleeper kept 46% of its group in 2026, and 49% on the 2025 archive.
+    - **The rule:** with two projection sources (Sleeper, ESPN), their shares now follow the least-squares mix, θ = Σ(y−b)(a−b)/Σ(a−b)², demeaned within each position-week over the pool players both cover. It uses the same weeks, lag and pool as the other weights. θ is clamped to .2–.8 and shrunk n/(n+k) toward even (n = weeks measured). Each source's `w` carries its share, its prior being 1.
+    - **Recorded in `weights.json`:** `projection_rule` (rule, raw θ, its leave-one-week-out SE, the share, n), from the next week written. Earlier weeks keep their records, and the audit re-checks each record under the rule it was written with.
+    - **Pre-registered check on 2025,** all passed:
+      - **(a) Placebo:** a shuffled Sleeper gets 0.29 under the LS rule, against 0.49 under the ratio rule (bar: ≤ .35, against > .40).
+      - **(b) Noisy copies:** Sleeper plus noise of SD 1, 2 and 4 pts gets 0.37, 0.30 and 0.29, falling with the noise; the ratio rule gives 0.50, 0.49 and 0.45.
+      - **(c) Real independent view:** a season-to-date average has a 9-week raw share of 0.22 ± 0.09 against 0.28 over 17 weeks. Walk-forward ΔMSE of the LS blend against the ratio blend is −0.15 ± 0.29, so not worse.
+    - **On 2026 weeks 1–9:** Sleeper's raw share is 0.27 ± 0.09, so from week 12 the pair splits about ESPN 66 : Sleeper 34.
+    - **Kill switch, at the week-13 checkpoint:** revert to `"ratio"` if the cumulative walk-forward difference against the ratio rule on weeks 11+ turns against it at t ≥ +1. Three or four weeks can catch a reversal, not confirm a gain.
 
 ### 6.6 Anchored significance tiers (per position)
 Tiers are computed over the available pool after §2 filters, locked players removed, sorted by (−μ, sleeper_id). The first player anchors Tier 1. Each next player i joins the current tier while `μ_anchor − μ_i ≤ z·√(σ_anchor² + σ_i²)`, with σ = σ_μ. Otherwise he starts a new tier as its anchor. Default z = 0.75 (config; 1.0 until it was tuned on weeks 1–4 with `sadlidp tune`, 2026-10-12, see `docs/tier-tuning.md`). Comparing every player to the tier's top player prevents chaining, and the tiers are contiguous and deterministic. Display truncation doesn't change upper tiers. **Rostered players never anchor.** Let a1 be the Tier 1 anchor. A rostered player m is shown as "above Tier 1" if `μ_m − μ_a1 > z·√(σ_a1² + σ_m²)`. Otherwise he is shown in the first tier, top-down, whose anchor a satisfies `μ_a − μ_m ≤ z·√(σ_a² + σ_m²)`. If no tier satisfies it, he is shown as "below Tier N", where N is the last tier. In the single-source MVP every σ equals the default, so tiers are equal-width point bands until more sources arrive.
@@ -559,6 +568,12 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - league transactions;
     - a DL matchup term in shadow;
     - "changed since Tuesday", a bye look-ahead, and one factual FAAB line.
+- **2026-11-17 · PR 26 (research, part 1):**
+  - **Sleeper 2024 joins as a test season:**
+    - **The archive:** 11,633 projected-and-played rows, every one with its game-time team and opponent. Scored under the newest league's settings (`--scoring-season`).
+    - **`sadlidp backtest cross`:** scores the page's settings on a season they weren't fitted on, against settings fitted on another season, with paired per-player differences clustered by week.
+    - **Use:** consulted only at checkpoints; nothing is fitted on it.
+  - **The projection pair's least-squares share** (§6.5).
 - **2026-11-17 · PR 25 (decision help, owner decisions):** changed since Tuesday and Tuesday's questionable tags (§6.6); the bye look-ahead, one move per player of yours, and the FAAB context line from saved league transactions (§6.7).
 - **2026-11-17 · PR 23 (decision scoreboard):** the waiver band scored rung by rung, from Sleeper alone to the number shown, and Tuesday's picks against kickoff's (§6.8).
 - **2026-11-17 · PR 21 (Stats page grades what you see):** the §6.8 evaluation protocol, implemented.

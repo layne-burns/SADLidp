@@ -408,3 +408,92 @@ def format_report(rep: dict, season: int) -> str:
             "  " + " | ".join(f"{slot} miss {c['miss']:+.2f}, snap {c['snap']:+.1f} per 100% (n {c['n']})"
                               for slot, c in rep["coef"].items())]  # fmt: skip
     return "\n".join(out)
+
+
+# ---- cross-season check (2026-11-17: Sleeper 2024 joins as a test season, docs/eval-protocol.md) -----------
+
+
+def _week_paired(diffs: dict[int, list[float]]) -> dict:
+    """Mean of per-player differences, with its SE clustered by week."""
+    from .metrics import cluster_mean, margin
+
+    groups = [v for v in diffs.values() if v]
+    m, se = cluster_mean(groups)
+    return {"mean": m, "se": se, "margin": margin(se, len(groups)), "weeks": len(groups), "n": sum(map(len, groups))}
+
+
+def _gauss_ll(e: float, sd: float) -> float:
+    sd = max(sd, 1e-6)
+    return -0.5 * math.log(2 * math.pi * sd * sd) - e * e / (2 * sd * sd)
+
+
+def cross(test_rows: list[dict], fit_rows: list[dict], cfg: dict, sc: dict, k: float = 4.0) -> dict:
+    """Score the page's settings on a season they weren't fitted on, against settings fitted on another season.
+
+    Per position, on the test season's top FIT_TOP by projection with a last snap share (the form band):
+    - `form`: the current `[form]` term against the projection alone (ΔMAE, negative = the term helps);
+    - `refit`: coefficients fitted on `fit_rows` against the current ones (ΔMAE, negative = the refit wins);
+    - `swing`: the Gaussian log score per player-game of the current `[swing]` against one fitted on `fit_rows`
+      (positive = the refit wins).
+    Every figure is a paired per-player difference with its SE clustered by week. A test season is consulted
+    only at a checkpoint, and nothing is ever fitted on it (docs/eval-protocol.md)."""
+    add_history(test_rows, k)
+    add_history(fit_rows, k)
+    fcfg = cfg.get("form") or {}
+    cur = {s: (float((fcfg.get("miss") or {}).get(s, 0)), float((fcfg.get("snap") or {}).get(s, 0)))
+           for s in IDP_SLOTS}  # fmt: skip
+    refit = fit_form(fit_rows, k)
+    fit_rep = report([dict(r) for r in fit_rows], sc, k)["swing"]
+    scfg = cfg.get("swing") or {}
+    out = {}
+    for slot in IDP_SLOTS:
+        g = [r for r in band(test_rows, slot, 0, FIT_TOP) if r["lsnap"] is not None]
+        avg = {w: statistics.fmean(r["lsnap"] for r in g if r["week"] == w) for w in {r["week"] for r in g}}
+
+        def pred(r, miss, snap, avg=avg):
+            return r["proj"] + miss * r["form"] + snap * (r["lsnap"] - avg[r["week"]])
+
+        form_d, refit_d = {}, {}
+        rf = (refit[slot]["miss"], refit[slot]["snap"])
+        for r in g:
+            base = abs(r["act"] - r["proj"])
+            now = abs(r["act"] - pred(r, *cur[slot]))
+            form_d.setdefault(r["week"], []).append(now - base)
+            refit_d.setdefault(r["week"], []).append(abs(r["act"] - pred(r, *rf)) - now)
+        sw = {}
+        fr = fit_rep.get(slot)
+        a0 = float((scfg.get("a") or {}).get(slot, 0))
+        b0 = float((scfg.get("b") or {}).get(slot, 0))
+        if fr:
+            for r in [r for r in test_rows if r["slot"] == slot and r["act"] is not None and r["proj"] >= 3]:
+                v = poisson_var(r["ps"], sc)
+                e = r["act"] - r["proj"]
+                ll_cur = _gauss_ll(e, math.sqrt(max(a0 + b0 * v, 1e-6)))
+                ll_fit = _gauss_ll(e, math.sqrt(max(fr["a"] + fr["b"] * v, 1e-6)))
+                sw.setdefault(r["week"], []).append(ll_fit - ll_cur)
+        out[slot] = {"form": _week_paired(form_d), "refit": _week_paired(refit_d), "refit_coef": refit[slot],
+                     "swing": _week_paired(sw) if sw else None,
+                     "swing_fit": {"a": fr["a"], "b": fr["b"]} if fr else None}  # fmt: skip
+    return out
+
+
+def format_cross(rep: dict, test: int, fit: int) -> str:
+    def f(d, nd=3):
+        if not d or d["mean"] is None:
+            return "—"
+        m = d["margin"]
+        return f"{d['mean']:+.{nd}f}" + (f" ± {m:.{nd}f}" if m is not None else "") + f" ({d['weeks']} wk)"
+
+    lines = [f"Cross-season check: the page's settings scored on {test}, against settings fitted on {fit}.",
+             "Paired per player, margins clustered by week (about 95%)."]  # fmt: skip
+    for slot, r in rep.items():
+        c = r["refit_coef"]
+        lines.append(f"{slot}:")
+        lines.append(f"  form term vs projection alone, ΔMAE: {f(r['form'])}  (negative = the term helps)")
+        lines.append(f"  fitted on {fit} (miss {c['miss']:.2f}, snap {c['snap']:.2f}) vs current, ΔMAE: "
+                     f"{f(r['refit'])}  (negative = the refit wins)")  # fmt: skip
+        if r["swing"]:
+            s = r["swing_fit"]
+            lines.append(f"  swing fitted on {fit} (a {s['a']:.1f}, b {s['b']:.2f}) vs current, log score: "
+                         f"{f(r['swing'], 4)}  (positive = the refit wins)")  # fmt: skip
+    return "\n".join(lines)

@@ -105,5 +105,8 @@ The table uses these abbreviations:
 | P(play) discount from 2026 Questionable rates | 2026 | n = 11 (CI 0.11–0.69); likely double counts what the sources already price in | Rejected for 2026 data; research on 2025 injury reports instead | The 2025 held-out test passes (season end). |
 | DL swing re-fit (adopted 2026-11-17 at 1.46 SE) | 2024; 2025; 2026 | Log score per player-game: 2024 +0.0019 ± 0.0014, 2025 +0.0003 ± 0.0009, 2026 +0.0018 ± 0.0024 | Kept for now; revert candidate at week 13 | Rule in `docs/status.md` §6. |
 
+| Within-group shares by least squares (projection pair) instead of error ratios | 2025 archive, synthetic second sources; 2026 wk 1–9 | Placebo 0.29 (ratio rule 0.49); noisy copies 0.37 / 0.30 / 0.29; season average stable (9 vs 17 wk) and walk-forward ΔMSE −0.15 ± 0.29; 2026 Sleeper raw share 0.27 ± 0.09 | Adopted 2026-11-17 (owner decision), with a week-13 kill switch | — |
+| Sleeper 2024 as a test season: the page's settings vs settings fitted on another season | 2024 ↔ 2025 | Snap term on 2024: DL −0.07 ± 0.08, LB −0.24 ± 0.08, DB −0.04 ± 0.04 ΔMAE. A miss term fitted on 2025 helps against Sleeper on 2024 (LB −0.12 ± 0.05), as it should on a Sleeper-only archive: it can't test the blend, which is why LB and DB are off. DL swing refit vs the 2025 fit on 2024: −0.002 ± 0.003 log score | Recorded (a test set, nothing fitted) | — |
+
 Previously recorded elsewhere: tier z (`docs/tier-tuning.md`; every z within noise at week 9) and the week-9
 checkpoint (`docs/status.md` §3).

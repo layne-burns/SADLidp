@@ -8,7 +8,7 @@ sadlidp replay --weeks 5 --season YYYY --fill-frozen     # add missing frozen re
 sadlidp backfill --source S --weeks 5 --fill-gaps        # add archive rows a live week lacks (§5.3)
 sadlidp tune --season YYYY                               # re-tier past weeks under candidate settings
 sadlidp audit [--season YYYY]                            # read-only data checks (SPEC §7 Data audit)
-sadlidp backtest fetch|run|dst-fetch|dst|patch-teams --season YYYY   # last season's archive: store it, test ideas on it
+sadlidp backtest fetch|run|dst-fetch|dst|patch-teams|cross --season YYYY   # archives: store them, test ideas on them
 sadlidp gate [--now ISO]             # dry run: this week's windows and whether one is due
 sadlidp leakcheck PATH... | --staged REPO
 """
@@ -190,10 +190,15 @@ def cmd_backtest(args: argparse.Namespace) -> int:
     cfg = load_config(args.config)
     data_dir = Path(args.data_dir)
     season = args.season or datetime.now(ET).year - 1
-    sc = (json.loads((data_dir / str(season + 1) / "league.json").read_text()) or {}).get("scoring_settings") or {}
+    # scored under one league's settings: --scoring-season, else the next season's, else the newest saved
+    have = sorted(int(d.name) for d in data_dir.glob("[0-9]*") if (d / "league.json").exists())
+    scoring_season = args.scoring_season or (season + 1 if season + 1 in have else (have[-1] if have else None))
+    league_path = data_dir / str(scoring_season) / "league.json"
+    sc = (json.loads(league_path.read_text()) or {}).get("scoring_settings") or {} if league_path.exists() else {}
     if not sc:
-        print(f"backtest: no league.json for {season + 1} to score {season} with")
+        print(f"backtest: no league.json for {scoring_season} to score {season} with")
         return 1
+    print(f"backtest: {season} scored under the {scoring_season} league's settings")
     if args.what == "dst-fetch":
         from . import dstbacktest
 
@@ -218,6 +223,14 @@ def cmd_backtest(args: argparse.Namespace) -> int:
         players = {str(k): v for k, v in sleeper.players(datetime.now(ET).date().isoformat()).items()}
         written = backtest.fetch(sleeper, data_dir, season, players, sc, redo=args.redo)
         print(f"backtest: {season}: wrote weeks {written or 'none (already archived)'}")
+        return 0
+    if args.what == "cross":
+        fit = args.fit_season or season + 1
+        test_rows, fit_rows = backtest.load(data_dir, season, sc), backtest.load(data_dir, fit, sc)
+        if not test_rows or not fit_rows:
+            print(f"backtest cross: need archives for {season} and {fit}")
+            return 1
+        print(backtest.format_cross(backtest.cross(test_rows, fit_rows, cfg, sc), season, fit))
         return 0
     rows = backtest.load(data_dir, season, sc)
     if not rows:
@@ -304,9 +317,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_tune)
     p = sub.add_parser("backtest", parents=[common], help="last season's archive: fetch it, run the checks")
-    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst", "patch-teams"])
+    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst", "patch-teams", "cross"])
+    p.add_argument("--fit-season", type=int, help="cross: the season the comparison settings are fitted on")
     p.add_argument("--season", type=int, help="the archived season (default: last year)")
     p.add_argument("--redo", action="store_true", help="refetch weeks already archived")
+    p.add_argument("--scoring-season", type=int,
+                   help="score with this season's league.json (default: next season's, else newest)")  # fmt: skip
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_backtest)
     sub.add_parser("leakcheck", help="scan PATH... or --staged REPO for secrets")

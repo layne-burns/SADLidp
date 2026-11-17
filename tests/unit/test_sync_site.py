@@ -21,6 +21,8 @@ from sadlidp.sync import run_sync
 ROOT = Path(__file__).parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 CFG = load_config(ROOT / "config" / "sadl.toml")
+# the LB and DB miss terms are off in the config (2026-11-17); tests of the term's machinery switch them on
+CFG_MISS = {**CFG, "form": {**CFG["form"], "miss": {"DL": 0.45, "LB": 0.40, "DB": 0.20}}}
 CFG_PLAIN = {**CFG, "form": {**CFG["form"], "enabled": False}}  # the consensus alone: no form from the week-4 snaps
 NOW = datetime(2026, 10, 6, 22, 0, tzinfo=UTC)  # Tue 3 PM PT: inside the week-5 pre-waiver window
 LEAGUE = json.loads((FIXTURES / "sleeper_league.json").read_text())
@@ -493,6 +495,7 @@ def test_every_synced_week_gets_a_page_with_final_scores(tmp_path):
 def test_replay_rebuilds_a_past_week_from_saved_data(tmp_path):
     from sadlidp.replay import replay_week
 
+    CFG = CFG_MISS  # Tykee is a DB: his miss term is tested with it switched on
     data = tmp_path / "d"
     run_sync(CFG, data, tmp_path / "c", NOW, client=FakeClient(routes()), log=lambda m: None)  # league + schedule
     truth = json.loads((FIXTURES / "sleeper_week04_ground_truth.json").read_text())
@@ -554,7 +557,9 @@ def _card(obj, pid):
 
 def test_form_term_from_earlier_weeks(tmp_path):
     """SPEC §6.4: Tykee's week-4 line (from the actuals the sync writes) and a frozen week-4 μ give him a form
-    term in week 5: his shrunk miss and his snap share against the DB average, shown in his breakdown."""
+    term in week 5: his shrunk miss and his snap share against the DB average, shown in his breakdown. The DB
+    miss term is off in the config since 2026-11-17, so it's switched on here to test the machinery."""
+    CFG = CFG_MISS
     data = tmp_path / "d"
     truth = json.loads((FIXTURES / "sleeper_week04_ground_truth.json").read_text())
     week4 = data / "2026" / "week04"

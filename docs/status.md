@@ -135,7 +135,13 @@ Plan:
     - FantasyPros left as is (its archive matched 23 of 31);
     - 581 rebuilt records refreshed.
 - [ ] PR 23: a decision scoreboard: does each layer (Sleeper → blend → weights → form) rank the waiver band better?
-- [ ] PR 24: the form miss term off at LB and DB (owner decision). Snap terms and DL unchanged.
+- [x] PR 24: the form miss term is off at LB and DB (owner decision); snap terms and DL unchanged.
+  - Replay of weeks 6–10 with it off:
+    - about 1 LB and 2–3 DBs a week trade places in and out of the shown 25, at the bottom of the list;
+    - 53 tier lines shift;
+    - 7 top-5 places swap;
+    - 3 DB badges change.
+  - μ moves by about 0.6 at LB and 0.3 at DB on average, 1.75 at most.
 - [ ] PR 25: decision help:
   - "changed since Tuesday" and Tuesday-Q facts;
   - a bye look-ahead;

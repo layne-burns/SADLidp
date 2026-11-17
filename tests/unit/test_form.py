@@ -63,3 +63,15 @@ def test_apply_shrinks_the_miss_and_centres_the_snap_share_on_the_position():
     cons = {"x": {"mu": 1.0}}
     form.apply(cons, {"x": "LB"}, {"x": {"misses": [-100.0], "lsnap": None, "last": None}}, COEF)
     assert cons["x"]["mu"] == 0.0 and cons["x"]["form"]["pts"] == -1.0
+
+
+def test_the_miss_term_is_off_at_lb_and_db_since_the_full_review():
+    """SPEC §6.4 (2026-11-17): the LB and DB miss coefficients were fitted on Sleeper's misses, but the blend
+    already carries that persistence, so they are 0 until the week-13 test brings one back; DL and every snap
+    term are unchanged."""
+    from pathlib import Path
+
+    from sadlidp.config import load_config
+
+    c = form.coefficients(load_config(Path(__file__).parents[2] / "config" / "sadl.toml"))
+    assert c["miss"] == {"DL": 0.45, "LB": 0.0, "DB": 0.0} and c["snap"] == {"DL": 7.5, "LB": 5.5, "DB": 4.0}

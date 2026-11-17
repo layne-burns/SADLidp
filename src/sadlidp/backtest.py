@@ -497,3 +497,219 @@ def format_cross(rep: dict, test: int, fit: int) -> str:
             lines.append(f"  swing fitted on {fit} (a {s['a']:.1f}, b {s['b']:.2f}) vs current, log score: "
                          f"{f(r['swing'], 4)}  (positive = the refit wins)")  # fmt: skip
     return "\n".join(lines)
+
+
+# ---- FantasyPros past-season ranks (2026-11-17, docs/status.md §6: D2) --------------------------------------
+
+
+class _YearClient:
+    """Asks FantasyPros for a past season's page (`&year=`) and keeps each page's text for its time stamps."""
+
+    def __init__(self, client, year: int):
+        self.client, self.year, self.pages = client, year, {}
+
+    def get(self, url, **kw):
+        r = self.client.get(f"{url}&year={self.year}", **kw)
+        if r.ok:
+            self.pages[url] = r.text()
+        return r
+
+
+def fp_fetch(client, matcher, data_dir: Path | str, season: int, players: dict, cfg: dict,
+             log: Callable[[str], None] = print, now: datetime | None = None) -> list[int]:  # fmt: skip
+    """Store a past season's weekly FantasyPros DL/LB/DB ranks once, matched to Sleeper ids through the live
+    adapter, with each player's kickoff and each list's last update (the look-ahead guard). Weeks already
+    stored are kept: the pull is one-time and never re-fetched to change a result."""
+    from .sources import fp_ecr
+    from .sources.base import FetchContext
+
+    written = []
+    for week in WEEKS:
+        path = archive_dir(data_dir, season) / f"fp_week{week:02d}.json"
+        if path.exists():
+            continue
+        yc = _YearClient(client, season)
+        ctx = FetchContext(yc, None, season, week, now or datetime.now(ET), players,
+                           {"_root": cfg.get("_root", "config")}, matcher, None, archive=True)  # fmt: skip
+        res = fp_ecr.fetch(ctx)
+        if not res.rows:
+            log(f"backtest: FantasyPros {season} week {week}: {res.status}; stopped")
+            break
+        kick, updated = {}, {}
+        for text in yc.pages.values():
+            data = fp_ecr.parse_ecr(text) or {}
+            slot = str(data.get("position_id") or "").upper()
+            updated[slot] = data.get("last_updated_ts")
+            by_fp = {str(p.get("player_id")): p.get("player_game_kickoff_ts") for p in data.get("players") or []}
+            for pid, row in res.rows.items():
+                if row.get("fp_id") in by_fp:
+                    kick[pid] = by_fp[row["fp_id"]]
+        rows = {pid: {"ranks": r["ranks"], "kickoff": kick.get(pid)} for pid, r in res.rows.items()}
+        doc = {"season": season, "week": week, "source": "fp_ecr", "fetched_at": (now or datetime.now(ET)).isoformat(),
+               "last_updated": updated, "universe": res.universe, "lists": res.lists, "rows": rows}  # fmt: skip
+        storage.write_json(path, doc)
+        rate = res.report.get("match", {}).get("teamed_match_rate")
+        log(f"backtest: FantasyPros {season} week {week}: {len(rows)} matched (teamed match rate {rate})")
+        written.append(week)
+    return written
+
+
+def blend(rows: list[dict], data_dir: Path | str, season: int, guard: bool = True, k: float = 4.0) -> dict:
+    """The three questions registered for FantasyPros' past season (docs/status.md §6, D2), on the top 50 by
+    Sleeper's projection among players who played:
+    1. Sleeper's least-squares share against FantasyPros (mapped to points on Sleeper's values, §6.4), all
+       positions; 2. the same at LB; 3. the form miss coefficient fitted on a 0.6 Sleeper / 0.4 FantasyPros
+    base against one fitted on Sleeper. With `guard`, a player whose kickoff came before his list's last
+    update is left out (a rank that may have been touched after his game)."""
+    from .rankmap import rank_values
+
+    fp = {}
+    for path in sorted(archive_dir(data_dir, season).glob("fp_week*.json")):
+        doc = storage.read_json(path) or {}
+        fp[doc["week"]] = doc
+    cells: dict[str, dict[int, list[float]]] = {"all": {}, "LB": {}}
+    blended = []
+    dropped = kept = 0
+    for w in sorted({r["week"] for r in rows}):
+        doc = fp.get(w)
+        if not doc:
+            continue
+        wk = [r for r in rows if r["week"] == w]
+        p = {r["pid"]: r["proj"] for r in wk}
+        slot = {r["pid"]: r["slot"] for r in wk}
+        vals, _ = rank_values(doc["rows"], p, slot.get, doc.get("universe") or {}, lambda pid: False,
+                              members=doc.get("lists"))  # fmt: skip
+        upd = doc.get("last_updated") or {}
+        for r in wk:
+            v = vals.get(r["pid"])
+            row = doc["rows"].get(r["pid"]) or {}
+            lst = next(iter(row.get("ranks") or {}), None)
+            late = guard and row.get("kickoff") and upd.get(lst) and row["kickoff"] <= upd[lst]
+            if v is not None and late:
+                dropped += 1
+                v = None
+            elif v is not None:
+                kept += 1
+            r["fp"] = v
+            blended.append({**r, "proj": 0.6 * r["proj"] + 0.4 * v if v is not None else r["proj"]})
+        for s in IDP_SLOTS:
+            g = [r for r in band(wk, s, 0, 50) if r.get("fp") is not None]
+            if len(g) < 15:
+                continue
+            m = [statistics.fmean(x) for x in ([r["act"] for r in g], [r["proj"] for r in g], [r["fp"] for r in g])]
+            for scope in ("all", "LB") if s == "LB" else ("all",):
+                c = cells[scope].setdefault(w, [0.0, 0.0])
+                for r in g:
+                    y, a, b = r["act"] - m[0], r["proj"] - m[1], r["fp"] - m[2]
+                    c[0] += (y - b) * (a - b)
+                    c[1] += (a - b) ** 2
+    from .accuracy import _jackknife
+
+    out = {"guard": guard, "dropped": dropped, "kept": kept, "weeks": sorted(fp)}
+    for scope, cs in cells.items():
+        num, den = sum(c[0] for c in cs.values()), sum(c[1] for c in cs.values())
+        out[f"sleeper_share_{scope}"] = {"raw": num / den if den else None, "se": _jackknife(cs, num, den),
+                                        "weeks": len(cs)}  # fmt: skip
+    on_sleeper = [dict(r) for r in rows]
+    add_history(on_sleeper, k)  # misses against Sleeper's projection
+    add_history(blended, k)  # misses against the blend (the base the term would correct)
+    out["form_on_sleeper"] = fit_form(on_sleeper, k)
+    out["form_on_blend"] = fit_form(blended, k)
+    return out
+
+
+# ---- DL matchup, measured after the fact (2026-11-17, docs/status.md §6: P3) --------------------------------
+
+
+def matchup_rows(data_dir: Path | str, season: int, sc: dict, weekly: dict, live: bool = False,
+                 k: float = 4.0) -> list[dict]:  # fmt: skip
+    """DL player-weeks for the matchup test: the miss (points − μ) and the opponent's QB-hit rate allowed
+    (matchup.o_hit, weeks before). Archive seasons: μ = projection + the shipped DL form and snap terms, on
+    each week's top 60 DL by μ. A live season (`live`): μ = the frozen record, team and opponent from the
+    week's Sleeper rows, top 60 DL by frozen μ among players who played."""
+    from . import matchup
+
+    out = []
+    cache: dict[int, dict] = {}
+
+    def rate(w, opp):
+        if w not in cache:
+            cache[w] = matchup.o_hit(weekly, w)
+        return cache[w].get((opp or "").lstrip("@"))
+
+    if not live:
+        rows = load(data_dir, season, sc)
+        add_history(rows, k)
+        arch = {(storage.read_json(p) or {}).get("week"): (storage.read_json(p) or {}).get("rows") or {}
+                for p in archive_dir(data_dir, season).glob("week*.json")}  # fmt: skip
+        for w in sorted({r["week"] for r in rows}):
+            g = [r for r in rows if r["week"] == w and r["slot"] == "DL" and r["act"] is not None
+                 and r["lsnap"] is not None]  # fmt: skip
+            if not g or w < 2:
+                continue
+            avg = statistics.fmean(r["lsnap"] for r in g)
+            for r in g:
+                r["mu"] = r["proj"] + 0.45 * r["form"] + 7.5 * (r["lsnap"] - avg)
+            for r in sorted(g, key=lambda r: -r["mu"])[:FIT_TOP]:
+                s = rate(w, (arch.get(w, {}).get(r["pid"]) or {}).get("opponent"))
+                if s is not None:
+                    out.append({"season": season, "week": w, "y": r["act"] - r["mu"], "x": s})
+        return out
+    season_dir = Path(data_dir) / str(season)
+    players: dict = {}
+    for p in sorted(season_dir.glob("week*/players.json")):
+        players.update((storage.read_json(p) or {}).get("players") or {})
+    for wd in sorted(season_dir.glob("week*")):
+        w = int(wd.name[4:])
+        act = (storage.read_json(wd / "actuals.json") or {}).get("stats") or {}
+        frozen = (storage.read_json(wd / "frozen.json") or {}).get("players") or {}
+        src = (storage.read_json(wd / "sources" / "sleeper_proj.json") or {}).get("rows") or {}
+        if w < 2 or not act or not frozen:
+            continue
+        dl = [(pid, r) for pid, r in frozen.items() if slot_of(players.get(pid) or {}) == "DL"
+              and weeklog.played(act.get(pid)) and r.get("mu") is not None]  # fmt: skip
+        for pid, r in sorted(dl, key=lambda x: -x[1]["mu"])[:FIT_TOP]:
+            s = rate(w, (src.get(pid) or {}).get("opponent"))
+            if s is not None:
+                out.append({"season": season, "week": w, "y": scoring.points(act[pid], sc) - r["mu"], "x": s})
+    return out
+
+
+def matchup_report(rows: list[dict], frozen_coef: float = 0.30) -> dict:
+    """Pooled and per-season slopes of the DL miss on the opponent's QB-hit rate (within season-week, SEs
+    clustered by week), leave-one-season-out ΔMAE, and ΔMAE with the frozen coefficient."""
+    from .metrics import cluster_mean, margin
+
+    by: dict[tuple, list[dict]] = {}
+    for r in rows:
+        by.setdefault((r["season"], r["week"]), []).append(r)
+    for g in by.values():
+        mx, my = statistics.fmean(r["x"] for r in g), statistics.fmean(r["y"] for r in g)
+        for r in g:
+            r["xd"], r["yd"] = r["x"] - mx, r["y"] - my
+
+    def fit(g):
+        sxx = sum(r["xd"] ** 2 for r in g)
+        return sum(r["xd"] * r["yd"] for r in g) / sxx if sxx else 0.0
+
+    b = fit(rows)
+    sxx = sum(r["xd"] ** 2 for r in rows)
+    se = (sum(sum(r["xd"] * (r["yd"] - b * r["xd"]) for r in g) ** 2 for g in by.values()) * len(by)
+          / max(len(by) - 1, 1)) ** 0.5 / sxx  # fmt: skip
+    seasons = sorted({r["season"] for r in rows})
+    out = {"n": len(rows), "slope": b, "t": b / se if se else None, "seasons": {}}
+    loso: dict[tuple, list[float]] = {}
+    frozen: dict[tuple, list[float]] = {}
+    for s in seasons:
+        test = [r for r in rows if r["season"] == s]
+        bb = fit([r for r in rows if r["season"] != s])
+        for r in test:
+            loso.setdefault((s, r["week"]), []).append(abs(r["yd"] - bb * r["xd"]) - abs(r["yd"]))
+            frozen.setdefault((s, r["week"]), []).append(abs(r["yd"] - frozen_coef * r["xd"]) - abs(r["yd"]))
+        m, e = cluster_mean([v for key, v in loso.items() if key[0] == s])
+        out["seasons"][s] = {"n": len(test), "slope": fit(test), "loso_coef": bb, "loso_dmae": m,
+                             "loso_margin": margin(e, len({r["week"] for r in test}))}  # fmt: skip
+    for name, d in (("loso", loso), ("frozen", frozen)):
+        m, e = cluster_mean(list(d.values()))
+        out[name] = {"dmae": m, "margin": margin(e, len(d))}
+    return out

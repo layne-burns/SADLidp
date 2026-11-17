@@ -126,11 +126,14 @@ Plan:
 **Plan (owner-approved 2026-11-17), one PR each, spec first**
 - [ ] PR 20: the evaluation protocol (`docs/eval-protocol.md`), the tested-and-rejected ledger (`docs/methods-review.md`) and this agenda.
 - [ ] PR 21: the Stats page grades the published μ, counts decisions, scores the shown 25 tiers, and checks range coverage with honest ± everywhere.
-- [ ] PR 22: data hygiene:
-  - the 2025 archive's game-time team;
-  - `sadlidp audit`;
-  - a warning when a source is mostly skipped after kickoff;
-  - the week-5 repair.
+- [x] PR 22: data hygiene:
+  - **The 2025 archive's game-time team:** 4,242 rows fixed, no other value moved. The D/ST verdict stands.
+  - **`sadlidp audit`:** it flags exactly week 5, which is acknowledged, plus three ESPN DL names unmatched since week 5.
+  - **A banner** when a source is read mostly after kickoff.
+  - **The week-5 repair:**
+    - ESPN filled from its archive (37 of 37 live rows matched; 502 added);
+    - FantasyPros left as is (its archive matched 23 of 31);
+    - 581 rebuilt records refreshed.
 - [ ] PR 23: a decision scoreboard: does each layer (Sleeper → blend → weights → form) rank the waiver band better?
 - [ ] PR 24: the form miss term off at LB and DB (owner decision). Snap terms and DL unchanged.
 - [ ] PR 25: decision help:

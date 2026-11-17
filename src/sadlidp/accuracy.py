@@ -52,8 +52,10 @@ def _demeaned_ss(errors: list[float]) -> float:
     return sum((e - m) ** 2 for e in errors)
 
 
-def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: dict) -> dict:
-    """Error ratios per source and the group-split estimate over the settled weeks ≤ `upto`."""
+def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: dict,
+            as_of: datetime | None = None) -> dict:  # fmt: skip
+    """Error ratios per source and the group-split estimate over the settled weeks ≤ `upto`. With `as_of`, only
+    source rows first read by then count (the audit re-checks a recorded week against the data it saw)."""
     from . import stats  # stats reads the sync's source labels; imported here to keep the import graph acyclic
 
     season_dir = Path(data_dir) / str(season)
@@ -77,7 +79,7 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
             continue  # stat corrections still open (§6.5 Actuals)
         lines = act_doc.get("stats") or {}
         act = {pid: scoring.points(line, core) for pid, line in lines.items() if weeklog.played(line)}
-        preds, rows, kd, pall = stats.source_points(wd, core, slots)
+        preds, rows, kd, pall = stats.source_points(wd, core, slots, as_of)  # as_of: rows read by then only
         for name in untrusted & preds.keys():  # an archive that hasn't passed its check: live rows only
             live = {
                 p for p, row in rows[name].items() if not (row or {}).get("backfill") and not (row or {}).get("late")

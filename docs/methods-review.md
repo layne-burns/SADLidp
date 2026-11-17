@@ -83,7 +83,7 @@ The table uses these abbreviations:
 
 | Idea | Seasons, sample | Result | Verdict | Re-test only if |
 |---|---|---|---|---|
-| Opponent D/ST rank; opponent implied points (D18, PR 6b) | 2025; 2026 wk 1–9 | Every \|t\| < 2 in 2026; LB D/ST rank flips sign between seasons; held-out worse at DL (5.57 → 5.80) and DB | Rejected (2026-10-14, re-checked 2026-11-17) | The archive team fix (PR 22) changes the verdict. It is expected not to. |
+| Opponent D/ST rank; opponent implied points (D18, PR 6b) | 2025; 2026 wk 1–9 | Every \|t\| < 2 in 2026; LB D/ST rank flips sign between seasons. On the 2025 archive with game-time teams (PR 22), every \|t\| < 2 and held-out is worse at every position (DL 6.510 → 6.524, LB 5.718 → 5.762, DB 4.932 → 4.939) | Rejected (2026-10-14; re-checked 2026-11-17 on corrected teams) | — |
 | Snap share compared within role (edge LBs vs edge players) | 2025 | Band r .305 → .284; top-50 MAE 5.57 → 5.61 | Rejected (2026-10-14) | — |
 | Recency (last 3 games instead of season to date) | 2025 | β 0.33–0.42 vs 0.5–0.8 for season to date | Rejected (2026-10-12) | — |
 | Level (bias) correction at LB, or any position | 2026 wk 3–10, walk-forward | ΔMAE LB +0.019 ± 0.051, DB +0.031 ± 0.029, DL +0.002 ± 0.017 (± 2 SE). The LB median miss is +0.3 while the mean is −1.1: a skewed tail, not a shift | Rejected | The league adds an IDP flex. With one DL, LB and DB slot a shared offset can't change a decision. |

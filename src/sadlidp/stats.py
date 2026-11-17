@@ -67,22 +67,26 @@ def _names(season_dir: Path) -> dict[str, str]:
     return names
 
 
-def _projection_sources(wd: Path, kind: str = "projection") -> dict[str, dict]:
-    """name -> rows of every source of `kind` saved for the week, in the sync's source order."""
+def _projection_sources(wd: Path, kind: str = "projection", as_of: datetime | None = None) -> dict[str, dict]:
+    """name -> rows of every source of `kind` saved for the week, in the sync's source order. With `as_of`, rows
+    first read after it are left out (what the week's files held then)."""
     order = list(SOURCE_LABELS)
     out = {}
     for path in sorted((wd / "sources").glob("*.json"), key=lambda p: (order.index(p.stem) if p.stem in order
                                                                        else len(order), p.stem)):  # fmt: skip
         doc = storage.read_json(path) or {}
+        if as_of is not None:
+            doc = {**doc, "rows": {pid: r for pid, r in (doc.get("rows") or {}).items() if not r.get("fetched_at")
+                                   or datetime.fromisoformat(r["fetched_at"]) <= as_of}}  # fmt: skip
         if doc.get("kind", "projection") == kind:
             out[path.stem] = (doc.get("rows") or {}) if kind == "projection" else doc
     return out
 
 
-def source_points(wd: Path, sc: dict, slots: dict[str, str]):
+def source_points(wd: Path, sc: dict, slots: dict[str, str], as_of: datetime | None = None):
     """Each saved source's SADL points for the week: (points[source][pid], rows[source], kind[source],
     equal-weight projection mean). Rank sources are mapped to points against that mean (§6.4)."""
-    sources = _projection_sources(wd)
+    sources = _projection_sources(wd, as_of=as_of)
     kinds = dict.fromkeys(sources, "projection")
     preds = {
         name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
@@ -93,7 +97,7 @@ def source_points(wd: Path, sc: dict, slots: dict[str, str]):
         for pid, v in pred_s.items():
             covering.setdefault(pid, []).append(v)
     pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
-    for name, doc in _projection_sources(wd, "rank").items():  # scored on their mapped points (§6.4)
+    for name, doc in _projection_sources(wd, "rank", as_of).items():  # scored on their mapped points (§6.4)
         rows = {pid: r for pid, r in (doc.get("rows") or {}).items() if pid in slots}
         universe, members = doc.get("universe") or {}, doc.get("lists") or {}
         preds[name], _ = rank_values(rows, pred_all, slots.get, universe, lambda pid: False, members=members)

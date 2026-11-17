@@ -22,6 +22,12 @@ from .sources.base import FetchContext
 
 BUDGET_S = 300.0
 MAX_REQUESTS = 40
+GAP_AGREE = 0.99  # a gap fill needs the archive to match this share of the week's live rows
+
+
+def _core(row: dict) -> dict:
+    """What a row contributes to μ: a projection's stats, a ranking's ranks (labels such as team aren't checked)."""
+    return {k: row.get(k) for k in ("stats", "ranks") if k in row}
 
 
 def history(data_dir: Path | str, season: int, before_week: int) -> dict[str, list[dict]]:
@@ -86,6 +92,7 @@ def run(
     priors: dict | None = None,
     only: str | None = None,
     redo: bool = False,
+    fill_gaps: bool = False,
     log: Callable[[str], None] = print,
     clock: Callable[[], float] = time.monotonic,
     sched=None,
@@ -93,7 +100,9 @@ def run(
     """Fetch and save the missing past `weeks` of every archive source (`only` one, if named): {name: [weeks]}.
 
     `sources` is the sync's registry (name -> (module, kind)); `players` the IDP players. With `redo`, a week
-    that was backfilled before is fetched again; a week with live rows is never overwritten.
+    that was backfilled before is fetched again; a week with live rows is never overwritten. With `fill_gaps`
+    (SPEC §5.3 Gap fill, 2026-11-17), a week with live rows gains archive rows for the players it has no row
+    for, marked `backfill`, and only if the archive agrees with ≥ 99% of its live rows; live rows stay as they are.
     """
     bcfg = cfg.get("backfill") or {}
     budget_s = float(bcfg.get("budget_s", BUDGET_S))
@@ -117,6 +126,8 @@ def run(
             if not path.exists():
                 todo.append(w)
             elif redo and _all_backfilled(path):
+                todo.append(w)
+            elif fill_gaps and not _all_backfilled(path):
                 todo.append(w)
             elif redo:
                 log(f"backfill: {name} week {w} has live rows; left alone")
@@ -144,6 +155,21 @@ def run(
                 log(f"backfill: {name} week {w}: {why}; retried next sync")
                 continue
             path = storage.week_dir(data_dir, season, w) / "sources" / f"{name}.json"
+            if fill_gaps and path.exists() and not _all_backfilled(path):
+                old = storage.load_source(path).get("rows") or {}
+                live = [pid for pid, row in old.items() if not row.get("backfill") and pid in res.rows]
+                agree = sum(_core(old[pid]) == _core(res.rows[pid]) for pid in live)
+                if not live or agree < GAP_AGREE * len(live):
+                    log(f"backfill: {name} week {w}: the archive matches {agree} of {len(live)} live rows; "
+                        "gaps left unfilled")  # fmt: skip
+                    continue
+                added = {pid: {**row, "backfill": True, "fetched_at": res.fetched_at}  # first seen now
+                         for pid, row in res.rows.items() if pid not in old}  # fmt: skip
+                storage.save_source(path, res, {**old, **added})
+                log(f"backfill: {name} week {w}: archive matches {agree} of {len(live)} live rows; "
+                    f"{len(added)} rows added, {len(old)} kept")  # fmt: skip
+                done.setdefault(name, []).append(w)
+                continue
             stored = len(storage.load_source(path).get("rows") or {})
             shrink = float((cfg.get("sources") or {}).get("shrink_guard", 0.6))
             if stored and len(res.rows) < shrink * stored:  # a --redo never shrinks a week (SPEC §7)

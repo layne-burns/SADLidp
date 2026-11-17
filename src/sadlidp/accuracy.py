@@ -69,6 +69,8 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
     kinds: dict[str, str] = {}
     num = den = 0.0
     cells: dict[int, list[float]] = {}  # week -> [num, den] of the group-split estimate (for its jackknife SE)
+    pair_cells: dict[int, list[float]] = {}  # week -> [num, den] of the projection pair's LS share (§6.5, PR 26)
+    pair: list[str] = []
     used: list[int] = []
     for week, wd in stats._weeks(season_dir):
         if week > upto or not core:
@@ -112,6 +114,19 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
                         _demeaned_ss([vals[pid] - act[pid] for pid in cov]) / d
                     )
                     counted = True
+            projs = [n for n in preds if kd[n] == "projection"]
+            if len(projs) == 2:  # the LS share of the first projection source against the second (§6.5, PR 26)
+                pair = pair or projs
+                a_s, b_s = preds[pair[0]], preds[pair[1]]
+                both = [pid for pid in pool if pid in a_s and pid in b_s]
+                if len(both) >= MIN_COVER:
+                    m3 = [statistics.fmean(v) for v in ([act[p] for p in both], [a_s[p] for p in both],
+                                                        [b_s[p] for p in both])]  # fmt: skip
+                    c = pair_cells.setdefault(week, [0.0, 0.0])
+                    for p_ in both:
+                        y, a, b = act[p_] - m3[0], a_s[p_] - m3[1], b_s[p_] - m3[2]
+                        c[0] += (y - b) * (a - b)
+                        c[1] += (a - b) ** 2
             trip = [(act[pid], *groups(pid)) for pid in pool]
             trip = [t for t in trip if t[1] is not None and t[2] is not None]
             if len(trip) >= MIN_COVER:
@@ -139,7 +154,17 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
         "alpha_hat_raw": num / den if den > 0 else None,
         "alpha_n": len(cells),
         "alpha_se": _jackknife(cells, num, den),
+        "pair": _pair_share(pair, pair_cells),
     }
+
+
+def _pair_share(pair: list[str], cells: dict[int, list[float]]) -> dict | None:
+    """The least-squares share of the first projection source in the best mix of the two (demeaned within each
+    position-week): Σ(y−b)(a−b)/Σ(a−b)², with its leave-one-week-out SE (§6.5, PR 26)."""
+    num, den = sum(c[0] for c in cells.values()), sum(c[1] for c in cells.values())
+    if not pair or den <= 0:
+        return None
+    return {"sources": pair, "raw": num / den, "n": len(cells), "se": _jackknife(cells, num, den)}
 
 
 def _se(xs: list[float]) -> float | None:
@@ -183,6 +208,18 @@ def weights(m: dict, cfg: dict) -> dict:
                                  "mean_r": round(s["mean_r"], 4)}  # fmt: skip
             if s.get("r_se") is not None:
                 out["sources"][n]["r_se"] = round(s["r_se"], 4)
+    pr = m.get("pair")
+    if wcfg.get("projection_rule", "ratio") == "ls" and pr and pr["n"]:
+        # the projection pair's shares follow their least-squares mix (§6.5, PR 26): clamped to .2-.8 and
+        # shrunk n/(n+k) toward even; the two sources' w then carry those shares (their priors are 1)
+        th = pr["n"] / (pr["n"] + k) * min(max(pr["raw"], 0.2), 0.8) + k / (pr["n"] + k) * 0.5
+        a, b = pr["sources"]
+        for name, share in ((a, th), (b, 1 - th)):
+            entry = out["sources"].setdefault(name, {"n": pr["n"]})
+            entry["w"] = round(2 * share, 4)
+        out["projection_rule"] = {"rule": "ls", "sources": pr["sources"], "raw": round(pr["raw"], 4),
+                                  "share": round(th, 4), "n": pr["n"],
+                                  "se": round(pr["se"], 4) if pr.get("se") is not None else None}  # fmt: skip
     raw, n = m["alpha_hat_raw"], m["alpha_n"]
     if raw is not None and n:
         a_hat = min(max(raw, 0.2), 0.8)

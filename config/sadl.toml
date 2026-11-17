@@ -50,6 +50,7 @@ DB = 5.0
 
 [weights]
 prior_split = 0.6           # projection : rank group prior (D11)
+projection_rule = "ls"      # "ls": the two projection sources share by their least-squares mix (§6.5, 2026-11-17); "ratio" reverts
 k = 4                       # shrinkage of the accuracy weights, in weeks: after n weeks the data counts n/(n+k) (§6.5)
 
 [weights.prior]             # each source's starting weight within its group (SPEC §6.5 "Prior weights"); others 1

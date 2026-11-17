@@ -152,7 +152,8 @@ Plan:
   - **Bye look-ahead** for your players over the next 3 weeks.
   - **One move per player of yours:** e.g. 17 START badges over Kyler Gordon become one, plus "same move: …".
   - **League transactions saved each sync.** FAAB line: 16 of 24 IDP claims were won with $1 or less; 4 contested ($0–$15); 24 free-agent IDP adds, most on a Wednesday.
-- [ ] PR 26: research on archives:
+- [x] PR 26 (part 1): Sleeper 2024 is a test season (`sadlidp backtest cross`). The least-squares share for the projection pair passed its pre-registered 2025 check and is adopted (ESPN about 66 : Sleeper 34 from week 12), with a week-13 kill switch.
+- [ ] PR 26 (part 2): research on archives:
   - Sleeper 2024 as a test season;
   - FantasyPros 2025 ranks;
   - the least-squares source share checked on 2025 before any change;

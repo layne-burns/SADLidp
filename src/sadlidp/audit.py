@@ -100,7 +100,10 @@ def run(data_dir: Path | str, season: int, cfg: dict) -> list[dict]:
         rec = storage.read_json(wd / "weights.json")
         if rec and rec.get("method") == "accuracy":
             as_of = datetime.fromisoformat(rec["computed_at"]) if rec.get("computed_at") else None
-            again = accuracy.weights(accuracy.measure(data_dir, season, week - accuracy.LAG, sched, cfg, as_of), cfg)
+            rule = (rec.get("projection_rule") or {}).get("rule", "ratio")  # the rule in force when it was written
+            cfg_then = {**cfg, "weights": {**(cfg.get("weights") or {}), "projection_rule": rule}}
+            again = accuracy.weights(accuracy.measure(data_dir, season, week - accuracy.LAG, sched, cfg, as_of),
+                                     cfg_then)  # fmt: skip
             diffs = [
                 n
                 for n, s in (rec.get("sources") or {}).items()

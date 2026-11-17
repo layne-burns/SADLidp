@@ -153,11 +153,14 @@ Plan:
   - **One move per player of yours:** e.g. 17 START badges over Kyler Gordon become one, plus "same move: …".
   - **League transactions saved each sync.** FAAB line: 16 of 24 IDP claims were won with $1 or less; 4 contested ($0–$15); 24 free-agent IDP adds, most on a Wednesday.
 - [x] PR 26 (part 1): Sleeper 2024 is a test season (`sadlidp backtest cross`). The least-squares share for the projection pair passed its pre-registered 2025 check and is adopted (ESPN about 66 : Sleeper 34 from week 12), with a week-13 kill switch.
-- [ ] PR 26 (part 2): research on archives:
-  - Sleeper 2024 as a test season;
-  - FantasyPros 2025 ranks;
-  - the least-squares source share checked on 2025 before any change;
-  - a DL matchup term (opponent QB-hit rate) shadow-logged only.
+- [x] PR 26 (part 2):
+  - **FantasyPros 2025 weekly ranks stored once.** The three registered questions, guarded (players whose list was updated after their kickoff left out; 1,345 of 4,681):
+    - Sleeper's share against FantasyPros: 0.42 ± 0.07, about even;
+    - at LB: 0.28 ± 0.13, leaning FantasyPros as in 2026, but within 2 SE, so no per-position share;
+    - the form miss fitted against a 0.6 Sleeper / 0.4 FantasyPros base: DL 0.31, LB 0.32, DB 0.09, against 0.43 / 0.40 / 0.20 on Sleeper.
+
+    All feed 2027.
+  - **The DL matchup** is measured after the fact (`sadlidp backtest matchup`); the season-end rule is in the week-13 agenda, item 8.
 
 **Week-13 checkpoint agenda (Tue 2026-12-15), registered 2026-11-17 before week 10 settled**
 
@@ -182,11 +185,12 @@ Rules: settled weeks only, and the definitions of `docs/eval-protocol.md`. Every
    - Score: paired log score of 4.3 + 2.23·V against 0 + 2.5·V on 2024, on 2025 held out and on 2026 weeks 1–13.
    - Keep the re-fit only if the pooled gain is at least 2 SE; otherwise return to 0 + 2.5·V.
 7. **Source weights:** if the least-squares share is adopted in PR 26, check its kill switch. Revert if the cumulative walk-forward difference against the old rule on weeks 11 and later turns against it at t ≥ +1.
-8. **DL matchup (shadow).** A sanity gate only:
-   - the live opponent hit rate matches the backtest;
-   - no team-mapping errors;
-   - the shadow average miss is not worse by more than 0.1.
-   - The go/no-go comes at season end, on the pooled leave-one-season-out result.
+8. **DL matchup (measured after the fact, not logged live).** A past week's opponent hit rate is rebuilt exactly from nflverse play-by-play, so live logging would add a 10 MB download per sync day and no information.
+   - At week 13: `sadlidp backtest matchup --season 2026` runs; report only.
+   - **Season end, the go/no-go,** with the coefficient frozen at 0.30 points per percentage point:
+     - add the term to DL μ for 2027 only if the pooled leave-one-season-out ΔMAE on 2024–2026 (all of 2026) is below 0 beyond its margin;
+     - and only if 2026 alone is not worse.
+   - Weeks 2–10, registered 2026-11-17: pooled slope +0.39 per pp (t 5.5); 2024 / 2025 / 2026 slopes +0.45 / +0.30 / +0.46. LOSO ΔMAE −0.034 ± 0.036; frozen 0.30: −0.035 ± 0.028.
 9. **Not at week 13:** RotoBaller/FantasyData drop (one look at week 17), outcome-based tiers and P(play) from 2025 injury reports (season end).
 
 ## Owner questions still open

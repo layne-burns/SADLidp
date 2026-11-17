@@ -108,5 +108,8 @@ The table uses these abbreviations:
 | Within-group shares by least squares (projection pair) instead of error ratios | 2025 archive, synthetic second sources; 2026 wk 1–9 | Placebo 0.29 (ratio rule 0.49); noisy copies 0.37 / 0.30 / 0.29; season average stable (9 vs 17 wk) and walk-forward ΔMSE −0.15 ± 0.29; 2026 Sleeper raw share 0.27 ± 0.09 | Adopted 2026-11-17 (owner decision), with a week-13 kill switch | — |
 | Sleeper 2024 as a test season: the page's settings vs settings fitted on another season | 2024 ↔ 2025 | Snap term on 2024: DL −0.07 ± 0.08, LB −0.24 ± 0.08, DB −0.04 ± 0.04 ΔMAE. A miss term fitted on 2025 helps against Sleeper on 2024 (LB −0.12 ± 0.05), as it should on a Sleeper-only archive: it can't test the blend, which is why LB and DB are off. DL swing refit vs the 2025 fit on 2024: −0.002 ± 0.003 log score | Recorded (a test set, nothing fitted) | — |
 
+| FantasyPros 2025: Sleeper vs FantasyPros share; at LB; form fitted on a blend | 2025 archive + FantasyPros 2025 ranks (kickoff-guarded) | Share 0.42 ± 0.07 (unguarded 0.48 ± 0.07); LB 0.28 ± 0.13; miss on blend DL 0.31 / LB 0.32 / DB 0.09 vs on Sleeper 0.43 / 0.40 / 0.20 | Recorded; feeds 2027 priors; no in-season change | A second season agrees beyond 2 SE |
+| DL matchup: opponent QB-hit rate allowed (nflverse play-by-play) | 2024; 2025; 2026 wk 2–10 | Slope +0.39 / pp, t 5.5; per season +0.45 / +0.30 / +0.46; LOSO ΔMAE −0.034 ± 0.036; frozen 0.30: −0.035 ± 0.028. The Sleeper-derived "hits allowed per game" stand-in kept a third of it (−0.022 ± 0.030) | Not used; go/no-go at season end (`docs/status.md` §6) | — |
+
 Previously recorded elsewhere: tier z (`docs/tier-tuning.md`; every z within noise at week 9) and the week-9
 checkpoint (`docs/status.md` §3).

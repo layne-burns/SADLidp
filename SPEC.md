@@ -574,6 +574,13 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - **`sadlidp backtest cross`:** scores the page's settings on a season they weren't fitted on, against settings fitted on another season, with paired per-player differences clustered by week.
     - **Use:** consulted only at checkpoints; nothing is fitted on it.
   - **The projection pair's least-squares share** (§6.5).
+- **2026-11-17 · PR 26, research part 2:**
+  - **FantasyPros' 2025 weekly DL, LB and DB ranks** were pulled once through the live adapter (`&year=`). They are stored with each player's kickoff and each list's last update as `data/2025/archive/fp_weekNN.json`, and never re-fetched to change a result.
+    - `sadlidp backtest blend` answers the three registered questions, kickoff-guarded and not.
+  - **DL matchup (opponent QB-hit rate allowed), measured after the fact:**
+    - `matchup.py` reads nflverse play-by-play (regular-season dropbacks without spikes, shrunk by 4 team-games toward the league rate). `sadlidp backtest matchup` scores it on 2024–2026.
+    - It is not logged live: a past week's rate is rebuilt exactly from play-by-play, so live logging would only add a daily download.
+    - Its coefficient is frozen at 0.30 per percentage point. It never touches μ unless the season-end test in `docs/status.md` §6 passes.
 - **2026-11-17 · PR 25 (decision help, owner decisions):** changed since Tuesday and Tuesday's questionable tags (§6.6); the bye look-ahead, one move per player of yours, and the FAAB context line from saved league transactions (§6.7).
 - **2026-11-17 · PR 23 (decision scoreboard):** the waiver band scored rung by rung, from Sleeper alone to the number shown, and Tuesday's picks against kickoff's (§6.8).
 - **2026-11-17 · PR 21 (Stats page grades what you see):** the §6.8 evaluation protocol, implemented.

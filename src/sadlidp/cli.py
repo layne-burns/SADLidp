@@ -23,7 +23,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import leakcheck
-from .config import DEFAULT_CONFIG, load_config
+from .config import DEFAULT_CONFIG, load_alias, load_config
 from .schedule import ET
 
 
@@ -224,6 +224,42 @@ def cmd_backtest(args: argparse.Namespace) -> int:
         written = backtest.fetch(sleeper, data_dir, season, players, sc, redo=args.redo)
         print(f"backtest: {season}: wrote weeks {written or 'none (already archived)'}")
         return 0
+    if args.what == "fp-fetch":
+        from . import crosswalk
+        from .positions import slot_of
+        from .sync import build_matcher
+
+        client = make_client(cfg)
+        sleeper = Sleeper(client, args.cache_dir)
+        day = datetime.now(ET).date().isoformat()
+        players = {str(k): v for k, v in sleeper.players(day).items()}
+        matcher = build_matcher(cfg, players, crosswalk.load(client, args.cache_dir, day))
+        idp = {pid: p for pid, p in players.items() if slot_of(p)}
+        written = backtest.fp_fetch(client, matcher, data_dir, season, idp, cfg)
+        print(f"backtest: FantasyPros {season}: wrote weeks {written or 'none (already stored)'}")
+        return 0
+    if args.what == "blend":
+        rows = backtest.load(data_dir, season, sc)
+        for guard in (True, False):
+            rep = backtest.blend([dict(r) for r in rows], data_dir, season, guard)
+            print(json.dumps(rep, indent=1, default=str))
+        return 0
+    if args.what == "matchup":
+        from . import matchup
+
+        client = make_client(cfg)
+        day = datetime.now(ET).date().isoformat()
+        aliases = load_alias(cfg, "nflverse_teams")
+        rows = []
+        for s_ in (season - 2, season - 1, season):
+            weekly = matchup.load(client, s_, args.cache_dir, day, aliases)
+            if weekly is None:
+                print(f"backtest matchup: no play-by-play for {s_}; left out")
+                continue
+            live = not backtest.archive_dir(data_dir, s_).exists()
+            rows += backtest.matchup_rows(data_dir, s_, sc, weekly, live=live)
+        print(json.dumps(backtest.matchup_report(rows), indent=1))
+        return 0
     if args.what == "cross":
         fit = args.fit_season or season + 1
         test_rows, fit_rows = backtest.load(data_dir, season, sc), backtest.load(data_dir, fit, sc)
@@ -317,7 +353,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cache-dir", default=".cache")
     p.set_defaults(func=cmd_tune)
     p = sub.add_parser("backtest", parents=[common], help="last season's archive: fetch it, run the checks")
-    p.add_argument("what", choices=["fetch", "run", "dst-fetch", "dst", "patch-teams", "cross"])
+    p.add_argument(
+        "what", choices=["fetch", "run", "dst-fetch", "dst", "patch-teams", "cross", "fp-fetch", "blend", "matchup"]
+    )
     p.add_argument("--fit-season", type=int, help="cross: the season the comparison settings are fitted on")
     p.add_argument("--season", type=int, help="the archived season (default: last year)")
     p.add_argument("--redo", action="store_true", help="refetch weeks already archived")

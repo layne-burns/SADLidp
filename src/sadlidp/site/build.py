@@ -202,7 +202,8 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     views = {v["key"]: v for v in (ev or {}).get("views") or []}
     dbnote = (ev or {}).get("db_note")
     tueq = (ev or {}).get("tuesday_q")
-    faab = league_tx.faab_summary(data_dir, latest[0], stats._positions(Path(data_dir) / str(latest[0])))
+    settings = (storage.read_json(Path(data_dir) / str(latest[0]) / "league.json") or {}).get("settings") or {}
+    faab = league_tx.faab_summary(data_dir, latest[0], stats._positions(Path(data_dir) / str(latest[0])), settings)
     to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:

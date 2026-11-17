@@ -151,7 +151,7 @@ Plan:
   - **Tuesday-Q facts:** 62 of 112 waiver players tagged Q on a pre-waiver page sat out, against 5.7% untagged.
   - **Bye look-ahead** for your players over the next 3 weeks.
   - **One move per player of yours:** e.g. 17 START badges over Kyler Gordon become one, plus "same move: …".
-  - **League transactions saved each sync.** FAAB line: 16 of 24 IDP claims were won with $1 or less; 4 contested ($0–$15); 24 free-agent IDP adds, most on a Wednesday.
+  - **League transactions saved each sync.** FAAB line, as shares of the starting budget ($100 here): 16 of 24 IDP claims were won with a token bid (1% or less); 4 contested (0–15%); 24 free-agent IDP adds, most on a Wednesday.
 - [x] PR 26 (part 1): Sleeper 2024 is a test season (`sadlidp backtest cross`). The least-squares share for the projection pair passed its pre-registered 2025 check and is adopted (ESPN about 66 : Sleeper 34 from week 12), with a week-13 kill switch.
 - [x] PR 26 (part 2):
   - **FantasyPros 2025 weekly ranks stored once.** The three registered questions, guarded (players whose list was updated after their kickoff left out; 1,345 of 4,681):

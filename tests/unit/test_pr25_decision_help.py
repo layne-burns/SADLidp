@@ -58,12 +58,30 @@ def test_faab_line_counts_claims_contests_and_free_agent_days(tmp_path):
     claims.append({"type": "waiver", "status": "failed", "adds": {"p4": 2}, "bid": 9, "leg": 3})  # p4 contested
     claims.append({"type": "waiver", "status": "complete", "adds": {"qb": 1}, "bid": 30, "leg": 3})  # not an IDP
     fa = [{"type": "free_agent", "status": "complete", "adds": {"p6": 1}, "created": wed, "leg": 3}]
+    faab100 = {"waiver_type": 2, "waiver_budget": 100}
     _tx(tmp_path, 3, claims[:4] + fa)
-    assert league_tx.faab_summary(tmp_path, 2026, slots) is None  # 4 claims: too few to say
+    assert league_tx.faab_summary(tmp_path, 2026, slots, faab100) is None  # 4 claims: too few to say
     _tx(tmp_path, 3, claims + fa)
-    out = league_tx.faab_summary(tmp_path, 2026, slots)
-    assert (out["claims"], out["won_at_1"], out["contested"], out["contested_bids"]) == (5, 3, 1, [15, 15])
-    assert out["fa_adds"] == 1 and out["fa_top_day"] == ("Wednesday", 1)
+    out = league_tx.faab_summary(tmp_path, 2026, slots, faab100)
+    assert (out["claims"], out["won_token"], out["contested"], out["contested_pct"]) == (5, 3, 1, [15.0, 15.0])
+    assert out["token_pct"] == 1.0 and out["fa_adds"] == 1 and out["fa_top_day"] == ("Wednesday", 1)
+    assert league_tx.faab_summary(tmp_path, 2026, slots, {"waiver_type": 0, "waiver_budget": 100}) is None  # no FAAB
+
+
+def test_faab_is_read_as_a_share_of_the_leagues_starting_budget(tmp_path):
+    """Leagues start with different budgets (§6.7): the same bids are a different share of $1,000 or $50, and a
+    token bid is at most 1% of the budget, or $1 if that is more."""
+    slots = {f"p{i}": "LB" for i in range(10)}
+    bids = (0, 5, 10, 11, 150)
+    claims = [{"type": "waiver", "status": "complete", "adds": {f"p{i}": 1}, "bid": b, "leg": 2}
+              for i, b in enumerate(bids)]  # fmt: skip
+    claims.append({"type": "waiver", "status": "failed", "adds": {"p4": 3}, "bid": 120, "leg": 2})
+    _tx(tmp_path, 2, claims)
+    big = league_tx.faab_summary(tmp_path, 2026, slots, {"waiver_type": 2, "waiver_budget": 1000})
+    assert big["token_pct"] == 1.0 and big["won_token"] == 3 and big["contested_pct"] == [15.0, 15.0]  # $0, $5, $10
+    small = league_tx.faab_summary(tmp_path, 2026, slots, {"waiver_type": 2, "waiver_budget": 50})
+    assert small["token_pct"] == 2.0 and small["won_token"] == 1  # $1 is the least a token bid can be: only $0
+    assert small["budget"] == 50.0
 
 
 class _Sleeper:

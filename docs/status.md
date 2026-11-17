@@ -184,7 +184,12 @@ Rules: settled weeks only, and the definitions of `docs/eval-protocol.md`. Every
 6. **DL swing re-fit:**
    - Score: paired log score of 4.3 + 2.23·V against 0 + 2.5·V on 2024, on 2025 held out and on 2026 weeks 1–13.
    - Keep the re-fit only if the pooled gain is at least 2 SE; otherwise return to 0 + 2.5·V.
-7. **Source weights:** if the least-squares share is adopted in PR 26, check its kill switch. Revert if the cumulative walk-forward difference against the old rule on weeks 11 and later turns against it at t ≥ +1.
+7. **Source weights: the least-squares share's kill switch** (adopted in PR 26, live from week 12).
+   - **Measure:** for each settled week from 11 on, take the Sleeper/ESPN blend at the least-squares shares and at the error-ratio shares. Both are computed walk-forward from weeks ≤ N − 2, exactly as `accuracy.weights` would.
+   - **Sample and score:** the top-50 pool, squared error demeaned within position-week, and the per-week difference (least squares − ratio) with a week-clustered SE.
+   - **Fires if** the cumulative difference is against the least-squares rule at t ≥ +1.
+   - **Owner decision (2026-11-17, "use your best"):** if it fires, the check-in switches `[weights] projection_rule` back to `"ratio"` itself, in its results PR, without asking. Weeks already written keep their `weights.json`. If it doesn't fire, the rule stays.
+   - **Limit:** three weeks can catch a reversal, not confirm a gain.
 8. **DL matchup (measured after the fact, not logged live).** A past week's opponent hit rate is rebuilt exactly from nflverse play-by-play, so live logging would add a 10 MB download per sync day and no information.
    - At week 13: `sadlidp backtest matchup --season 2026` runs; report only.
    - **Season end, the go/no-go,** with the coefficient frozen at 0.30 points per percentage point:

@@ -28,7 +28,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 {%- macro f1(x) -%}{% if x is none %}—{% else %}{{ '%.1f'|format(x) }}{% endif %}{%- endmacro %}
 {%- macro pct(x) -%}{% if x is none %}—{% else %}{{ (x * 100)|round|int }}%{% endif %}{%- endmacro %}
 {%- macro pm(m, fmt='%.1f') -%}{% if m is not none %} <small>± {{ fmt|format(m) }}</small>{% endif %}{%- endmacro %}
-{%- macro runs(b, m) -%}{% if b is none %}—{% elif m is none %}{% if b|abs < 0.5 %}about right{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{% else %}{{ '%.1f'|format(-b) }} pts low{% endif %}{% elif b|abs <= m %}can't tell{{ pm(m) }}{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{{ pm(m) }}{% else %}{{ '%.1f'|format(-b) }} pts low{{ pm(m) }}{% endif %}{%- endmacro %}
+{%- macro runs(b, m) -%}{% if b is none %}—{% elif m is none %}<small>can't tell from one week ({{ '%.1f'|format(b|abs) }} {{ 'high' if b > 0 else 'low' }})</small>{% elif b|abs <= m %}can't tell{{ pm(m) }}{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{{ pm(m) }}{% else %}{{ '%.1f'|format(-b) }} pts low{{ pm(m) }}{% endif %}{%- endmacro %}
 {%- macro ranks(k) -%}{% if k is none or k.r is none or k.weeks < 4 %}not enough weeks yet{% else %}{% set r = k.r %}{% if k.margin is not none and r|abs <= k.margin %}can't tell yet{% elif r < 0.1 %}barely{% elif r < 0.3 %}weakly{% elif r < 0.5 %}moderately{% else %}well{% endif %} ({{ '%.2f'|format(r) }}{% if k.margin is not none %} ± {{ '%.2f'|format(k.margin) }}{% endif %}){% endif %}{%- endmacro %}
 {%- macro vs(x) -%}{% if x is none or x.diff is none %}—{% elif x.margin is none %}{{ '%+.2f'|format(x.diff) }} <small>(one week can't tell)</small>{% elif x.diff|abs <= x.margin %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, can't tell apart</small>{% else %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, {{ 'ours better' if x.diff < 0 else 'ours worse' }}</small>{% endif %}{%- endmacro %}
 {%- macro decisions(t, label) -%}{{ label }} {{ t.hits }} of {{ t.decided }} decision{{ 's' if t.decided != 1 else '' }} paid off{% if t.expected is not none %} (the odds expected {{ '%.1f'|format(t.expected) }}){% endif %}{% if t.net is not none %}, {{ '%+.1f'|format(t.net) }}{% if t.net_margin is not none %} ± {{ '%.1f'|format(t.net_margin) }}{% endif %} pts per decision{% endif %}{% if t.wilson %}; the true hit rate is likely {{ (t.wilson[0] * 100)|round|int }}–{{ (t.wilson[1] * 100)|round|int }}%{% elif t.decided %}; too few to judge yet{% endif %}.{%- endmacro %}
@@ -90,10 +90,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
         <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
         {% for slot in slots %}
         {% for name, by_slot in srcs.items() %}{% set x = by_slot.get(slot) %}{% if x %}
-        <tr><td>{{ s.source_labels.get(name, name) }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias, none) }}</td>
+        <tr><td>{{ s.source_labels.get(name, name) }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias, x.bias_margin) }}</td>
           <td class="num">{{ pct(x.covered / x.pool) if x.pool else '—' }} <small>({{ x.covered }})</small></td></tr>
         {% endif %}{% endfor %}
-        <tr><td><b>Our number</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias, none) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
+        <tr><td><b>Our number</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias, ss[slot].bias_margin) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
         {% endfor %}
       </table></div>
     </div>

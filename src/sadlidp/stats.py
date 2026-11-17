@@ -181,13 +181,15 @@ def _decisions(picked: list[dict], kind: str) -> dict:
     reps = [min(g, key=lambda e: (-(e.get("p") or 0.0), -(e.get("mu_w") or 0.0), str(e["w"]))) for g in groups.values()]
     decided = [e for e in reps if e["outcome"] in ("hit", "miss", "push")]
     hits = sum(e["outcome"] == "hit" for e in decided)
-    net = [(e.get("pts") or 0.0) - (e.get("over_pts") or 0.0) for e in decided]
-    net_mean, net_se = metrics.mean_se(net)
+    by_week: dict[int, list[float]] = {}  # decisions in one week share its games: clustered by week
+    for e in decided:
+        by_week.setdefault(e["week"], []).append((e.get("pts") or 0.0) - (e.get("over_pts") or 0.0))
+    net_mean, net_se = metrics.cluster_mean(list(by_week.values()))
     badges = [e for e in mine if e["outcome"] in ("hit", "miss", "push")]
     return {
         "hits": hits, "decided": len(decided), "void": sum(e["outcome"] == "void" for e in reps),
         "expected": sum(e.get("p") or 0.0 for e in decided) if decided else None,
-        "net": net_mean, "net_margin": 2 * net_se if net_se is not None else None,
+        "net": net_mean, "net_margin": metrics.margin(net_se, len(by_week)), "weeks": len(by_week),
         "wilson": metrics.wilson(hits, len(decided)) if len(decided) >= 5 else None,
         "badges": {"hits": sum(e["outcome"] == "hit" for e in badges), "decided": len(badges)},
         "reps": {id(e) for e in reps},
@@ -319,7 +321,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         )  # fmt: skip
         weekly.append(row)
         provisional_wk[week] = provisional
-        live_wk[week] = not row["replayed"] and not row["rebuilt"]
+        live_wk[week] = not row["replayed"] and not row["rebuilt"] and not row["fallback"]
         kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
         played_out[week] = bool(kicks and captured) and datetime.fromisoformat(captured) >= max(kicks) + timedelta(
             hours=4
@@ -443,15 +445,19 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         for name in names_src:
             for slot in IDP_SLOTS:
                 acc = {"pred": [], "act": [], "sig": [], "base": [], "covered": 0, "pool": 0}
+                groups = []
                 for w in sel:
                     r = ((raw_src.get(w) or {}).get(name) or {}).get(slot)
                     if not r or (r["partial"] and not keep_partial):
                         continue
                     for k in acc:
                         acc[k] += r[k]
+                    groups.append([p - a for p, a in zip(r["pred"], r["act"], strict=True)])
                 if acc["pool"]:
                     summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
-                    summ.update(covered=acc["covered"], pool=acc["pool"])
+                    _, b_se = metrics.cluster_mean(groups)
+                    summ.update(covered=acc["covered"], pool=acc["pool"],
+                                bias_margin=metrics.margin(b_se, len([g for g in groups if g])))  # fmt: skip
                     by_src.setdefault(name, {})[slot] = summ
         picked = [e for e in suggestions if e["week"] in sel]
         tallies = {kind: _decisions(picked, kind) for kind in ("live", "rebuilt")}
@@ -512,6 +518,11 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     season_out = season_view["by_slot"]
     season_by_source = season_view["by_source"]
     tier_rows = season_view["tiers"]
+    to_date = {}  # week -> the decisions of weeks up to it (a past week's report card, §6.8)
+    for w in all_weeks:
+        upto = [e for e in suggestions if e["week"] <= w]
+        to_date[w] = {kind: {k: v for k, v in _decisions(upto, kind).items() if k != "reps"}
+                      for kind in ("live", "rebuilt")}  # fmt: skip
     db = season_out["DB"]["rank"]
     db_note = {"r": db["r"], "margin": db["margin"],
                "show": db["r"] is None or db["margin"] is None or db["r"] - db["margin"] <= 0.1}  # fmt: skip
@@ -524,6 +535,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "tiers": tier_rows,
         "views": views,
         "db_note": db_note,
+        "decisions_to_date": to_date,
         "season_by_source": season_by_source,
         "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
         # equal priors within each group, 60:40 between them (D11); PR 6 records the accuracy weights in force
@@ -556,14 +568,13 @@ def _weights_now(data_dir, season: int, weeks: list[int], sched: Schedule, cfg: 
     m = accuracy.measure(data_dir, season, max(weeks), sched, cfg)
     if not m["from_weeks"]:
         return None
-    n = len(m["from_weeks"])
     return {
         "weeks": m["from_weeks"],
         "alpha_hat": m["alpha_hat_raw"],
         "alpha_margin": metrics.margin(m.get("alpha_se"), m["alpha_n"]),
         "prior_split": float((cfg.get("weights") or {}).get("prior_split", 0.6)),
         "sources": {
-            SOURCE_LABELS.get(k, k): {"mean_r": v["mean_r"], "margin": metrics.margin(v.get("r_se"), n)}
+            SOURCE_LABELS.get(k, k): {"mean_r": v["mean_r"], "margin": metrics.margin(v.get("r_se"), v["n"])}
             for k, v in m["sources"].items()
         },  # fmt: skip
     }

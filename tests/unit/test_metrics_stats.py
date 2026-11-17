@@ -197,6 +197,7 @@ def test_the_headline_grades_the_frozen_number_with_reference_rows(tmp_path):
     ev = evaluate(data, 2026, cfg)
     w2, before = ev["weekly"][1], plain["weekly"][1]
     assert w2["fallback"] == 1 and w2["by_slot"]["LB"]["n"] == 50
+    assert {x["key"]: x for x in ev["views"]}["season"]["live_weeks"] == []  # a stand-in isn't the page as shown
     assert w2["by_slot"]["LB"]["bias"] == pytest.approx(before["by_slot"]["LB"]["bias"] + 49 / 50)
     assert w2["by_slot"]["LB"]["ref"]["plain"] == pytest.approx(before["by_slot"]["LB"]["mae"])
     assert w2["by_slot"]["LB"]["ref"]["base"] == pytest.approx(before["by_slot"]["LB"]["mae"])  # base = plain here
@@ -234,7 +235,8 @@ def test_suggestions_count_as_decisions(tmp_path):
     assert live["expected"] == pytest.approx(0.70 + 0.66) and live["wilson"] is None  # under 5: too few
     counted = {e["name"] for e in w2["list"] if e["counted"]}
     assert counted == {"p13", "p1"}
-    assert live["net"] == pytest.approx(((18 - 10) + (8 - 12)) / 2)
+    assert live["net"] == pytest.approx(((18 - 10) + (8 - 12)) / 2) and live["net_margin"] is None  # one week
+    assert ev["decisions_to_date"][1]["live"]["decided"] == 0 and ev["decisions_to_date"][3]["live"]["decided"] == 2
 
 
 def test_the_tier_table_scores_only_the_players_shown(tmp_path):
@@ -273,5 +275,10 @@ def test_report_card_counts_decisions_and_the_season():
                                                                                          "net": 10.6}}}  # fmt: skip
     c = report_card(page, view, 9, False, season)
     assert (c["hits"], c["decided"], c["badges"]) == (1, 2, 5)
-    assert (c["season_hits"], c["season_decided"]) == (9, 11)
-    assert c["season_net"] == pytest.approx((5.0 * 6 + 10.6 * 5) / 11) and c["median_miss"] == {"LB": -0.4}
+    assert c["so_far"] == {"live": {"hits": 4, "decided": 6, "net": 5.0},
+                           "rebuilt": {"hits": 5, "decided": 5, "net": 10.6}}  # fmt: skip
+    assert c["median_miss"] == {"LB": -0.4}
+    calls = [{"name": "W", "pts": 2.0, "over_pts": 9.0, "outcome": "miss", "counted": False},
+             {"name": "X", "pts": 1.0, "over_pts": 9.0, "outcome": "miss", "counted": True}]  # fmt: skip
+    c = report_card(page, {"suggestions": {"list": calls}}, 9, False)
+    assert c["worst_call"]["name"] == "X" and c["so_far"] == {}  # only the badge that stands for the decision

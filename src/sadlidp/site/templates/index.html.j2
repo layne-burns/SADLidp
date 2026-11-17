@@ -54,7 +54,7 @@
     <div class="slot report">
       <p class="headline">{% if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).{% else %}None of your IDPs had both a projection and a final score.{% endif %}
         {% if c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}{% if c.badges > c.decided %} <small>({{ c.badges }} badges; several over the same player count once)</small>{% endif %}{% if c.rebuilt %} (rebuilt){% endif %}.{% else %}No suggestions were decided that week.{% endif %}
-        {% if c.season_decided %}Season so far: {{ c.season_hits }} of {{ c.season_decided }}{% if c.season_net is not none %}, {{ '%+.1f'|format(c.season_net) }} pts each{% endif %}.{% endif %}</p>
+        {% if c.so_far %}Season to week {{ c.week }}: {% for k, t in c.so_far.items() %}{{ 'live ' if k == 'live' else 'rebuilt weeks ' }}{{ t.hits }} of {{ t.decided }}{% if t.net is not none %}, {{ '%+.1f'|format(t.net) }} pts each{% endif %}{{ '; ' if not loop.last else '.' }}{% endfor %}{% endif %}</p>
       <ul class="rc">
         {% for x in c.players %}
         <li><span>{{ x.name }} <small>{{ x.slot }}</small></span>

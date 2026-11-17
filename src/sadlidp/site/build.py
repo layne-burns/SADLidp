@@ -106,7 +106,8 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
                              -(x["pts"] or -1.0)))  # fmt: skip
     both = [x for x in mine if x["diff"] is not None]
     sugg = (view or {}).get("suggestions") or {}
-    calls = [e for e in sugg.get("list") or [] if not e.get("reference") and e.get("outcome") in ("hit", "miss")]
+    calls = [e for e in sugg.get("list") or []  # the badge that stands for each decision (§6.8)
+             if e.get("counted", True) and not e.get("reference") and e.get("outcome") in ("hit", "miss")]  # fmt: skip
 
     def margin(e):
         return (e.get("pts") or 0.0) - (e.get("over_pts") or 0.0)
@@ -114,8 +115,7 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
     hits = [e for e in calls if e["outcome"] == "hit"]
     misses = [e for e in calls if e["outcome"] == "miss"]
     tally = [sugg.get(k) or {} for k in ("live", "rebuilt")]
-    so_far = [((season or {}).get("suggestions") or {}).get(k) or {} for k in ("live", "rebuilt")]
-    nets = [(t.get("net"), t.get("decided", 0)) for t in so_far if t.get("decided") and t.get("net") is not None]
+    so_far = (season or {}).get("suggestions") or {}  # decisions of the weeks up to this one, live and rebuilt
     beat = max(both, key=lambda x: x["diff"], default=None)
     short = min(both, key=lambda x: x["diff"], default=None)
     return {
@@ -129,9 +129,11 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
         "decided": sum(t.get("decided", 0) for t in tally),
         "badges": sum((t.get("badges") or {}).get("decided", 0) for t in tally),
         "rebuilt": bool((sugg.get("rebuilt") or {}).get("decided")),
-        "season_hits": sum(t.get("hits", 0) for t in so_far),
-        "season_decided": sum(t.get("decided", 0) for t in so_far),
-        "season_net": sum(n * k for n, k in nets) / sum(k for _, k in nets) if nets else None,
+        "so_far": {
+            k: {x: (so_far.get(k) or {}).get(x) for x in ("hits", "decided", "net")}
+            for k in ("live", "rebuilt")
+            if (so_far.get(k) or {}).get("decided")
+        },  # fmt: skip
         "median_miss": {slot: x.get("median_miss") for slot, x in ((view or {}).get("by_slot") or {}).items()},
         "beat": beat if beat and beat["diff"] > 0 else None,
         "short": short if short and short["diff"] < 0 else None,
@@ -199,6 +201,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     ev = stats.evaluate(data_dir, latest[0], cfg or {})
     views = {v["key"]: v for v in (ev or {}).get("views") or []}
     dbnote = (ev or {}).get("db_note")
+    to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
         data = json.loads((wdir / "consensus.json").read_text())
@@ -215,7 +218,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
         if (season, week) != latest:
             data, final = scored_page(season, wdir)
             if final and season == latest[0]:
-                card = report_card(data, views.get(f"w{week}"), week, final["provisional"], views.get("season"))
+                card = report_card(data, views.get(f"w{week}"), week, final["provisional"], to_date.get(week))
         else:
             data = json.loads((wdir / "consensus.json").read_text())
             prev = by_week.get((season, week - 1))
@@ -223,7 +226,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
                 prev_data, prev_final = scored_page(season, prev)
                 if prev_final:
                     card = report_card(prev_data, views.get(f"w{week - 1}"), week - 1, prev_final["provisional"],
-                                       views.get("season"))  # fmt: skip
+                                       to_date.get(week - 1))  # fmt: skip
         data_name = f"data-{season}-{week:02d}.json"
         html = template.render(
             d=data, slots=("DL", "LB", "DB"), nav=nav, here=(season, week), latest=(season, week) == latest,

@@ -1473,7 +1473,7 @@
    "home": "LAR",
    "kickoff": "2026-11-25T20:00:00-05:00",
    "spread_line": 3.5,
-   "total_line": 45.5,
+   "total_line": 46.5,
    "week": 12
   },
   {
@@ -1481,7 +1481,7 @@
    "game_id": "2026_12_CHI_DET",
    "home": "DET",
    "kickoff": "2026-11-26T13:00:00-05:00",
-   "spread_line": -2.5,
+   "spread_line": -1.5,
    "total_line": 54.5,
    "week": 12
   },

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-17T15:34:44-05:00",
+ "generated_at": "2026-11-17T15:46:45-05:00",
  "last_week": null,
  "league": {
   "limits": {
@@ -12,6 +12,7 @@
  },
  "my_idps": {
   "DB": {
+   "byes": [],
    "count": 2,
    "limit": 2,
    "names": {
@@ -259,6 +260,24 @@
      "action": "choose_drop",
      "badge": "START",
      "drop": null,
+     "others": [
+      "Kevin Winston Jr.",
+      "Joshua Metellus",
+      "Nohl Williams",
+      "Jaquan Brisker",
+      "Jalen Pitre",
+      "Jacob Parrish",
+      "Cole Bishop",
+      "Chamarri Conner",
+      "Minkah Fitzpatrick",
+      "Jev\u00f3n Holland",
+      "Jamel Dean",
+      "Malaki Starks",
+      "Amik Robertson",
+      "Michael Taaffe",
+      "Bryan Cook",
+      "Roger McCreary"
+     ],
      "over": "8365",
      "p": 0.707,
      "player": {
@@ -426,680 +445,11 @@
      },
      "reference": false,
      "why": []
-    },
-    {
-     "action": "choose_drop",
-     "badge": "START",
-     "drop": null,
-     "over": "8365",
-     "p": 0.675,
-     "player": {
-      "also": [],
-      "badge": null,
-      "breakdown": {
-       "base": 12.76,
-       "est": true,
-       "form": {
-        "pts": 0.445,
-        "snap": {
-         "avg": 0.889,
-         "pts": 0.445,
-         "share": 1.0,
-         "week": 10
-        }
-       },
-       "mu": 13.2,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 10.08,
-         "share": 0.2979,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           2.28,
-           false
-          ],
-          [
-           "ast",
-           3.13,
-           false
-          ],
-          [
-           "TFL",
-           0.17,
-           false
-          ],
-          [
-           "sack",
-           0.11,
-           false
-          ],
-          [
-           "QB hit",
-           0.34,
-           false
-          ],
-          [
-           "PD",
-           0.23,
-           false
-          ],
-          [
-           "FF",
-           0.06,
-           false
-          ],
-          [
-           "FR",
-           0.06,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 13.48,
-         "share": 0.3064,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           4.5,
-           false
-          ],
-          [
-           "ast",
-           2.69,
-           false
-          ],
-          [
-           "TFL",
-           0.3,
-           true
-          ],
-          [
-           "QB hit",
-           0.13,
-           true
-          ],
-          [
-           "PD",
-           0.11,
-           false
-          ],
-          [
-           "FF",
-           0.09,
-           false
-          ],
-          [
-           "FR",
-           0.06,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 13.41,
-         "rank": 7,
-         "share": 0.2651,
-         "source": "FantasyPros",
-         "stats": [],
-         "zero": false
-        },
-        {
-         "missing": "nothing posted for this week yet",
-         "source": "RotoBaller"
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 15.86,
-         "rank": 1,
-         "share": 0.1306,
-         "source": "FantasyData",
-         "stats": [],
-         "zero": false
-        }
-       ]
-      },
-      "ceiling": 18.1,
-      "flags": [],
-      "floor": 8.0,
-      "id": "12588",
-      "kickoff": "2026-11-22T13:00:00-05:00",
-      "late": false,
-      "max": 15.86,
-      "min": 10.08,
-      "mine": false,
-      "mu": 13.2,
-      "n": 4,
-      "name": "Kevin Winston Jr.",
-      "opp": "@DAL",
-      "result": null,
-      "sigma": 2.06,
-      "slot": "DB",
-      "swing": 6.49,
-      "team": "TEN",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": false,
-     "why": []
-    },
-    {
-     "action": "choose_drop",
-     "badge": "START",
-     "drop": null,
-     "over": "8365",
-     "p": 0.663,
-     "player": {
-      "also": [
-       "LB"
-      ],
-      "badge": null,
-      "breakdown": {
-       "base": 12.5,
-       "est": true,
-       "form": {
-        "pts": 0.445,
-        "snap": {
-         "avg": 0.889,
-         "pts": 0.445,
-         "share": 1.0,
-         "week": 10
-        }
-       },
-       "mu": 12.94,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 10.99,
-         "share": 0.2979,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           2.97,
-           false
-          ],
-          [
-           "ast",
-           2.26,
-           false
-          ],
-          [
-           "TFL",
-           0.11,
-           false
-          ],
-          [
-           "sack",
-           0.08,
-           false
-          ],
-          [
-           "QB hit",
-           0.11,
-           false
-          ],
-          [
-           "PD",
-           0.33,
-           false
-          ],
-          [
-           "INT",
-           0.11,
-           false
-          ],
-          [
-           "FR",
-           0.11,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 14.19,
-         "share": 0.3064,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           4.34,
-           false
-          ],
-          [
-           "ast",
-           2.6,
-           false
-          ],
-          [
-           "TFL",
-           0.06,
-           true
-          ],
-          [
-           "sack",
-           0.07,
-           false
-          ],
-          [
-           "QB hit",
-           0.14,
-           true
-          ],
-          [
-           "PD",
-           0.47,
-           false
-          ],
-          [
-           "INT",
-           0.12,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 12.38,
-         "rank": 17,
-         "share": 0.2651,
-         "source": "FantasyPros",
-         "stats": [],
-         "zero": false
-        },
-        {
-         "missing": "nothing posted for this week yet",
-         "source": "RotoBaller"
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 12.2,
-         "rank": 19,
-         "share": 0.1306,
-         "source": "FantasyData",
-         "stats": [],
-         "zero": false
-        }
-       ]
-      },
-      "ceiling": 18.0,
-      "flags": [],
-      "floor": 7.5,
-      "id": "6901",
-      "kickoff": "2026-11-22T20:20:00-05:00",
-      "late": false,
-      "max": 14.19,
-      "min": 10.99,
-      "mine": false,
-      "mu": 12.94,
-      "n": 4,
-      "name": "Joshua Metellus",
-      "opp": "@SF",
-      "result": null,
-      "sigma": 1.73,
-      "slot": "DB",
-      "swing": 6.75,
-      "team": "MIN",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": false,
-     "why": []
-    },
-    {
-     "action": "choose_drop",
-     "badge": "START",
-     "drop": null,
-     "over": "8365",
-     "p": 0.655,
-     "player": {
-      "also": [],
-      "badge": null,
-      "breakdown": {
-       "base": 12.33,
-       "est": true,
-       "form": {
-        "pts": 0.445,
-        "snap": {
-         "avg": 0.889,
-         "pts": 0.445,
-         "share": 1.0,
-         "week": 10
-        }
-       },
-       "mu": 12.77,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 11.16,
-         "share": 0.2979,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           2.94,
-           false
-          ],
-          [
-           "ast",
-           1.47,
-           false
-          ],
-          [
-           "TFL",
-           0.24,
-           false
-          ],
-          [
-           "sack",
-           0.09,
-           false
-          ],
-          [
-           "QB hit",
-           0.12,
-           false
-          ],
-          [
-           "PD",
-           0.65,
-           false
-          ],
-          [
-           "INT",
-           0.12,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 14.52,
-         "share": 0.3064,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           3.38,
-           false
-          ],
-          [
-           "ast",
-           1.33,
-           false
-          ],
-          [
-           "TFL",
-           0.44,
-           true
-          ],
-          [
-           "QB hit",
-           0.06,
-           true
-          ],
-          [
-           "PD",
-           1.19,
-           false
-          ],
-          [
-           "INT",
-           0.26,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 12.0,
-         "rank": 25,
-         "share": 0.2651,
-         "source": "FantasyPros",
-         "stats": [],
-         "zero": false
-        },
-        {
-         "missing": "nothing posted for this week yet",
-         "source": "RotoBaller"
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 10.52,
-         "rank": 42,
-         "share": 0.1306,
-         "source": "FantasyData",
-         "stats": [],
-         "zero": false
-        }
-       ]
-      },
-      "ceiling": 18.0,
-      "flags": [],
-      "floor": 7.2,
-      "id": "12622",
-      "kickoff": "2026-11-22T13:00:00-05:00",
-      "late": false,
-      "max": 14.52,
-      "min": 10.52,
-      "mine": false,
-      "mu": 12.77,
-      "n": 4,
-      "name": "Nohl Williams",
-      "opp": "ARI",
-      "result": null,
-      "sigma": 1.86,
-      "slot": "DB",
-      "swing": 6.97,
-      "team": "KC",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": false,
-     "why": []
-    },
-    {
-     "action": "choose_drop",
-     "badge": "START",
-     "drop": null,
-     "over": "8365",
-     "p": 0.654,
-     "player": {
-      "also": [],
-      "badge": null,
-      "breakdown": {
-       "base": 12.27,
-       "est": true,
-       "form": {
-        "pts": 0.445,
-        "snap": {
-         "avg": 0.889,
-         "pts": 0.445,
-         "share": 1.0,
-         "week": 10
-        }
-       },
-       "mu": 12.72,
-       "parts": [
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 10.39,
-         "share": 0.2979,
-         "source": "Sleeper",
-         "stats": [
-          [
-           "solo",
-           2.6,
-           false
-          ],
-          [
-           "ast",
-           2.35,
-           false
-          ],
-          [
-           "TFL",
-           0.19,
-           false
-          ],
-          [
-           "QB hit",
-           0.06,
-           false
-          ],
-          [
-           "PD",
-           0.5,
-           false
-          ],
-          [
-           "INT",
-           0.12,
-           false
-          ],
-          [
-           "FF",
-           0.06,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "kind": "projection",
-         "late": false,
-         "pts": 14.31,
-         "share": 0.3064,
-         "source": "ESPN",
-         "stats": [
-          [
-           "solo",
-           3.91,
-           false
-          ],
-          [
-           "ast",
-           1.53,
-           false
-          ],
-          [
-           "TFL",
-           0.39,
-           true
-          ],
-          [
-           "sack",
-           0.08,
-           false
-          ],
-          [
-           "PD",
-           0.86,
-           false
-          ],
-          [
-           "INT",
-           0.16,
-           false
-          ]
-         ],
-         "zero": false
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 12.84,
-         "rank": 10,
-         "share": 0.2651,
-         "source": "FantasyPros",
-         "stats": [],
-         "zero": false
-        },
-        {
-         "missing": "nothing posted for this week yet",
-         "source": "RotoBaller"
-        },
-        {
-         "censored": false,
-         "kind": "rank",
-         "late": false,
-         "list": "DB",
-         "pts": 10.63,
-         "rank": 41,
-         "share": 0.1306,
-         "source": "FantasyData",
-         "stats": [],
-         "zero": false
-        }
-       ]
-      },
-      "ceiling": 17.8,
-      "flags": [],
-      "floor": 7.3,
-      "id": "8314",
-      "kickoff": "2026-11-19T20:15:00-05:00",
-      "late": false,
-      "max": 14.31,
-      "min": 10.39,
-      "mine": false,
-      "mu": 12.72,
-      "n": 4,
-      "name": "Jalen Pitre",
-      "opp": "IND",
-      "result": null,
-      "sigma": 1.93,
-      "slot": "DB",
-      "swing": 6.79,
-      "team": "HOU",
-      "tier": null,
-      "unavailable": []
-     },
-     "reference": false,
-     "why": []
     }
    ]
   },
   "DL": {
+   "byes": [],
    "count": 1,
    "limit": 2,
    "names": {
@@ -1287,6 +637,14 @@
    "suggestions": []
   },
   "LB": {
+   "byes": [
+    {
+     "id": "4960",
+     "name": "Roquan Smith",
+     "team": "BAL",
+     "week": 13
+    }
+   ],
    "count": 2,
    "limit": 2,
    "names": {
@@ -1644,6 +1002,7 @@
    "no_projection": 111,
    "played": [],
    "played_hidden": 0,
+   "since_tuesday": null,
    "tier_count": 7,
    "tiers": [
     {
@@ -5633,6 +4992,7 @@
    "no_projection": 100,
    "played": [],
    "played_hidden": 0,
+   "since_tuesday": null,
    "tier_count": 6,
    "tiers": [
     {
@@ -9600,6 +8960,7 @@
    "no_projection": 55,
    "played": [],
    "played_hidden": 0,
+   "since_tuesday": null,
    "tier_count": 8,
    "tiers": [
     {
@@ -13646,10 +13007,10 @@
  "sources": {
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-11-17T15:34:44-05:00",
+   "last_success": "2026-11-17T15:46:45-05:00",
    "match": {
     "names": [
      "Jeremiah Moon CAR DL",
@@ -13681,10 +13042,10 @@
   "fantasydata": {
    "censored": 89,
    "error": null,
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "rank",
    "label": "FantasyData",
-   "last_success": "2026-11-17T15:34:44-05:00",
+   "last_success": "2026-11-17T15:46:45-05:00",
    "mapped": 300,
    "match": {
     "names": [],
@@ -13710,18 +13071,18 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-11-17T15:34:44-05:00",
+   "last_success": "2026-11-17T15:46:45-05:00",
    "merge": {
     "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 16,
-    "updated": 10
+    "unchanged": 26,
+    "updated": 0
    },
    "no_projection": 0,
    "rows": 26,
@@ -13733,10 +13094,10 @@
   "fp_ecr": {
    "censored": 88,
    "error": null,
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-11-17T15:34:44-05:00",
+   "last_success": "2026-11-17T15:46:45-05:00",
    "mapped": 278,
    "match": {
     "names": [],
@@ -13744,13 +13105,13 @@
     "unmatched": 0
    },
    "merge": {
-    "added": 34,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 162,
-    "updated": 82
+    "unchanged": 278,
+    "updated": 0
    },
    "no_projection": 0,
    "observed_after": "2026-11-17T20:12:16+00:00",
@@ -13763,7 +13124,7 @@
   "rotoballer": {
    "error": "no week-11 article in the feed's first 3 pages",
    "expected_by": "2026-11-19T12:00:00-05:00",
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "rank",
    "label": "RotoBaller",
    "last_success": null,
@@ -13778,10 +13139,10 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-11-17T15:34:44-05:00",
+   "fetched_at": "2026-11-17T15:46:45-05:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-11-17T15:34:44-05:00",
+   "last_success": "2026-11-17T15:46:45-05:00",
    "merge": {
     "added": 0,
     "deleted": 0,

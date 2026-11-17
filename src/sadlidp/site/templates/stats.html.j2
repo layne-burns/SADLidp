@@ -27,41 +27,55 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 <body>
 {%- macro f1(x) -%}{% if x is none %}—{% else %}{{ '%.1f'|format(x) }}{% endif %}{%- endmacro %}
 {%- macro pct(x) -%}{% if x is none %}—{% else %}{{ (x * 100)|round|int }}%{% endif %}{%- endmacro %}
-{%- macro runs(b) -%}{% if b is none %}—{% elif b|abs < 0.5 %}about right{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{% else %}{{ '%.1f'|format(-b) }} pts low{% endif %}{%- endmacro %}
-{%- macro ranks(r, n) -%}{% if r is none %}not enough games yet{% elif r < 0.1 %}barely ({{ '%.2f'|format(r) }}){% elif r < 0.3 %}weakly ({{ '%.2f'|format(r) }}){% elif r < 0.5 %}moderately ({{ '%.2f'|format(r) }}){% else %}well ({{ '%.2f'|format(r) }}){% endif %}{%- endmacro %}
-{%- macro view(v, dbr) -%}
+{%- macro pm(m, fmt='%.1f') -%}{% if m is not none %} <small>± {{ fmt|format(m) }}</small>{% endif %}{%- endmacro %}
+{%- macro runs(b, m) -%}{% if b is none %}—{% elif m is none %}{% if b|abs < 0.5 %}about right{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{% else %}{{ '%.1f'|format(-b) }} pts low{% endif %}{% elif b|abs <= m %}can't tell{{ pm(m) }}{% elif b > 0 %}{{ '%.1f'|format(b) }} pts high{{ pm(m) }}{% else %}{{ '%.1f'|format(-b) }} pts low{{ pm(m) }}{% endif %}{%- endmacro %}
+{%- macro ranks(k) -%}{% if k is none or k.r is none or k.weeks < 4 %}not enough weeks yet{% else %}{% set r = k.r %}{% if k.margin is not none and r|abs <= k.margin %}can't tell yet{% elif r < 0.1 %}barely{% elif r < 0.3 %}weakly{% elif r < 0.5 %}moderately{% else %}well{% endif %} ({{ '%.2f'|format(r) }}{% if k.margin is not none %} ± {{ '%.2f'|format(k.margin) }}{% endif %}){% endif %}{%- endmacro %}
+{%- macro vs(x) -%}{% if x is none or x.diff is none %}—{% elif x.margin is none %}{{ '%+.2f'|format(x.diff) }} <small>(one week can't tell)</small>{% elif x.diff|abs <= x.margin %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, can't tell apart</small>{% else %}{{ '%+.2f'|format(x.diff) }} <small>± {{ '%.2f'|format(x.margin) }}, {{ 'ours better' if x.diff < 0 else 'ours worse' }}</small>{% endif %}{%- endmacro %}
+{%- macro decisions(t, label) -%}{{ label }} {{ t.hits }} of {{ t.decided }} decision{{ 's' if t.decided != 1 else '' }} paid off{% if t.expected is not none %} (the odds expected {{ '%.1f'|format(t.expected) }}){% endif %}{% if t.net is not none %}, {{ '%+.1f'|format(t.net) }}{% if t.net_margin is not none %} ± {{ '%.1f'|format(t.net_margin) }}{% endif %} pts per decision{% endif %}{% if t.wilson %}; the true hit rate is likely {{ (t.wilson[0] * 100)|round|int }}–{{ (t.wilson[1] * 100)|round|int }}%{% elif t.decided %}; too few to judge yet{% endif %}.{%- endmacro %}
+{%- macro view(v, dbn) -%}
   {% set ss = v.by_slot %}{% set single = v.weeks|length == 1 %}
   {% set live = v.suggestions.live %}{% set reb = v.suggestions.rebuilt %}
   <p class="headline">{% if single %}Week {{ v.weeks[0] }}{% else %}Weeks {{ v.weeks[0] }}–{{ v.weeks[-1] }}{% endif %}:
-    {% if live.decided or reb.decided %}suggestions paid off {{ live.hits + reb.hits }} of {{ live.decided + reb.decided }}{% if reb.decided and not live.decided %} (rebuilt){% endif %}{% else %}no suggestions decided{% endif %};
-    projections missed by {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
+    {% if live.decided or reb.decided %}suggestions paid off in {{ live.hits + reb.hits }} of {{ live.decided + reb.decided }} decisions{% if reb.decided and not live.decided %} (rebuilt){% endif %}{% else %}no suggestions decided{% endif %};
+    the number the page showed missed by {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
     {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}</p>
   <section aria-labelledby="close-h-{{ v.key }}">
-    <h2 id="close-h-{{ v.key }}">How close were the projections?</h2>
+    <h2 id="close-h-{{ v.key }}">How close was our number?</h2>
     <div class="slot">
-      <p>For the {{ s.n_eval }} best-projected players at each position{{ '' if single else ' each week' }}, our number missed by
+      <p>For the {{ s.n_eval }} best-projected players at each position{{ '' if single else ' each week' }} (picked by the plain average of the projection sources, so no number picks its own players), the number the page showed before kickoff missed by
         {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
         {% if not single %}{% set part = s.weekly|selectattr('week', 'in', v.weeks)|selectattr('partial_slots')|map(attribute='week')|list %}{% if part %}Week{{ 's' if part|length > 1 else '' }} {{ part|join(', ') }} {{ 'are' if part|length > 1 else 'is' }} only partly covered (the projections saved before kickoff cover some games only), so {{ 'they are' if part|length > 1 else 'it is' }} left out of these numbers.{% endif %}{% endif %}
+        {% set rep = s.weekly|selectattr('week', 'in', v.weeks)|rejectattr('week', 'in', v.live_weeks)|map(attribute='week')|list %}{% if rep %}{{ 'Week' if rep|length == 1 else 'Weeks' }} {{ rep|join(', ') }} {{ 'was' if rep|length == 1 else 'were' }} rebuilt after the fact from saved projections (in full or in part), not shown live.{% if not single and v.live_weeks %} Live weeks only ({{ v.live_weeks|join(', ') }}): {{ f1(ss.DL.live_mae) }} / {{ f1(ss.LB.live_mae) }} / {{ f1(ss.DB.live_mae) }}.{% endif %}{% endif %}
         {% if ss.DL.mae_base %}A simple guess, each player's own average so far, missed by {{ f1(ss.DL.mae_base) }} / {{ f1(ss.LB.mae_base) }} / {{ f1(ss.DB.mae_base) }} on the same players (ours: {{ f1(ss.DL.mae_ours_on_base) }} / {{ f1(ss.LB.mae_ours_on_base) }} / {{ f1(ss.DB.mae_ours_on_base) }}).{% endif %}</p>
       <table>
         <tr><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th>{{ 'Top-12 hits' if single else 'Ranks players right' }}</th></tr>
         {% for slot in slots %}{% set x = ss[slot] %}
-        <tr><td>{{ slot }}{% if x.partial %} <small>partial</small>{% endif %}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td><td>{% if single %}{{ top12(x.top12) }}{% else %}{{ ranks(x.spearman, x.n) }}{% endif %}</td></tr>
+        <tr><td>{{ slot }}{% if x.partial %} <small>partial</small>{% endif %}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias, x.bias_margin) }}</td><td>{% if single %}{{ top12(x.top12) }}{% if x.top12_random %} <small>(random: {{ f1(x.top12_random[0]) }})</small>{% endif %}{% else %}{{ ranks(x.rank) }}{% endif %}</td></tr>
         {% endfor %}
       </table>
-      {% if single %}<p class="note">Top-12 hits: of our 12 best-projected, how many finished in the actual top 12 (random picks from the 50 would land about 3). How well the order matches is shown season-long only, once there are enough games.</p>{% endif %}
-      {% for slot in slots %}{% set b = ss[slot].bias %}{% if b is not none and b|abs >= 1 %}
-      <p class="note">{{ slot }} numbers run about {{ '%.1f'|format(b|abs) }} pts {{ 'high' if b > 0 else 'low' }} on average. Suggestions only compare {{ slot }}s with other {{ slot }}s, so a shift shared by all of them changes no suggestion; it isn't corrected.</p>
+      {% if single %}<p class="note">Top-12 hits: of our 12 best, how many finished in the actual top 12; "random" is what 12 picked at random from the {{ s.n_eval }} would land on average. How well the order matches is shown over several weeks only.</p>{% else %}<p class="note">"Ranks players right" is the rank correlation between our number and the scores within each week, averaged over the weeks, ± its margin of error (about 95%). "Runs high/low" says "can't tell" when the gap is inside its margin.</p>{% endif %}
+      {% for slot in slots %}{% set x = ss[slot] %}{% set b = x.bias %}{% if b is not none and x.bias_margin is not none and b|abs > x.bias_margin and b|abs >= 1 %}
+      <p class="note">{{ slot }} numbers run about {{ '%.1f'|format(b|abs) }} pts {{ 'high' if b > 0 else 'low' }} on average{% if x.median_miss is not none %}, but the typical {{ slot }} scored {{ '%+.1f'|format(x.median_miss) }} against his number: a few big games pull the average{% endif %}. Suggestions only compare {{ slot }}s with other {{ slot }}s, so a shift shared by all of them changes no suggestion; it isn't corrected.</p>
       {% endif %}{% endfor %}
-      {% if dbr is not none and dbr < 0.1 %}<p class="note dbnote"><b>DBs:</b> so far this season, the order of the DB projections barely matches the order of the scores (r {{ '%.2f'|format(dbr) }}; last season's waiver DBs: 0.01). Treat DB tiers as rough. A DB's snap share and form, both in his breakdown on the main page, say more than a point or two of projection.</p>{% endif %}
-      <details><summary>More stats</summary>
+      {% if dbn and dbn.show %}<p class="note dbnote"><b>DBs:</b> so far this season, our DB order barely matches the order of the scores (r {% if dbn.r is not none %}{{ '%.2f'|format(dbn.r) }}{% if dbn.margin is not none %} ± {{ '%.2f'|format(dbn.margin) }}{% endif %}{% else %}not measured yet{% endif %}; last season's waiver DBs: 0.01). Treat DB tiers as rough. A DB's snap share and form, both in his breakdown on the main page, say more than a point or two of projection.</p>{% endif %}
+      <details><summary>Our number against simpler versions of it</summary>
+        <p class="note">The same players scored three ways: the number the page showed; the same number before the form term ("before form"); and the plain average of the projection sources (Sleeper and ESPN), which this page used to grade until 2026-11-17. The difference is ours minus the other, week by week, ± its margin of error.</p>
         <div class="scroll"><table>
-          <tr><th>Pos</th><th class="num">Player-games</th><th class="num">Typical miss (RMSE)</th><th class="num">Inside ±1 range (aim 68%)</th><th class="num">Inside ±2 (aim 95%)</th><th class="num">Top-12 hits</th><th class="num">R²</th><th class="num">Correlation</th></tr>
+          <tr><th>Pos</th><th class="num">Ours</th><th class="num">Before form</th><th>Ours − before form</th><th class="num">Plain average</th><th>Ours − plain average</th></tr>
           {% for slot in slots %}{% set x = ss[slot] %}
-          <tr><td>{{ slot }}</td><td class="num">{{ x.n }}</td><td class="num">{{ f1(x.rmse) }}</td><td class="num">{{ pct(x.within1) }}</td><td class="num">{{ pct(x.within2) }}</td>
-            <td class="num">{{ top12(x.top12) }}</td><td class="num">{{ '%.2f'|format(x.r2) if x.r2 is not none else '—' }}</td><td class="num">{{ '%.2f'|format(x.pearson) if x.pearson is not none else '—' }}</td></tr>
+          <tr><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td class="num">{{ f1(x.ref.base.mae) }}</td><td>{{ vs(x.ref.base) }}</td><td class="num">{{ f1(x.ref.plain.mae) }}</td><td>{{ vs(x.ref.plain) }}</td></tr>
           {% endfor %}
         </table></div>
+      </details>
+      <details><summary>More stats</summary>
+        <div class="scroll"><table>
+          <tr><th>Pos</th><th class="num">Player-games</th><th class="num">Typical miss (RMSE)</th><th class="num">Below / inside / above the range (aim 20 / 60 / 20)</th><th class="num">Spread check (aim 1.00)</th><th class="num">Top-12 hits (random)</th></tr>
+          {% for slot in slots %}{% set x = ss[slot] %}{% set c = x.coverage %}
+          <tr><td>{{ slot }}</td><td class="num">{{ x.n }}</td><td class="num">{{ f1(x.rmse) }}</td><td class="num">{% if c %}{{ pct(c.below) }} / {{ pct(c.inside) }} / {{ pct(c.above) }} <small>({{ c.n }})</small>{% else %}—{% endif %}</td><td class="num">{% if c and c.spread is not none %}{{ '%.2f'|format(c.spread) }}{% else %}—{% endif %}</td>
+            <td class="num">{{ top12(x.top12) }}{% if x.top12_random %} <small>({{ f1(x.top12_random[0]) }} ± {{ f1(2 * x.top12_random[1]) }})</small>{% endif %}</td></tr>
+          {% endfor %}
+        </table></div>
+        <p class="note">The range is each card's floor to ceiling; it is meant to catch 3 games in 5, with 1 in 5 below and 1 in 5 above. Weeks before the cards had a range (1–4) aren't counted. The spread check compares the misses with the stated spread: 1.00 means the odds are as sure as they should be, above 1 overconfident, below 1 too timid.</p>
       </details>
     </div>
   </section>
@@ -71,15 +85,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <section aria-labelledby="src-h-{{ v.key }}">
     <h2 id="src-h-{{ v.key }}">Each source on the same players</h2>
     <div class="slot">
-      <p>The players are picked by all sources together, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly if w.week in v.weeks %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
+      <p>The players are picked by the plain average of the projections, so no source chooses its own. Each source is scored on the ones it projected; "Covered" is how many of them that was.{% set mid = [] %}{% for w in s.weekly if w.week in v.weeks %}{% for name in w.joined_midweek or [] %}{% set _ = mid.append(s.source_labels.get(name, name) ~ ' in week ' ~ w.week) %}{% endfor %}{% endfor %}{% if mid %} A source first read live partway through a week only covers the games still to come ({{ mid|join(', ') }}); projections for games already played are never kept.{% endif %}</p>
       <div class="scroll"><table>
         <tr><th>Source</th><th>Pos</th><th class="num">Avg miss (pts)</th><th>Runs high/low</th><th class="num">Covered</th></tr>
         {% for slot in slots %}
         {% for name, by_slot in srcs.items() %}{% set x = by_slot.get(slot) %}{% if x %}
-        <tr><td>{{ s.source_labels.get(name, name) }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias) }}</td>
+        <tr><td>{{ s.source_labels.get(name, name) }}</td><td>{{ slot }}</td><td class="num">{{ f1(x.mae) }}</td><td>{{ runs(x.bias, none) }}</td>
           <td class="num">{{ pct(x.covered / x.pool) if x.pool else '—' }} <small>({{ x.covered }})</small></td></tr>
         {% endif %}{% endfor %}
-        <tr><td><b>All together</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
+        <tr><td><b>Our number</b></td><td>{{ slot }}</td><td class="num"><b>{{ f1(ss[slot].mae) }}</b></td><td>{{ runs(ss[slot].bias, none) }}</td><td class="num">100% <small>({{ ss[slot].n }})</small></td></tr>
         {% endfor %}
       </table></div>
     </div>
@@ -89,14 +103,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <section aria-labelledby="sugg-h-{{ v.key }}">
     <h2 id="sugg-h-{{ v.key }}">Did the suggestions pay off?</h2>
     <div class="slot">
-      <p>{% if live.decided %}Live suggestions: {{ live.hits }} of {{ live.decided }} paid off (the suggested player outscored the one he was compared with).{% elif not reb.decided %}No suggestions were decided {{ 'this week' if single else 'yet' }}.{% endif %}
-        {% if reb.decided %}{{ 'This week was rebuilt after the fact' if single else 'On the rebuilt weeks' }}: {{ reb.hits }} of {{ reb.decided }} would have paid off.{% endif %}
-        Suggestions shown only for reference aren't counted, and a void one (a player who didn't play) isn't either.</p>
+      <p>{% if live.decided %}{{ decisions(live, 'Live:') }}{% elif not reb.decided %}No suggestions were decided {{ 'this week' if single else 'yet' }}.{% endif %}
+        {% if reb.decided %}{{ decisions(reb, 'This week was rebuilt after the fact:' if single else 'On the rebuilt weeks:') }}{% endif %}</p>
+      <p class="note">A decision is one week, one position and one of your players a suggestion was measured against: several badges over the same player are one choice, so the most likely one stands for it{% if (live.badges.decided + reb.badges.decided) > (live.decided + reb.decided) %} ({{ live.badges.decided + reb.badges.decided }} badges in all, {{ live.badges.hits + reb.badges.hits }} paid off){% endif %}. "Paid off" means the suggested player outscored the one he was compared with; the odds expected the sum of the badges' percentages. Suggestions shown only for reference aren't counted, and a void one (a player who didn't play) isn't either.</p>
       {% if single and v.suggestions.list %}
       <ul class="calls">
         {% for e in v.suggestions.list %}
         <li class="{{ e.outcome or '' }}{% if e.reference %} ref{% endif %}"><span class="mark">{% if e.outcome == 'hit' %}✓{% elif e.outcome == 'miss' %}✗{% else %}·{% endif %}</span>
-          <span>{{ e.badge }} <b>{{ e.name }}</b> <small>{{ e.slot }}</small> {{ f1(e.pts) }}{% if e.over_name %} vs {{ e.over_name }} {{ f1(e.over_pts) }}{% endif %}{% if e.p is not none %} <small>({{ [(e.p * 100)|round|int, 99]|min }}% said)</small>{% endif %}{% if e.reference %} <small>for reference</small>{% endif %}{% if e.outcome == 'void' %} <small>void</small>{% endif %}</span></li>
+          <span>{{ e.badge }} <b>{{ e.name }}</b> <small>{{ e.slot }}</small> {{ f1(e.pts) }}{% if e.over_name %} vs {{ e.over_name }} {{ f1(e.over_pts) }}{% endif %}{% if e.p is not none %} <small>({{ [(e.p * 100)|round|int, 99]|min }}% said)</small>{% endif %}{% if e.reference %} <small>for reference</small>{% elif not e.counted %} <small>same decision</small>{% endif %}{% if e.outcome == 'void' %} <small>void</small>{% endif %}</span></li>
         {% endfor %}
       </ul>
       {% endif %}
@@ -108,12 +122,16 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     <div class="slot">
       {% set nums = (v.tiers.DL + v.tiers.LB + v.tiers.DB)|map(attribute='tier')|unique|sort %}
       {% if nums %}
-      <p>Average score of the players in each tier as shown when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), with the number of player-games. Higher tiers should score more.</p>
-      <p class="note">The ± is the margin of error (about 95%): one game swings a player's score by around 7 points, while the waiver players a position shows are usually projected within 2 to 4 points of each other. Where two tiers' ranges overlap, the games {{ 'this week' if single else 'so far' }} can't tell them apart, even if the tiers are right.</p>
+      <p>Average score of the {{ s.depth }} players each position showed when you set waivers (the Tuesday sync; rebuilt weeks: before their first game), by tier and by place in the list, with the number of player-games. Higher tiers should score more.</p>
+      <p>{% for slot in slots %}{% set o = v.tier_order[slot] %}{{ slot }}: {% if o.r is none or o.weeks < 2 %}not enough weeks yet{% elif o.margin is not none and o.r - o.margin > 0 %}higher in the list scored more ({{ '%.2f'|format(o.r) }} ± {{ '%.2f'|format(o.margin) }}){% else %}no clear order yet ({{ '%.2f'|format(o.r) }}{% if o.margin is not none %} ± {{ '%.2f'|format(o.margin) }}{% endif %}){% endif %}{{ '; ' if not loop.last else '.' }}{% endfor %}</p>
+      <p class="note">The ± is the margin of error (about 95%): one game swings a player's score by around 7 points, while the waiver players a position shows are usually projected within 2 to 4 points of each other. Where two tiers' ranges overlap, the games {{ 'this week' if single else 'so far' }} can't tell them apart, even if the tiers are right. The order line is the rank correlation between place in the list and score, week by week.</p>
       <div class="scroll"><table>
         <tr><th>Tier</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}</tr>
         {% for n in nums %}
         <tr><td>Tier {{ n }}</td>{% for slot in slots %}{% set t = v.tiers[slot]|selectattr('tier', 'equalto', n)|first %}<td class="num">{% if t %}{{ f1(t.avg) }}{% if t.margin is not none %} <small>±{{ f1(t.margin) }}</small>{% endif %} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
+        {% endfor %}
+        {% for b in v.tier_buckets.DL %}{% set i = loop.index0 %}
+        <tr><td>Shown {{ b.lo }}–{{ b.hi }}</td>{% for slot in slots %}{% set t = v.tier_buckets[slot][i] %}<td class="num">{% if t.n %}{{ f1(t.avg) }}{% if t.margin is not none %} <small>±{{ f1(t.margin) }}</small>{% endif %} <small>({{ t.n }})</small>{% else %}—{% endif %}</td>{% endfor %}</tr>
         {% endfor %}
       </table></div>
       {% else %}<p class="note">No tiers were saved from before the waiver run {{ 'this week' if single else 'yet' }}.</p>{% endif %}
@@ -130,23 +148,23 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <p class="note">No week has final stats yet.</p>
 {% else %}
   {% set ss = s.season_by_slot %}
-  {% set dbr = ss.DB.spearman %}
+  {% set dbn = s.db_note %}
   <div class="tabs views">
     {% for v in s.views %}<input type="radio" name="view" id="view-{{ v.key }}"{% if loop.first %} checked{% endif %}><label for="view-{{ v.key }}" class="{{ 'wk' if v.key.startswith('w') else 'main' }}">{{ v.label }}</label>{% endfor %}
     {% for v in s.views %}
-    <div class="tabpanel" id="vpanel-{{ v.key }}">{{ view(v, dbr) }}</div>
+    <div class="tabpanel" id="vpanel-{{ v.key }}">{{ view(v, dbn) }}</div>
     {% endfor %}
   </div>
 
   <section aria-labelledby="weeks-h">
     <h2 id="weeks-h">Week by week</h2>
     <div class="slot">
-      <p class="note">Average miss in points. "archive" = projections fetched after the week from the sources' archives; "late" = some captured after kickoff.</p>
+      <p class="note">Average miss of the number the page showed, in points. "rebuilt" = the week's numbers were rebuilt after the fact (in full or in part); "archive" = projections fetched after the week from the sources' archives; "late" = some captured after kickoff.</p>
       <table>
         <tr><th>Wk</th>{% for slot in slots %}<th class="num">{{ slot }}</th>{% endfor %}<th></th></tr>
         {% for w in s.weekly %}
         <tr><td>{{ w.week }}</td>{% for slot in slots %}{% set x = w.by_slot[slot] %}<td class="num">{{ f1(x.mae) }}{% if x.partial %} <small>partial ({{ x.n }})</small>{% endif %}</td>{% endfor %}
-          <td><small>{% if w.provisional %}provisional {% endif %}{% if w.backfill %}archive{% endif %}{% if w.late %} · late{% endif %}</small></td></tr>
+          <td><small>{% if w.provisional %}provisional {% endif %}{% if w.replayed or w.rebuilt %}rebuilt {% endif %}{% if w.backfill %}archive{% endif %}{% if w.late %} · late{% endif %}</small></td></tr>
         {% endfor %}
       </table>
     </div>
@@ -156,16 +174,18 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     <h2 id="odds-h">Are the START/UPGRADE odds honest?</h2>
     <div class="slot">
       <p>For every pair of pool players at a position, we checked how often the one we favoured actually scored more.
-        Odds score (a coin flip is 0.250; lower is better): {% for slot in slots %}{% set x = ss[slot] %}{{ slot }} {% if x.brier is none %}—{% else %}{{ '%.3f'|format(x.brier) }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}.
-        {% set o = namespace(better=[], even=[], worse=[]) %}{% for slot in slots %}{% set b = ss[slot].brier %}{% if b is not none %}{% if b < 0.245 %}{% set o.better = o.better + [slot] %}{% elif b > 0.255 %}{% set o.worse = o.worse + [slot] %}{% else %}{% set o.even = o.even + [slot] %}{% endif %}{% endif %}{% endfor %}
-        {% if o.better %}Better than a coin flip at {{ o.better|join(', ') }}. {% endif %}{% if o.even %}About as good as a coin flip at {{ o.even|join(', ') }}. {% endif %}{% if o.worse %}Worse than a coin flip at {{ o.worse|join(', ') }}: the odds there are overconfident. {% endif %}{% if o.even or o.worse %}Treat a 60–75% badge as a slight lean, not a sure thing.{% endif %}</p>
+        Odds score (a coin flip is 0.250; lower is better): {% for slot in slots %}{% set x = ss[slot] %}{{ slot }} {% if x.brier is none %}—{% else %}{{ '%.3f'|format(x.brier) }}{% if x.brier_margin is not none %} <small>± {{ '%.3f'|format(x.brier_margin) }}</small>{% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}.
+        {% set o = namespace(better=[], even=[], worse=[]) %}{% for slot in slots %}{% set x = ss[slot] %}{% set b = x.brier %}{% if b is not none %}{% set m = x.brier_margin if x.brier_margin is not none else 0.005 %}{% if 0.25 - b > m %}{% set o.better = o.better + [slot] %}{% elif b - 0.25 > m %}{% set o.worse = o.worse + [slot] %}{% else %}{% set o.even = o.even + [slot] %}{% endif %}{% endif %}{% endfor %}
+        {% if o.better %}Better than a coin flip at {{ o.better|join(', ') }}. {% endif %}{% if o.even %}Can't tell from a coin flip yet at {{ o.even|join(', ') }}. {% endif %}{% if o.worse %}Worse than a coin flip at {{ o.worse|join(', ') }}: the odds there are overconfident. {% endif %}{% if o.even or o.worse %}Treat a 60–75% badge as a slight lean, not a sure thing.{% endif %}
+        The ± is week to week: pairs from the same week share that week's surprises, so they count as one week's evidence, not many.</p>
       <details><summary>When we said X%, how often did it happen?</summary>
         <table>
-          <tr><th>Pos</th><th class="num">We said</th><th class="num">Happened</th><th class="num">Pairs</th></tr>
+          <tr><th>Pos</th><th class="num">We said</th><th class="num">Happened</th><th class="num">Pairs</th><th class="num">Favoured players</th></tr>
           {% for slot in slots %}{% for c in ss[slot].calibration %}
-          <tr><td>{{ slot }}</td><td class="num">{{ pct(c.said) }}</td><td class="num">{{ pct(c.happened) }}</td><td class="num">{{ c.n }}</td></tr>
+          <tr><td>{{ slot }}</td><td class="num">{{ pct(c.said) }}</td><td class="num">{% if c.too_few %}<small>too few</small>{% else %}{{ pct(c.happened) }}{% endif %}</td><td class="num">{{ c.n }}</td><td class="num">{{ c.favourites }}</td></tr>
           {% endfor %}{% endfor %}
         </table>
+        <p class="note">"Favoured players" counts the distinct player-weeks the odds favoured: a row resting on fewer than 20 can be one player's one game, so it shows "too few".</p>
       </details>
     </div>
   </section>
@@ -176,6 +196,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
       {% set hist = s.weights_history or [] %}{% set now = hist[-1] if hist else none %}
       <p>{% if s.sources|length == 1 %}Only {{ s.sources[0].name }} so far: it's 100% of every number.{% else %}Each source's share of a player's number when every source has him{% if now %} this week (week {{ now.week }}){% endif %}: {% if now %}{% for name, sh in now.shares.items() %}{{ name }} {{ pct(sh) }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{% for x in s.sources %}{{ x.name }} {{ pct(x.share) }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. Where a source has nothing for a player, the others' shares grow to fill its place. A ranking becomes points by giving rank N the Nth-best projection among the players it ranks.{% endif %}</p>
       <p>{% if now and now.method == 'accuracy' %}The shares follow each source's measured accuracy on weeks {{ now.from_weeks|join(', ') }}{% if now.alpha_hat is not none %}; the best mix of projections and rankings on those weeks was {{ pct(now.alpha_hat) }} projections (capped at 20–80%){% endif %}. Every estimate is pulled toward the starting shares (projections {{ pct(s.prior_split) }}, sources equal within each group) until it has many weeks behind it, so one odd week moves little.{% else %}{% set has_rank = s.sources|selectattr('kind', 'equalto', 'rank')|list %}These are the starting shares: {% if has_rank %}projections {{ pct(s.prior_split) }}, rankings {{ pct(1 - s.prior_split) }}, sources equal within each group{% else %}sources equal{% endif %}.{% if now and now.reason %} ({{ now.reason|capitalize }}.){% endif %} From 3 scored weeks on, each source's share follows its measured accuracy.{% endif %} A week uses results up to two weeks before it, and its shares are fixed at its first sync, so they never change under a page you've already seen.</p>
+      {% set wn = s.weights_now %}{% if wn and wn.alpha_hat is not none %}
+      <p>Measured on every settled week so far ({{ wn.weeks|join(', ') }}), the best mix was {{ pct(wn.alpha_hat) }} projections{% if wn.alpha_margin is not none %} ± {{ (wn.alpha_margin * 100)|round|int }} points{% endif %}{% if wn.alpha_margin is not none and (wn.alpha_hat - wn.prior_split)|abs <= wn.alpha_margin %}: not distinguishable from the {{ pct(wn.prior_split) }} starting point, so week-to-week moves in the shares are noise{% endif %}.
+        {% if wn.sources %}Each source's error against the blend (1.00 = as good as the blend; lower is better): {% for name, x in wn.sources.items() %}{{ name }} {{ '%.2f'|format(x.mean_r) }}{% if x.margin is not none %} <small>± {{ '%.2f'|format(x.margin) }}</small>{% endif %}{{ ', ' if not loop.last else '.' }}{% endfor %}{% endif %}</p>
+      {% endif %}
       {% if hist|length > 1 %}
       <details><summary>Shares week by week</summary>
         <div class="scroll"><table>
@@ -215,13 +239,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
       <li><b>Avg miss</b>: the average gap between our number and what the player scored. Lower is better.</li>
       <li><b>Simple guess</b>: the player's own average so far this season (players with 2+ games). If we don't beat it, the projections add nothing.</li>
       <li><b>Runs high/low</b>: whether our numbers are too high or too low on average.</li>
-      <li><b>Ranks players right</b>: how well the order of our numbers matches the order of the scores (0 = no better than random, 1 = perfect). Shown only once there are {{ s.min_corr_n }}+ player-games.</li>
-      <li><b>Inside ±1 / ±2 range</b>: how often the score landed within one or two "typical swings" of our number. About 68% and 95% means the ranges are honest.</li>
+      <li><b>Our number</b>: the μ the page showed at a player's last sync before his game (the frozen record), the number every suggestion and tier used.</li>
+      <li><b>Ranks players right</b>: how well the order of our numbers matches the order of the scores within a week (0 = no better than random, 1 = perfect), averaged over the weeks, ± its margin of error. Shown from 4 weeks on.</li>
+      <li><b>Below / inside / above the range</b>: how often the score landed below the card's floor, between floor and ceiling, or above the ceiling. About 20 / 60 / 20 means the ranges are honest. IDP scores have long tails, so the old "68% within one swing" target doesn't apply.</li>
+      <li><b>Spread check</b>: the typical miss divided by the stated spread. 1.00 means the odds are as sure as they should be.</li>
+      <li><b>Decision</b>: one week, one position and one of your players that suggestions were measured against. Several badges over the same player count once.</li>
+      <li><b>± (margin of error)</b>: about a 95% range, from how much the number moves week to week. "Can't tell" means the difference is inside it.</li>
       <li><b>Typical miss (RMSE)</b>: like the average miss, but big misses count extra.</li>
-      <li><b>Top-12 hits</b>: of our 12 best-projected, how many finished in the actual top 12 at the position (ties at 12th count). Picking 12 of the 50 at random would land about 3.</li>
-      <li><b>Correlation</b>: how closely our numbers and the scores rise and fall together (0 = not at all, 1 = perfectly).</li>
+      <li><b>Top-12 hits</b>: of our 12 best-projected, how many finished in the actual top 12 at the position (ties at 12th count). "Random" is what 12 picked at random from the 50 would land: about 12 × (how many of the actual top 12 were among the 50) ÷ 50.</li>
       <li><b>Odds score</b> (Brier): how good our win probabilities are. A coin flip scores 0.250; lower is better.</li>
-      <li><b>R²</b>: below 0 means a flat guess of the average would have done better.</li>
     </ul>
   </details>
 {% endif %}

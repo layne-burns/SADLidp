@@ -53,13 +53,15 @@
     <h2 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h2>
     <div class="slot report">
       <p class="headline">{% if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).{% else %}None of your IDPs had both a projection and a final score.{% endif %}
-        {% if c.decided %}Suggestions paid off <b>{{ c.hits }} of {{ c.decided }}</b>{% if c.rebuilt %} (rebuilt){% endif %}.{% else %}No suggestions were decided that week.{% endif %}</p>
+        {% if c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}{% if c.badges > c.decided %} <small>({{ c.badges }} badges; several over the same player count once)</small>{% endif %}{% if c.rebuilt %} (rebuilt){% endif %}.{% else %}No suggestions were decided that week.{% endif %}
+        {% if c.season_decided %}Season so far: {{ c.season_hits }} of {{ c.season_decided }}{% if c.season_net is not none %}, {{ '%+.1f'|format(c.season_net) }} pts each{% endif %}.{% endif %}</p>
       <ul class="rc">
         {% for x in c.players %}
         <li><span>{{ x.name }} <small>{{ x.slot }}</small></span>
           <span class="num">{% if x.mu is not none %}{{ '%.1f'|format(x.mu) }}{% else %}<small>no projection</small>{% endif %} → {% if x.pts is not none %}<b>{{ '%.0f'|format(x.pts) }}</b>{% elif x.state == 'dnp' %}<small>did not play</small>{% else %}<small>—</small>{% endif %}{% if x.diff is not none %} <small class="{{ 'up' if x.diff >= 0 else 'down' }}">{{ '%+.1f'|format(x.diff) }}</small>{% endif %}</span></li>
         {% endfor %}
       </ul>
+      {% set mm = c.median_miss or {} %}{% if mm.DL is not none or mm.LB is not none or mm.DB is not none %}<p class="note">For comparison, the typical top-50 player that week scored {% for slot in slots %}{% if mm[slot] is not none %}{{ '%+.1f'|format(mm[slot]) }} ({{ slot }}){% else %}— ({{ slot }}){% endif %}{{ ', ' if not loop.last else '' }}{% endfor %} against his projection.</p>{% endif %}
       {% if c.beat or c.short or c.best_call or c.worst_call %}<dl class="rcx">
         {% if c.beat %}<dt>Biggest beat</dt><dd>{{ c.beat.name }}: {{ '%.0f'|format(c.beat.pts) }} vs {{ '%.1f'|format(c.beat.mu) }} projected</dd>{% endif %}
         {% if c.short %}<dt>Biggest shortfall</dt><dd>{{ c.short.name }}: {{ '%.0f'|format(c.short.pts) }} vs {{ '%.1f'|format(c.short.mu) }} projected</dd>{% endif %}
@@ -121,7 +123,7 @@
       {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
       {% for slot in slots %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
-        {% if slot == 'DB' and dbr is defined and dbr is not none and dbr < 0.1 %}<p class="note dbnote">Projections barely tell waiver DBs apart (this season r {{ '%.2f'|format(dbr) }}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>{% endif %}
+        {% if slot == 'DB' and dbnote is defined and dbnote and dbnote.show %}<p class="note dbnote">Projections barely tell waiver DBs apart (this season r {% if dbnote.r is not none %}{{ '%.2f'|format(dbnote.r) }}{% if dbnote.margin is not none %} ± {{ '%.2f'|format(dbnote.margin) }}{% endif %}{% else %}not measured yet{% endif %}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>{% endif %}
         {% for t in pos.tiers %}
         <div class="card">
           <p class="tierhead">Tier {{ t.tier }}</p>

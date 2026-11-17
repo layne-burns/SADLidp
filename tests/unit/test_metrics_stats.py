@@ -119,7 +119,8 @@ def test_views_last_week_season_and_each_week(tmp_path):
     assert views["w3"]["by_slot"]["LB"]["partial"] and views["w1"]["by_slot"]["LB"]["spearman"] is None
     call = views["w2"]["suggestions"]["list"][0]
     assert (call["name"], call["pts"], call["over_pts"], call["outcome"]) == ("p0", 6.0, 8.0, "miss")
-    assert views["w2"]["suggestions"]["live"] == {"hits": 0, "decided": 1, "void": 0}
+    live = views["w2"]["suggestions"]["live"]
+    assert (live["hits"], live["decided"], live["void"], live["expected"]) == (0, 1, 0, 0.7)
     assert views["w1"]["suggestions"]["list"] == [] and ev["suggestions"]["live"]["decided"] == 1
 
 
@@ -154,3 +155,123 @@ def test_last_week_skips_a_week_still_being_played(tmp_path):
     act.write_text(json.dumps(doc))
     ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
     assert ev["views"][0]["weeks"] == [2] and ev["views"][-1]["key"] == "w3"
+
+
+def test_uncertainty_helpers():
+    assert metrics.margin(0.1, 9) == pytest.approx(0.2306)  # t(0.975, 8 df) at 9 weeks
+    assert metrics.margin(0.1, 12) == pytest.approx(0.2) and metrics.margin(0.1, 1) is None
+    m, se = metrics.cluster_mean([[1.0, 2.0], [3.0, 4.0], [5.0]])
+    assert m == pytest.approx(3.0) and se == pytest.approx((1.5 * (3**2 + 1**2 + 2**2)) ** 0.5 / 5)
+    lo, hi = metrics.wilson(9, 11)
+    assert lo == pytest.approx(0.523, abs=1e-3) and hi == pytest.approx(0.949, abs=1e-3)
+    cov = metrics.coverage([1.0, 5.0, 9.0, 4.0], [4.0, 4.0, 4.0, 4.0], [8.0, 8.0, 8.0, 8.0])
+    assert (cov["below"], cov["inside"], cov["above"]) == (0.25, 0.5, 0.25)  # on the floor counts as inside
+    assert metrics.spread_ratio([0.0, 0.0], [2.0, -2.0], [2.0, 2.0]) == pytest.approx(1.0)
+    pool = [f"p{i}" for i in range(50)]
+    actual = {pid: (100.0 if i < 6 else 1.0) for i, pid in enumerate(pool)} | {f"x{i}": 100.0 for i in range(6)}
+    exp, var = metrics.top_k_random(pool, actual, 12)
+    assert exp == pytest.approx(12 * 6 / 50) and var > 0  # 6 of the actual top 12 were in the pool
+    pairs = [(0.85, 1, "1:a")] * 13 + [(0.55, 0, f"1:{i}") for i in range(25)]
+    rows = {r["lo"]: r for r in metrics.calibration(pairs)}
+    assert rows[0.8]["favourites"] == 1 and rows[0.8]["too_few"] and not rows[0.5]["too_few"]
+
+
+def _frozen(wd, recs):
+    (wd / "frozen.json").write_text(json.dumps({"players": recs}))
+
+
+def test_the_headline_grades_the_frozen_number_with_reference_rows(tmp_path):
+    """§6.8: the number the page showed is graded, on the pool the plain average picks; before form and the
+    plain average are reference rows; σ_pred and the range come from the frozen record."""
+    data = _season(tmp_path)
+    cfg = load_config(ROOT / "config" / "sadl.toml")
+    plain = evaluate(data, 2026, cfg)
+    wd = data / "2026" / "week02"
+    src = json.loads((wd / "sources" / "sleeper_proj.json").read_text())["rows"]
+    recs = {}
+    for i, pid in enumerate(src):
+        p = 2 * (3 + i * 0.05)
+        recs[pid] = {"mu": p + 1.0, "base": p, "sigma": 1.0, "swing": 4.0, "floor": p - 3, "ceiling": p + 3}
+    del recs["p30"]  # a pool player with no frozen record: the plain average stands in, counted
+    _frozen(wd, recs)
+    ev = evaluate(data, 2026, cfg)
+    w2, before = ev["weekly"][1], plain["weekly"][1]
+    assert w2["fallback"] == 1 and w2["by_slot"]["LB"]["n"] == 50
+    assert w2["by_slot"]["LB"]["bias"] == pytest.approx(before["by_slot"]["LB"]["bias"] + 49 / 50)
+    assert w2["by_slot"]["LB"]["ref"]["plain"] == pytest.approx(before["by_slot"]["LB"]["mae"])
+    assert w2["by_slot"]["LB"]["ref"]["base"] == pytest.approx(before["by_slot"]["LB"]["mae"])  # base = plain here
+    v = {x["key"]: x for x in ev["views"]}["w2"]["by_slot"]["LB"]
+    assert v["coverage"]["n"] == 49 and v["ref"]["plain"]["margin"] is None  # one week: no margin
+    t = cfg["tiers"]
+    fallback_sig = (max(t["s0_default"], t["sigma_floor"]["LB"]) ** 2 + cfg["sigma_out"]["LB"] ** 2) ** 0.5
+    ids = [i for i in range(9, 59)]  # the 50 best by the plain average who played (p59 didn't)
+    pred = [2 * (3 + i * 0.05) + (0 if i == 30 else 1) for i in ids]
+    sig = [fallback_sig if i == 30 else 17**0.5 for i in ids]  # σ_pred = √(σ_μ² + swing²) = √(1 + 16)
+    assert v["coverage"]["spread"] == pytest.approx(metrics.spread_ratio(pred, [2 * (3 + i % 7) for i in ids], sig))
+    season = ev["season_by_slot"]["LB"]
+    assert season["ref"]["plain"]["weeks"] == 3 and season["ref"]["plain"]["margin"] is not None
+    assert season["rank"]["weeks"] == 3 and ev["db_note"]["show"]  # no DBs at all: the note stays on
+
+
+def test_suggestions_count_as_decisions(tmp_path):
+    """§6.8: badges over the same (week, position, compared player, kind) are one decision, represented by
+    the highest-p badge (ties: higher μ); reference badges are left out; a push is decided, not paid off."""
+    data = _season(tmp_path)
+    badges = {
+        "a": {"w": "p0", "over": "p9", "badge": "UPGRADE", "slot": "LB", "p": 0.62, "mu_w": 9.0, "active": True},
+        "b": {"w": "p6", "over": "p9", "badge": "UPGRADE", "slot": "LB", "p": 0.70, "mu_w": 8.0, "active": True},
+        "c": {"w": "p13", "over": "p9", "badge": "UPGRADE", "slot": "LB", "p": 0.70, "mu_w": 9.5, "active": True},
+        "d": {"w": "p1", "over": "p3", "badge": "START", "slot": "LB", "p": 0.66, "active": True},
+        "e": {"w": "p2", "over": "p9", "badge": "UPGRADE", "slot": "LB", "p": 0.95, "active": True,
+              "reference": True},
+    }  # fmt: skip
+    (data / "2026" / "week02" / "badges.json").write_text(json.dumps({"badges": badges}))
+    ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
+    w2 = {x["key"]: x for x in ev["views"]}["w2"]["suggestions"]
+    live = w2["live"]
+    # actual points: p13 → 2·(3+13%7)=18, p9 → 10, p1 → 8, p3 → 12: c (higher μ of the p=0.70 pair) hits, d misses
+    assert (live["decided"], live["hits"], live["badges"]["decided"]) == (2, 1, 4)
+    assert live["expected"] == pytest.approx(0.70 + 0.66) and live["wilson"] is None  # under 5: too few
+    counted = {e["name"] for e in w2["list"] if e["counted"]}
+    assert counted == {"p13", "p1"}
+    assert live["net"] == pytest.approx(((18 - 10) + (8 - 12)) / 2)
+
+
+def test_the_tier_table_scores_only_the_players_shown(tmp_path):
+    """§6.8: the pre-waiver log holds the whole pool from week 6 on; only the `depth` shown per position
+    count, in (tier, −μ) order, with rank buckets and the order's correlation."""
+    data = _season(tmp_path)
+    log = {f"p{i}": {"slot": "LB", "tier": 1 + i // 10, "mu": 20.0 - i * 0.1} for i in range(60)}
+    for week in (1, 2, 3):
+        (data / "2026" / f"week{week:02d}" / "tiers_log.json").write_text(json.dumps({"prewaiver": {"players": log}}))
+    ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
+    rows = ev["tiers"]["LB"]
+    assert sum(r["n"] for r in rows) == 3 * 25 and [r["tier"] for r in rows] == [1, 2, 3]
+    season = {x["key"]: x for x in ev["views"]}["season"]
+    assert [b["n"] for b in season["tier_buckets"]["LB"]] == [15, 15, 45]
+    assert season["tier_order"]["LB"]["weeks"] == 3
+
+
+def test_measure_reports_the_week_to_week_noise_of_the_mix():
+    from sadlidp import accuracy
+
+    cells = {1: [1.0, 2.0], 2: [3.0, 4.0], 3: [1.0, 1.0]}
+    se = accuracy._jackknife(cells, 5.0, 7.0)
+    loo = [(5 - 1) / (7 - 2), (5 - 3) / (7 - 4), (5 - 1) / (7 - 1)]
+    m = sum(loo) / 3
+    assert se == pytest.approx((2 / 3 * sum((x - m) ** 2 for x in loo)) ** 0.5)
+    assert accuracy._jackknife({1: [1.0, 2.0]}, 1.0, 2.0) is None
+
+
+def test_report_card_counts_decisions_and_the_season():
+    from sadlidp.site.build import report_card
+
+    page = {"my_idps": {"LB": {"players": [{"name": "A", "mu": 10.0, "result": {"state": "final", "pts": 12.0}}]}}}
+    view = {"suggestions": {"live": {"hits": 1, "decided": 2, "badges": {"decided": 5}}, "rebuilt": {}, "list": []},
+            "by_slot": {"LB": {"median_miss": -0.4}}}  # fmt: skip
+    season = {"suggestions": {"live": {"hits": 4, "decided": 6, "net": 5.0}, "rebuilt": {"hits": 5, "decided": 5,
+                                                                                         "net": 10.6}}}  # fmt: skip
+    c = report_card(page, view, 9, False, season)
+    assert (c["hits"], c["decided"], c["badges"]) == (1, 2, 5)
+    assert (c["season_hits"], c["season_decided"]) == (9, 11)
+    assert c["season_net"] == pytest.approx((5.0 * 6 + 10.6 * 5) / 11) and c["median_miss"] == {"LB": -0.4}

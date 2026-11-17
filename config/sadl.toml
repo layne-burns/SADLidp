@@ -33,12 +33,12 @@ lo = -0.8                   # floor = μ + lo·swing, ceiling = μ + hi·swing: 
 hi = 0.75
 
 [swing.a]                   # swing² = a + b · Σ (points per stat)² × projected stat; fitted on 2025 (`sadlidp backtest run`)
-DL = 0.0
+DL = 4.3                    # DL re-fitted on 2025 + 2026 weeks 1–9 at the week-9 checkpoint (2026-11-17); LB, DB unchanged
 LB = 18.0
 DB = 27.0
 
 [swing.b]
-DL = 2.5
+DL = 2.23
 LB = 1.35
 DB = 0.65
 

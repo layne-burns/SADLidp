@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import accuracy, scoring, storage, swing, weeklog
+from . import accuracy, league_tx, scoring, storage, swing, weeklog
 from . import backfill as backfillmod
 from . import crosswalk as crosswalkmod
 from . import form as formmod
@@ -23,7 +23,7 @@ from .consensus import consensus
 from .impute import load_or_build_priors
 from .matching import Matcher, load_nicknames, load_overrides
 from .net import Client
-from .pool import PlayerStatus, player_status, rostered_ids
+from .pool import HIDE_INJURY, PlayerStatus, player_status, rostered_ids
 from .positions import IDP_SLOTS, also_eligible, player_name, slot_of
 from .rankmap import rank_values
 from .roster import panel, starter_slots
@@ -240,6 +240,7 @@ def build_week_logs(
     now: datetime,
     prewaiver: bool,
     claimed: Callable[[str], str | None] = lambda pid: None,
+    flags_of: Callable[[str], list] = lambda pid: [],
 ) -> tuple[dict, dict]:
     """badges.json and tiers_log.json documents for later evaluation (weeklog.py); written by the caller.
     `claimed(pid)` says who has rostered a player ("me", "other" or None)."""
@@ -257,13 +258,68 @@ def build_week_logs(
     prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
     badges = {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now, claimed)}
     rows = {
-        pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3)}
+        pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3),
+              **({"flags": list(f)} if (f := flags_of(pid)) else {})}  # injury tags as shown (Q), §6.6
         for slot in IDP_SLOTS
         for t in tiers_by_slot[slot]
         for pid in t["players"]
-    }
+    }  # fmt: skip
     tiers = weeklog.update_tiers_log(storage.read_json(wdir / "tiers_log.json") or {}, rows, now, kickoff_of, prewaiver)
     return badges, tiers
+
+
+SINCE_TUE_MOVE = 1.5  # a μ move this big since Tuesday is listed (fixed once, about σ_μ's scale; SPEC §6.6)
+
+
+def since_tuesday(slot: str, prewaiver: dict | None, order: list[str], cons: dict, idp: dict,
+                  status_of: Callable[[str], PlayerStatus],
+                  claimed: Callable[[str], str | None]) -> list[dict] | None:  # fmt: skip
+    """What changed since the pre-waiver page for Tuesday's top 5 at `slot` (SPEC §6.6, 2026-11-17): now Out,
+    Doubtful or questionable, claimed, a μ move of SINCE_TUE_MOVE or more, and players new to the top 5.
+    Facts only: nothing is re-ranked or discounted."""
+    tue = {pid: r for pid, r in ((prewaiver or {}).get("players") or {}).items() if r.get("slot") == slot}
+    if not tue:
+        return None
+    top = sorted(tue, key=lambda pid: (tue[pid].get("tier") or 99, -(tue[pid].get("mu") or 0.0), pid))
+    out = []
+    for rank, pid in enumerate(top[:5], start=1):
+        st, then = status_of(pid), tue[pid]
+        item = {"id": pid, "name": player_name(idp.get(pid, {})), "rank": rank, "mu_tue": then.get("mu"),
+                "mu": round(cons[pid]["mu"], 2) if pid in cons else None, "changes": []}  # fmt: skip
+        who = claimed(pid)
+        if who:
+            item["changes"].append("you claimed him" if who == "me" else "claimed by another team")
+        injury = [r for r in st.reasons if r in HIDE_INJURY]
+        if injury:
+            item["changes"].append(f"now {injury[0]}")
+        elif "Q" in st.flags and "Q" not in (then.get("flags") or []):
+            item["changes"].append("now questionable")
+        if item["mu"] is not None and item["mu_tue"] is not None and abs(item["mu"] - item["mu_tue"]) >= SINCE_TUE_MOVE:
+            item["changes"].append(f"μ {item['mu_tue']:.1f} → {item['mu']:.1f}")
+        if item["changes"]:
+            out.append(item)
+    for pid in order[:5]:
+        if pid not in top[:5]:
+            was = top.index(pid) + 1 if pid in top else None
+            out.append({"id": pid, "name": player_name(idp.get(pid, {})), "rank": None, "mu": round(cons[pid]["mu"], 2),
+                        "changes": [f"new in the top 5 (Tuesday #{was})" if was else "new in the top 5"]})  # fmt: skip
+    return out
+
+
+def bye_lookahead(roster_ids: list[str], reserve: set | list, players: dict, sched: Schedule, week: int,
+                  ahead: int = 3) -> list[dict]:  # fmt: skip
+    """Your rostered players at a position (IR left out) with a bye in the next `ahead` weeks (schedule facts)."""
+    out = []
+    for pid in roster_ids:
+        p = players.get(pid) or {}
+        team = p.get("team")
+        if pid in reserve or not team:
+            continue
+        for w in range(week + 1, week + 1 + ahead):
+            if sched.week_games(w) and sched.game_for(team, w) is None:
+                out.append({"id": pid, "name": player_name(p), "team": team, "week": w})
+                break
+    return out
 
 
 def live_results(payload, pids, sc: dict, status_of: Callable[[str], PlayerStatus], now: datetime) -> dict[str, dict]:
@@ -756,6 +812,13 @@ def run_sync(
         log,
     )
     matchups = _guard("matchups", lambda: sleeper.matchups(league["league_id"], week)[0], None, warnings, log)
+    _guard(
+        "transactions",
+        lambda: league_tx.sync_legs(sleeper, league["league_id"], data_dir, season, week, now),
+        None,
+        warnings,
+        log,
+    )  # FAAB context (§6.7): saved each sync, shown as counts only
     my_matchup = next((m for m in (matchups or []) if me and m.get("roster_id") == me.get("roster_id")), {})
     lineup = starter_slots(league.get("roster_positions") or [], my_matchup.get("starters"))
     # a locked rostered player is judged on his status at kickoff (a later injury tag can't empty the slot)
@@ -778,7 +841,7 @@ def run_sync(
 
     logs = _guard("decision logs", lambda: build_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of,
                                                          now, prewaiver=bool(window and window.kind == "pre-waiver"),
-                                                         claimed=claimed),
+                                                         claimed=claimed, flags_of=lambda pid: status_of(pid).flags),
                   (None, None), warnings, log)  # fmt: skip
     badge_doc, tiers_doc = logs
     started = [pid for pid in idp if status_of(pid).locked]
@@ -823,7 +886,10 @@ def run_sync(
             card = _player_card(pid, idp[pid], cons[pid], status_of(pid), logged_tier.get(pid), None, False)
             card["result"] = results.get(pid)
             played.append(card)
+        since_tue = (since_tuesday(slot, (tiers_doc or {}).get("prewaiver"), waiver_order[slot], cons, idp, status_of,
+                                   claimed) if not (window and window.kind == "pre-waiver") else None)  # fmt: skip
         positions_out[slot] = {
+            "since_tuesday": since_tue,
             "tiers": out_tiers,
             "tier_count": len(tiers_by_slot[slot]),
             "hidden": len(waiver_order[slot]) - shown,
@@ -843,11 +909,18 @@ def run_sync(
             card.update(reserve=pid in pnl["reserve"], taxi=pid in pnl["taxi"], role=(
                 "starter" if pid == pnl["starter"] else "other" if pid == pnl["other"] else None))  # fmt: skip
             cards.append(card)
+        # several badges over the same player of yours are one move (§6.7, 2026-11-17): the likeliest stands for it
+        moves: dict[tuple, list[tuple[str, dict]]] = {}
+        for w, b in pnl["badges"].items():
+            moves.setdefault((b["badge"], b.get("over"), b["reference"]), []).append((w, b))
+        reps = []
+        for members in moves.values():
+            members.sort(key=lambda wb: (-(wb[1].get("p") or 0.0), -cons[wb[0]]["mu"], wb[0]))
+            (w, b), rest = members[0], members[1:]
+            reps.append((w, {**b, "others": [player_name(idp[x]) for x, _ in rest]}))
         suggestions = [
             {**b, "player": _player_card(w, idp[w], cons[w], status_of(w), None, None, False)}
-            for w, b in sorted(pnl["badges"].items(), key=lambda kv: (kv[1]["reference"], -cons[kv[0]]["mu"], kv[0]))[
-                :5
-            ]
+            for w, b in sorted(reps, key=lambda kv: (kv[1]["reference"], -cons[kv[0]]["mu"], kv[0]))[:5]
         ]
         names = {pid: player_name(players.get(pid, {})) for pid in pnl["players"]}
         played_sugg = []  # issued this week (active at lock) and already locked: shown with their results
@@ -878,6 +951,7 @@ def run_sync(
             "limit": pnl["limit"],
             "starter_locked": pnl["starter_locked"],
             "suggestions": suggestions,
+            "byes": bye_lookahead(pnl["players"], pnl["reserve"], players, sched, week),
             "played_suggestions": played_sugg[:6],
             "played_suggestions_hidden": max(0, len(played_sugg) - 6),
             "names": names,

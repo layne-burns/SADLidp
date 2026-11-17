@@ -290,6 +290,18 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 ### 6.6 Anchored significance tiers (per position)
 Tiers are computed over the available pool after §2 filters, locked players removed, sorted by (−μ, sleeper_id). The first player anchors Tier 1. Each next player i joins the current tier while `μ_anchor − μ_i ≤ z·√(σ_anchor² + σ_i²)`, with σ = σ_μ. Otherwise he starts a new tier as its anchor. Default z = 0.75 (config; 1.0 until it was tuned on weeks 1–4 with `sadlidp tune`, 2026-10-12, see `docs/tier-tuning.md`). Comparing every player to the tier's top player prevents chaining, and the tiers are contiguous and deterministic. Display truncation doesn't change upper tiers. **Rostered players never anchor.** Let a1 be the Tier 1 anchor. A rostered player m is shown as "above Tier 1" if `μ_m − μ_a1 > z·√(σ_a1² + σ_m²)`. Otherwise he is shown in the first tier, top-down, whose anchor a satisfies `μ_a − μ_m ≤ z·√(σ_a² + σ_m²)`. If no tier satisfies it, he is shown as "below Tier N", where N is the last tier. In the single-source MVP every σ equals the default, so tiers are equal-width point bands until more sources arrive.
 
+- **Changed since Tuesday (added 2026-11-17, owner decision; `sync.since_tuesday`):** on every page after the week's pre-waiver page, each position's tab opens with what changed for the pre-waiver page's top 5:
+  - now Out or Doubtful (or another hiding status);
+  - newly questionable;
+  - claimed, by you or another team;
+  - a μ move of 1.5 pts or more (fixed once, about σ_μ's scale; never tuned);
+  - players new to the top 5, with their Tuesday place.
+
+  It states facts only: nothing is re-ranked or discounted.
+- **Tuesday's tags:** the pre-waiver tiers log records each player's injury tag as shown (`flags`, with `tags: true`). Weeks 6–10 were filled from the players file saved at each week's pre-waiver commit (2026-11-17).
+  - From the logs, the main page says how often a waiver player tagged questionable on a pre-waiver page sat out: 62 of 112 through week 10, against 5.7% of untagged ones. It is shown once 20 or more were tagged.
+  - No μ discount follows from it: a P(play) factor is research on 2025's injury reports (`docs/status.md` §6).
+
 ### 6.7 My IDPs panel (D15)
 - **Outcome probabilities use predictive σ:** σ_pred,i² = σ_μ,i² + σ_out,p². σ_out,p is the RMS of (actual − frozen μ) for evaluated pool players at position p once 3 evaluated weeks exist. Before that, it is last season's within-player SD of weekly SADL points (players with ≥8 games) under the current scoring.
   - *Per-player swing (added 2026-10-12; docs/methods-review.md step 3):* with `swing.enabled`, σ_out,p is replaced for every player a projection source has stats for by his own swing_i² = a_p + b_p · V_i, where V_i = Σ_k coef_k² · λ_k,i is the variance of his points if each projected stat were an independent Poisson count (SADL pays 6 for a sack and 2 for a solo tackle, so sack-heavy players swing more) and λ_i is the projection sources' projected line for him, averaged with his effective shares (the breakdown's parts). a_p and b_p are fitted per position on Sleeper's 2025 archive (`sadlidp backtest run` prints them; `[swing]`): DL 0 + 2.5·V, LB 18 + 1.35·V, DB 27 + 0.65·V, which reproduces the realized SD by fifth of predicted swing at every position. **Re-fitted 2026-11-17 (week-9 checkpoint):** on 2025 + 2026 weeks 1–9 pooled, the DL fit is 4.3 + 2.23·V. It beats 0 + 2.5·V on held-out weeks in both fold directions (Gaussian log-likelihood better by 0.035 ± 0.024 per player-game), mainly by no longer giving low-volume DL players a near-zero swing. LB and DB re-fits are within noise of the current values, so they stay. lo and hi stay at −0.8 and 0.75 (the DL quantiles under the new fit are ±0.74). A player with no projected stats (rank-only, zero-filled) keeps σ_out,p. Each card shows a floor and ceiling, μ + lo·swing (never below 0) and μ + hi·swing, with lo = −0.8 and hi = 0.75 the 20th and 80th percentiles of (actual − μ)/swing on 2025: one game in five lands below the floor, one in five above the ceiling. `frozen.json` keeps swing, floor and ceiling; the badge log records both players' swings; the Stats page scores σ_pred with the swing the week's page used. Tiers are unchanged (σ_μ only).
@@ -308,7 +320,16 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - `drop_locked`: the player the move would drop is locked (for "you choose the drop": every other non-IR player at the position is locked); Sleeper won't drop him.
   - A locked rostered player with no frozen record but a pre-kickoff projection (the first week only) is judged as playable at kickoff; later injury tags are ignored.
   - Waiver players whose game has started stay out of the pool.
-- **Context shown:** each rostered player's μ, σ, tier placement and status, plus the league's waiver type. There is no FAAB advice in v1.
+- **Context shown:** each rostered player's μ, σ, tier placement and status, plus the league's waiver type. There is no FAAB advice in v1, only FAAB context (below).
+- **Bye look-ahead (added 2026-11-17):** a rostered player (IR left out) whose team has a bye in the next 3 weeks is named under his position, from the schedule.
+- **One move, many badges (added 2026-11-17):** badges of the same kind against the same player of yours are one move. The likeliest stands for it, and the others are named under it ("same move, slightly lower odds: …"), up to four and a count. The badge log still records each one.
+- **FAAB context (added 2026-11-17, owner decision; amends "no FAAB advice"; `league_tx.py`):**
+  - Every sync saves the previous and current leg's league transactions from Sleeper's public endpoint (`week<NN>/transactions.json`, compact), and fills up to 3 earlier legs that have none.
+  - The tiers section shows one line of counts, once 5 or more IDP claims are decided:
+    - how many IDP waiver claims were won with $1 or less;
+    - how many were contested (two or more teams claimed the same player in a leg) and what those went for;
+    - how many IDPs were picked up as free agents, and on which day most often.
+  - It never gives a bid for a particular player, never tags a player "likely contested" (2 of 15 precision; logged for a test at week 17), and never says "safe to wait".
 
 ### 6.8 Stats page (D20; v0 in PR 2, full in PR 6)
 `stats.html` is rebuilt from the committed week files on every site build; nothing on it feeds back into the numbers on the main page.
@@ -538,6 +559,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - league transactions;
     - a DL matchup term in shadow;
     - "changed since Tuesday", a bye look-ahead, and one factual FAAB line.
+- **2026-11-17 · PR 25 (decision help, owner decisions):** changed since Tuesday and Tuesday's questionable tags (§6.6); the bye look-ahead, one move per player of yours, and the FAAB context line from saved league transactions (§6.7).
 - **2026-11-17 · PR 23 (decision scoreboard):** the waiver band scored rung by rung, from Sleeper alone to the number shown, and Tuesday's picks against kickoff's (§6.8).
 - **2026-11-17 · PR 21 (Stats page grades what you see):** the §6.8 evaluation protocol, implemented.
   - The headline is the frozen μ, with "before form" and the plain average as reference rows.

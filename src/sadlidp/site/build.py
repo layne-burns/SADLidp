@@ -15,7 +15,7 @@ from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
 
-from .. import stats, storage, weeklog
+from .. import league_tx, stats, storage, weeklog
 from ..schedule import ET, Schedule
 
 ACTION_TEXT = {
@@ -201,6 +201,8 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     ev = stats.evaluate(data_dir, latest[0], cfg or {})
     views = {v["key"]: v for v in (ev or {}).get("views") or []}
     dbnote = (ev or {}).get("db_note")
+    tueq = (ev or {}).get("tuesday_q")
+    faab = league_tx.faab_summary(data_dir, latest[0], stats._positions(Path(data_dir) / str(latest[0])))
     to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
@@ -230,7 +232,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
         data_name = f"data-{season}-{week:02d}.json"
         html = template.render(
             d=data, slots=("DL", "LB", "DB"), nav=nav, here=(season, week), latest=(season, week) == latest,
-            final=final, data_href=data_name, card=card, dbnote=dbnote,
+            final=final, data_href=data_name, card=card, dbnote=dbnote, tueq=tueq, faab=faab,
         )  # fmt: skip
         (site / page_name(season, week)).write_text(html)
         (site / data_name).write_text(json.dumps(data, indent=1, sort_keys=True))

@@ -151,6 +151,10 @@ def test_site_data_tiers_and_my_idps(synced):
     db = d["my_idps"]["DB"]  # Tykee Smith (12.0) starts; weak Lassiter is the upgrade target
     assert {s["badge"] for s in db["suggestions"]} == {"UPGRADE"}
     assert {db["names"][s["drop"]] for s in db["suggestions"]} == {"Kamari Lassiter"}
+    # every UPGRADE over Lassiter is one move (§6.7): the likeliest stands for it, the rest are named under it
+    moves = [(s["badge"], s["over"]) for m in d["my_idps"].values() for s in m["suggestions"]]
+    assert len(moves) == len(set(moves)) and len(db["suggestions"]) == 1
+    assert all((x.get("p") or 0) <= db["suggestions"][0]["p"] for x in db["suggestions"])
     text = (data / "2026" / "week05" / "consensus.json").read_text()
     assert "idp_tkl" not in text  # per-source values never reach the site data
 

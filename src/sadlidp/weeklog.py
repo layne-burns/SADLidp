@@ -65,8 +65,8 @@ def update_tiers_log(
 ) -> dict:
     last, _ = storage.merge_rows(existing.get("last_pre_kickoff", {}), tier_rows, now, kickoff_of)
     out = {"schema_version": 1, "last_pre_kickoff": last, "prewaiver": existing.get("prewaiver")}
-    if prewaiver:
-        out["prewaiver"] = {"at": now.isoformat(), "players": tier_rows}
+    if prewaiver:  # `tags`: each player's injury tag as shown is recorded (from 2026-11-17; §6.6)
+        out["prewaiver"] = {"at": now.isoformat(), "tags": True, "players": tier_rows}
     return out
 
 

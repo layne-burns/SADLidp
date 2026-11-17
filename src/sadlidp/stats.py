@@ -19,7 +19,7 @@ import statistics
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import metrics, scoring, storage, swing, weeklog
+from . import metrics, scoreboard, scoring, storage, swing, weeklog
 from .positions import IDP_SLOTS, slot_of
 from .rankmap import rank_values
 from .schedule import Schedule
@@ -223,6 +223,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     raw: dict[int, dict[str, dict]] = {}  # week -> slot -> the pool's numbers
     raw_src: dict[int, dict[str, dict[str, dict]]] = {}  # week -> source -> slot -> pred/act/sig/base/covered/pool
     tiers_wk: dict[int, dict[str, list[tuple[int, int, float]]]] = {}  # week -> slot -> (shown rank, tier, pts)
+    board_wk: dict[int, dict] = {}  # week -> the decision scoreboard's per-position numbers (§6.8)
+    wcfg = cfg.get("weights") or {}
+    priors = {k: float(v) for k, v in (wcfg.get("prior") or {}).items()}
+    split = float(wcfg.get("prior_split", 0.6))
     provisional_wk: dict[int, bool] = {}
     live_wk: dict[int, bool] = {}  # synced live before kickoff: neither replayed nor carrying rebuilt records
     played_out: dict[int, bool] = {}  # week -> every game over (last kickoff + 4 h) when its stats were captured
@@ -370,10 +374,16 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
                     by_slot_shown.setdefault(slot, []).extend((t["tier"], -(p.get("mu") or 0.0), p["id"])
                                                               for p in t["players"])  # fmt: skip
+        band = {}
         for slot, lst in by_slot_shown.items():
+            band[slot] = [pid for _, _, pid in sorted(lst)[:depth]]
             for rank, (tier, _, pid) in enumerate(sorted(lst)[:depth], start=1):
                 if pid in played:
                     tiers_wk.setdefault(week, {}).setdefault(slot, []).append((rank, tier, played[pid]))
+        if band:  # the decision scoreboard on the same shown band (§6.8); Tuesday's μ only from a live log
+            tue = {pid: float(r["mu"]) for pid, r in log.items() if r.get("mu") is not None}
+            rows = scoreboard.band_rows(band, frozen, played, tue, week_kinds, priors, split)
+            board_wk[week] = scoreboard.week_stats(rows)
 
         for pid, pts in played.items():
             history.setdefault(pid, []).append(pts)
@@ -460,8 +470,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 if acc["pool"]:
                     summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
                     _, b_se = metrics.cluster_mean(groups)
-                    summ.update(covered=acc["covered"], pool=acc["pool"],
-                                bias_margin=metrics.margin(b_se, len([g for g in groups if g])))  # fmt: skip
+                    n_g = len([g for g in groups if g])
+                    summ.update(covered=acc["covered"], pool=acc["pool"], weeks=n_g,
+                                bias_margin=metrics.margin(b_se, n_g))  # fmt: skip
                     by_src.setdefault(name, {})[slot] = summ
         picked = [e for e in suggestions if e["week"] in sel]
         tallies = {kind: _decisions(picked, kind) for kind in ("live", "rebuilt")}
@@ -511,6 +522,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             "tiers": tier_rows,
             "tier_buckets": buckets,
             "tier_order": tier_r,
+            "scoreboard": scoreboard.aggregate({w: board_wk[w] for w in sel if w in board_wk})
+            if len(sel) > 1
+            else None,
         }
 
     all_weeks = [w for w, _ in weeks]
@@ -529,8 +543,11 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         upto = [e for e in suggestions if e["week"] <= w]
         to_date[w] = {kind: {k: v for k, v in _decisions(upto, kind).items() if k != "reps"}
                       for kind in ("live", "rebuilt")}  # fmt: skip
-    db = season_out["DB"]["rank"]
-    db_note = {"r": db["r"], "margin": db["margin"],
+    # the DB note reads the waiver DBs shown (the scoreboard's band, our number), else the top-50 pool
+    sb_db = ((season_view.get("scoreboard") or {}).get("DB") or {}).get("rows") or []
+    band = next((r["r"] for r in sb_db if r["key"] == "form" and r["r"]["weeks"]), None)
+    db = {"r": band["mean"], "margin": band["margin"]} if band else season_out["DB"]["rank"]
+    db_note = {"r": db["r"], "margin": db["margin"], "band": bool(band),
                "show": db["r"] is None or db["margin"] is None or db["r"] - db["margin"] <= 0.1}  # fmt: skip
     return {
         "season": season,

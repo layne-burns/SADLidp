@@ -134,7 +134,11 @@ Plan:
     - ESPN filled from its archive (37 of 37 live rows matched; 502 added);
     - FantasyPros left as is (its archive matched 23 of 31);
     - 581 rebuilt records refreshed.
-- [ ] PR 23: a decision scoreboard: does each layer (Sleeper → blend → weights → form) rank the waiver band better?
+- [x] PR 23: decision scoreboard. Settled weeks 1–4 and 6–9, the 25 shown per position:
+  - **Our number ranks them better than Sleeper alone:** +0.14 ± 0.10 rank correlation.
+  - **Most of the gain is ESPN's:** ESPN alone is +0.16 ± 0.15.
+  - **Top-3 lift:** our top 3 beat the list by +3.5 ± 1.4 pts; Sleeper's by +1.7 ± 1.2.
+  - **Tuesday vs kickoff:** Tuesday's top 5 beat the list by +1.2 ± 2.2, kickoff's by +3.5 ± 1.2. 4 of the 60 Tuesday top-5 players didn't play.
 - [x] PR 24: the form miss term is off at LB and DB (owner decision); snap terms and DL unchanged.
   - Replay of weeks 6–10 with it off:
     - about 1 LB and 2–3 DBs a week trade places in and out of the shown 25, at the bottom of the list;

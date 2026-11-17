@@ -155,6 +155,8 @@ def test_last_week_skips_a_week_still_being_played(tmp_path):
     act.write_text(json.dumps(doc))
     ev = evaluate(data, 2026, load_config(ROOT / "config" / "sadl.toml"))
     assert ev["views"][0]["weeks"] == [2] and ev["views"][-1]["key"] == "w3"
+    season = {v["key"]: v for v in ev["views"]}["season"]
+    assert season["weeks"] == [1, 2] and season["held_back"] == [3]  # settled weeks only (§6.8)
 
 
 def test_uncertainty_helpers():

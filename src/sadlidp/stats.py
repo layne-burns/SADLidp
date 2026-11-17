@@ -510,7 +510,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         }
 
     all_weeks = [w for w, _ in weeks]
-    season_view = view(all_weeks)
+    settled = [w for w in all_weeks if not provisional_wk.get(w)] or all_weeks  # season figures: settled weeks only
+    season_view = view(settled)
+    season_view["held_back"] = [w for w in all_weeks if w not in settled]  # still provisional: its own tab only
     last = max((w for w in all_weeks if played_out.get(w)), default=all_weeks[-1])  # not a week still being played
     views = [{"key": "last", "label": f"Last week (week {last})", **view([last])},
              {"key": "season", "label": "All season", **season_view}]  # fmt: skip

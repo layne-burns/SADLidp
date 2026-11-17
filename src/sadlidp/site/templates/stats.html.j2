@@ -38,7 +38,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   <p class="headline">{% if single %}Week {{ v.weeks[0] }}{% else %}Weeks {{ v.weeks[0] }}–{{ v.weeks[-1] }}{% endif %}:
     {% if live.decided or reb.decided %}suggestions paid off in {{ live.hits + reb.hits }} of {{ live.decided + reb.decided }} decisions{% if reb.decided and not live.decided %} (rebuilt){% endif %}{% else %}no suggestions decided{% endif %};
     the number the page showed missed by {{ f1(ss.DL.mae) }} (DL), {{ f1(ss.LB.mae) }} (LB) and {{ f1(ss.DB.mae) }} (DB) points on average.
-    {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}</p>
+    {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}
+    {% if v.held_back %}<small>Week{{ 's' if v.held_back|length > 1 else '' }} {{ v.held_back|join(', ') }} {{ 'join' if v.held_back|length > 1 else 'joins' }} the season figures once {{ 'their' if v.held_back|length > 1 else 'its' }} stat corrections close; until then {{ 'they are' if v.held_back|length > 1 else 'it is' }} under its own tab.</small>{% endif %}</p>
   <section aria-labelledby="close-h-{{ v.key }}">
     <h2 id="close-h-{{ v.key }}">How close was our number?</h2>
     <div class="slot">

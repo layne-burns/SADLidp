@@ -320,6 +320,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - **Ranges:** the floor–ceiling coverage (below / inside / above, aim 20/60/20) and the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, replace "within ±1σ (aim 68%)". IDP scores are fat-tailed, so honest ranges put 71–78% within ±1σ. The raw within-1σ/2σ values stay in `stats.json`.
   - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. A pooled value crossing 0.1 by noise no longer switches it off.
   - **Adoption:** a model change is adopted only at a checkpoint and only under the rules of `docs/eval-protocol.md`. Every test is recorded in the ledger of `docs/methods-review.md` before it runs.
+  - **Settled weeks only:** the All-season figures (every verdict, margin and the DB note) use the weeks whose stat corrections have closed. A provisional week shows under Last week and its own tab until then.
   - **Honest uncertainty (PR 21):**
     - Every season figure carries a week-clustered margin (t-quantile at 9 weeks or fewer, 2 SE beyond). This covers bias, the within-week rank correlation, the paired differences against the reference rows, and the odds score (Brier), whose pairs within a week share that week's surprises.
     - "Better than a coin flip" and "runs high/low" are said only beyond that margin.

@@ -90,11 +90,13 @@
         {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
       </ul>
       {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
+      {% for b in m.byes or [] %}<p class="note">Bye ahead: {{ b.name }} ({{ b.team }}) has a bye in week {{ b.week }}.</p>{% endfor %}
       {% for s in m.suggestions %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
         {{ chip(s) }}
         <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
         · {{ '%.1f'|format(s.player.mu) }} pts{% if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}{% else %}; you have no playable {{ slot }} this week{% endif %}.
+        {% if s.others %}<div class="sub">Same move, slightly lower odds: {{ s.others[:4]|join(', ') }}{% if s.others|length > 4 %} and {{ s.others|length - 4 }} more{% endif %}.</div>{% endif %}
         {% if latest is not defined or latest %}<div class="sub">{{ action(s, m.names) }}</div>
         {% if s.reference %}<div class="why">For reference: {{ why(s, m.names, slot) }}.</div>{% endif %}{% endif %}
         {% if s.player.breakdown %}<details class="mini"><summary>sources ▾</summary>{{ bdbody(s.player) }}</details>{% endif %}
@@ -119,10 +121,13 @@
 
   <section aria-labelledby="tiers-h">
     <h2 id="tiers-h">Streaming tiers (available players)</h2>
+    {% if tueq is defined and tueq and tueq.tagged >= 20 %}<p class="note">Questionable on Tuesday: {{ tueq.sat }} of the {{ tueq.tagged }} waiver players tagged Q on a pre-waiver page this season sat out (untagged: {{ (100 * tueq.untagged_sat / tueq.untagged)|round|int }}%).</p>{% endif %}
+    {% if faab is defined and faab %}<p class="note">IDP waivers this season: {{ faab.won_at_1 }} of {{ faab.claims }} claims were won with $1 or less{% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested (won at ${{ faab.contested_bids[0] }}–${{ faab.contested_bids[1] }}){% endif %}.{% if faab.fa_adds %} {{ faab.fa_adds }} IDPs were picked up as free agents{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
     <div class="tabs">
       {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
       {% for slot in slots %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
+        {% if pos.since_tuesday %}<div class="note since"><b>Changed since Tuesday's list:</b><ul>{% for x in pos.since_tuesday %}<li>{{ x.name }}{% if x.rank %} (Tuesday #{{ x.rank }}){% endif %}: {{ x.changes|join('; ') }}</li>{% endfor %}</ul></div>{% elif pos.since_tuesday is not none and pos.since_tuesday is defined %}<p class="note since">Since Tuesday's list: no changes to its top 5.</p>{% endif %}
         {% if slot == 'DB' and dbnote is defined and dbnote and dbnote.show %}<p class="note dbnote">Projections barely tell waiver DBs apart (this season r {% if dbnote.r is not none %}{{ '%.2f'|format(dbnote.r) }}{% if dbnote.margin is not none %} ± {{ '%.2f'|format(dbnote.margin) }}{% endif %}{% else %}not measured yet{% endif %}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>{% endif %}
         {% for t in pos.tiers %}
         <div class="card">

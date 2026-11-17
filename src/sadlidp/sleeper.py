@@ -76,6 +76,10 @@ class Sleeper:
     def matchups(self, league_id: str, week: int):
         return self._optional(f"{V1}/league/{league_id}/matchups/{week}")
 
+    def transactions(self, league_id: str, leg: int):
+        """One leg's league transactions (waiver claims, free-agent moves, trades), public like matchups."""
+        return self._optional(f"{V1}/league/{league_id}/transactions/{leg}")
+
     def projections(self, season: int, week: int):
         return self._optional(f"{API}/projections/nfl/{season}/{week}?season_type=regular&{IDP_POSITIONS_QUERY}")
 

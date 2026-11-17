@@ -1,0 +1,88 @@
+"""PR 25, decision help (owner request 2026-11-17): what changed since Tuesday's list, the bye look-ahead,
+collapsed suggestions, Tuesday's questionable tags and the FAAB context line (SPEC §6.6, §6.7)."""
+
+import json
+from pathlib import Path
+
+from sadlidp import league_tx, storage
+from sadlidp.pool import PlayerStatus
+from sadlidp.schedule import Schedule
+from sadlidp.sync import bye_lookahead, since_tuesday
+
+ROOT = Path(__file__).parents[2]
+SCHED = Schedule.from_json(json.loads((ROOT / "data" / "2026" / "schedule.json").read_text()))
+
+
+def _idp(n):
+    return {f"p{i}": {"full_name": f"Player {i}", "position": "LB", "team": "NYJ"} for i in range(n)}
+
+
+def test_since_tuesday_lists_facts_about_tuesdays_top_five():
+    pre = {"players": {f"p{i}": {"slot": "LB", "tier": 1, "mu": 20.0 - i, **({"flags": ["Q"]} if i == 4 else {})}
+                       for i in range(8)}}  # fmt: skip
+    cons = {f"p{i}": {"mu": 20.0 - i} for i in range(8)} | {"p2": {"mu": 15.5}, "p7": {"mu": 30.0}}
+    status = {"p0": PlayerStatus(["Out"]), "p3": PlayerStatus([], ["Q"]), "p4": PlayerStatus([], ["Q"])}
+
+    def claimed(pid):
+        return "other" if pid == "p1" else None
+
+    out = since_tuesday("LB", pre, ["p7", "p3", "p4", "p5", "p6"], cons, _idp(8),
+                        lambda pid: status.get(pid, PlayerStatus()), claimed)  # fmt: skip
+    by = {x["name"]: x["changes"] for x in out}
+    assert by["Player 0"] == ["now Out"] and by["Player 1"] == ["claimed by another team"]
+    assert by["Player 2"] == ["μ 18.0 → 15.5"] and by["Player 3"] == ["now questionable"]
+    assert "Player 4" not in by  # already questionable on Tuesday: nothing new
+    assert by["Player 7"] == ["new in the top 5 (Tuesday #8)"] and by["Player 6"] == ["new in the top 5 (Tuesday #7)"]
+    assert since_tuesday("LB", None, [], {}, {}, lambda pid: PlayerStatus(), claimed) is None
+
+
+def test_bye_lookahead_names_a_bye_in_the_next_three_weeks():
+    team, bye = next((t, w) for w in range(6, 15) for t in ("NYJ", "GB", "CHI", "BAL", "DAL", "KC", "SF")
+                     if SCHED.week_games(w) and SCHED.game_for(t, w) is None)  # fmt: skip
+    players = {"a": {"full_name": "A", "team": team}, "ir": {"full_name": "IR", "team": team}}
+    assert bye_lookahead(["a", "ir"], {"ir"}, players, SCHED, bye - 1) == [{"id": "a", "name": "A", "team": team,
+                                                                            "week": bye}]  # fmt: skip
+    assert bye_lookahead(["a"], set(), players, SCHED, bye) == []  # this week's bye isn't "ahead"
+    assert bye_lookahead(["a"], set(), players, SCHED, bye - 3)[0]["week"] == bye
+
+
+def _tx(data, leg, txs):
+    storage.write_json(storage.week_dir(data, 2026, leg) / "transactions.json", {"leg": leg, "transactions": txs})
+
+
+def test_faab_line_counts_claims_contests_and_free_agent_days(tmp_path):
+    slots = {f"p{i}": "LB" for i in range(10)}
+    wed = 1793203200000  # Wed 2026-10-28 12:00 ET, in ms
+    claims = [{"type": "waiver", "status": "complete", "adds": {f"p{i}": 1}, "bid": b, "leg": 3}
+              for i, b in enumerate((0, 1, 1, 4, 15))]  # fmt: skip
+    claims.append({"type": "waiver", "status": "failed", "adds": {"p4": 2}, "bid": 9, "leg": 3})  # p4 contested
+    claims.append({"type": "waiver", "status": "complete", "adds": {"qb": 1}, "bid": 30, "leg": 3})  # not an IDP
+    fa = [{"type": "free_agent", "status": "complete", "adds": {"p6": 1}, "created": wed, "leg": 3}]
+    _tx(tmp_path, 3, claims[:4] + fa)
+    assert league_tx.faab_summary(tmp_path, 2026, slots) is None  # 4 claims: too few to say
+    _tx(tmp_path, 3, claims + fa)
+    out = league_tx.faab_summary(tmp_path, 2026, slots)
+    assert (out["claims"], out["won_at_1"], out["contested"], out["contested_bids"]) == (5, 3, 1, [15, 15])
+    assert out["fa_adds"] == 1 and out["fa_top_day"] == ("Wednesday", 1)
+
+
+class _Sleeper:
+    def __init__(self, legs):
+        self.legs, self.calls = legs, []
+
+    def transactions(self, league_id, leg):
+        self.calls.append(leg)
+        return (self.legs[leg], None) if leg in self.legs else (None, "HTTP 404")
+
+
+def test_sync_legs_keeps_two_current_legs_and_backfills_a_few(tmp_path):
+    from datetime import datetime
+
+    raw = {"transaction_id": "1", "type": "waiver", "status": "complete", "adds": {"p1": 3},
+           "settings": {"waiver_bid": 2}, "created": 1, "metadata": {"notes": "x"}}  # fmt: skip
+    sl = _Sleeper({leg: [raw] for leg in range(1, 10)})
+    out = league_tx.sync_legs(sl, "L", tmp_path, 2026, 9, datetime(2026, 11, 3))
+    assert sorted(out) == [1, 2, 3, 8, 9]  # the two current legs, then three missing ones
+    doc = storage.read_json(storage.week_dir(tmp_path, 2026, 8) / "transactions.json")
+    assert doc["transactions"] == [{**{k: raw.get(k) for k in league_tx.KEEP}, "bid": 2}]  # compact, no metadata
+    assert sorted(league_tx.sync_legs(sl, "L", tmp_path, 2026, 9, datetime(2026, 11, 3))) == [4, 5, 6, 8, 9]

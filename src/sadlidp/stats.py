@@ -224,6 +224,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     raw_src: dict[int, dict[str, dict[str, dict]]] = {}  # week -> source -> slot -> pred/act/sig/base/covered/pool
     tiers_wk: dict[int, dict[str, list[tuple[int, int, float]]]] = {}  # week -> slot -> (shown rank, tier, pts)
     board_wk: dict[int, dict] = {}  # week -> the decision scoreboard's per-position numbers (§6.8)
+    tue_q: dict = {"q": [0, 0], "untagged": [0, 0], "weeks": []}  # [tagged, sat] on Tuesday's waiver list
     wcfg = cfg.get("weights") or {}
     priors = {k: float(v) for k, v in (wcfg.get("prior") or {}).items()}
     split = float(wcfg.get("prior_split", 0.6))
@@ -374,6 +375,16 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
                     by_slot_shown.setdefault(slot, []).extend((t["tier"], -(p.get("mu") or 0.0), p["id"])
                                                               for p in t["players"])  # fmt: skip
+        if (
+            log
+            and played_out[week]
+            and ((storage.read_json(wd / "tiers_log.json") or {}).get("prewaiver") or {}).get("tags")
+        ):  # Tuesday's questionable tags and who sat (§6.6): weeks whose log recorded the tags
+            for pid, r in log.items():
+                k = "q" if "Q" in (r.get("flags") or []) else "untagged"
+                tue_q[k][0] += 1
+                tue_q[k][1] += pid not in played
+            tue_q["weeks"].append(week)
         band = {}
         for slot, lst in by_slot_shown.items():
             band[slot] = [pid for _, _, pid in sorted(lst)[:depth]]
@@ -559,6 +570,13 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "views": views,
         "db_note": db_note,
         "decisions_to_date": to_date,
+        "tuesday_q": {
+            "tagged": tue_q["q"][0],
+            "sat": tue_q["q"][1],
+            "untagged": tue_q["untagged"][0],
+            "untagged_sat": tue_q["untagged"][1],
+            "weeks": tue_q["weeks"],
+        },  # fmt: skip
         "season_by_source": season_by_source,
         "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
         # equal priors within each group, 60:40 between them (D11); PR 6 records the accuracy weights in force

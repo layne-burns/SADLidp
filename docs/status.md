@@ -146,10 +146,12 @@ Plan:
     - 7 top-5 places swap;
     - 3 DB badges change.
   - μ moves by about 0.6 at LB and 0.3 at DB on average, 1.75 at most.
-- [ ] PR 25: decision help:
-  - "changed since Tuesday" and Tuesday-Q facts;
-  - a bye look-ahead;
-  - league transactions with one factual FAAB line.
+- [x] PR 25: decision help:
+  - **"Changed since Tuesday's list"** on each position's tab after the pre-waiver page: Out or Doubtful, newly Q, claimed, μ moves of 1.5 or more, and new top-5 entries.
+  - **Tuesday-Q facts:** 62 of 112 waiver players tagged Q on a pre-waiver page sat out, against 5.7% untagged.
+  - **Bye look-ahead** for your players over the next 3 weeks.
+  - **One move per player of yours:** e.g. 17 START badges over Kyler Gordon become one, plus "same move: …".
+  - **League transactions saved each sync.** FAAB line: 16 of 24 IDP claims were won with $1 or less; 4 contested ($0–$15); 24 free-agent IDP adds, most on a Wednesday.
 - [ ] PR 26: research on archives:
   - Sleeper 2024 as a test season;
   - FantasyPros 2025 ranks;

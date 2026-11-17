@@ -66,7 +66,7 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
     ratios: dict[str, dict[int, list[float]]] = {}  # source -> week -> r per position
     kinds: dict[str, str] = {}
     num = den = 0.0
-    alpha_weeks: set[int] = set()
+    cells: dict[int, list[float]] = {}  # week -> [num, den] of the group-split estimate (for its jackknife SE)
     used: list[int] = []
     for week, wd in stats._weeks(season_dir):
         if week > upto or not core:
@@ -114,11 +114,13 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
             trip = [t for t in trip if t[1] is not None and t[2] is not None]
             if len(trip) >= MIN_COVER:
                 m = [statistics.fmean(t[i] for t in trip) for i in range(3)]
+                cell = cells.setdefault(week, [0.0, 0.0])
                 for y, p, r in trip:
                     y, p, r = y - m[0], p - m[1], r - m[2]
                     num += (y - r) * (p - r)
                     den += (p - r) ** 2
-                alpha_weeks.add(week)
+                    cell[0] += (y - r) * (p - r)
+                    cell[1] += (p - r) ** 2
         if counted:
             used.append(week)
     return {
@@ -128,12 +130,28 @@ def measure(data_dir: Path | str, season: int, upto: int, sched: Schedule, cfg: 
                 "kind": kinds.get(name, "projection"),
                 "n": len(by_week),
                 "mean_r": statistics.fmean(r for rs in by_week.values() for r in rs),
+                "r_se": _se([statistics.fmean(rs) for rs in by_week.values()]),
             }
             for name, by_week in sorted(ratios.items())
         },  # fmt: skip
         "alpha_hat_raw": num / den if den > 0 else None,
-        "alpha_n": len(alpha_weeks),
+        "alpha_n": len(cells),
+        "alpha_se": _jackknife(cells, num, den),
     }
+
+
+def _se(xs: list[float]) -> float | None:
+    """Standard error of a mean of per-week values (None below 2 weeks)."""
+    return statistics.stdev(xs) / len(xs) ** 0.5 if len(xs) >= 2 else None
+
+
+def _jackknife(cells: dict[int, list[float]], num: float, den: float) -> float | None:
+    """Leave-one-week-out standard error of the group-split estimate num/den (display only, §6.8)."""
+    loo = [(num - c[0]) / (den - c[1]) for c in cells.values() if den - c[1] > 0]
+    if len(loo) < 2:
+        return None
+    m = statistics.fmean(loo)
+    return ((len(loo) - 1) / len(loo) * sum((x - m) ** 2 for x in loo)) ** 0.5
 
 
 def weights(m: dict, cfg: dict) -> dict:
@@ -161,11 +179,15 @@ def weights(m: dict, cfg: dict) -> dict:
             w = p * (s["n"] / (s["n"] + k) * w_data + k / (s["n"] + k))
             out["sources"][n] = {"w": round(w, 4), "w_data": round(w_data, 4), "n": s["n"],
                                  "mean_r": round(s["mean_r"], 4)}  # fmt: skip
+            if s.get("r_se") is not None:
+                out["sources"][n]["r_se"] = round(s["r_se"], 4)
     raw, n = m["alpha_hat_raw"], m["alpha_n"]
     if raw is not None and n:
         a_hat = min(max(raw, 0.2), 0.8)
         out.update(alpha_hat=round(a_hat, 4), alpha_hat_raw=round(raw, 4),
                    alpha=round(n / (n + k) * a_hat + k / (n + k) * prior, 4))  # fmt: skip
+        if m.get("alpha_se") is not None:
+            out["alpha_se"] = round(m["alpha_se"], 4)
     return out
 
 

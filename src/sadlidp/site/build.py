@@ -88,10 +88,11 @@ def overlay_results(data: dict, results: dict) -> None:
             s["outcome"] = weeklog.outcome(s["player"]["result"], over, s["over_result"])
 
 
-def report_card(data: dict, view: dict | None, week: int, provisional: bool) -> dict:
-    """The week's report card (SPEC §6.8): your rostered IDPs projected vs scored, the suggestions that paid
-    off (from the Stats page's view of the week: the decision log, or the rebuilt page), and the biggest
-    beat, shortfall, best and worst call. `data` is the week's page with its final scores overlaid."""
+def report_card(data: dict, view: dict | None, week: int, provisional: bool, season: dict | None = None) -> dict:
+    """The week's report card (SPEC §6.8): your rostered IDPs projected vs scored, with the position's median
+    miss that week for comparison; the suggestions that paid off, counted as decisions (from the Stats page's
+    view of the week: the decision log, or the rebuilt page), and the season so far; and the biggest beat,
+    shortfall, best and worst call. `data` is the week's page with its final scores overlaid."""
     mine = []
     for slot, m in (data.get("my_idps") or {}).items():
         for p in m.get("players") or []:
@@ -105,7 +106,8 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool) -> 
                              -(x["pts"] or -1.0)))  # fmt: skip
     both = [x for x in mine if x["diff"] is not None]
     sugg = (view or {}).get("suggestions") or {}
-    calls = [e for e in sugg.get("list") or [] if not e.get("reference") and e.get("outcome") in ("hit", "miss")]
+    calls = [e for e in sugg.get("list") or []  # the badge that stands for each decision (§6.8)
+             if e.get("counted", True) and not e.get("reference") and e.get("outcome") in ("hit", "miss")]  # fmt: skip
 
     def margin(e):
         return (e.get("pts") or 0.0) - (e.get("over_pts") or 0.0)
@@ -113,6 +115,7 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool) -> 
     hits = [e for e in calls if e["outcome"] == "hit"]
     misses = [e for e in calls if e["outcome"] == "miss"]
     tally = [sugg.get(k) or {} for k in ("live", "rebuilt")]
+    so_far = (season or {}).get("suggestions") or {}  # decisions of the weeks up to this one, live and rebuilt
     beat = max(both, key=lambda x: x["diff"], default=None)
     short = min(both, key=lambda x: x["diff"], default=None)
     return {
@@ -124,7 +127,14 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool) -> 
         "counted": len(both),
         "hits": sum(t.get("hits", 0) for t in tally),
         "decided": sum(t.get("decided", 0) for t in tally),
+        "badges": sum((t.get("badges") or {}).get("decided", 0) for t in tally),
         "rebuilt": bool((sugg.get("rebuilt") or {}).get("decided")),
+        "so_far": {
+            k: {x: (so_far.get(k) or {}).get(x) for x in ("hits", "decided", "net")}
+            for k in ("live", "rebuilt")
+            if (so_far.get(k) or {}).get("decided")
+        },  # fmt: skip
+        "median_miss": {slot: x.get("median_miss") for slot, x in ((view or {}).get("by_slot") or {}).items()},
         "beat": beat if beat and beat["diff"] > 0 else None,
         "short": short if short and short["diff"] < 0 else None,
         "best_call": max(hits, key=margin, default=None),
@@ -190,7 +200,8 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     ]  # fmt: skip
     ev = stats.evaluate(data_dir, latest[0], cfg or {})
     views = {v["key"]: v for v in (ev or {}).get("views") or []}
-    dbr = ((ev or {}).get("season_by_slot") or {}).get("DB", {}).get("spearman")
+    dbnote = (ev or {}).get("db_note")
+    to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
         data = json.loads((wdir / "consensus.json").read_text())
@@ -207,18 +218,19 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
         if (season, week) != latest:
             data, final = scored_page(season, wdir)
             if final and season == latest[0]:
-                card = report_card(data, views.get(f"w{week}"), week, final["provisional"])
+                card = report_card(data, views.get(f"w{week}"), week, final["provisional"], to_date.get(week))
         else:
             data = json.loads((wdir / "consensus.json").read_text())
             prev = by_week.get((season, week - 1))
             if prev is not None:  # the newest week with stats: last week's card (§6.8)
                 prev_data, prev_final = scored_page(season, prev)
                 if prev_final:
-                    card = report_card(prev_data, views.get(f"w{week - 1}"), week - 1, prev_final["provisional"])
+                    card = report_card(prev_data, views.get(f"w{week - 1}"), week - 1, prev_final["provisional"],
+                                       to_date.get(week - 1))  # fmt: skip
         data_name = f"data-{season}-{week:02d}.json"
         html = template.render(
             d=data, slots=("DL", "LB", "DB"), nav=nav, here=(season, week), latest=(season, week) == latest,
-            final=final, data_href=data_name, card=card, dbr=dbr,
+            final=final, data_href=data_name, card=card, dbnote=dbnote,
         )  # fmt: skip
         (site / page_name(season, week)).write_text(html)
         (site / data_name).write_text(json.dumps(data, indent=1, sort_keys=True))

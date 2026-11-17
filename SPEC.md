@@ -320,6 +320,19 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - **Ranges:** the floor–ceiling coverage (below / inside / above, aim 20/60/20) and the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, replace "within ±1σ (aim 68%)". IDP scores are fat-tailed, so honest ranges put 71–78% within ±1σ. The raw within-1σ/2σ values stay in `stats.json`.
   - **DB note:** prints the within-week rank correlation of the published μ ± 2 SE, and stays on until the lower end of that range clears 0.1. A pooled value crossing 0.1 by noise no longer switches it off.
   - **Adoption:** a model change is adopted only at a checkpoint and only under the rules of `docs/eval-protocol.md`. Every test is recorded in the ledger of `docs/methods-review.md` before it runs.
+  - **Settled weeks only:** the All-season figures (every verdict, margin and the DB note) use the weeks whose stat corrections have closed. A provisional week shows under Last week and its own tab until then.
+  - **Honest uncertainty (PR 21):**
+    - Every season figure carries a week-clustered margin (t-quantile at 9 weeks or fewer, 2 SE beyond). This covers bias, the within-week rank correlation, the paired differences against the reference rows, and the odds score (Brier), whose pairs within a week share that week's surprises.
+    - "Better than a coin flip" and "runs high/low" are said only beyond that margin.
+    - A calibration row resting on fewer than 20 distinct favoured player-weeks shows "too few".
+    - The top-12 random baseline is 12·K/50 ± 2 hypergeometric SDs (about 95%, like every ± on the page), K being the pool players who made the actual top 12.
+    - Pooled Pearson and R² stay in `stats.json` only.
+    - Next to the bias, the page shows the median miss (actual − μ): a few big games can pull the mean while the typical player lands near his number.
+    - The report card shows that week's median miss per position, and the decisions of the weeks up to it, live and rebuilt apart. Its best and worst call come from the badges that stand for decisions.
+    - The margin on points per decision is clustered by week, since decisions in one week share its games.
+    - A week where any pool player lacks a frozen record has the plain average standing in for him, counted (`fallback`). It is not called live.
+    - The weights section shows α̂ measured on every settled week ± its leave-one-week-out margin, and each source's error ratio ± its margin, with "not distinguishable from 0.6" when that holds.
+    - `weights.json` gains `alpha_se` and each source's `r_se` from the next week written. Weeks already written are never rewritten.
 
 ## 7. Failure handling and security
 - **Fatal:** a failure of the documented Sleeper /v1 endpoints (state, user, leagues, league, rosters, players). The job fails, nothing deploys, and the last good site stays live.
@@ -469,6 +482,13 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - league transactions;
     - a DL matchup term in shadow;
     - "changed since Tuesday", a bye look-ahead, and one factual FAAB line.
+- **2026-11-17 · PR 21 (Stats page grades what you see):** the §6.8 evaluation protocol, implemented.
+  - The headline is the frozen μ, with "before form" and the plain average as reference rows.
+  - Suggestions are counted as decisions.
+  - The tier table scores the 25 shown, with rank buckets.
+  - Range coverage and a spread check replace "aim 68%".
+  - Margins everywhere, and the DB note's new rule.
+  - Nothing feeds back into the model.
 
 ## 13. Phase 1 findings (probe runs 1–4, 2026-10-12)
 Evidence: `probe-fixtures` branch, `latest/report.md` and `runs/`.

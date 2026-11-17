@@ -1,0 +1,14 @@
+{
+ "alpha": 0.6,
+ "alpha_hat": null,
+ "alpha_n": 0,
+ "computed_at": "2026-10-14T15:31:15-04:00",
+ "from_weeks": [],
+ "k": 4.0,
+ "method": "prior",
+ "prior_split": 0.6,
+ "reason": "the week's first sync came before accuracy weights",
+ "schema_version": 1,
+ "sources": {},
+ "week": 6
+}

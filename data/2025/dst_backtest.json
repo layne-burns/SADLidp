@@ -1,0 +1,89 @@
+{
+ "passes": false,
+ "positions": {
+  "DB": {
+   "mae": {
+    "projection": 4.932,
+    "with signals": 4.939
+   },
+   "n": 1080,
+   "signals": {
+    "opp_implied": {
+     "halves_agree": true,
+     "passes": false,
+     "per_unit": 0.132,
+     "t": 1.1
+    },
+    "rank": {
+     "halves_agree": true,
+     "passes": false,
+     "per_unit": 0.024,
+     "t": 0.5
+    }
+   }
+  },
+  "DL": {
+   "mae": {
+    "projection": 6.51,
+    "with signals": 6.524
+   },
+   "n": 1080,
+   "signals": {
+    "opp_implied": {
+     "halves_agree": false,
+     "passes": false,
+     "per_unit": -0.11,
+     "t": -0.7
+    },
+    "rank": {
+     "halves_agree": false,
+     "passes": false,
+     "per_unit": 0.021,
+     "t": 0.3
+    }
+   }
+  },
+  "LB": {
+   "mae": {
+    "projection": 5.718,
+    "with signals": 5.762
+   },
+   "n": 1080,
+   "signals": {
+    "opp_implied": {
+     "halves_agree": false,
+     "passes": false,
+     "per_unit": 0.027,
+     "t": 0.2
+    },
+    "rank": {
+     "halves_agree": false,
+     "passes": false,
+     "per_unit": 0.04,
+     "t": 0.6
+    }
+   }
+  }
+ },
+ "season": 2025,
+ "weeks": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18
+ ]
+}

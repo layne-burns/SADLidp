@@ -14,8 +14,10 @@ never "safe to wait" advice.
 
 from __future__ import annotations
 
+import math
 from collections import Counter
 from datetime import datetime
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 from . import storage
@@ -65,6 +67,32 @@ def _all(data_dir: Path | str, season: int) -> list[dict]:
     return out
 
 
+def pct_text(x: float, nd: int | None = None) -> str:
+    """A share of the budget for the page, without the % sign: one decimal below 10%, whole above (half up),
+    "<0.1" for a sliver, "0" for nothing."""
+    if x == 0:
+        return "0"
+    if 0 < x < 0.1:
+        return "<0.1"
+    nd = (1 if x < 10 else 0) if nd is None else nd
+    out = f"{Decimal(str(x)).quantize(Decimal(1).scaleb(-nd), rounding=ROUND_HALF_UP):.{nd}f}"
+    return out[:-2] if out.endswith(".0") else out
+
+
+def range_text(lo: float, hi: float) -> str:
+    """'a–b', or one value when the two ends read the same (one decimal first if rounding merged them)."""
+    a, b = pct_text(lo), pct_text(hi)
+    if lo != hi and a == b:
+        a, b = pct_text(lo, 1), pct_text(hi, 1)
+    return a if a == b else f"{a}–{b}"
+
+
+def cut_text(x: float) -> str:
+    """The token-bid cut, rounded up to one decimal so the page never states a lower cut than the one counted."""
+    out = f"{math.ceil(round(x * 10, 6)) / 10:.1f}"
+    return out[:-2] if out.endswith(".0") else out
+
+
 def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], settings: dict) -> dict | None:
     """Counts behind the FAAB line, bids as a share of the league's starting budget: IDP waiver claims won, how
     many with a token bid, contested claims (two or more teams claimed the same player in a leg) and their
@@ -93,14 +121,17 @@ def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], setti
     bids = [pct(t) for t in contested]
     adds = [t for t in txs if t.get("type") == "free_agent" and t.get("status") == "complete" and idp(t)]
     days = Counter(datetime.fromtimestamp(t["created"] / 1000, ET).strftime("%A") for t in adds if t.get("created"))
-    top = days.most_common(1)
+    top = days.most_common(2)
+    lead = top[0] if top and top[0][1] > 1 and (len(top) == 1 or top[0][1] > top[1][1]) else None  # no tie, 2+
     return {
         "claims": len(won),
         "budget": budget,
         "token_pct": 100 * token / budget,  # the token-bid cut as a share of the budget (1%, or $1 if more)
+        "token_label": cut_text(100 * token / budget),
         "won_token": sum(float(t.get("bid") or 0) <= token for t in won),
         "contested": len(contested),
         "contested_pct": [min(bids), max(bids)] if bids else None,
+        "contested_label": range_text(min(bids), max(bids)) if bids else None,
         "fa_adds": sum(days.values()),
-        "fa_top_day": top[0] if top else None,
+        "fa_top_day": lead,
     }

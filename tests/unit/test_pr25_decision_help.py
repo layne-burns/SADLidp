@@ -64,7 +64,9 @@ def test_faab_line_counts_claims_contests_and_free_agent_days(tmp_path):
     _tx(tmp_path, 3, claims + fa)
     out = league_tx.faab_summary(tmp_path, 2026, slots, faab100)
     assert (out["claims"], out["won_token"], out["contested"], out["contested_pct"]) == (5, 3, 1, [15.0, 15.0])
-    assert out["token_pct"] == 1.0 and out["fa_adds"] == 1 and out["fa_top_day"] == ("Wednesday", 1)
+    assert out["token_pct"] == 1.0 and out["fa_adds"] == 1 and out["fa_top_day"] is None  # one add: no "most often"
+    _tx(tmp_path, 4, [{**fa[0], "leg": 4}, {**fa[0], "leg": 4, "adds": {"p7": 1}}])
+    assert league_tx.faab_summary(tmp_path, 2026, slots, faab100)["fa_top_day"] == ("Wednesday", 3)
     assert league_tx.faab_summary(tmp_path, 2026, slots, {"waiver_type": 0, "waiver_budget": 100}) is None  # no FAAB
 
 
@@ -104,3 +106,42 @@ def test_sync_legs_keeps_two_current_legs_and_backfills_a_few(tmp_path):
     doc = storage.read_json(storage.week_dir(tmp_path, 2026, 8) / "transactions.json")
     assert doc["transactions"] == [{**{k: raw.get(k) for k in league_tx.KEEP}, "bid": 2}]  # compact, no metadata
     assert sorted(league_tx.sync_legs(sl, "L", tmp_path, 2026, 9, datetime(2026, 11, 3))) == [4, 5, 6, 8, 9]
+
+
+def test_faab_shares_read_honestly_on_the_page():
+    """§6.7: the token cut is never stated lower than the one counted, a range never collapses to "15–15%",
+    and small shares keep a decimal."""
+    assert league_tx.cut_text(1.0) == "1" and league_tx.cut_text(100 / 75) == "1.4" and league_tx.cut_text(2.5) == "2.5"
+    assert league_tx.cut_text(100 / 30) == "3.4"  # $1 of $30 is 3.33%: rounded up, never down
+    assert league_tx.range_text(1.5, 2.5) == "1.5–2.5" and league_tx.range_text(0.0, 15.0) == "0–15"
+    assert league_tx.range_text(14.6, 15.4) == "14.6–15.4" and league_tx.range_text(15.0, 15.0) == "15"
+    assert league_tx.pct_text(0.04) == "<0.1" and league_tx.pct_text(12.5) == "13" and league_tx.pct_text(0.25) == "0.3"
+
+
+def _faab_line(faab):
+    from jinja2 import Environment, PackageLoader
+
+    env = Environment(loader=PackageLoader("sadlidp.site", "templates"), autoescape=True)
+    src = env.loader.get_source(env, "index.html.j2")[0]
+    i = src.index("{% if faab is defined and faab %}")
+    j = src.index("{% endif %}</p>{% endif %}", i) + len("{% endif %}</p>{% endif %}")
+    import re
+
+    return re.sub(r"\\s+", " ", re.sub(r"<[^>]+>", "", env.from_string(src[i:j]).render(faab=faab))).strip()
+
+
+def test_the_faab_line_in_a_thousand_dollar_league_with_one_free_agent_add(tmp_path):
+    slots = {f"p{i}": "LB" for i in range(10)}
+    bids = (0, 5, 10, 15, 25)
+    claims = [{"type": "waiver", "status": "complete", "adds": {f"p{i}": 1}, "bid": b, "leg": 2}
+              for i, b in enumerate(bids)]  # fmt: skip
+    claims += [{"type": "waiver", "status": "failed", "adds": {"p3": 2}, "bid": 9, "leg": 2},
+               {"type": "waiver", "status": "failed", "adds": {"p4": 2}, "bid": 20, "leg": 2},
+               {"type": "free_agent", "status": "complete", "adds": {"p8": 1}, "created": 1793203200000,
+                "leg": 2}]  # fmt: skip
+    _tx(tmp_path, 2, claims)
+    faab = league_tx.faab_summary(tmp_path, 2026, slots, {"waiver_type": 2, "waiver_budget": 1000})
+    line = _faab_line(faab)
+    assert "3 of 5 claims were won with a token bid (at most 1% of the starting budget)" in line
+    assert "2 were contested, won at 1.5–2.5% of it" in line and "(Starting budget $1000.)" in line
+    assert line.endswith("1 IDP was picked up as a free agent.")  # one add: singular, no "most often"

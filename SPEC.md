@@ -335,9 +335,12 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **FAAB context (added 2026-11-17, owner decision; amends "no FAAB advice"; `league_tx.py`):**
   - Every sync saves the previous and current leg's league transactions from Sleeper's public endpoint (`week<NN>/transactions.json`, compact), and fills up to 3 earlier legs that have none.
   - The tiers section shows one line of counts, once 5 or more IDP claims are decided:
-    - how many IDP waiver claims were won with $1 or less;
+    - how many IDP waiver claims were won with a token bid;
     - how many were contested (two or more teams claimed the same player in a leg) and what those went for;
     - how many IDPs were picked up as free agents, and on which day most often.
+  - **Normalized to the starting budget (2026-11-17, owner request):** leagues start with different FAAB budgets, so every bid is shown as a share of the league's starting budget (Sleeper's `waiver_budget`), with the budget in small print.
+    - A token bid is at most 1% of the budget, or $1 if that is more: $1 in a $100 league, $10 in a $1,000 league, $1 (2%) in a $50 league.
+    - A league without FAAB (`waiver_type` other than 2) gets no line.
   - It never gives a bid for a particular player, never tags a player "likely contested" (2 of 15 precision; logged for a test at week 17), and never says "safe to wait".
 
 ### 6.8 Stats page (D20; v0 in PR 2, full in PR 6)
@@ -574,6 +577,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - **`sadlidp backtest cross`:** scores the page's settings on a season they weren't fitted on, against settings fitted on another season, with paired per-player differences clustered by week.
     - **Use:** consulted only at checkpoints; nothing is fitted on it.
   - **The projection pair's least-squares share** (§6.5).
+- **2026-11-17 · FAAB line normalized (owner request):** bids are shares of the league's starting budget, and a token bid is at most 1% of it ($1 if more) (§6.7).
 - **2026-11-17 · PR 26, research part 2:**
   - **FantasyPros' 2025 weekly DL, LB and DB ranks** were pulled once through the live adapter (`&year=`). They are stored with each player's kickoff and each list's last update as `data/2025/archive/fp_weekNN.json`, and never re-fetched to change a result.
     - `sadlidp backtest blend` answers the three registered questions, kickoff-guarded and not.

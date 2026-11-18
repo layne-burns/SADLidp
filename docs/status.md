@@ -197,6 +197,71 @@ Rules: settled weeks only, and the definitions of `docs/eval-protocol.md`. Every
      - and only if 2026 alone is not worse.
    - Weeks 2–10, registered 2026-11-17: pooled slope +0.39 per pp (t 5.5); 2024 / 2025 / 2026 slopes +0.45 / +0.30 / +0.46. LOSO ΔMAE −0.034 ± 0.036; frozen 0.30: −0.035 ± 0.028.
 9. **Not at week 13:** RotoBaller/FantasyData drop (one look at week 17), outcome-based tiers and P(play) from 2025 injury reports (season end).
+10. **Kickers (added 2026-11-17 with D23, before any kicker result was graded).** The three registered kicker checks are written out in §7. At week 13:
+    - K1, the kicker archive check, is decided if its sample is there;
+    - K2 (swing) and K3 (weights) are report only, and are decided at season end.
+
+    None of them touches items 1–9 or any DL, LB or DB number.
+
+## 7. Kickers and the position-first page (2026-11-17, owner decisions D23 and D24)
+Owner decisions, 2026-11-17:
+- **Kicker sources:** the five current sites (Sleeper, ESPN, FantasyPros, FantasyData, RotoBaller) plus CBS. FantasySharks, DraftSharks and the others looked at are not added now (SPEC D21).
+- **Backfill where possible,** so each kicker source's accuracy can be measured and weighted like the IDP ones.
+- **The page:** the position-first layout (SPEC D24).
+
+**In flight** on branch `claude/kickers` (cut from `main` at 07539cb). Nothing was committed or merged when this was written; a box is ticked when its part merges.
+- [ ] **Spec first:** SPEC D23 and D24, with the amendments they need.
+- [ ] **Core:** slots and groups, the source registry, `sleeper_k`, per-group matching, consensus, weights and backfill, the kicker roster rule, the add-only merge of past kicker results, a page build that runs on Windows. Built in the working tree; the suite passes there.
+- [ ] **The five other kicker adapters:** `espn_k`, `cbs_k`, `fp_k`, `fantasydata_k`, `rotoballer_k`.
+- [ ] **Statistics:** K as a separate scope on the Stats page, the report card and the kicker note.
+- [ ] **The page:** This week card, position bar, Yours and Available, folded sections.
+- [ ] **Owner:** write the body of `swing.kicker_var`. Until then every kicker's odds use σ_out,K = 5.0 and no kicker has a floor–ceiling.
+- [ ] **Integration (2026-11-17, in the working tree):** all five parts together. The old code and the new one give identical DL/LB/DB output on the season's real data, offline (replays of weeks 1–11, a week-11 sync, the Stats page, the audit; SPEC §10).
+- [ ] **After merge:** the first sync from Actions with the kicker sources, and the kicker backfill at its normal budget. Run once so far, on 2026-11-17, from a home connection into a scratch copy (nothing committed; SPEC §10): all six kicker sources `ok` with no warning; the backfill, capped at 3 requests a host, wrote weeks 1–3 of three archives; the add-only merge added kicker results to weeks 6–9.
+- [ ] **A probe from Actions** of the six kicker sources under the pipeline's user agent. They have been read from a home connection only (the probe, and that one scratch sync with the pipeline's own client).
+- [ ] **Owner, before any kicker result is graded:** confirm the thresholds of K1–K3 below. Their outline was agreed; the numbers in them (99% of rows, 2 live weeks and 40 rows, the spread ratio as K2's primary statistic) were chosen when they were written down.
+- [ ] **FantasySharks from Actions:** it answered a home connection on 2026-11-17. It stays out until a runner gets the same answer and the owner amends D21.
+- [ ] **Follow-up, not part of this change:** the IDP "under the limit, so no drop is needed" wording ignores roster room. Your roster was full (27 of 27) on 2026-11-17.
+
+**What did not change:** anything about DL, LB or DB. Every IDP number, stored record, weight and statistic comes out as before; the check that proves it is the first kicker item of SPEC §10. The evaluation protocol's definitions and items 1–9 of the week-13 agenda stand as registered.
+
+**No kicker term was fitted on this season's results.**
+- a_K = 0, b_K = 1, the σ floor, the rank priors 2 : 1 : 1 and the 60:40 split are priors.
+- σ_out,K = 5.0 is a level set from 2022–25 (4.78 within a kicker's season). The 2026 figure (5.20 over weeks 5–10) was read beside it, not fitted.
+- The yards-per-make table is a league-wide unit conversion. Its 2,398 kicks do include 530 from 2026 weeks 1–10.
+- The probe looked at five sampled weeks of Sleeper kicker projections against results (r 0.15) to size how predictable kickers are. Nothing was tuned on it.
+
+**Registered kicker checks (2026-11-17, before any kicker result was graded)**
+
+Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. Every result goes in the ledger whichever way it comes out. No variant search after seeing the data.
+
+- **K1. Archive integrity of `sleeper_k`, `espn_k`, `fp_k` and `rotoballer_k`.**
+  - **Question:** does a source's archive, read after the games, return the row that was frozen live before kickoff? Until it does, the source's backfilled and late rows don't count toward the kicker weights (`[accuracy] untrusted`).
+  - **Sample:** per source, the rows it read live (not `backfill`, not `late`) in the live kicker weeks settled by the check. Each such week is read again from the archive into a scratch directory. Nothing under `data/` is changed.
+  - **Primary statistic:** the share of compared rows that are equal on what feeds μ: a projection's published stat line, a ranking's rank. Labels such as team aren't compared.
+  - **Pass rule,** as for the IDP archives (SPEC §5.3, §13): at least 99% equal. With fewer than 100 rows that means every row.
+  - **Minimum sample:** 2 live weeks and 40 compared rows for the source. Below that it is not decided and stays untrusted.
+  - **Reported beside it, outside the rule:** live rows the archive no longer returns. RotoBaller's re-dated article drops Thursday kickers, and FantasyPros' archived lists lose players.
+  - **On a pass:** the source leaves `untrusted` in the checkpoint's results PR, and its archive rows count from the next week written. Weeks already written keep their `weights.json`.
+  - **On a fail:** it stays untrusted and its archive rows stay display-only. The rule is not loosened afterwards.
+  - **When:** the week-13 checkpoint if the sample is there, otherwise season end.
+- **K2. The kicker swing.**
+  - **Question:** are the kicker ranges and odds the right width?
+  - **Sample:** the kicker pool (the 20 best by the plain average of the kicker projection sources, among kickers who played) on live, settled kicker weeks. σ_pred comes from the frozen record: √(σ_μ² + swing²), or σ_out,K where the record has no swing.
+  - **Primary statistic:** the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, with a week-clustered margin of 2 SE.
+  - **Guardrail, shown beside it:** range coverage below / inside / above the floor–ceiling against 20/60/20, on the weeks where kickers had a swing of their own.
+  - **Weeks before `kicker_var` was written** are graded on σ_out,K alone and reported apart.
+  - **Week 13:** report only.
+  - **Season end:** keep a_K = 0 and b_K = 1 (and σ_out,K = 5.0) if the margin contains 1.00. Otherwise refit them on the season's live kicker weeks for 2027. One season can't both fit and test the refit, so it enters 2027 as a prior to be checked on 2027's weeks.
+  - No in-season change either way.
+- **K3. Do the kicker weights differ from their priors at all?**
+  - **Why ask:** kicker projections explain little of a kicker's week (r about 0.15, SPEC §11), so the expected answer is no.
+  - **Sample:** the kicker pool on the settled weeks the kicker weights count: live rows, and archive rows only for a source that has passed K1.
+  - **Primary statistic:** α̂ for kickers, the least-squares projection : ranking split as recorded, with its leave-one-week-out margin, against the prior 0.6.
+  - **Reported beside it:** each kicker source's error ratio with its margin, against 1.
+  - **Week 13:** report only.
+  - **Season end:** if α̂ is within 2 SE of 0.6 and no source's ratio is 2 SE from 1, the result is recorded as "not distinguishable from the priors", and the owner decides whether the kicker weights are simply fixed at the priors for 2027. Otherwise the weights stay as the shrunk rule gives them. K is a single position, so a "differs" claim needs |t| ≥ 2.5 (protocol rule 6).
+  - No in-season change either way.
 
 ## Owner questions still open
 - Vegas player props (would need an Odds API key): untested. Game lines (spread, total, implied points) were tested and rejected (ledger in `docs/methods-review.md`), apart from the DL game total, which stays shadow-only inside the DL matchup candidate.

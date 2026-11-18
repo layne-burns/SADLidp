@@ -66,3 +66,16 @@ cheapest ways to add evidence.
    expected by chance. A pass at a single position needs |t| ≥ 2.5.
 7. **Frozen definitions.** The pool, band, weeks and SE rules change only at a checkpoint. They apply from then on
    and are never re-run on past data to rescue a result.
+
+## Kickers (added 2026-11-17, before any kicker result was graded)
+Kickers joined as a fourth position on 2026-11-17 (SPEC D23). This section adds their scope. It changes none of
+the definitions above, which remain the DL, LB and DB definitions.
+- **A separate scope.** No kicker row, pair or week enters a DL, LB or DB figure, a pooled figure, or the IDP
+  weights. Kicker figures are shown on their own.
+- **The kicker pool:** per week, the 20 best kickers by the plain average of the kicker projection sources, among
+  kickers who played. Top-k hits are top 5. A source counts in a week when it covers 10 of the pool. A kicker week
+  is partial only against 20. (About 28 kickers play a week, so the sizes of 50, 12 and 15 can't apply.)
+- **The same rules otherwise:** settled weeks only, the frozen μ as the number graded, every figure with its ± or
+  its n, and the adoption rule above. K is one position, so a pass needs |t| ≥ 2.5 (rule 6).
+- **Registered kicker checks:** `docs/status.md` §7 (archive integrity, the swing, whether the weights differ from
+  their priors). No kicker term was fitted on this season's results.

@@ -45,6 +45,7 @@
  "houston": "HOU",
  "ind": "IND",
  "indianapolis": "IND",
+ "jac": "JAX",
  "jacksonville": "JAX",
  "jacksonville jaguars": "JAX",
  "jaguars": "JAX",
@@ -52,6 +53,7 @@
  "jets": "NYJ",
  "kansas city": "KC",
  "kc": "KC",
+ "la": "LAR",
  "lac": "LAC",
  "lar": "LAR",
  "las vegas": "LV",
@@ -97,5 +99,6 @@
  "titans": "TEN",
  "vikings": "MIN",
  "was": "WAS",
- "washington": "WAS"
+ "washington": "WAS",
+ "wsh": "WAS"
 }

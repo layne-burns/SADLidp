@@ -10,20 +10,21 @@ import math
 import statistics
 
 from . import scoring
-from .positions import IDP_SLOTS, slot_of
+from .positions import SLOTS, slot_of
 
 
 def within_player_sd(
     weekly_stats: dict[int, dict[str, dict]], players: dict[str, dict], scoring_settings: dict, min_games: int = 8
 ) -> dict:
-    """weekly_stats[week][player_id] = actual stat line. Returns {"DL": sd, ..., "players": {...}}."""
+    """weekly_stats[week][player_id] = actual stat line. Returns {"DL": sd, ..., "players": {...}}, one entry
+    per tracked slot (K included: a kicker's lines are scored like anyone's)."""
     weekly_points: dict[str, list[float]] = {}
     for lines in weekly_stats.values():
         for pid, st in lines.items():
             if not scoring.num(st.get("gp")) or slot_of(players.get(pid, {})) is None:
                 continue
             weekly_points.setdefault(pid, []).append(scoring.points(st, scoring_settings))
-    sds: dict[str, list[float]] = {s: [] for s in IDP_SLOTS}
+    sds: dict[str, list[float]] = {s: [] for s in SLOTS}
     for pid, pts in weekly_points.items():
         if len(pts) >= min_games:
             sds[slot_of(players[pid])].append(statistics.stdev(pts))

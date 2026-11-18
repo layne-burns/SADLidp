@@ -78,10 +78,10 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     from .impute import load_or_build_priors
     from .positions import slot_of
     from .sleeper import Sleeper, season_of
-    from .sync import SIGNALS, SOURCES, build_matcher, fetch_schedule, make_client
+    from .sync import K_SOURCES, SIGNALS, SOURCES, build_matcher, fetch_schedule, make_client
 
     cfg = load_config(args.config)
-    archives = {**SOURCES, **SIGNALS}
+    archives = {**SOURCES, **SIGNALS, **K_SOURCES}
     if args.source and args.source not in archives:
         print(f"backfill: unknown source {args.source!r}; one of {', '.join(archives)}")
         return 2
@@ -94,9 +94,10 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     target = sched.target_week(now) or max((g.week for g in sched.games), default=0) + 1
     weeks = [w for w in (_weeks(args.weeks) if args.weeks else range(1, target)) if w < target]
     players = {str(k): v for k, v in sleeper.players(now.date().isoformat()).items()}
-    idp = {pid: p for pid, p in players.items() if slot_of(p)}
+    tracked = {pid: p for pid, p in players.items() if slot_of(p)}  # IDPs and kickers; each source gets its group's
     priors = load_or_build_priors(sleeper, data_dir, season, players)
-    matcher = build_matcher(cfg, players, crosswalk.load(client, args.cache_dir, now.date().isoformat()))
+    xwalk = crosswalk.load(client, args.cache_dir, now.date().isoformat())
+    matcher = build_matcher(cfg, players, xwalk)
     done = backfill.run(
         archives,
         cfg,
@@ -106,8 +107,9 @@ def cmd_backfill(args: argparse.Namespace) -> int:
         now,
         client=client,
         sleeper=sleeper,
-        players=idp,
+        players=tracked,
         matcher=matcher,
+        matchers={"k": build_matcher(cfg, players, xwalk, group="k")},
         priors=priors,
         only=args.source,
         redo=args.redo,
@@ -226,7 +228,7 @@ def cmd_backtest(args: argparse.Namespace) -> int:
         return 0
     if args.what == "fp-fetch":
         from . import crosswalk
-        from .positions import slot_of
+        from .positions import idp_slot_of as slot_of
         from .sync import build_matcher
 
         client = make_client(cfg)
@@ -325,7 +327,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--season", type=int)
     p.set_defaults(func=cmd_gate)
     p = sub.add_parser("backfill", parents=[common], help="fetch past weeks from the sources' archives")
-    p.add_argument("--source", help="only this source (e.g. espn_proj)")
+    p.add_argument("--source", help="only this source (e.g. espn_proj, or sleeper_k for the kickers)")
     p.add_argument("--weeks", help="e.g. 1-5 (default: every week before the target week)")
     p.add_argument("--redo", action="store_true", help="refetch weeks backfilled before (live weeks are kept)")
     p.add_argument("--fill-gaps", action="store_true",

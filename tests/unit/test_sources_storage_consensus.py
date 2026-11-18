@@ -114,7 +114,7 @@ def test_within_player_sd():
     out = within_player_sd(weekly, players, {"idp_tkl_solo": 2.0, "idp_sack": 6.0}, min_games=8)
     pts = [2.0 * (w % 3) for w in range(1, 9)]
     assert out["LB"] == round(statistics.stdev(pts), 3) and out["DL"] == 0.0 and out["DB"] is None
-    assert out["players"] == {"DL": 1, "LB": 1, "DB": 0}
+    assert out["players"] == {"DL": 1, "LB": 1, "DB": 0, "K": 0} and out["K"] is None  # every tracked slot
 
 
 def test_unchanged_rows_keep_their_first_seen_time_and_files_are_one_row_per_line(tmp_path):

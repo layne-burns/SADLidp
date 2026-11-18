@@ -20,10 +20,10 @@ class FetchContext:
     season: int
     week: int
     now: datetime
-    players: dict[str, dict]  # the week's IDP players, by Sleeper id
+    players: dict[str, dict]  # the week's players of the source's own group (IDPs, or kickers), by Sleeper id
     cfg: dict  # the source's own config table plus "espn_league_id"
     matcher: object | None = None  # matching.Matcher (§6.1)
-    imputer: object | None = None  # impute.Imputer (§6.2)
+    imputer: object | None = None  # impute.Imputer (§6.2); None for a kicker source (never imputed)
     archive: bool = False  # the backfill runner is asking for a past week (§5.3)
     kickoff_of: Callable[[str], datetime | None] | None = None  # a player's kickoff that week, if known
 

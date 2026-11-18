@@ -23,6 +23,7 @@ s0_default = 1.0            # between-source SD assumed until >=3-source players
 DL = 0.75
 LB = 0.75
 DB = 0.75
+K = 0.75
 
 [swap]
 threshold = 0.6             # START/UPGRADE badge probability (SPEC §6.7)
@@ -36,17 +37,21 @@ hi = 0.75
 DL = 4.3                    # DL re-fitted on 2025 + 2026 weeks 1–9 at the week-9 checkpoint (2026-11-17); LB, DB unchanged
 LB = 18.0
 DB = 27.0
+K = 0.0                     # kickers: swing² = a + b · kicker_var (swing.py), a prior, not a fit (2026-11-17)
 
 [swing.b]
 DL = 2.23
 LB = 1.35
 DB = 0.65
+K = 1.0
 
 [sigma_out]                 # per-position weekly outcome SD: the fallback when a player has no projected stats
 method = "last_season"      # "residuals": this season's errors once 3 settled weeks exist (SPEC §6.7)
 DL = 5.0
 LB = 5.5
 DB = 5.0
+K = 5.0                     # measured: 4.78 within kicker-seasons 2022–25, 5.3 in 2026 weeks 5–8; used as is (the
+                            # 2025 cache has no K and is not rebuilt for it)
 
 [weights]
 prior_split = 0.6           # projection : rank group prior (D11)
@@ -57,9 +62,15 @@ k = 4                       # shrinkage of the accuracy weights, in weeks: after
 fp_ecr = 2.0                # a 26-expert consensus
 rotoballer = 1.0
 fantasydata = 1.0
+fp_k = 2.0                  # the kicker rank sources (their own group: these never meet the three above)
+rotoballer_k = 1.0
+fantasydata_k = 1.0
 
 [accuracy]                  # accuracy weights (SPEC §6.5 Implementation)
-untrusted = []              # sources whose archived/late rows don't count yet; Sleeper, ESPN and FP have passed (§13)
+# sources whose archived/late rows don't count yet; Sleeper, ESPN and FP have passed for IDP (§13). The four
+# kicker archives have not been checked for pre-game values: their backfilled rows are stored and shown, but
+# only rows read live move the kicker weights until the check passes (docs/status.md).
+untrusted = ["sleeper_k", "espn_k", "fp_k", "rotoballer_k"]
 
 [form]                      # the form term added to μ (SPEC §6.4): his earlier misses this season and his last game's snaps
 enabled = true
@@ -110,6 +121,46 @@ expected_by = "Wed 12:00"
 enabled = true
 archive = true
 
+# Kicker sources (2026-11-17): their own group, blended and weighted apart from the five above (SPEC §5.2).
+[sources.sleeper_k]         # Sleeper projections, position K (own request)
+enabled = true
+late_rows = true
+archive = true
+
+[sources.espn_k]            # the same ESPN league, kicker slot
+enabled = true
+archive = true
+late_rows = false
+
+[sources.cbs_k]             # CBS weekly kicker projections; the page serves the current week only
+enabled = true
+archive = false
+late_rows = false
+
+[sources.fp_k]              # FantasyPros weekly kicker ECR
+enabled = true
+archive = true
+late_rows = false
+
+[sources.fantasydata_k]     # FantasyData's weekly kicker rankings
+enabled = true
+archive = false             # live weeks only
+late_rows = false
+expected_by = "Wed 12:00"
+
+[sources.rotoballer_k]      # RotoBaller's weekly kicker article, found through its search RSS
+enabled = true
+archive = true
+late_rows = false
+expected_by = "Thu 12:00"
+
+[kicker.yards_per_make]     # mean distance of a made FG in each bucket, 2024–26 (n = 2,398); for sources that give counts, not yards
+"0_19" = 19.0
+"20_29" = 25.4
+"30_39" = 34.4
+"40_49" = 44.4
+"50p" = 53.9
+
 [censor]
 M = 10                      # unlisted players ranked up to depth + M by projection get a censored rank (SPEC §6.4)
 
@@ -122,6 +173,7 @@ max_requests = 40           # per host
 "www.fantasypros.com" = 5.0  # its robots.txt crawl delay
 "www.rotoballer.com" = 3.0
 "fantasydata.com" = 3.0
+"www.cbssports.com" = 3.0
 
 # [impute.m_k]              # overrides the empirical-Bayes m_k in data/<prev>/impute_priors.json (SPEC §6.2)
 # idp_tkl_loss = 50.0

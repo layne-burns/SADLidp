@@ -20,8 +20,8 @@ GROUPS = {"sleeper_proj": "projection", "espn_proj": "projection", "fp_ecr": "ra
 def test_coefficients_and_poisson_variance():
     assert swing.coefficients({}) is None and swing.coefficients({"swing": {"enabled": False}}) is None
     c = swing.coefficients({"swing": {"enabled": True, "a": {"LB": 18}, "b": {"DL": 2.5}}})
-    assert c == {"a": {"DL": 0.0, "LB": 18.0, "DB": 0.0}, "b": {"DL": 2.5, "LB": 1.0, "DB": 1.0}, "lo": -0.8,
-                 "hi": 0.75}  # fmt: skip
+    assert c == {"a": {"DL": 0.0, "LB": 18.0, "DB": 0.0, "K": 0.0}, "b": {"DL": 2.5, "LB": 1.0, "DB": 1.0, "K": 1.0},
+                 "lo": -0.8, "hi": 0.75}  # fmt: skip
     assert swing.poisson_var({"idp_tkl_solo": 4, "idp_sack": 0.5, "def_snp": 60}, SC) == 4 * 4 + 36 * 0.5
 
 

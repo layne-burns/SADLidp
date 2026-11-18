@@ -2,7 +2,8 @@
 
 Runs the normal sync pipeline offline, as of one minute before the week's first kickoff, against:
 - every source file saved for the week (SPEC §5.3: no refetch; each source's live fetch fails, so the
-  sync uses the saved rows, and a source with no file that week is left out);
+  sync uses the saved rows, and a source with no file that week is left out; the kicker sources' files only
+  for a week that tracked kickers live, never for one whose kicker rows were all backfilled later);
 - the rosters and lineups of that week (Sleeper's matchups for the week);
 - the saved league settings, schedule and last season's σ_out;
 - the earlier weeks' results and frozen records, so the form term (SPEC §6.4) sees what it would have.
@@ -33,6 +34,7 @@ from . import storage
 from .net import Response
 from .schedule import NFLVERSE_GAMES, Schedule
 from .sleeper import V1
+from .sources import registry
 from .sync import SIGNALS, SOURCES, run_sync
 
 NOTE = (
@@ -55,6 +57,11 @@ class ReplayClient:
         return Response(url=url, final_url=url, status=200, body=json.dumps(body).encode())
 
 
+def _has_live_rows(path: Path) -> bool:
+    """Whether a saved source file holds a row read while the week was live (not marked `backfill`)."""
+    return any(not row.get("backfill") for row in (storage.load_source(path).get("rows") or {}).values())
+
+
 def replay_week(
     cfg: dict,
     data_dir: Path | str,
@@ -69,9 +76,16 @@ def replay_week(
     data_dir = Path(data_dir)
     wdir = storage.week_dir(data_dir, season, week)
     league = storage.read_json(data_dir / str(season) / "league.json")
+    blended = [*SOURCES, *registry.names_for("k")]  # kicker sources too: a week saved before them has none
     saved = {
-        name: wdir / "sources" / f"{name}.json" for name in SOURCES if (wdir / "sources" / f"{name}.json").exists()
+        name: wdir / "sources" / f"{name}.json" for name in blended if (wdir / "sources" / f"{name}.json").exists()
     }
+    # Kickers are replayed only for a week that tracked them live. A week whose kicker files hold archive rows
+    # alone (backfilled later, for the Stats page) had a page without kickers: its replay has none either, and
+    # no kicker record is made up for it (SPEC §5.3).
+    k_saved = [name for name in saved if registry.group_of_source(name) == "k"]
+    if not any(_has_live_rows(saved[name]) for name in k_saved):
+        saved = {name: path for name, path in saved.items() if name not in k_saved}
     sched_json = storage.read_json(data_dir / str(season) / "schedule.json")
     if not league or not saved or not sched_json:
         raise FileNotFoundError(f"week {week}: league.json, schedule.json or every source snapshot is missing")
@@ -103,7 +117,7 @@ def replay_week(
                             "injury_status": None}  # fmt: skip
     # sources with no file that week are switched off; the backfill runner has nothing to do in a replay
     sources_cfg = {**(cfg.get("sources") or {})}
-    for name in [*SOURCES, *SIGNALS]:  # signals aren't part of a page: never read in a replay
+    for name in [*blended, *SIGNALS]:  # signals aren't part of a page: never read in a replay
         if name not in saved:
             sources_cfg[name] = {**(sources_cfg.get(name) or {}), "enabled": False}
     run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0}}
@@ -154,7 +168,7 @@ def replay_week(
         return path
     data["replayed"] = {"as_of": now.isoformat(), "note": NOTE}
     # the refused live fetches ("<source>: failed ...; using earlier rows") are how a replay reads saved rows
-    noise = ("σ_out", "live stats", *(f"{name}: failed" for name in SOURCES))
+    noise = ("σ_out", "live stats", *(f"{name}: failed" for name in blended))
     data["warnings"] = [w for w in data.get("warnings", []) if not w.startswith(noise)]
     for name in saved:  # each source was read from its saved file, not fetched: say so, not "failed"
         src = (data.get("sources") or {}).get(name)

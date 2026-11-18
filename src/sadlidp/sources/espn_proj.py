@@ -39,10 +39,10 @@ RAW_ONLY = ("94", "98", "103", "105")  # likely defensive TDs and safeties: kept
 POSITIONS = {9: "DL", 10: "DL", 11: "LB", 12: "DB", 13: "DB"}  # defaultPositionId DT, DE, LB, CB, S
 
 
-def filter_header(offset: int) -> str:
-    """The X-Fantasy-Filter for one page: the IDP lineup slots, most owned first."""
+def filter_header(offset: int, slot_ids: list[int] = SLOT_IDS) -> str:
+    """The X-Fantasy-Filter for one page: the IDP lineup slots (or `slot_ids`, for `espn_k`), most owned first."""
     players = {
-        "filterSlotIds": {"value": SLOT_IDS},
+        "filterSlotIds": {"value": slot_ids},
         "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
         "limit": PAGE_SIZE,
         "offset": offset,
@@ -62,13 +62,15 @@ def projections(player: dict, season: int) -> dict[int, dict]:
     return out
 
 
-def _pages(ctx: FetchContext, url: str) -> tuple[list[dict], int, bool, str | None, str | None]:
+def _pages(
+    ctx: FetchContext, url: str, slot_ids: list[int] = SLOT_IDS
+) -> tuple[list[dict], int, bool, str | None, str | None]:
     """(players, pages read, ended on a short page, status, error): any bad page fails them all (§5.2)."""
     players: list[dict] = []
     for page in range(MAX_PAGES):
         offset = page * PAGE_SIZE
         where = f"page {page + 1} (offset {offset})"
-        resp = ctx.client.get(url, headers={"X-Fantasy-Filter": filter_header(offset)})
+        resp = ctx.client.get(url, headers={"X-Fantasy-Filter": filter_header(offset, slot_ids)})
         if getattr(resp, "challenged", False):
             return players, page + 1, False, "blocked", f"{where}: bot challenge"
         if not resp.ok:

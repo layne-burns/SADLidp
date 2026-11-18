@@ -191,7 +191,7 @@ def test_fp_ranks_join_the_consensus_at_the_rank_groups_share(tmp_path):
     data = tmp_path / "d"
     routes, pages = fp_world()
     out = run_sync(CFG, data, tmp_path / "c", NOW, client=SyncClient(routes, pages), log=lambda m: None)
-    assert out.synced and not [w for w in out.warnings if w.startswith("fp_")]
+    assert out.synced and not [w for w in out.warnings if w.startswith(("fp_ecr", "fp_dst"))]  # no K page here: fp_k
     week = data / "2026" / "week05"
     run = json.loads((week / "run.json").read_text())
     fp = run["sources"]["fp_ecr"]

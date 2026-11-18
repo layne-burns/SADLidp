@@ -29,7 +29,8 @@ from pathlib import Path
 
 from . import scoring, storage, weeklog
 from .metrics import brier, pairwise
-from .positions import IDP_SLOTS, slot_of
+from .positions import IDP_SLOTS
+from .positions import idp_slot_of as slot_of  # the archives and backtests are IDP only: a kicker has no slot here
 from .schedule import ET
 from .sleeper import Sleeper
 from .swing import poisson_var
@@ -142,12 +143,13 @@ def patch_teams(sleeper: Sleeper, data_dir: Path | str, season: int,
 
 def load(data_dir: Path | str, season: int, sc: dict) -> list[dict]:
     """Player-weeks with a projection, scored under `sc`: week, pid, slot, proj, ps (projected stats),
-    act (None if he didn't play), snap (share of the team's defensive snaps), sack."""
+    act (None if he didn't play), snap (share of the team's defensive snaps), sack. DL, LB and DB rows only:
+    every fit and check below is an IDP one, so a row of any other slot is never loaded."""
     rows = []
     for path in sorted(archive_dir(data_dir, season).glob("week*.json")):
         doc = storage.read_json(path) or {}
         for pid, r in (doc.get("rows") or {}).items():
-            if not r.get("proj"):
+            if not r.get("proj") or r.get("slot") not in IDP_SLOTS:
                 continue
             act = r.get("act")
             snap = r.get("snap")

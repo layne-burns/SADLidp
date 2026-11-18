@@ -1,0 +1,277 @@
+[
+ {
+  "company": "rotowire",
+  "opponent": "IND",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Ka'imi",
+   "injury_status": null,
+   "last_name": "Fairbairn",
+   "position": "K",
+   "team": "HOU"
+  },
+  "player_id": "3451",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 2.72,
+   "fgm": 2.36,
+   "fgm_20_29": 0.41,
+   "fgm_30_39": 0.53,
+   "fgm_40_49": 0.59,
+   "fgm_50p": 0.41,
+   "fgm_yds": 82.31,
+   "fgmiss_30_39": 0.04,
+   "fgmiss_40_49": 0.04,
+   "fgmiss_50p": 0.13,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 9.98,
+   "pts_ppr": 9.98,
+   "pts_std": 9.98,
+   "xpa": 2.86,
+   "xpm": 2.79,
+   "xpmiss": 0.07
+  },
+  "team": "HOU",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": "NYG",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Cam",
+   "injury_status": null,
+   "last_name": "Little",
+   "position": "K",
+   "team": "JAX"
+  },
+  "player_id": "11786",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 2.31,
+   "fgm": 1.99,
+   "fgm_20_29": 0.31,
+   "fgm_30_39": 0.46,
+   "fgm_40_49": 0.41,
+   "fgm_50p": 0.41,
+   "fgm_yds": 67.09,
+   "fgmiss_30_39": 0.04,
+   "fgmiss_40_49": 0.04,
+   "fgmiss_50p": 0.12,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 8.52,
+   "pts_ppr": 8.52,
+   "pts_std": 8.52,
+   "xpa": 2.82,
+   "xpm": 2.69,
+   "xpmiss": 0.13
+  },
+  "team": "JAX",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": "CHI",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Charlie",
+   "injury_status": null,
+   "last_name": "Smyth",
+   "position": "K",
+   "team": "NO"
+  },
+  "player_id": "11653",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 1.83,
+   "fgm": 1.46,
+   "fgm_20_29": 0.2,
+   "fgm_30_39": 0.4,
+   "fgm_40_49": 0.4,
+   "fgm_50p": 0.2,
+   "fgm_yds": 51.5,
+   "fgmiss_30_39": 0.05,
+   "fgmiss_40_49": 0.09,
+   "fgmiss_50p": 0.14,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 6.52,
+   "pts_ppr": 6.52,
+   "pts_std": 6.52,
+   "xpa": 2.2,
+   "xpm": 2.14,
+   "xpmiss": 0.06
+  },
+  "team": "NO",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": "LAC",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Jason",
+   "injury_status": null,
+   "last_name": "Sanders",
+   "position": "K",
+   "team": "NYJ"
+  },
+  "player_id": "5119",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 1.94,
+   "fgm": 1.62,
+   "fgm_20_29": 0.36,
+   "fgm_30_39": 0.41,
+   "fgm_40_49": 0.41,
+   "fgm_50p": 0.2,
+   "fgm_yds": 56.18,
+   "fgmiss_30_39": 0.04,
+   "fgmiss_40_49": 0.04,
+   "fgmiss_50p": 0.13,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 7.11,
+   "pts_ppr": 7.11,
+   "pts_std": 7.11,
+   "xpa": 2.31,
+   "xpm": 2.25,
+   "xpmiss": 0.06
+  },
+  "team": "NYJ",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": "DEN",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Matt",
+   "injury_status": null,
+   "last_name": "Gay",
+   "position": "K",
+   "team": "LV"
+  },
+  "player_id": "6083",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 1.86,
+   "fgm": 1.57,
+   "fgm_20_29": 0.35,
+   "fgm_30_39": 0.46,
+   "fgm_40_49": 0.52,
+   "fgm_50p": 0.17,
+   "fgm_yds": 62.53,
+   "fgmiss_50p": 0.15,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 7.37,
+   "pts_ppr": 7.37,
+   "pts_std": 7.37,
+   "xpa": 2.21,
+   "xpm": 2.09,
+   "xpmiss": 0.12
+  },
+  "team": "LV",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": "PIT",
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Jake",
+   "injury_status": null,
+   "last_name": "Elliott",
+   "position": "K",
+   "team": "PHI"
+  },
+  "player_id": "4195",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 999.0,
+   "fga": 1.77,
+   "fgm": 1.53,
+   "fgm_20_29": 0.3,
+   "fgm_30_39": 0.4,
+   "fgm_40_49": 0.35,
+   "fgm_50p": 0.25,
+   "fgm_yds": 53.38,
+   "fgmiss_30_39": 0.04,
+   "fgmiss_40_49": 0.04,
+   "fgmiss_50p": 0.08,
+   "gp": 1.0,
+   "pos_adp_dd_ppr": 999.0,
+   "pts_half_ppr": 6.88,
+   "pts_ppr": 6.88,
+   "pts_std": 6.88,
+   "xpa": 2.42,
+   "xpm": 2.3,
+   "xpmiss": 0.12
+  },
+  "team": "PHI",
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": null,
+  "player": {
+   "fantasy_positions": [
+    "K"
+   ],
+   "first_name": "Phillip",
+   "injury_status": null,
+   "last_name": "Andersen",
+   "position": "K",
+   "team": null
+  },
+  "player_id": "5838",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 1000.0
+  },
+  "team": null,
+  "week": 11
+ },
+ {
+  "company": "rotowire",
+  "opponent": null,
+  "player": {
+   "fantasy_positions": [
+    "K",
+    "P"
+   ],
+   "first_name": "Ty",
+   "injury_status": null,
+   "last_name": "Long",
+   "position": "P",
+   "team": null
+  },
+  "player_id": "2650",
+  "season": "2026",
+  "stats": {
+   "adp_dd_ppr": 1000.0
+  },
+  "team": null,
+  "week": 11
+ }
+]

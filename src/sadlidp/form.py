@@ -13,6 +13,8 @@ the sources' misses, never the form term's own. The position's average snap shar
 best-projected players this week, the band the coefficients were fitted on (`backtest.fit_form`). A
 player with no earlier game this season gets no term; μ never drops below 0. The coefficients live in
 `[form]` of the config and are recorded in run.json.
+
+IDP only. A kicker (K) has no coefficients, no snap share and no term: `apply` leaves his μ as it is.
 """
 
 from __future__ import annotations
@@ -83,6 +85,8 @@ def apply(cons: dict[str, dict], slot_of: dict[str, str | None], hist: dict[str,
         h = hist.get(pid) or {}
         base = c["mu"]
         c["base"] = base
+        if slot not in IDP_SLOTS:
+            continue  # a kicker (or an unknown slot): no form term, and no snap share is read for him
         detail: dict[str, dict] = {}
         misses = h.get("misses") or []
         if misses and slot and coef["miss"].get(slot):

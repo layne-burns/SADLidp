@@ -18,6 +18,8 @@ from pathlib import Path
 
 from . import storage, weeklog
 from .impute import Imputer
+from .positions import in_group
+from .sources import registry
 from .sources.base import FetchContext
 
 BUDGET_S = 300.0
@@ -48,10 +50,13 @@ def imputer_for(cfg: dict, priors: dict | None, data_dir: Path | str, season: in
 
 
 def source_cfg(cfg: dict, name: str) -> dict:
-    """`ctx.cfg`: the source's own config table plus the ESPN league id and the config root (alias tables)."""
+    """`ctx.cfg`: the source's own config table plus the ESPN league id and the config root (alias tables); a
+    kicker source also gets the `[kicker]` table (`yards_per_make`) under "kicker"."""
     out = {**((cfg.get("sources") or {}).get(name) or {}), "espn_league_id": (cfg.get("espn") or {}).get("league_id")}
     if "_root" in cfg:
         out["_root"] = cfg["_root"]
+    if registry.group_of_source(name) == "k":
+        out["kicker"] = cfg.get("kicker") or {}
     return out
 
 
@@ -96,10 +101,14 @@ def run(
     log: Callable[[str], None] = print,
     clock: Callable[[], float] = time.monotonic,
     sched=None,
+    matchers: dict[str, object] | None = None,
 ) -> dict[str, list[int]]:
     """Fetch and save the missing past `weeks` of every archive source (`only` one, if named): {name: [weeks]}.
 
-    `sources` is the sync's registry (name -> (module, kind)); `players` the IDP players. With `redo`, a week
+    `sources` is the sync's registry (name -> (module, kind)); `players` the tracked players. Each source is
+    fetched with its own group's players (`positions.in_group`: a kicker source the kickers, any other source
+    everyone else), its group's matcher (`matchers[group]`, else `matcher`), and no imputer for a kicker source
+    (a kicker line is never imputed). With `redo`, a week
     that was backfilled before is fetched again; a week with live rows is never overwritten. With `fill_gaps`
     (SPEC §5.3 Gap fill, 2026-11-17), a week with live rows gains archive rows for the players it has no row
     for, marked `backfill`, and only if the archive agrees with ≥ 99% of its live rows; live rows stay as they are.
@@ -140,9 +149,12 @@ def run(
                 log(f"backfill: {max_requests} requests to {host} reached; {name} weeks {left} wait for the next sync")
                 break
             before = getattr(client, "request_count", None)
-            ctx = FetchContext(client, sleeper, season, w, now, players, source_cfg(cfg, name), matcher,
-                               imputer_for(cfg, priors, data_dir, season, w, players), archive=True,
-                               kickoff_of=week_kickoffs(sched, players, w))  # fmt: skip
+            group = registry.group_of_source(name)
+            mine = in_group(players, group)
+            ctx = FetchContext(client, sleeper, season, w, now, mine, source_cfg(cfg, name),
+                               (matchers or {}).get(group, None if group == "k" else matcher),
+                               None if group == "k" else imputer_for(cfg, priors, data_dir, season, w, mine),
+                               archive=True, kickoff_of=week_kickoffs(sched, mine, w))  # fmt: skip
             try:
                 res = module.fetch(ctx)
                 why = None if res.ok else res.status + (f" ({res.error})" if res.error else "")

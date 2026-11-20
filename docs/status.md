@@ -209,16 +209,16 @@ Owner decisions, 2026-11-17:
 - **Backfill where possible,** so each kicker source's accuracy can be measured and weighted like the IDP ones.
 - **The page:** the position-first layout (SPEC D24).
 
-**In flight** on branch `claude/kickers` (cut from `main` at 07539cb). Nothing was committed or merged when this was written; a box is ticked when its part merges.
+**In flight** on branch `claude/kickers` (cut from `main` at 07539cb). Committed on the branch and pushed (e57de35, d4dc19e), not merged; a box is ticked when its part merges.
 - [ ] **Spec first:** SPEC D23 and D24, with the amendments they need.
 - [ ] **Core:** slots and groups, the source registry, `sleeper_k`, per-group matching, consensus, weights and backfill, the kicker roster rule, the add-only merge of past kicker results, a page build that runs on Windows. Built in the working tree; the suite passes there.
 - [ ] **The five other kicker adapters:** `espn_k`, `cbs_k`, `fp_k`, `fantasydata_k`, `rotoballer_k`.
 - [ ] **Statistics:** K as a separate scope on the Stats page, the report card and the kicker note.
 - [ ] **The page:** This week card, position bar, Yours and Available, folded sections.
 - [ ] **Owner:** write the body of `swing.kicker_var`. Until then every kicker's odds use σ_out,K = 5.0 and no kicker has a floor–ceiling.
-- [ ] **Integration (2026-11-17, in the working tree):** all five parts together. The old code and the new one give identical DL/LB/DB output on the season's real data, offline (replays of weeks 1–11, a week-11 sync, the Stats page, the audit; SPEC §10).
-- [ ] **After merge:** the first sync from Actions with the kicker sources, and the kicker backfill at its normal budget. Run once so far, on 2026-11-17, from a home connection into a scratch copy (nothing committed; SPEC §10): all six kicker sources `ok` with no warning; the backfill, capped at 3 requests a host, wrote weeks 1–3 of three archives; the add-only merge added kicker results to weeks 6–9.
-- [ ] **A probe from Actions** of the six kicker sources under the pipeline's user agent. They have been read from a home connection only (the probe, and that one scratch sync with the pipeline's own client).
+- [ ] **Integration (2026-11-17, in the working tree):** all five parts together. The old code and the new one give identical DL/LB/DB output on the season's real data, offline (replays of weeks 1–11, a week-11 sync, the Stats page, the audit; SPEC §10). Re-run on 2026-11-19 on the data of the preview sync from Actions, which holds real kicker rows: every DL/LB/DB leaf identical.
+- [ ] **After merge:** the first sync from Actions with the kicker sources, and the kicker backfill at its normal budget. Run once so far, on 2026-11-17, from a home connection into a scratch copy (nothing committed; SPEC §10): all six kicker sources `ok` with no warning; the backfill, capped at 3 requests a host, wrote weeks 1–3 of three archives; the add-only merge added kicker results to weeks 6–9. Then once from Actions, by the branch's preview sync that night: all six `ok` with no warning; the backfill, at its normal budget, filled weeks 1–10 of `sleeper_k`, `espn_k` and `fp_k` and weeks 2–10 of `rotoballer_k`; the same add-only merge (SPEC §10). Still to run: the first sync from `main`.
+- [ ] **A probe from Actions** of the six kicker sources under the pipeline's user agent. Read from a runner once so far, by the branch's preview sync of 2026-11-17 under the pipeline's user agent: all six `ok`, every row with a team matched (SPEC §10).
 - [ ] **Owner, before any kicker result is graded:** confirm the thresholds of K1–K3 below. Their outline was agreed; the numbers in them (99% of rows, 2 live weeks and 40 rows, the spread ratio as K2's primary statistic) were chosen when they were written down.
 - [ ] **FantasySharks from Actions:** it answered a home connection on 2026-11-17. It stays out until a runner gets the same answer and the owner amends D21.
 - [ ] **Follow-up, not part of this change:** the IDP "under the limit, so no drop is needed" wording ignores roster room. Your roster was full (27 of 27) on 2026-11-17.

@@ -117,8 +117,9 @@ def test_week_picker_keeps_every_week_and_shows_the_current_one_first(tmp_path):
     for w in range(1, 13):  # every week keeps its link and label, inside "all weeks"
         label = f"Week {w} · now" if w == 12 else f"Week {w}"
         assert re.search(rf'<a href="week-2026-{w:02d}\.html"[^>]*>{label}</a>', nav), w
-    current = re.findall(r'<a href="([^"]+)" class="here" aria-current="page">', nav)
-    assert current == ["week-2026-03.html"] * 2 and nav.count("aria-current") == 2  # the row, and the full list
+    current = re.findall(r'<a href="([^"]+)" class="here"', nav)
+    assert current == ["week-2026-03.html"] * 2  # marked in the row, and in the full list
+    assert nav.count('aria-current="page"') == 1 and 'class="here" aria-current="page">Week 3<' in nav  # the row's
     row = nav[: nav.index("<details>")]  # always on screen: previous, this week, next
     assert re.findall(r'href="week-2026-(\d+)\.html"', row) == ["02", "03", "04"]
     assert "‹ Wk 2" in row and "Wk 4 ›" in row and "all weeks ▾" in nav

@@ -25,7 +25,7 @@ No secrets are needed. The sync pushes its data commits straight to `main`, so i
 
 ## Reading the page
 The page runs top to bottom in the order you need it: what to do this week, then one panel per position, then folded sections for everything else.
-- **Header:** the week and "data as of …". A yellow banner appears when the data is more than 36 hours old. The week picker shows the previous, current and next week; the rest are under "all weeks".
+- **Header:** the season, the week and the time of the data; the league name and the full "data as of …" line are at the bottom of the page. A yellow banner appears when the data is more than 36 hours old. The week picker shows the previous, current and next week; the rest are under "all weeks".
 - **This week:** the card at the top.
   - Every move the page suggests, across positions, with its odds and what to add and drop.
   - "No move suggested at: …" for the positions with none.

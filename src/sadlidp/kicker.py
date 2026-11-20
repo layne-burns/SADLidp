@@ -58,7 +58,8 @@ def add_past_actuals(sleeper, data_dir: Path | str, season: int, sched, now: dat
     stat-correction window is final and never refetched, so the weeks saved before kickers were tracked hold
     no kicker lines. Each such week is refetched once: lines are added for kickers (by Sleeper `position`,
     never by stat key: `TEAM_*` rows carry kicking keys) that have no line yet, no existing line changes, and
-    `k_added_at` marks the week done. Newest weeks first, at most `limit` a sync. Returns the weeks written."""
+    `k_added_at` marks the week done. A week that already holds a kicker line was captured with kickers and is
+    skipped. Newest weeks first, at most `limit` a sync. Returns the weeks written."""
     todo = []
     for week in sorted({g.week for g in sched.games}, reverse=True):
         kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
@@ -68,6 +69,8 @@ def add_past_actuals(sleeper, data_dir: Path | str, season: int, sched, now: dat
         settles, captured = sched.settles_at(week), (doc or {}).get("captured_at")
         if not doc or doc.get("k_added_at") or not captured or settles is None:
             continue
+        if any(is_kicker(players.get(str(pid)) or {}) for pid in doc.get("stats") or {}):
+            continue  # captured with kickers (refresh_actuals keeps their lines): nothing to add, no refetch
         if datetime.fromisoformat(captured) >= settles:  # final; an open week is rewritten whole, kickers included
             todo.append((week, doc))
     written = []

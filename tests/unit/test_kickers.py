@@ -6,7 +6,7 @@ import json
 import math
 import random
 import types
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -258,6 +258,29 @@ def test_kicker_add_drop_swap_and_choose_drop_when_the_roster_is_full():
     assert locked_bye["action"] == "choose_drop" and locked_bye["why"] == [] and locked_bye["reference"] is False
 
 
+def test_a_full_roster_drops_the_kicker_who_cant_play_never_the_one_who_can():
+    """Two kickers, the other one on bye (the owner's week 11: Boswell plays, Borregales is on bye): the move
+    drops the bye kicker. Swapping out S would leave a kicker who can't play on the roster."""
+    bye = _kpanel(["ks", "kb"], 0, {"kb": PlayerStatus(reasons=["bye"])})["K"]
+    assert (bye["starter"], bye["other"], bye["count"]) == ("ks", None, 2)
+    w1 = bye["badges"]["w1"]
+    assert (w1["badge"], w1["over"], w1["action"], w1["drop"]) == ("START", "ks", "add_drop", "kb") and not w1["why"]
+    assert "w2" not in bye["badges"]  # UPGRADE still needs a comparable B
+    st = {pid: PlayerStatus() for pid in K_PLAYERS}
+    no_mu = {pid: c for pid, c in K_CONS.items() if pid != "kb"}  # no projection: the same, he can't be compared
+    out = roster.panel({"players": ["ks", "kb"]}, K_PLAYERS, no_mu, st, {"K": ["w1"]}, {}, {"K": 2.0}, 0.6, {}, 0)
+    assert (out["K"]["badges"]["w1"]["action"], out["K"]["badges"]["w1"]["drop"]) == ("add_drop", "kb")
+    # one Sleeper won't drop (out, his game started) or one on taxi (frees no active spot): back to the swap
+    gone = _kpanel(["ks", "kb"], 0, {"kb": PlayerStatus(reasons=["Out", "locked"])})["K"]["badges"]["w1"]
+    assert (gone["action"], gone["drop"], gone["reference"]) == ("swap", "ks", False)
+    taxi = roster.panel({"players": ["ks", "kb"], "taxi": ["kb"]}, K_PLAYERS, no_mu, st, {"K": ["w1"]}, {}, {"K": 2.0},
+                        0.6, {}, 0)  # fmt: skip
+    assert (taxi["K"]["badges"]["w1"]["action"], taxi["K"]["badges"]["w1"]["drop"]) == ("swap", "ks")
+    assert _kpanel(["ks", "kb"], 1, {"kb": PlayerStatus(reasons=["bye"])})["K"]["badges"]["w1"]["action"] == "add"
+    both = _kpanel(["ks", "kb"], 0, {pid: PlayerStatus(reasons=["bye"]) for pid in ("ks", "kb")})["K"]["badges"]
+    assert (both["w1"]["action"], both["w1"]["drop"]) == ("choose_drop", None)  # no S: still yours to choose
+
+
 def test_kicker_reference_reasons_and_a_league_that_does_set_a_limit():
     played = _kpanel(["ks"], 0, {"ks": LOCKED}, lineup={"K": "ks"})["K"]
     assert played["starter_locked"] and played["badges"]["w1"]["action"] == "swap"
@@ -308,26 +331,32 @@ def test_settled_weeks_gain_kicker_lines_once_and_nothing_else_changes(tmp_path)
                "p1": {"position": "P", "fantasy_positions": ["K", "P"]}}  # fmt: skip
     now = datetime(2026, 11, 17, 18, 0, tzinfo=ET)
     final, still_open = "2026-11-01T12:00:00+00:00", "2026-09-10T12:00:00+00:00"
-    saved = {"a": {"gp": 1, "idp_tkl_solo": 5}, "k1": {"gp": 1, "xpm": 2}}
+    saved = {"a": {"gp": 1, "idp_tkl_solo": 5}}
+    with_k = {**saved, "k1": {"gp": 1, "xpm": 2}}  # a final week captured with kickers (today's refresh_actuals)
     docs = {1: {"week": 1, "captured_at": final, "stats": saved},
             2: {"week": 2, "captured_at": final, "stats": dict(saved)},
             3: {"week": 3, "captured_at": final, "stats": dict(saved), "k_added_at": "2026-11-16T00:00:00+00:00"},
-            4: {"week": 4, "captured_at": still_open, "stats": dict(saved)}}  # fmt: skip
-    assert datetime.fromisoformat(still_open) < SCHED.settles_at(4) <= datetime.fromisoformat(final)
+            4: {"week": 4, "captured_at": still_open, "stats": dict(saved)},
+            5: {"week": 5, "captured_at": final, "stats": with_k}}  # fmt: skip
+    open_at, final_at = datetime.fromisoformat(still_open), datetime.fromisoformat(final)
+    assert open_at < SCHED.settles_at(4) <= SCHED.settles_at(5) <= final_at
     for week, doc in docs.items():
         storage.write_json(storage.week_dir(tmp_path, 2026, week) / "actuals.json", doc)
-    payload = {"a": {"gp": 1, "idp_tkl_solo": 99}, "b": {"gp": 1, "idp_sack": 1}, "k1": {"gp": 1, "xpm": 99},
+    payload = {"a": {"gp": 1, "idp_tkl_solo": 99}, "b": {"gp": 1, "idp_sack": 1}, "k1": {"gp": 1, "xpm": 3},
                "k2": {"gp": 1, "fgm_yds": 104, "xpm": 2, "xpmiss": 1}, "p1": {"gp": 1, "punts": 4},
                "TEAM_PIT": {"fgm_yds": 104, "xpm": 2, "gp": 1}, "PIT": {"gp": 1}}  # fmt: skip
-    sleeper = StatsSleeper({1: payload, 2: None})
+    sleeper = StatsSleeper({1: payload, 2: None, 5: payload})
     done = kicker.add_past_actuals(sleeper, tmp_path, 2026, SCHED, now, players)
-    assert done == [1] and sleeper.calls == [2, 1]  # newest first; week 3 is marked, week 4 open, week 5+ unsaved
+    # newest first; week 5 already holds kicker lines, week 3 is marked, week 4 open, week 6+ unsaved
+    assert done == [1] and sleeper.calls == [2, 1]
+    assert storage.read_json(storage.week_dir(tmp_path, 2026, 5) / "actuals.json") == docs[5]  # not even rewritten
     doc = storage.read_json(storage.week_dir(tmp_path, 2026, 1) / "actuals.json")
     assert doc["stats"] == {
         **saved,
+        "k1": payload["k1"],
         "k2": payload["k2"],
-    }  # one kicker added: no line changed, no IDP, punter or team row
-    assert (doc["k_added_at"], doc["k_added"], doc["captured_at"], doc["week"]) == (now.isoformat(), 1, final, 1)
+    }  # two kickers added: no line changed, no IDP, punter or team row
+    assert (doc["k_added_at"], doc["k_added"], doc["captured_at"], doc["week"]) == (now.isoformat(), 2, final, 1)
     assert scoring.points(doc["stats"]["k2"], SC) == pytest.approx(11.4)
     assert "k_added_at" not in storage.read_json(storage.week_dir(tmp_path, 2026, 2) / "actuals.json")  # fetch failed
     assert kicker.add_past_actuals(sleeper, tmp_path, 2026, SCHED, now, players) == [] and sleeper.calls == [2, 1, 2]
@@ -335,6 +364,22 @@ def test_settled_weeks_gain_kicker_lines_once_and_nothing_else_changes(tmp_path)
     assert kicker.add_past_actuals(sleeper, tmp_path, 2026, SCHED, now, players) == [2]
     assert storage.read_json(storage.week_dir(tmp_path, 2026, 2) / "actuals.json")["k_added"] == 0
     assert kicker.add_past_actuals(sleeper, tmp_path, 2026, SCHED, now, players) == [] and len(sleeper.calls) == 4
+
+
+def test_the_week_refresh_finalises_with_kickers_is_not_fetched_again(tmp_path):
+    """refresh_actuals keeps kicker lines, so a week it finalises needs no add-only pass: one /stats request for
+    it in that sync, not two, and no `k_added_at` marker (that marks a week saved before kickers)."""
+    now, week = datetime(2026, 11, 17, 18, 0, tzinfo=ET), 9
+    assert SCHED.settles_at(week) <= now
+    open_capture = {"week": week, "captured_at": (SCHED.settles_at(week) - timedelta(days=1)).isoformat(), "stats": {}}
+    storage.write_json(storage.week_dir(tmp_path, 2026, week) / "actuals.json", open_capture)
+    sleeper = StatsSleeper({week: {"a": {"gp": 1, "idp_sack": 1}, "k1": {"gp": 1, "xpm": 3}}})
+    players = {"a": {"position": "LB"}, "k1": KICKER}
+    assert sync.refresh_actuals(sleeper, tmp_path, 2026, SCHED, now, players) == [week]
+    assert kicker.add_past_actuals(sleeper, tmp_path, 2026, SCHED, now, players) == []
+    assert sleeper.calls.count(week) == 1
+    doc = storage.read_json(storage.week_dir(tmp_path, 2026, week) / "actuals.json")
+    assert doc["stats"] == {"a": {"gp": 1, "idp_sack": 1}, "k1": {"gp": 1, "xpm": 3}} and "k_added_at" not in doc
 
 
 def test_at_most_a_few_settled_weeks_a_sync(tmp_path):
@@ -390,7 +435,11 @@ def test_mix_averages_a_kickers_kicking_line_and_nothing_else():
                                  "fgm_0_39": 0.7, "fgm_20_29": 0.3, "fgm_30_39": 0.5, "fgm_40_49": 0.5})  # fmt: skip
     assert "xpa" not in lam and "gp" not in lam and not [k for k in lam if k.startswith("idp_")]  # only what's given
     buckets = sum(v for k, v in lam.items() if k.startswith("fgm_") and k != "fgm_yds")
-    assert buckets == pytest.approx(lam["fgm"])  # sources cut the buckets differently; mixed, they still add up
+    assert buckets == pytest.approx(lam["fgm"])  # cut differently, no make in two buckets (each source's add up here)
+    short = {"sleeper_k": {"k": {"stats": {"fgm": 2.36, "fgm_20_29": 0.41, "fgm_30_39": 0.53, "fgm_40_49": 0.59,
+                                           "fgm_50p": 0.41}}}}  # fmt: skip
+    lam_s = swing.mix("k", short, K_KINDS, SC, None, "K")  # Sleeper's bands can fall short of its makes: kept so
+    assert lam_s["fgm"] == 2.36 and sum(v for k, v in lam_s.items() if k != "fgm") == pytest.approx(1.94)
     assert swing.mix("k", K_ROWS, K_KINDS, SC, {"sleeper_k": 1.0}, "K")["fgm_yds"] == 60.0
     assert swing.mix("z", K_ROWS, K_KINDS, SC, slot="K") is None
     assert set(swing.mix("k", K_ROWS, K_KINDS, SC)) == set(scoring.idp_keys(SC))  # no slot given: the IDP keys
@@ -431,9 +480,15 @@ def test_a_kicker_variance_becomes_his_swing_when_the_model_gives_one(monkeypatc
     }  # fmt: skip
     priors = {**COEF, "a": {**COEF["a"], "K": 9.0}}
     assert swing.kicker_sigma({"fgm": 2.0}, priors, SC) == 5.0
-    for bad in (0.0, -4.0, float("nan")):  # never a zero-width range: no usable variance, no swing
+    for bad in (0.0, -4.0, float("nan"), "n/a"):  # never a zero-width range: no usable variance, no swing
         monkeypatch.setattr(swing, "kicker_var", lambda line, sc, yards=None, bad=bad: bad)
         assert swing.kicker_sigma({"fgm": 2.0}, COEF, SC) is None
+    # a first model that reads a key the line lacks raises: that kicker keeps σ_out,K and the sync goes on
+    monkeypatch.setattr(swing, "kicker_var", lambda line, sc, yards=None: line["fgm_0_19"])
+    assert swing.kicker_sigma({"fgm": 2.0}, COEF, SC) is None
+    cons = {"k": {"mu": 9.0, "sigma": 1.0, "eff": {"sleeper_k": 0.5, "espn_k": 0.5}}}
+    assert swing.apply(cons, {"k": "K"}, K_ROWS, K_KINDS, SC, COEF, ("K",), yards)["no_var"] == 1
+    assert not {"swing", "floor", "ceiling"} & cons["k"].keys()
 
 
 def test_kicker_var_takes_the_line_the_scoring_and_the_yards_table():

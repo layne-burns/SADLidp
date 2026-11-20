@@ -285,7 +285,7 @@
       <summary>all weeks ▾</summary>
       <div class="all">
         {% for n in nav -%}
-        <a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here" aria-current="page"{% endif %}>{{ n.label }}{% if n.latest %} · now{% endif %}</a>
+        <a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here"{% endif %}>{{ n.label }}{% if n.latest %} · now{% endif %}</a>
         {% endfor %}
       </div>
     </details>

@@ -204,7 +204,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
 
 **Late sources (added 2026-10-12, PR 5):** each source may set `expected_by` (weekday and ET time). After that moment, a source still `not_yet_published` for the target week is shown as *late* in the footer and a banner; before it, "not posted yet" is shown without a banner. The footer lists each source's usual posting time and whether it was in time for the pre-waiver run.
 
-**Kicker sources (D23, added 2026-11-17).** Six sources, each a sibling module of an IDP adapter with its own request, its own stored file (`sources/<name>.json`) and its own match report. All six were probed live on 2026-11-17 from a home connection, logged out, with a research user agent, and read once that evening by the pipeline's own client in a scratch sync; none has run from Actions (§10). The page labels them by site (Sleeper, ESPN, CBS, FantasyPros, FantasyData, RotoBaller) under "Kicker sources". A banner about a source names it by its code name, as the IDP banners do (`espn_k: …`), which tells the two groups' Sleeper and ESPN apart.
+**Kicker sources (D23, added 2026-11-17).** Six sources, each a sibling module of an IDP adapter with its own request, its own stored file (`sources/<name>.json`) and its own match report. All six were probed live on 2026-11-17 from a home connection, logged out, with a research user agent, read once that evening by the pipeline's own client in a scratch sync, and read once from Actions that night by the branch's preview sync, where all six were `ok` (§10). The page labels them by site (Sleeper, ESPN, CBS, FantasyPros, FantasyData, RotoBaller) under "Kicker sources". A banner about a source names it by its code name, as the IDP banners do (`espn_k: …`), which tells the two groups' Sleeper and ESPN apart.
 - **`sleeper_k` (projection):**
   - **Fetch:** `api.sleeper.com/projections/nfl/{season}/{week}?season_type=regular&position[]=K`. A real row has `stats.gp` and an opponent; everything else is a placeholder ("no projection", never 0). Week 11 returned 157 rows: 153 kickers and 4 punters, 26 of them real.
   - **Read:** the line as published, without the `pts_*`, `adp_*` and `pos_adp_*` keys: `fga`, `fgm`, `fgm_yds`, `xpa`, `xpm`, `xpmiss` and the made buckets `fgm_20_29`, `fgm_30_39`, `fgm_40_49`, `fgm_50p` (`fgm_0_19` on a rare row). `fgm_yds` is used as published.
@@ -421,6 +421,7 @@ Availability is unconfirmed until **Phase 1 probes each one from Actions.** The 
     - lines are added only for kickers that have no line yet, chosen by Sleeper `position`, never by stat key;
     - no existing line is changed, and no IDP line is added (a missing IDP line added to a settled week could move an IDP statistic);
     - the week is marked `k_added_at`, with `k_added` = how many lines were added, even when that is 0;
+    - a week that already holds a kicker line was captured with kickers and is left alone (no refetch, no marker);
     - newest weeks first, at most 4 a sync; a failed fetch is retried at the next sync.
   - **Core points:** none of the keys left out of core points is a kicking key, so a kicker's core points are his full points.
   - **Evaluation pool:** the top 20 kickers by the equal-weight mean of the kicker projection sources, among those who played. A source counts in a week when it covers 10 or more of them. The IDP sizes (50 and 15) would leave every kicker week partial: about 28 kickers play a week.
@@ -485,12 +486,12 @@ Tiers are computed over the available pool after §2 filters, locked players rem
   - **σ_out,K = 5.0** (`[sigma_out] K`). It is a set level, not a fit: the SD of weekly decimal points within a kicker-season was 4.78 on 2022–25 (2,148 kicker-games), and the SD over 173 kicker-games of 2026 weeks 5–10 was 5.20. Last season's cache (`data/2025/sigma_out.json`) has no K and is not rebuilt for it; a slot the cache lacks takes its config value.
   - **Swing:** a kicker's points are not a sum of counts (a made field goal scores a tenth of its distance), so the Poisson V above doesn't apply. swing_K² = a_K + b_K · `kicker_var`(his projected kicking line), with **a_K = 0 and b_K = 1 as a prior, not a fit** (`[swing.a]`, `[swing.b]`).
     - **His line** is his projection sources' kicking keys (`fga`, `fgm`, `fgm_yds`, `fgmiss`, `xpa`, `xpm`, `xpmiss` and any `fgm_<bucket>` key present), averaged with his effective shares.
-    - **`swing.kicker_var` is the owner's to write.** Until it returns a number, no kicker has a swing of his own: he has no floor–ceiling, and his odds use σ_out,K, exactly as for an IDP no projection source has stats for. A zero, negative or missing variance is treated the same way, so there is never a zero-width range.
+    - **`swing.kicker_var` is the owner's to write.** Until it returns a number, no kicker has a swing of his own: he has no floor–ceiling, and his odds use σ_out,K, exactly as for an IDP no projection source has stats for. A zero, negative or missing variance is treated the same way, so there is never a zero-width range; so is an error raised inside `kicker_var`, which never stops a sync.
     - lo and hi stay global (−0.8 and 0.75). They are IDP percentiles and unchecked for kickers.
   - **No position limit.** The league sets none for K, so the block shows "N rostered" with no "/limit". What limits an add is roster room (§4.1).
   - **The move** for a START or UPGRADE on waiver kicker W:
     - *add* (no drop) when you have a free roster spot (if the roster size can't be read, room is assumed);
-    - otherwise *add and drop B*, your other comparable kicker, when you have one;
+    - otherwise *add and drop your other kicker*: B, your other comparable kicker, when you have one; with no B, a kicker of yours who can't play this week (bye, out, no number; not on IR or taxi, and not locked), so the kicker who can play is the one kept;
     - otherwise *swap*, a new action: add W and drop S, the starter he would replace;
     - otherwise *you choose the drop*: the roster is full and no kicker of yours can be compared this week (he can't play, or you roster none), so the drop can come from anywhere on the roster. It is never flagged `drop_locked`.
   - **UPGRADE over B** fires as for IDP, only when you roster a second comparable kicker; its move is *add* with room, else *add and drop B*.
@@ -648,7 +649,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
    3. **Statistics:** K as a separate scope on the Stats page, the report card and the kicker note (§6.8).
    4. **The page:** the position-first order (D24).
    5. **Left to the owner:** the body of `swing.kicker_var` (§6.7). Until it is written, kickers use σ_out,K.
-   6. **After merge:** the first sync from Actions and the kicker backfill at its normal budget (one scratch sync from a home connection has run, §10); a probe of the six kicker sources from Actions; the archive-integrity check of the four kicker archives; the season-end swing check (`docs/status.md` §7).
+   6. **After merge:** the first sync from `main` with the kicker sources (the branch's preview sync has run one from Actions, with the kicker backfill at its normal budget, §10); the archive-integrity check of the four kicker archives; the season-end swing check (`docs/status.md` §7).
 
 ## 9. Config tunables (`config/sadl.toml`)
 `league.names`, `league.league_id?`, `espn.league_id=942104146`, `roster.position_limit` (fallback), `display.depth=25`, `tiers.z=0.75`, `tiers.sigma_floor.{dl,lb,db}=0.75`, `tiers.s0_default`, `tiers.nu0=2`, `form.{enabled, k=4, miss.{DL,LB,DB}, snap.{DL,LB,DB}}`, `swing.{enabled, lo=-0.8, hi=0.75, a.{DL,LB,DB}, b.{DL,LB,DB}}`, `swap_threshold=0.6`, `censor.M=10`, `weights.prior_split=0.6`, `weights.k=4`, `weights.group_bounds=[0.2,0.8]`, `weights.prior_weight_cap`, `accuracy.N_eval=50`, `accuracy.min_covered=15`, `impute.m_k.*`, `max_source_age_h=96`, `sources.shrink_guard=0.6`, `sources.<name>.{archive, late_rows}`, `backfill.{budget_s=300, max_requests}`, `net.host_interval_s.<host>`, `odds.monthly_credit_budget=450`, `gate.*` (window offsets), `sources.<name>.{enabled, private}`, `sources.fp_ecr` and `sources.fp_dst` (`archive = true`; PR 4).
@@ -686,6 +687,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - a forced week-11 sync on the whole season's saved data (every fetch refused, so the saved rows are used): 203 of 206 files byte-identical, and the other three (`consensus.json`, `run.json`, `weights.json`) differ only in K slots, kicker source entries, the kicker warnings and the `"kickers"` record;
     - the same sync on the data of the live check below, which holds real kicker rows, 27 kicker frozen records and kicker tiers (the old code was given that data without the kicker source files): every DL/LB/DB leaf identical;
     - the site built from the committed data: `stats.json` and every `data-*.json` byte-identical, `stats.html` identical outside the shared style block, and all 11 week pages render with three positions and no kicker text; the audit output is identical too.
+    - re-run on 2026-11-19 on the data of the preview sync from Actions (below), which holds real kicker rows in weeks 1–11 and kicker results in weeks 6–10; the old code was given the same data with everything kicker taken out: replays of weeks 6, 9, 10 and 11 and a forced week-11 sync at Thursday 7 PM ET, every DL/LB/DB leaf identical (weeks 6, 9 and 10 replay with no K, since their kicker rows are all backfilled); the site built from it, no leaf of the old code's `stats.json` or `data-*.json` differs (the new one only adds kicker keys).
   - **A replay never builds kickers from archive rows alone** (§5.3): a test replays one week with no kicker file, with a backfilled one and with a live one.
   - **Unit tests:**
     - the kicker slot rule: `position` K only, no `fantasy_positions` fallback, punters left out, id 5251 still DL;
@@ -705,7 +707,12 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - 10 available kickers had a number, in 4 tiers; a card's parts added up to its μ, and a part's points matched its stored line by hand (0.1 × 64.91 − (2.19 − 1.87) + 2.58 − 0.13 = 8.62).
     - The add-only merge added 31 to 36 kicker lines to each of weeks 6–9 and changed no existing line; week 10, still inside its correction window, was rewritten whole with its 35 kicker lines.
     - The backfill wrote weeks 1–3 of `sleeper_k`, `espn_k` and `fp_k` and stopped at the cap. `rotoballer_k` found no week-1 article in the feed's first 3 pages, so how far back its feed reaches is not known.
-  - **Live, still to run:** the six sources from Actions (every probe and the run above came from a home connection); the kicker backfill at its normal budget; a week in which CBS has not yet turned to the new week.
+  - **Live from Actions, run once (2026-11-17, 11:09 PM ET):** the branch's CI preview job ran a forced sync with the branch's code on a GitHub runner, under the pipeline's own user agent, on a copy of the committed data, and published the result to `previews/claude/kickers` (nothing merged).
+    - All six kicker sources were `ok`, with no warning, with the same row counts as the run above. Every row with a team matched a Sleeper kicker; 10 ESPN free agents, who have no team, matched none and were left out. No kicker was zero-filled.
+    - The backfill, at its normal budget, wrote weeks 1–10 of `sleeper_k`, `espn_k` and `fp_k` and weeks 2–10 of `rotoballer_k` (again no week-1 article in the feed's first 3 pages).
+    - The add-only merge added kicker lines to weeks 9, 8, 7 and 6 (31 to 36 each) and changed no existing line; week 10 was rewritten whole with its 35 kicker lines. Weeks 1–5 follow in the next syncs (4 a sync).
+    - DL, LB and DB: the same tier counts as the committed week-11 page of three hours earlier; μ moved by 0.04–0.08 points on average, from that later fetch of the IDP sources.
+  - **Live, still to run:** the first sync from `main`; a week in which CBS has not yet turned to the new week.
   - **Page:** the position bar and the folds work with JavaScript off; a week saved before kickers shows three positions; every string and number of the DL/LB/DB cards is unchanged.
 
 ## 11. Known limitations (accepted)
@@ -727,7 +734,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
 - **FantasyPros' archived kicker pages show today's teams,** so a backfilled row for a kicker who has moved can fail its name-and-team match; the FantasyPros id through the crosswalk is tried first (21 of week 11's 26 projected kickers have one there).
 - **Kicker numbers that are priors, not measurements:** a_K = 0 and b_K = 1, the σ floor 0.75, z, M = 10, the 60:40 split, the rank priors 2 : 1 : 1 and the floor and ceiling multipliers. σ_out,K = 5.0 is a level read off past seasons. Until the owner writes `kicker_var`, every kicker's odds use σ_out,K and no kicker has a floor–ceiling.
 - **Kicker lists are short and nearly complete,** which the censoring rule wasn't designed for (§5.2). Its effect on kickers is untested, and so is the zero-fill of a kicker Sleeper leaves out with no placeholder.
-- **The kicker sources have only been read from a home connection:** probed under a research user agent, then read once by the pipeline's own client (§10). None has been read from Actions, and a source may answer a runner differently.
+- **The kicker sources have been read from Actions once:** probed from a home connection under a research user agent, read once there by the pipeline's own client, then once from a GitHub runner by the branch's preview sync of 2026-11-17, where all six were `ok` (§10). One week from a runner can't show how often a source challenges or rate-limits one.
 
 ## 12. Change log
 - **2026-10-12 · v2:** agreed spec.
@@ -961,4 +968,4 @@ Evidence: live requests on Tuesday 2026-11-17, about 9 PM ET, in NFL week 11, fr
 | RotoBaller | 26 (week 11), 30 (week 9) | Tuesday 7:09 AM ET (week 11), Tuesday (week 10), Thursday (week 8); week 9 carried a Saturday date after an update |
 
 - **Ids for kickers:** the DynastyProcess crosswalk has 282 kicker rows; of week 11's 26 projected kickers it has 23, 21 with a FantasyPros id and 23 with an ESPN id. RotoBaller's player links carry the FantasyData id (23 of 23 linked week-11 kickers), but not every row is linked.
-- **Not determined:** whether the four archives (Sleeper, ESPN, FantasyPros, RotoBaller) return pre-game numbers for kickers, which is why their rows are untrusted (§6.5); how the six sources answer a runner under the pipeline's user agent; how many kickers carry `espn_id` and `fantasy_data_id` in Sleeper's players DB; exact agreement of a kicker's points with Sleeper's `players_points`; the weekday each source first posts a new week's kicker list.
+- **Not determined:** whether the four archives (Sleeper, ESPN, FantasyPros, RotoBaller) return pre-game numbers for kickers, which is why their rows are untrusted (§6.5); how the six sources answer a runner under the pipeline's user agent (read once since: all six `ok` in the branch's preview sync from Actions, 2026-11-17, §10); how many kickers carry `espn_id` and `fantasy_data_id` in Sleeper's players DB; exact agreement of a kicker's points with Sleeper's `players_points`; the weekday each source first posts a new week's kicker list.

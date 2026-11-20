@@ -419,6 +419,11 @@ def test_the_page_lists_k_beside_the_three_positions(seasons):
     assert "at each position each week" not in html and "the three positions count as one week" not in html
     assert "DL, LB and DB count as one week; kickers are not in these rows" in html
     assert "(DB) and " in html and " (K) points on average." in html  # "a (DL), b (LB), c (DB) and d (K)"
+    tail = {key: html[html.index(f'id="vpanel-{key}"') :] for key in ("season", "w1", "w4")}
+    heads = {key: t[: t.index("</p>")] for key, t in tail.items()}  # each view opens with its headline
+    assert all("the number the page showed missed by" in h for h in heads.values())
+    # weeks 1 and 3 showed no kicker number (a stand-in grades them), so only week 4's headline names K
+    assert " (K) points" not in heads["season"] and " (K) points" not in heads["w1"] and " (K) points" in heads["w4"]
     assert "for the 20 best-projected kickers each week (weeks 1, 3, 4)" in html
     assert "Weeks 1, 3 had no number on the page for some or all of these kickers" in html
     assert "Week 2 is only partly covered at K" in html and "ESPN kickers in week 3" in html

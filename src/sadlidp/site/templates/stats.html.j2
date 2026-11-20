@@ -75,7 +75,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   {% set live = v.suggestions.live %}{% set reb = v.suggestions.rebuilt %}{% set ks = v.suggestions.k if k_on else none %}
   <p class="headline">{% if single %}Week {{ v.weeks[0] }}{% else %}Weeks {{ v.weeks[0] }}–{{ v.weeks[-1] }}{% endif %}:
     {% if live.decided or reb.decided %}{% if k_on %}DL, LB and DB {% endif %}suggestions paid off in {% if live.decided %}{{ live.hits }} of {{ live.decided }} live decisions{% endif %}{% if live.decided and reb.decided %} and {% endif %}{% if reb.decided %}{{ reb.hits }} of {{ reb.decided }} on rebuilt weeks{% endif %}{% else %}no {% if k_on %}DL, LB or DB {% endif %}suggestions decided{% endif %}{% if ks and (ks.live.decided or ks.rebuilt.decided) %}, kicker suggestions in {{ ks.live.hits + ks.rebuilt.hits }} of {{ ks.live.decided + ks.rebuilt.decided }}{% endif %};
-    the number the page showed missed by {{ listed(ss, vsl) }} points on average.
+    the number the page showed missed by {{ listed(ss, isl if k_on and v.k.stand_in else vsl) }} points on average.{# a stand-in week showed no kicker number: K is only in the kicker note #}
     {% if v.provisional %}<small>Provisional: stat corrections still possible.</small>{% endif %}
     {% if v.held_back %}<small>Week{{ 's' if v.held_back|length > 1 else '' }} {{ v.held_back|join(', ') }} {{ 'join' if v.held_back|length > 1 else 'joins' }} the season figures once {{ 'their' if v.held_back|length > 1 else 'its' }} stat corrections close; until then {{ 'they are' if v.held_back|length > 1 else 'it is' }} under its own tab.</small>{% endif %}</p>
   {% if v.scoreboard and v.scoreboard['all'].weeks %}{{ board(v.scoreboard, vsl) }}{% endif %}

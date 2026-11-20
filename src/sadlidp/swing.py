@@ -64,8 +64,11 @@ def kicker_var(line: dict, scoring: dict, yards: dict | None = None) -> float | 
                                    expected makes in each distance bucket (yards)
         "fgm_0_39"                 ESPN's one bucket for every make under 40 yards
       The sources cut the buckets differently (Sleeper and CBS by ten yards, ESPN 0-39 / 40-49 / 50+). Each
-      source's line enters with its share, so the bucket keys present add up to "fgm": no make is counted
-      in two buckets. Example, Sleeper alone:
+      source's line enters with its share, so no make is counted in two buckets, but the bucket keys present
+      need NOT add up to "fgm": Sleeper's own bands often fall short of its "fgm" (2026 week 11: 21 of 26
+      kickers by more than 0.15), and a key a source lacks counts 0 for that source (so "fgm_0_39" carries
+      only ESPN's share). Treat "fgm" minus the buckets' sum as makes of unknown distance, or use
+      "fgm_yds" / "fgm" as their mean distance. Example, Sleeper alone (buckets 1.94, "fgm" 2.36):
         {"fga": 2.72, "fgm": 2.36, "fgm_yds": 82.31, "fgmiss": 0.36, "xpa": 2.86, "xpm": 2.79,
          "xpmiss": 0.07, "fgm_20_29": 0.41, "fgm_30_39": 0.53, "fgm_40_49": 0.59, "fgm_50p": 0.41}
     - `scoring`: the league's points per unit of each stat. For a kicker the non-zero ones are
@@ -88,7 +91,9 @@ def kicker_var(line: dict, scoring: dict, yards: dict | None = None) -> float | 
 
     How the result is used: swing² = a_K + b_K · kicker_var(...), with `[swing.a] K = 0` and `[swing.b] K = 1`,
     so the kicker's game-to-game standard deviation is √kicker_var. For scale, kickers' realised game-to-game
-    standard deviation is about 5 points (4.8 within kicker-seasons 2022–25).
+    standard deviation is about 5 points (4.8 within kicker-seasons 2022–25). If this function raises, the
+    sync treats it as None for that kicker (`kicker_sigma`), so a mistake here never stops a sync; run.json's
+    `swing.kickers.no_var` counts the kickers left without a swing.
     """
     # TODO(human)
     return None
@@ -96,11 +101,15 @@ def kicker_var(line: dict, scoring: dict, yards: dict | None = None) -> float | 
 
 def kicker_sigma(lam: dict, coef: dict, sc: dict, yards: dict | None = None) -> float | None:
     """A kicker's swing from his projected kicking line, √(a_K + b_K · kicker_var); None when `kicker_var`
-    has no answer or the result isn't a positive number (never a zero-width range, SPEC §6.7)."""
-    v = kicker_var(lam, sc, yards)
-    if v is None:
+    has no answer, raises, or the result isn't a positive number (never a zero-width range, SPEC §6.7): an error in
+    the owner's model leaves that kicker on σ_out,K instead of failing the whole sync, DL/LB/DB included."""
+    try:
+        v = kicker_var(lam, sc, yards)
+        if v is None:
+            return None
+        s2 = coef["a"].get(K, 0.0) + coef["b"].get(K, 1.0) * float(v)
+    except Exception:
         return None
-    s2 = coef["a"].get(K, 0.0) + coef["b"].get(K, 1.0) * float(v)
     return math.sqrt(s2) if s2 > 0 else None
 
 
@@ -109,7 +118,7 @@ def mix(pid: str, source_rows: dict, groups: dict, sc: dict, eff: dict | None = 
     """His projected IDP stats, averaged over the projection sources that have a row with stats for him,
     weighted by his effective source shares (`eff`, SPEC §6.4) or equally; None when no source does. For a
     kicker (`slot` "K") the kicking keys instead (`kicker.line_keys`), a key a source lacks counting 0 there,
-    so the distance buckets of sources that cut them differently still add up to the makes."""
+    so no make is counted in two buckets; the buckets add up to the makes only as far as each source's do."""
     rows = []
     for name, rows_s in source_rows.items():
         if groups.get(name) != "projection":

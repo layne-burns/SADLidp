@@ -14,10 +14,11 @@ starts exactly one DL/LB/DB, so nothing added there can score this week; `drop_l
 it would drop is locked (Sleeper won't drop him).
 
 Kickers (K) follow the same comparisons with their own add rule, because the league sets no kicker limit:
-only roster room counts. With a free roster spot the move is `add`; with none it is `add_drop` (drop B, your
-other comparable kicker) when B exists, else `swap` (drop S, your kicker W would replace: a straight swap),
-else `choose_drop` (no kicker of yours can be compared this week, so the drop is yours to choose anywhere on
-the roster; it is never flagged `drop_locked`).
+only roster room counts. With a free roster spot the move is `add`; with none it is `add_drop` of your other
+kicker: B when B exists, else (S exists) an unlocked kicker of yours who can't play this week (bye, out, no
+μ; never IR or taxi), so the kicker who can play is the one kept; else `swap` (drop S, your kicker W would
+replace: a straight swap), else `choose_drop` (no kicker of yours can be compared this week, so the drop is
+yours to choose anywhere on the roster; it is never flagged `drop_locked`). UPGRADE still needs a comparable B.
 """
 
 from __future__ import annotations
@@ -54,7 +55,8 @@ def starter_slots(roster_positions: list[str], starters: list[str] | None) -> di
 def kicker_action(open_spots: int | None, limit: int | None, count: int, starter: str | None,
                   other: str | None) -> tuple[str, str | None]:  # fmt: skip
     """(action, drop) for adding a waiver kicker. `open_spots` = your free active roster spots (None: unknown,
-    taken as room); `limit` = the league's kicker limit, if it sets one."""
+    taken as room); `limit` = the league's kicker limit, if it sets one; `other` = the kicker to drop before S
+    (B, or with no B one of yours who can't play this week)."""
     if (open_spots is None or open_spots > 0) and (limit is None or count < limit):
         return "add", None
     if other:
@@ -106,13 +108,16 @@ def panel(
         mu_s, sp_s = (cons[starter]["mu"], sp(starter)) if starter else (0.0, 0.0)
         # with no comparable B, the drop is yours to choose among all non-IR players here (S included)
         drop_pool = [pid for pid in here if pid not in reserve]
+        # K with S but no B: drop your kicker who can't play this week, not S (an unlocked one; taxi frees no spot)
+        idle = [pid for pid in drop_pool if pid != starter and pid not in taxi and not locked(pid)]
+        k_other = other or (idle[0] if slot == K and starter and idle else None)
 
         badges: dict[str, dict] = {}
         for w in waiver_ids.get(slot, []):
             p_start = p_outscores(cons[w]["mu"], sp(w), mu_s, sp_s)
             if p_start >= threshold:
                 if slot == K:  # no kicker limit: roster room decides (module docstring)
-                    action, drop = kicker_action(open_spots, limits.get(K), count, starter, other)
+                    action, drop = kicker_action(open_spots, limits.get(K), count, starter, k_other)
                 else:
                     # under the limit: just add; else drop B; with no B, your other player is unavailable (you choose)
                     action = "add" if count < limits.get(slot, 2) else ("add_drop" if other else "choose_drop")

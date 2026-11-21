@@ -16,6 +16,23 @@
   9
  ],
  "k": 4.0,
+ "kickers": {
+  "alpha": 0.6,
+  "alpha_hat": null,
+  "alpha_n": 0,
+  "computed_at": "2026-11-21T12:39:31-05:00",
+  "from_weeks": [],
+  "k": 4.0,
+  "method": "prior",
+  "prior_split": 0.6,
+  "priors": {
+   "fantasydata_k": 1.0,
+   "fp_k": 2.0,
+   "rotoballer_k": 1.0
+  },
+  "reason": "0 evaluated week(s); data weights start at 3",
+  "sources": {}
+ },
  "method": "accuracy",
  "prior_split": 0.6,
  "priors": {

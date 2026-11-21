@@ -1,0 +1,55 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-11-21T14:11:54-05:00"
+ ],
+ "kind": "rank",
+ "last_success": "2026-11-21T14:11:54-05:00",
+ "lists": {
+  "K": {"10955":25,"11261":32,"11533":1,"11539":15,"11786":6,"11792":18,"12185":26,"12711":5,"12713":20,"12961":21,"13545":13,"13833":30,"13968":28,"1945":19,"2020":8,"2747":7,"3451":4,"3678":17,"4195":16,"4227":9,"5095":23,"5119":24,"5189":3,"6083":27,"650":22,"6528":29,"6650":11,"7042":10,"7839":12,"7922":31,"8259":2}
+ },
+ "no_projection_ids": [],
+ "published_at": "2026-09-20T16:59:08+00:00",
+ "rows": {
+  "10955": {"ave":{"K":25.57},"backfill":true,"fp_id":"25354","ranks":{"K":25},"std":{"K":3.44},"team":"ARI"},
+  "11261": {"ave":{"K":31.33},"backfill":true,"fp_id":"25713","ranks":{"K":32},"std":{"K":1.34},"team":"CLE"},
+  "11533": {"ave":{"K":1.51},"backfill":true,"fp_id":"26068","ranks":{"K":1},"std":{"K":1.29},"team":"DAL"},
+  "11539": {"ave":{"K":14.7},"backfill":true,"fp_id":"26075","ranks":{"K":15},"std":{"K":3.11},"team":"DET"},
+  "11786": {"ave":{"K":7.65},"backfill":true,"fp_id":"26475","ranks":{"K":6},"std":{"K":4.54},"team":"JAX"},
+  "11792": {"ave":{"K":18.15},"backfill":true,"fp_id":"26341","ranks":{"K":18},"std":{"K":3.22},"team":"MIN"},
+  "12185": {"ave":{"K":26.02},"backfill":true,"fp_id":"26763","ranks":{"K":26},"std":{"K":2.04},"team":"IND"},
+  "12711": {"ave":{"K":6.95},"backfill":true,"fp_id":"27534","ranks":{"K":5},"std":{"K":3.41},"team":"BAL"},
+  "12713": {"ave":{"K":18.82},"backfill":true,"fp_id":"27291","ranks":{"K":20},"std":{"K":2.78},"team":"NE"},
+  "12961": {"ave":{"K":20.24},"backfill":true,"fp_id":"27261","ranks":{"K":21},"std":{"K":2.53},"team":"CAR"},
+  "13545": {"ave":{"K":12.15},"backfill":true,"fp_id":"28507","ranks":{"K":13},"std":{"K":3.05},"team":"GB"},
+  "13833": {"ave":{"K":27.06},"backfill":true,"fp_id":"28176","ranks":{"K":30},"std":{"K":2.94},"team":"NYG"},
+  "13968": {"ave":{"K":24.03},"backfill":true,"fp_id":"28175","ranks":{"K":28},"std":{"K":4.08},"team":"WAS"},
+  "1945": {"ave":{"K":18.7},"backfill":true,"fp_id":"13029","ranks":{"K":19},"std":{"K":4.24},"team":"PIT"},
+  "2020": {"ave":{"K":8.48},"backfill":true,"fp_id":"13731","ranks":{"K":8},"std":{"K":4.4},"team":"CHI"},
+  "2747": {"ave":{"K":8.2},"backfill":true,"fp_id":"14003","ranks":{"K":7},"std":{"K":3.79},"team":"SEA"},
+  "3451": {"ave":{"K":4.85},"backfill":true,"fp_id":"15756","ranks":{"K":4},"std":{"K":2.6},"team":"HOU"},
+  "3678": {"ave":{"K":17.31},"backfill":true,"fp_id":"16026","ranks":{"K":17},"std":{"K":3.0},"team":"DEN"},
+  "4195": {"ave":{"K":16.58},"backfill":true,"fp_id":"16540","ranks":{"K":16},"std":{"K":2.33},"team":"PHI"},
+  "4227": {"ave":{"K":10.19},"backfill":true,"fp_id":"16712","ranks":{"K":9},"std":{"K":2.92},"team":"KC"},
+  "5095": {"ave":{"K":23.62},"backfill":true,"fp_id":"17420","ranks":{"K":23},"std":{"K":2.88},"team":"MIA"},
+  "5119": {"ave":{"K":23.62},"backfill":true,"fp_id":"17533","ranks":{"K":24},"std":{"K":2.98},"team":"NYJ"},
+  "5189": {"ave":{"K":4.25},"backfill":true,"fp_id":"17575","ranks":{"K":3},"std":{"K":3.16},"team":"SF"},
+  "6083": {"ave":{"K":26.51},"backfill":true,"fp_id":"18545","ranks":{"K":27},"std":{"K":2.58},"team":"LV"},
+  "650": {"ave":{"K":22.87},"backfill":true,"fp_id":"9491","ranks":{"K":22},"std":{"K":2.86},"team":null},
+  "6528": {"ave":{"K":27.72},"backfill":true,"fp_id":"19028","ranks":{"K":29},"std":{"K":2.76},"team":"TEN"},
+  "6650": {"ave":{"K":10.84},"backfill":true,"fp_id":"19058","ranks":{"K":11},"std":{"K":2.56},"team":"TB"},
+  "7042": {"ave":{"K":10.35},"backfill":true,"fp_id":"19760","ranks":{"K":10},"std":{"K":3.77},"team":"BUF"},
+  "7839": {"ave":{"K":10.88},"backfill":true,"fp_id":"23297","ranks":{"K":12},"std":{"K":4.34},"team":"CIN"},
+  "7922": {"ave":{"K":31.13},"backfill":true,"fp_id":"23370","ranks":{"K":31},"std":{"K":0.73},"team":"BAL"},
+  "8259": {"ave":{"K":3.56},"backfill":true,"fp_id":"23901","ranks":{"K":2},"std":{"K":2.61},"team":"LAC"}
+ },
+ "schema_version": 2,
+ "source": "fp_k",
+ "universe": {
+  "K": {
+   "complete": false,
+   "depth": 32
+  }
+ },
+ "week": 2
+}

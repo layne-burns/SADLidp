@@ -1,52 +1,8 @@
 {
- "actuals_written": [
-  10
- ],
+ "actuals_written": [],
  "backfilled": {
-  "espn_k": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8,
-   9,
-   10
-  ],
   "fp_k": [
-   1,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8,
-   9,
-   10
-  ],
-  "rotoballer_k": [
-   3,
-   4,
-   5,
-   6,
-   7,
-   8,
-   9,
-   10
-  ],
-  "sleeper_k": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8,
-   9,
-   10
+   2
   ]
  },
  "form": {
@@ -58,7 +14,7 @@
   },
   "players": {
    "miss": 219,
-   "snap": 625
+   "snap": 623
   },
   "snap": {
    "DB": 4.0,
@@ -71,13 +27,13 @@
    "LB": 0.879
   }
  },
- "generated_at": "2026-11-21T12:39:31-05:00",
+ "generated_at": "2026-11-21T14:11:54-05:00",
  "impute_priors": 2025,
  "kicker_actuals_added": [
-  9,
-  8,
-  7,
-  6
+  5,
+  4,
+  3,
+  2
  ],
  "schedule": "nflverse",
  "season": 2026,
@@ -89,18 +45,18 @@
  "sources": {
   "cbs_k": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "projection",
    "label": "CBS",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
-    "added": 23,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 2,
-    "unchanged": 0,
+    "unchanged": 23,
     "updated": 0
    },
    "no_projection": 0,
@@ -135,18 +91,18 @@
   },
   "espn_k": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
-    "added": 24,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 2,
-    "unchanged": 0,
+    "unchanged": 24,
     "updated": 0
    },
    "no_projection": 22,
@@ -182,18 +138,18 @@
   },
   "espn_proj": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "projection",
    "label": "ESPN",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
-    "added": 11,
-    "deleted": 16,
+    "added": 0,
+    "deleted": 0,
     "frozen": 35,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 221,
-    "updated": 214
+    "unchanged": 446,
+    "updated": 0
    },
    "no_projection": 770,
    "observed_after": "2026-11-17T12:27:59-05:00",
@@ -261,21 +217,21 @@
    "zero_filled": 59
   },
   "fantasydata": {
-   "censored": 77,
+   "censored": 78,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "rank",
    "label": "FantasyData",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "mapped": 300,
    "merge": {
-    "added": 13,
-    "deleted": 13,
+    "added": 1,
+    "deleted": 1,
     "frozen": 23,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 35,
-    "updated": 229
+    "unchanged": 202,
+    "updated": 74
    },
    "no_projection": 0,
    "observed_after": "2026-11-17T12:27:59-05:00",
@@ -326,19 +282,19 @@
   "fantasydata_k": {
    "censored": 0,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "rank",
    "label": "FantasyData",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "mapped": 24,
    "merge": {
-    "added": 24,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 2,
-    "unchanged": 0,
+    "unchanged": 24,
     "updated": 0
    },
    "no_projection": 0,
@@ -375,18 +331,18 @@
   },
   "fp_dst": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "signal",
    "label": "FantasyPros D/ST",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
     "added": 0,
     "deleted": 0,
     "frozen": 2,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 17,
-    "updated": 7
+    "unchanged": 24,
+    "updated": 0
    },
    "no_projection": 0,
    "rows": 26,
@@ -396,21 +352,21 @@
    "week": 11
   },
   "fp_ecr": {
-   "censored": 87,
+   "censored": 85,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-11-21T12:39:31-05:00",
-   "mapped": 372,
+   "last_success": "2026-11-21T14:11:54-05:00",
+   "mapped": 371,
    "merge": {
-    "added": 52,
-    "deleted": 11,
+    "added": 0,
+    "deleted": 1,
     "frozen": 24,
     "late": 0,
     "skipped_after_kickoff": 4,
-    "unchanged": 0,
-    "updated": 296
+    "unchanged": 217,
+    "updated": 130
    },
    "no_projection": 0,
    "observed_after": "2026-11-21T16:55:43+00:00",
@@ -427,18 +383,18 @@
       "week": 11
      },
      "DL": {
-      "depth": 157,
+      "depth": 156,
       "error": null,
       "experts": 23,
-      "players": 157,
+      "players": 156,
       "status": "ok",
       "week": 11
      },
      "LB": {
-      "depth": 119,
+      "depth": 118,
       "error": null,
       "experts": 23,
-      "players": 119,
+      "players": 118,
       "status": "ok",
       "week": 11
      }
@@ -448,42 +404,42 @@
       "name_team": 6,
       "name_team_slot": 80,
       "no_team": 1,
-      "source_id": 335
+      "source_id": 333
      },
      "conflicts": [],
-     "matched": 421,
-     "teamed": 420,
+     "matched": 419,
+     "teamed": 418,
      "teamed_match_rate": 1.0,
      "unmatched": []
     },
     "unresolved_teams": {}
    },
-   "rows": 375,
-   "rows_used": 372,
+   "rows": 374,
+   "rows_used": 371,
    "status": "ok",
    "week": 11
   },
   "fp_k": {
    "censored": 0,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "rank",
    "label": "FantasyPros",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "mapped": 25,
    "merge": {
-    "added": 25,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 2,
-    "unchanged": 0,
-    "updated": 0
+    "unchanged": 1,
+    "updated": 24
    },
    "no_projection": 0,
-   "observed_after": "2026-11-21T12:39:31-05:00",
-   "published_at": "2026-11-21T13:00:33+00:00",
+   "observed_after": "2026-11-21T18:45:28+00:00",
+   "published_at": "2026-11-21T18:45:28+00:00",
    "report": {
     "archive": false,
     "lists": {
@@ -517,10 +473,10 @@
   "rotoballer": {
    "censored": 53,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "rank",
    "label": "RotoBaller",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "mapped": 147,
    "merge": {
     "added": 0,
@@ -591,19 +547,19 @@
   "rotoballer_k": {
    "censored": 0,
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "rank",
    "label": "RotoBaller",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "mapped": 24,
    "merge": {
-    "added": 24,
+    "added": 0,
     "deleted": 0,
     "frozen": 0,
     "late": 0,
     "skipped_after_kickoff": 2,
-    "unchanged": 0,
+    "unchanged": 24,
     "updated": 0
    },
    "no_projection": 0,
@@ -640,19 +596,19 @@
   },
   "sleeper_k": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "group": "k",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
-    "added": 24,
+    "added": 0,
     "deleted": 0,
-    "frozen": 0,
-    "late": 2,
+    "frozen": 2,
+    "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 0,
-    "updated": 0
+    "unchanged": 22,
+    "updated": 2
    },
    "no_projection": 127,
    "observed_after": "2026-11-21T12:39:31-05:00",
@@ -666,25 +622,25 @@
   },
   "sleeper_proj": {
    "error": null,
-   "fetched_at": "2026-11-21T12:39:31-05:00",
+   "fetched_at": "2026-11-21T14:11:54-05:00",
    "kind": "projection",
    "label": "Sleeper",
-   "last_success": "2026-11-21T12:39:31-05:00",
+   "last_success": "2026-11-21T14:11:54-05:00",
    "merge": {
     "added": 0,
-    "deleted": 16,
+    "deleted": 2,
     "frozen": 41,
     "late": 0,
     "skipped_after_kickoff": 0,
-    "unchanged": 263,
-    "updated": 308
+    "unchanged": 529,
+    "updated": 40
    },
-   "no_projection": 3744,
+   "no_projection": 3746,
    "observed_after": "2026-11-17T12:27:59-05:00",
    "published_at": null,
    "report": {},
-   "rows": 612,
-   "rows_used": 612,
+   "rows": 610,
+   "rows_used": 610,
    "status": "ok",
    "week": 11,
    "zero_filled": 0
@@ -714,9 +670,9 @@
   "lo": -0.8,
   "mean": {
    "DB": 6.05,
-   "DL": 5.5,
+   "DL": 5.51,
    "K": 5.24,
-   "LB": 6.29
+   "LB": 6.28
   },
   "players": 628
  },
@@ -799,5 +755,5 @@
   },
   "week": 11
  },
- "window": "forced"
+ "window": "2026-w11-saturday"
 }

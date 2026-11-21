@@ -1454,7 +1454,7 @@
    "game_id": "2026_11_MIN_SF",
    "home": "SF",
    "kickoff": "2026-11-22T20:20:00-05:00",
-   "spread_line": 3.5,
+   "spread_line": 3.0,
    "total_line": 46.5,
    "week": 11
   },
@@ -1464,7 +1464,7 @@
    "home": "WAS",
    "kickoff": "2026-11-23T20:15:00-05:00",
    "spread_line": -6.0,
-   "total_line": 53.5,
+   "total_line": 54.5,
    "week": 11
   },
   {
@@ -1545,7 +1545,7 @@
    "home": "JAX",
    "kickoff": "2026-11-29T13:00:00-05:00",
    "spread_line": 14.5,
-   "total_line": 47.5,
+   "total_line": 46.5,
    "week": 12
   },
   {

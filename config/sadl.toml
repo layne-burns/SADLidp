@@ -8,6 +8,11 @@ names = ["SADL", "Slow Ass Draft League"]
 [espn]
 league_id = "942104146"     # owner's public IDP league (Phase 3 source)
 
+[kicker_leagues.crooked]    # another of your leagues whose kickers the K tab also covers (SPEC D25, 2026-11-21)
+label = "Crooked"           # the page's tag; the folder under data/ is the key above
+names = ["Kusch's Crooked League"]  # matched among lbburnsy's leagues of the season, like [league] names
+# league_id = ""            # optional override of the name match (found 2026-11-21: 1364651976209473536)
+
 [roster]
 position_limit = 2          # used only if Sleeper's settings have no position_limit_* keys
 

@@ -120,7 +120,9 @@ def replay_week(
     for name in [*blended, *SIGNALS]:  # signals aren't part of a page: never read in a replay
         if name not in saved:
             sources_cfg[name] = {**(sources_cfg.get(name) or {}), "enabled": False}
-    run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0}}
+    # other leagues' kickers (SPEC D25) are never replayed: their rosters of that week weren't saved
+    run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0},
+               "kicker_leagues": {}}  # fmt: skip
     lid = league["league_id"]
     routes = {
         f"{V1}/state/nfl": {"season": str(season), "season_type": "regular", "week": week, "display_week": week},

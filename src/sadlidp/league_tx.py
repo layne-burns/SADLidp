@@ -37,7 +37,15 @@ def compact(t: dict) -> dict:
     return out
 
 
-def save_leg(sleeper, league_id: str, data_dir: Path | str, season: int, leg: int, now: datetime) -> int | None:
+def _path(data_dir: Path | str, season: int, leg: int, sub: str | None) -> Path:
+    """A leg's file: `week<NN>/transactions.json` for SADL, `week<NN>/<sub>/transactions.json` for another league
+    (other_leagues.py)."""
+    wdir = storage.week_dir(data_dir, season, leg)
+    return (wdir / sub if sub else wdir) / "transactions.json"
+
+
+def save_leg(sleeper, league_id: str, data_dir: Path | str, season: int, leg: int, now: datetime,
+             sub: str | None = None) -> int | None:  # fmt: skip
     """Fetch and save one leg's transactions; the number saved, or None if the fetch failed."""
     payload, _err = sleeper.transactions(league_id, leg)
     if not isinstance(payload, list):
@@ -45,25 +53,26 @@ def save_leg(sleeper, league_id: str, data_dir: Path | str, season: int, leg: in
     rows = [compact(t) for t in payload if isinstance(t, dict)]
     rows.sort(key=lambda t: (t.get("created") or 0, str(t.get("transaction_id"))))
     doc = {"schema_version": 1, "leg": leg, "fetched_at": now.isoformat(), "transactions": rows}
-    storage.write_json(storage.week_dir(data_dir, season, leg) / "transactions.json", doc)
+    storage.write_json(_path(data_dir, season, leg, sub), doc)
     return len(rows)
 
 
-def sync_legs(sleeper, league_id: str, data_dir: Path | str, season: int, week: int, now: datetime) -> dict:
+def sync_legs(sleeper, league_id: str, data_dir: Path | str, season: int, week: int, now: datetime,
+              sub: str | None = None) -> dict:  # fmt: skip
     """This sync's legs: the previous and current one every time (claims process mid-leg), plus up to
-    BACKFILL_PER_SYNC earlier legs that have no file yet."""
+    BACKFILL_PER_SYNC earlier legs that have no file yet. `sub`: another league's folder (None: SADL)."""
     legs = [w for w in (week - 1, week) if w >= 1]
-    missing = [w for w in range(1, week - 1)
-               if not (storage.week_dir(data_dir, season, w) / "transactions.json").exists()]  # fmt: skip
+    missing = [w for w in range(1, week - 1) if not _path(data_dir, season, w, sub).exists()]
     out = {}
     for leg in legs + missing[:BACKFILL_PER_SYNC]:
-        out[leg] = save_leg(sleeper, league_id, data_dir, season, leg, now)
+        out[leg] = save_leg(sleeper, league_id, data_dir, season, leg, now, sub)
     return out
 
 
-def _all(data_dir: Path | str, season: int) -> list[dict]:
+def _all(data_dir: Path | str, season: int, sub: str | None = None) -> list[dict]:
     out = []
-    for path in sorted((Path(data_dir) / str(season)).glob("week*/transactions.json")):
+    pattern = f"week*/{sub}/transactions.json" if sub else "week*/transactions.json"
+    for path in sorted((Path(data_dir) / str(season)).glob(pattern)):
         out += (storage.read_json(path) or {}).get("transactions") or []
     return out
 
@@ -94,13 +103,15 @@ def cut_text(x: float) -> str:
     return out[:-2] if out.endswith(".0") else out
 
 
-def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], settings: dict) -> dict | None:
+def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], settings: dict,
+                 count: tuple[str, ...] = IDP_SLOTS, sub: str | None = None) -> dict | None:  # fmt: skip
     """Counts behind the FAAB line, bids as a share of the league's starting budget: IDP waiver claims won, how
     many with a token bid, contested claims (two or more teams claimed the same player in a leg) and their
     winning bids, and IDP free-agent adds by day. None for a league without FAAB. `slots` is pid -> slot for
-    every tracked player; only DL, LB and DB count, so the line's numbers are what they were before kickers."""
+    every tracked player; only DL, LB and DB count, so the line's numbers are what they were before kickers.
+    Another league's kicker line (2026-11-21): `count=("K",)` and `sub` = its folder (other_leagues.py)."""
     budget = float(settings.get("waiver_budget") or 0)
-    txs = _all(data_dir, season)
+    txs = _all(data_dir, season, sub)
     if not txs or settings.get("waiver_type") != FAAB or budget <= 0:
         return None
     token = max(1.0, TOKEN_SHARE * budget)  # dollars
@@ -108,8 +119,8 @@ def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], setti
     def pct(t):
         return 100 * float(t.get("bid") or 0) / budget
 
-    # IDPs only: `slots` also maps kickers ("K") since 2026-11-17, and a kicker claim is not an IDP claim
-    idp = lambda t: [pid for pid in (t.get("adds") or {}) if slots.get(pid) in IDP_SLOTS]  # noqa: E731
+    # IDPs only (`count`): `slots` also maps kickers ("K") since 2026-11-17, and a kicker claim is not an IDP claim
+    idp = lambda t: [pid for pid in (t.get("adds") or {}) if slots.get(pid) in count]  # noqa: E731
     claims: dict[tuple, list[dict]] = {}
     for t in txs:
         if t.get("type") == "waiver":

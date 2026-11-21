@@ -87,7 +87,7 @@ def overlay_results(data: dict, results: dict) -> None:
                 walk(v)
 
     walk(data.get("positions"))
-    for m in (data.get("my_idps") or {}).values():
+    for m in [*(data.get("my_idps") or {}).values(), *other_blocks(data).values()]:
         walk(m.get("players"))
         for s in [*(m.get("suggestions") or []), *(m.get("played_suggestions") or [])]:
             walk(s.get("player"))
@@ -115,6 +115,19 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
     mine.sort(key=lambda x: ("DL LB DB".split().index(x["slot"]) if x["slot"] in ("DL", "LB", "DB") else 3,
                              -(x["pts"] or -1.0)))  # fmt: skip
     kickers.sort(key=lambda x: -(x["pts"] or -1.0))
+    blocks = other_blocks(data)
+    if blocks:  # your kickers in your other leagues (SPEC D25), each line named by its league
+        for x in kickers:
+            x["league"] = "SADL"
+        for label, m in ((o.get("label"), o["my"]) for o in (data.get("k_leagues") or {}).values() if o.get("my")):
+            for p in m.get("players") or []:
+                if p.get("reserve") or p.get("taxi"):
+                    continue
+                r = p.get("result") or {}
+                pts = r.get("pts") if r.get("state") == "final" else None
+                diff = pts - p["mu"] if pts is not None and p.get("mu") is not None else None
+                kickers.append({"name": p.get("name"), "slot": K, "mu": p.get("mu"), "pts": pts,
+                                "state": r.get("state"), "diff": diff, "league": label})  # fmt: skip
     both = [x for x in mine if x["diff"] is not None]
     sugg = (view or {}).get("suggestions") or {}
     calls = [e for e in sugg.get("list") or []  # the badge that stands for each decision (§6.8)
@@ -203,6 +216,12 @@ def _why(badge: dict, names: dict, slot: str) -> str:
     return "; ".join(reasons)
 
 
+def other_blocks(data: dict) -> dict[str, dict]:
+    """The page's other-league kicker blocks that have numbers (SPEC D25), by league label: each is a Yours block
+    like `my_idps["K"]`. A week synced before them, or a league that couldn't be read, has none."""
+    return {o.get("label") or key: o["my"] for key, o in (data.get("k_leagues") or {}).items() if o.get("my")}
+
+
 def page_slots(data: dict) -> tuple[str, ...]:
     """The positions a page shows: the ones its own data holds, in page order. A week synced before kickers
     were tracked (or replayed without a kicker source) has no K, so its page has three tabs and no K text."""
@@ -243,6 +262,45 @@ def this_week(data: dict, slots: tuple[str, ...]) -> dict:
         if m.get("starter_locked"):
             locked.append(slot)
         byes += [f"Bye ahead: {b['name']} ({b['team']}) has a bye in week {b['week']}." for b in m.get("byes") or []]
+    if K in slots:  # your other leagues' kickers (SPEC D25), each line named by its league
+        for key, o in (data.get("k_leagues") or {}).items():
+            label, m = o.get("label") or key, o.get("my")
+            if not m:
+                why = o.get("note") or "not read"
+                heads.append(f"{o.get('name') or label}: {why}; the kicker list is SADL's alone.")
+                continue
+            sugg = m.get("suggestions") or []
+            moves += [{"slot": K, "m": m, "s": s, "lg": label} for s in sugg]
+            if not sugg:
+                quiet.append(f"K ({label})")
+            players = m.get("players") or []
+            for p in players:
+                reasons = p.get("unavailable") or []
+                if p.get("reserve") or p.get("taxi") or "locked" in reasons:
+                    continue
+                who = f"{p.get('name')} (K, {label})"
+                if reasons == ["bye"]:
+                    heads.append(f"{who} is on bye.")
+                elif reasons:
+                    heads.append(f"{who} can't play this week: {', '.join(reasons)}.")
+                for flag in p.get("flags") or []:
+                    heads.append(f"{who} is questionable." if flag == "Q" else f"{who}: {flag}.")
+            starter = next((p for p in players if p.get("role") == "starter"), None)
+            starters.append({"slot": f"K ({label})", "p": starter})
+            if not players:
+                heads.append(f"No K rostered in {label}.")
+            elif starter is None and all(s.get("over") for s in sugg):
+                heads.append(f"You have no playable K in {label} this week.")
+            if m.get("starter_locked"):
+                locked.append(f"{label} K")
+            byes += [f"Bye ahead: {b['name']} ({b['team']}, {label}) has a bye in week {b['week']}."
+                     for b in m.get("byes") or []]  # fmt: skip
+        # "No move suggested at": plain K when no league has a kicker move, else the quiet leagues by name
+        k_quiet = [q for q in quiet if q == K or q.startswith("K (")]
+        shown = sum(1 for o in (data.get("k_leagues") or {}).values() if o.get("my"))
+        if shown and k_quiet:
+            quiet = [q for q in quiet if q not in k_quiet]  # K is the page's last position: its entries go last
+            quiet += [K] if len(k_quiet) == 1 + shown else ["K (SADL)" if q == K else q for q in k_quiet]
     if len(locked) == 1:
         heads.append(f"Your {locked[0]} starter's game has started, so suggestions there are for reference.")
     elif locked:
@@ -305,6 +363,19 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     # the FAAB line counts IDP claims only, as it always has (SPEC §6.8): a kicker claim is not an IDP waiver
     idp_ids = {pid: s for pid, s in stats._positions(Path(data_dir) / str(latest[0])).items() if s in IDP_SLOTS}
     faab = league_tx.faab_summary(data_dir, latest[0], idp_ids, settings)
+    # each other league on the latest page gets its own kicker FAAB line (SPEC D25): its kicker claims, as shares
+    # of its own starting budget, from the transactions saved in its folder
+    season_dir = Path(data_dir) / str(latest[0])
+    k_ids = {pid: s for pid, s in stats._positions(season_dir).items() if s == K}
+    latest_data = json.loads((weeks[-1][2] / "consensus.json").read_text(encoding="utf-8"))
+    faab_k = []
+    for key, o in (latest_data.get("k_leagues") or {}).items():
+        if not o.get("my"):
+            continue  # not read on the latest page: no line
+        o_settings = (storage.read_json(season_dir / key / "league.json") or {}).get("settings") or {}
+        line = league_tx.faab_summary(data_dir, latest[0], k_ids, o_settings, count=(K,), sub=key)
+        if line:
+            faab_k.append({**line, "label": o.get("label") or key, "name": o.get("name")})
     to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
@@ -339,7 +410,7 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
             now=this_week(data, slots), nav=nav, here=(season, week), latest=(season, week) == latest,
             nav_prev=nav[at - 1] if at else None, nav_next=nav[at + 1] if at + 1 < len(nav) else None,
             final=final, data_href=data_name, card=card, dbnote=dbnote, knote=knote, tueq=tueq, faab=faab,
-            source_groups=source_groups(data.get("sources")),
+            source_groups=source_groups(data.get("sources")), faab_k=faab_k,
         )  # fmt: skip
         (site / page_name(season, week)).write_text(html, encoding="utf-8")
         (site / data_name).write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")

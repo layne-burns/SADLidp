@@ -23,6 +23,7 @@ from . import crosswalk as crosswalkmod
 from . import form as formmod
 from . import gate as gatemod
 from . import kicker as kickermod
+from . import other_leagues as otherlg
 from .backfill import imputer_for, source_cfg
 from .config import load_alias
 from .consensus import consensus
@@ -63,6 +64,16 @@ def _guard(label: str, fn: Callable, default, warnings: list[str], log: Callable
         return fn()
     except Exception as e:  # isolation by design: the traceback goes to the job log only
         warnings.append(f"{label} failed ({type(e).__name__}); skipped this sync")
+        log(traceback.format_exc())
+        return default
+
+
+def _quiet(fn: Callable, default, log: Callable[[str], None]):
+    """Run one step of another league's part (SPEC D25): a failure goes to the job log and costs that part only,
+    with no page banner, so SADL's own page is exactly what it would have been."""
+    try:
+        return fn()
+    except Exception:
         log(traceback.format_exc())
         return default
 
@@ -233,6 +244,29 @@ def projection_means(values: dict[str, dict[str, float]], groups: dict[str, str]
     return {pid: sum(vs) / len(vs) for pid, vs in sums.items()}
 
 
+def badge_rows(my_panel: dict, slots, cons: dict, sigma_out: dict,
+               kickoff_of: Callable[[str], datetime | None]) -> dict:  # fmt: skip
+    """This sync's suggestions as badge-log rows, keyed "w|badge|over" (weeklog.update_badge_log)."""
+    current = {}
+    for slot in slots:
+        for w, b in my_panel[slot]["badges"].items():
+            kicks = [k for k in (kickoff_of(w), kickoff_of(b["over"]) if b["over"] else None) if k]
+            current[f"{w}|{b['badge']}|{b['over'] or ''}"] = {
+                "slot": slot, "w": w, "badge": b["badge"], "over": b["over"], "p": b["p"], "action": b["action"],
+                "drop": b["drop"], "reference": b["reference"], "why": b["why"], "mu_w": round(cons[w]["mu"], 3),
+                "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
+                "swing_w": cons[w].get("swing"), "swing_over": cons[b["over"]].get("swing") if b["over"] else None,
+                "lock_at": min(kicks).isoformat() if kicks else None,
+            }  # fmt: skip
+    return current
+
+
+def badge_log(wdir: Path, current: dict, now: datetime, claimed: Callable[[str], str | None]) -> dict:
+    """The badges.json document: the folder's earlier log updated with this sync's rows."""
+    prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
+    return {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now, claimed)}
+
+
 def build_week_logs(
     wdir: Path,
     my_panel: dict,
@@ -244,25 +278,15 @@ def build_week_logs(
     prewaiver: bool,
     claimed: Callable[[str], str | None] = lambda pid: None,
     flags_of: Callable[[str], list] = lambda pid: [],
+    extra: Callable[[str], dict] = lambda pid: {},
 ) -> tuple[dict, dict]:
     """badges.json and tiers_log.json documents for later evaluation (weeklog.py); written by the caller.
-    `claimed(pid)` says who has rostered a player ("me", "other" or None)."""
-    current = {}
-    for slot in tiers_by_slot:  # the page's slots
-        for w, b in my_panel[slot]["badges"].items():
-            kicks = [k for k in (kickoff_of(w), kickoff_of(b["over"]) if b["over"] else None) if k]
-            current[f"{w}|{b['badge']}|{b['over'] or ''}"] = {
-                "slot": slot, "w": w, "badge": b["badge"], "over": b["over"], "p": b["p"], "action": b["action"],
-                "drop": b["drop"], "reference": b["reference"], "why": b["why"], "mu_w": round(cons[w]["mu"], 3),
-                "mu_over": round(cons[b["over"]]["mu"], 3) if b["over"] else 0.0, "sigma_out": sigma_out.get(slot),
-                "swing_w": cons[w].get("swing"), "swing_over": cons[b["over"]].get("swing") if b["over"] else None,
-                "lock_at": min(kicks).isoformat() if kicks else None,
-            }  # fmt: skip
-    prev = (storage.read_json(wdir / "badges.json") or {}).get("badges", {})
-    badges = {"schema_version": 1, "badges": weeklog.update_badge_log(prev, current, now, claimed)}
+    `claimed(pid)` says who has rostered a player ("me", "other" or None). `extra(pid)` adds fields to a tier
+    row (a kicker's `free_in` when another league is on the page, SPEC D25; nothing for an IDP)."""
+    badges = badge_log(wdir, badge_rows(my_panel, tiers_by_slot, cons, sigma_out, kickoff_of), now, claimed)
     rows = {
         pid: {"slot": slot, "tier": t["tier"], "mu": round(cons[pid]["mu"], 3), "sigma": round(cons[pid]["sigma"], 3),
-              **({"flags": list(f)} if (f := flags_of(pid)) else {})}  # injury tags as shown (Q), §6.6
+              **({"flags": list(f)} if (f := flags_of(pid)) else {}), **extra(pid)}  # injury tags as shown (Q), §6.6
         for slot in tiers_by_slot
         for t in tiers_by_slot[slot]
         for pid in t["players"]
@@ -275,11 +299,12 @@ SINCE_TUE_MOVE = 1.5  # a μ move this big since Tuesday is listed (fixed once, 
 
 
 def since_tuesday(slot: str, prewaiver: dict | None, order: list[str], cons: dict, idp: dict,
-                  status_of: Callable[[str], PlayerStatus],
-                  claimed: Callable[[str], str | None]) -> list[dict] | None:  # fmt: skip
+                  status_of: Callable[[str], PlayerStatus], claimed: Callable[[str], str | None],
+                  claims: Callable[[str, dict], list[str]] | None = None) -> list[dict] | None:  # fmt: skip
     """What changed since the pre-waiver page for Tuesday's top 5 at `slot` (SPEC §6.6, 2026-11-17): now Out,
     Doubtful or questionable, claimed, a μ move of SINCE_TUE_MOVE or more, and players new to the top 5.
-    Facts only: nothing is re-ranked or discounted."""
+    Facts only: nothing is re-ranked or discounted. `claims(pid, tuesday_row)`, when given, words the claims
+    itself (the combined kicker list names the league, SPEC D25)."""
     tue = {pid: r for pid, r in ((prewaiver or {}).get("players") or {}).items() if r.get("slot") == slot}
     if not tue:
         return None
@@ -289,8 +314,9 @@ def since_tuesday(slot: str, prewaiver: dict | None, order: list[str], cons: dic
         st, then = status_of(pid), tue[pid]
         item = {"id": pid, "name": player_name(idp.get(pid, {})), "rank": rank, "mu_tue": then.get("mu"),
                 "mu": round(cons[pid]["mu"], 2) if pid in cons else None, "changes": []}  # fmt: skip
-        who = claimed(pid)
-        if who:
+        if claims is not None:
+            item["changes"] += claims(pid, then)
+        elif who := claimed(pid):
             item["changes"].append("you claimed him" if who == "me" else "claimed by another team")
         injury = [r for r in st.reasons if r in HIDE_INJURY]
         if injury:
@@ -341,14 +367,16 @@ def live_results(payload, pids, sc: dict, status_of: Callable[[str], PlayerStatu
     return out
 
 
-def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc: dict, players: dict) -> dict | None:
+def last_week_recap(data_dir: Path, season: int, week: int, sched: Schedule, sc: dict, players: dict,
+                    sub: str | None = None) -> dict | None:  # fmt: skip
     """Last week's issued suggestions with both players' final scores (D22). Scores come from
     actuals.json and stay provisional until the stat-correction window closes (last kickoff + 4 d 4 h).
     `slots` and `summary` are DL/LB/DB, as always; a week that issued kicker suggestions also has
-    `slots["K"]` and their own tally in `summary_k`, never pooled with the IDP one."""
+    `slots["K"]` and their own tally in `summary_k`, never pooled with the IDP one. `sub`: another league's
+    folder, whose badge log holds kicker suggestions only (SPEC D25)."""
     prev = week - 1
     wd = storage.week_dir(data_dir, season, prev)
-    badges = (storage.read_json(wd / "badges.json") or {}).get("badges", {})
+    badges = (storage.read_json((wd / sub if sub else wd) / "badges.json") or {}).get("badges", {})
     act = storage.read_json(wd / "actuals.json")
     if prev < 1 or not badges or not act:
         return None
@@ -520,6 +548,87 @@ def _player_card(pid, p, cons_row, status: PlayerStatus, tier, badge, mine: bool
         "floor": cons_row.get("floor") if cons_row else None,
         "ceiling": cons_row.get("ceiling") if cons_row else None,
         "result": None,
+    }
+
+
+def panel_statuses(pids, status_of: Callable[[str], PlayerStatus], frozen: dict,
+                   cons: dict) -> dict[str, PlayerStatus]:  # fmt: skip
+    """Your rostered players' statuses for the panel: a locked player is judged on his status at kickoff, so a
+    later injury tag can't empty the slot (from his frozen record; with none, only `locked` is kept)."""
+    out: dict[str, PlayerStatus] = {}
+    for pid in pids:
+        st, rec = status_of(pid), frozen.get(pid)
+        out[pid] = st
+        if st.locked and rec is not None:
+            reasons = [*rec.get("reasons", []), "locked"]
+            out[pid] = PlayerStatus(reasons, list(rec.get("flags", [])), st.kickoff, st.opponent)
+        elif st.locked and pid in cons:  # projected before kickoff but no record (first week): ignore later tags
+            out[pid] = PlayerStatus(["locked"], list(st.flags), st.kickoff, st.opponent)
+    return out
+
+
+def my_slot_out(slot: str, pnl: dict, players: dict, tracked: dict, cons: dict,
+                status_of: Callable[[str], PlayerStatus], panel_status: dict, results: dict, tiers: list, z: float,
+                badge_doc: dict | None, now: datetime, sched: Schedule, week: int) -> dict:  # fmt: skip
+    """One position's Yours block for the page (SPEC §6.7): your players' cards with their tier against `tiers`,
+    the suggested moves (one per player of yours compared against), this week's issued suggestions that have
+    played (from `badge_doc`), byes ahead and the names the moves use. `pnl` is roster.panel's entry."""
+    cards = []
+    for pid in pnl["players"]:
+        c = cons.get(pid)
+        tier = place(c["mu"], c["sigma"], tiers, z) if c else None
+        card = _player_card(pid, players.get(pid, {}), c, panel_status.get(pid, status_of(pid)), tier, None, True)
+        card["result"] = results.get(pid)
+        card.update(reserve=pid in pnl["reserve"], taxi=pid in pnl["taxi"], role=(
+            "starter" if pid == pnl["starter"] else "other" if pid == pnl["other"] else None))  # fmt: skip
+        cards.append(card)
+    # several badges over the same player of yours are one move (§6.7, 2026-11-17): the likeliest stands for it
+    moves: dict[tuple, list[tuple[str, dict]]] = {}
+    for w, b in pnl["badges"].items():
+        moves.setdefault((b["badge"], b.get("over"), b["reference"]), []).append((w, b))
+    reps = []
+    for members in moves.values():
+        members.sort(key=lambda wb: (-(wb[1].get("p") or 0.0), -cons[wb[0]]["mu"], wb[0]))
+        (w, b), rest = members[0], members[1:]
+        reps.append((w, {**b, "others": [player_name(tracked[x]) for x, _ in rest]}))
+    suggestions = [
+        {**b, "player": _player_card(w, tracked[w], cons[w], status_of(w), None, None, False)}
+        for w, b in sorted(reps, key=lambda kv: (kv[1]["reference"], -cons[kv[0]]["mu"], kv[0]))[:5]
+    ]
+    names = {pid: player_name(players.get(pid, {})) for pid in pnl["players"]}
+    played_sugg = []  # issued this week (active at lock) and already locked: shown with their results
+    issued = (badge_doc or {}).get("badges", {}).values()
+    for e in sorted(issued, key=lambda e: (e.get("lock_at") or "", e["w"])):
+        if e["slot"] != slot or not e.get("active") or not e.get("lock_at"):
+            continue
+        if datetime.fromisoformat(e["lock_at"]) > now:
+            continue
+        w, over = e["w"], e.get("over")
+        if status_of(w).kickoff is None or status_of(w).kickoff > now:
+            continue  # issued, but the suggested player hasn't played yet: still in the live list
+        c = cons.get(w) or {"mu": e["mu_w"], "sigma": None, "min": None, "max": None, "n_sources": 0}
+        card = _player_card(w, players.get(w, {}), c, status_of(w), None, None, False)
+        card["result"] = results.get(w)
+        for pid in (over, e.get("drop")):
+            if pid:
+                names.setdefault(pid, player_name(players.get(pid, {})))
+        played_sugg.append({
+            **{k: e.get(k) for k in ("badge", "over", "p", "action", "drop", "reference", "why", "mu_over")},
+            "player": card, "over_result": results.get(over) if over else None,
+            "outcome": weeklog.outcome(results.get(w), over, results.get(over) if over else None),
+        })  # fmt: skip
+    played_sugg.sort(key=lambda x: (-((x["player"]["result"] or {}).get("pts") or -1.0), -(x["player"]["mu"] or 0)))
+    return {
+        "players": cards,
+        "count": pnl["count"],
+        "limit": pnl["limit"],  # K: null (the league sets none); `open_spots` is what limits a kicker add
+        **({"open_spots": pnl["open_spots"]} if slot == K else {}),
+        "starter_locked": pnl["starter_locked"],
+        "suggestions": suggestions,
+        "byes": bye_lookahead(pnl["players"], pnl["reserve"], players, sched, week),
+        "played_suggestions": played_sugg[:6],
+        "played_suggestions_hidden": max(0, len(played_sugg) - 6),
+        "names": names,
     }
 
 
@@ -865,18 +974,39 @@ def run_sync(
             cons[pid] = {k: rec.get(k) for k in ("mu", "base", "form", "sigma", "min", "max", "n_sources", "eff",
                                                  "parts", "ranks", "swing", "floor", "ceiling")}  # fmt: skip
 
-    # waiver pool and tiers
+    # your other leagues whose kickers the K tab also covers (SPEC D25): read after SADL's own fetches and
+    # before the tiers. The kicker numbers above are shared (the leagues score kickers alike); only who is free,
+    # who is yours and your lineup and room differ. A league that can't be read is a note on the K tab.
+    others = [otherlg.read(sleeper, key, ocfg, season, week, user_id, sc, data_dir, now, log)
+              for key, ocfg in (otherlg.configured(cfg).items() if k_on else ())]  # fmt: skip
+    live = [o for o in others if o.ok]  # the leagues shown with numbers this sync
+    o_rostered = {o.key: o.rostered() for o in live}
+    o_mine = {o.key: {str(pid) for pid in (o.me or {}).get("players") or []} for o in live}
+
+    # waiver pool and tiers. The kicker list is every kicker free in SADL or in another league on the page (SPEC
+    # D25), and its tiers are counted over that whole list; SADL's own suggestions still weigh only the kickers
+    # free in SADL (`waiver_order`, in the same order as before). Without another league both are SADL's pool.
     rostered = rostered_ids(rosters)
+
+    def available(pid: str, slot: str) -> bool:
+        """On the page's list: free in SADL, or (a kicker) free in another league shown this sync."""
+        return pid not in rostered or (slot == K and any(pid not in r for r in o_rostered.values()))
+
+    def free_of(pid: str) -> list[str]:
+        """The leagues a kicker is free in, SADL first (the combined list's tags)."""
+        return otherlg.free_in(pid, rostered, live, o_rostered)
+
     z = float((cfg.get("tiers") or {}).get("z", 1.0))
-    tiers_by_slot, waiver_order = {}, {}
+    tiers_by_slot, waiver_order, shown_order = {}, {}, {}
     for slot in page_slots:
         pool = {
             pid: (c["mu"], c["sigma"])
             for pid, c in cons.items()
-            if slot_of(tracked[pid]) == slot and pid not in rostered and status_of(pid).playable
+            if slot_of(tracked[pid]) == slot and available(pid, slot) and status_of(pid).playable
         }
         tiers_by_slot[slot] = build_tiers(pool, z)
-        waiver_order[slot] = [pid for t in tiers_by_slot[slot] for pid in t["players"]]
+        shown_order[slot] = [pid for t in tiers_by_slot[slot] for pid in t["players"]]
+        waiver_order[slot] = [pid for pid in shown_order[slot] if pid not in rostered]  # SADL's suggestions
 
     me = my_roster(rosters, user_id)
     if me is None:
@@ -905,15 +1035,7 @@ def run_sync(
     my_matchup = next((m for m in (matchups or []) if me and m.get("roster_id") == me.get("roster_id")), {})
     lineup = starter_slots(league.get("roster_positions") or [], my_matchup.get("starters"))
     # a locked rostered player is judged on his status at kickoff (a later injury tag can't empty the slot)
-    panel_status: dict[str, PlayerStatus] = {}
-    for pid in (me or {}).get("players") or []:
-        st, rec = status_of(pid), frozen.get(pid)
-        panel_status[pid] = st
-        if st.locked and rec is not None:
-            reasons = [*rec.get("reasons", []), "locked"]
-            panel_status[pid] = PlayerStatus(reasons, list(rec.get("flags", [])), st.kickoff, st.opponent)
-        elif st.locked and pid in cons:  # projected before kickoff but no record (first week): ignore later tags
-            panel_status[pid] = PlayerStatus(["locked"], list(st.flags), st.kickoff, st.opponent)
+    panel_status = panel_statuses((me or {}).get("players") or [], status_of, frozen, cons)
     threshold = float((cfg.get("swap") or {}).get("threshold", 0.6))
     spots = open_spots(me, league.get("roster_positions"))  # free active roster spots: the kicker add rule
     my_panel = panel(me or {}, players, cons, panel_status, waiver_order, limits, sigma_out, threshold, lineup,
@@ -924,11 +1046,66 @@ def run_sync(
     def claimed(pid: str) -> str | None:
         return "me" if pid in mine else "other" if pid in rostered else None
 
+    # each other league's kicker panel (SPEC D25): SADL's rules (roster.py) on that league's roster, lineup and
+    # room, against the kickers free there, with the shared numbers and σ_out,K
+    o_panels: dict[str, dict] = {}
+    o_status: dict[str, dict[str, PlayerStatus]] = {}
+    for o in live:
+        try:  # a failure here costs that league's panel only (its kickers keep their tags on the list)
+            o_me = o.me or {}
+            o_match = next((m for m in (o.matchups or []) if m.get("roster_id") == o_me.get("roster_id")), {})
+            o_lineup = starter_slots(o.league.get("roster_positions") or [], o_match.get("starters"))
+            o_status[o.key] = panel_statuses(o_me.get("players") or [], status_of, frozen, cons)
+            o_free = [pid for pid in shown_order[K] if pid not in o_rostered[o.key]]
+            o_panels[o.key] = panel(o_me, players, cons, o_status[o.key], {K: o_free},
+                                    position_limits(o.league.get("settings") or {}, 2), sigma_out, threshold,
+                                    o_lineup, open_spots(o_me, o.league.get("roster_positions")), (K,))  # fmt: skip
+        except Exception as e:  # isolation by design: the traceback goes to the job log only
+            log(traceback.format_exc())
+            o.status, o.note = "failed", f"its panel couldn't be built this sync ({type(e).__name__})"
+
+    def k_claims(pid: str, then: dict) -> list[str]:
+        """Claims since Tuesday on the combined kicker list, by league: only where he was free on Tuesday."""
+        sets = {"SADL": (rostered, mine), **{o.label: (o_rostered[o.key], o_mine[o.key]) for o in live}}
+        out = []
+        for label in then.get("free_in") or []:
+            taken, yours = sets.get(label, (set(), set()))
+            if pid in yours:
+                out.append(f"you claimed him in {label}")
+            elif pid in taken:
+                out.append(f"claimed in {label}")
+        return out
+
+    def league_tags(pid: str) -> list[dict]:
+        """A combined-list card's leagues: each league he is free in, with that league's badge for him."""
+        free = free_of(pid)
+        tags = [{"label": "SADL", "badge": my_panel[K]["badges"].get(pid)}] if "SADL" in free else []
+
+        def badge(o) -> dict | None:
+            return ((o_panels.get(o.key) or {}).get(K) or {}).get("badges", {}).get(pid)
+
+        return tags + [{"label": o.label, "badge": badge(o)} for o in live if o.label in free]
+
     logs = _guard("decision logs", lambda: build_week_logs(wdir, my_panel, tiers_by_slot, cons, sigma_out, kickoff_of,
                                                          now, prewaiver=bool(window and window.kind == "pre-waiver"),
-                                                         claimed=claimed, flags_of=lambda pid: status_of(pid).flags),
+                                                         claimed=claimed, flags_of=lambda pid: status_of(pid).flags,
+                                                         extra=lambda pid: ({"free_in": free_of(pid)}
+                                                                            if live and slots.get(pid) == K else {})),
                   (None, None), warnings, log)  # fmt: skip
     badge_doc, tiers_doc = logs
+    o_badges: dict[str, dict | None] = {}
+    for o in (o for o in live if o.key in o_panels):  # each league's own suggestion log; a failure costs that log only
+
+        def o_claimed(pid: str, o=o) -> str | None:
+            return "me" if pid in o_mine[o.key] else "other" if pid in o_rostered[o.key] else None
+
+        o_badges[o.key] = _quiet(
+            lambda o=o, c=o_claimed: badge_log(
+                wdir / o.key, badge_rows(o_panels[o.key], (K,), cons, sigma_out, kickoff_of), now, c
+            ),
+            None,
+            log,
+        )
     started = [pid for pid in tracked if status_of(pid).locked]
     live_stats, stats_err = _guard("live stats", lambda: sleeper.stats(season, week), (None, None), warnings, log)
     if started and stats_err:  # an exception already has its own banner from _guard
@@ -952,18 +1129,20 @@ def run_sync(
             for pid in t["players"]:
                 if shown >= depth:
                     break
-                cards.append(_player_card(pid, tracked[pid], cons[pid], status_of(pid), t["tier"], badges.get(pid),
-                                          False))  # fmt: skip
+                card = _player_card(pid, tracked[pid], cons[pid], status_of(pid), t["tier"], badges.get(pid), False)
+                if slot == K and live:  # the combined list: where he is free, and each league's badge (SPEC D25)
+                    card["leagues"] = league_tags(pid)
+                cards.append(card)
                 shown += 1
             if cards:
                 out_tiers.append({"tier": t["tier"], "anchor_mu": round(t["mu"], 2), "players": cards})
         no_projection = sum(
             1
             for pid, p in tracked.items()
-            if slot_of(p) == slot and pid not in cons and pid not in rostered and status_of(pid).playable
+            if slot_of(p) == slot and pid not in cons and available(pid, slot) and status_of(pid).playable
         )
         played_ids = sorted(
-            (pid for pid in cons if slot_of(tracked[pid]) == slot and pid not in rostered and status_of(pid).locked
+            (pid for pid in cons if slot_of(tracked[pid]) == slot and available(pid, slot) and status_of(pid).locked
              and was_playable(pid)),
             key=lambda pid: (logged_tier.get(pid) or 999, -cons[pid]["mu"], pid),
         )  # fmt: skip
@@ -971,79 +1150,45 @@ def run_sync(
         for pid in played_ids[:depth]:
             card = _player_card(pid, tracked[pid], cons[pid], status_of(pid), logged_tier.get(pid), None, False)
             card["result"] = results.get(pid)
+            if slot == K and live:
+                card["leagues"] = [{"label": label, "badge": None} for label in free_of(pid)]
             played.append(card)
-        since_tue = (since_tuesday(slot, (tiers_doc or {}).get("prewaiver"), waiver_order[slot], cons, tracked,
-                                   status_of, claimed)
-                     if not (window and window.kind == "pre-waiver") else None)  # fmt: skip
+        prewaiver = (tiers_doc or {}).get("prewaiver")
+        tue_k = [r for r in ((prewaiver or {}).get("players") or {}).values() if r.get("slot") == K]
+        # the kicker list changed kind if Tuesday's was SADL's alone and today's is combined, or the other way
+        # round: "changed since Tuesday" would then compare different lists, so it is left out for K
+        same_kind = slot != K or not tue_k or all(("free_in" in r) == bool(live) for r in tue_k)
+        since_tue = (since_tuesday(slot, prewaiver, shown_order[slot], cons, tracked, status_of, claimed,
+                                   k_claims if slot == K and live else None)
+                     if not (window and window.kind == "pre-waiver") and same_kind else None)  # fmt: skip
         positions_out[slot] = {
             "since_tuesday": since_tue,
             "tiers": out_tiers,
             "tier_count": len(tiers_by_slot[slot]),
-            "hidden": len(waiver_order[slot]) - shown,
+            "hidden": len(shown_order[slot]) - shown,
             "no_projection": no_projection,
             "played": played,
             "played_hidden": max(0, len(played_ids) - depth),
         }
-    my_out = {}
-    for slot in page_slots:
-        pnl = my_panel[slot]
-        cards = []
-        for pid in pnl["players"]:
-            c = cons.get(pid)
-            tier = place(c["mu"], c["sigma"], tiers_by_slot[slot], z) if c else None
-            card = _player_card(pid, players.get(pid, {}), c, panel_status.get(pid, status_of(pid)), tier, None, True)
-            card["result"] = results.get(pid)
-            card.update(reserve=pid in pnl["reserve"], taxi=pid in pnl["taxi"], role=(
-                "starter" if pid == pnl["starter"] else "other" if pid == pnl["other"] else None))  # fmt: skip
-            cards.append(card)
-        # several badges over the same player of yours are one move (§6.7, 2026-11-17): the likeliest stands for it
-        moves: dict[tuple, list[tuple[str, dict]]] = {}
-        for w, b in pnl["badges"].items():
-            moves.setdefault((b["badge"], b.get("over"), b["reference"]), []).append((w, b))
-        reps = []
-        for members in moves.values():
-            members.sort(key=lambda wb: (-(wb[1].get("p") or 0.0), -cons[wb[0]]["mu"], wb[0]))
-            (w, b), rest = members[0], members[1:]
-            reps.append((w, {**b, "others": [player_name(tracked[x]) for x, _ in rest]}))
-        suggestions = [
-            {**b, "player": _player_card(w, tracked[w], cons[w], status_of(w), None, None, False)}
-            for w, b in sorted(reps, key=lambda kv: (kv[1]["reference"], -cons[kv[0]]["mu"], kv[0]))[:5]
-        ]
-        names = {pid: player_name(players.get(pid, {})) for pid in pnl["players"]}
-        played_sugg = []  # issued this week (active at lock) and already locked: shown with their results
-        issued = (badge_doc or {}).get("badges", {}).values()
-        for e in sorted(issued, key=lambda e: (e.get("lock_at") or "", e["w"])):
-            if e["slot"] != slot or not e.get("active") or not e.get("lock_at"):
-                continue
-            if datetime.fromisoformat(e["lock_at"]) > now:
-                continue
-            w, over = e["w"], e.get("over")
-            if status_of(w).kickoff is None or status_of(w).kickoff > now:
-                continue  # issued, but the suggested player hasn't played yet: still in the live list
-            c = cons.get(w) or {"mu": e["mu_w"], "sigma": None, "min": None, "max": None, "n_sources": 0}
-            card = _player_card(w, players.get(w, {}), c, status_of(w), None, None, False)
-            card["result"] = results.get(w)
-            for pid in (over, e.get("drop")):
-                if pid:
-                    names.setdefault(pid, player_name(players.get(pid, {})))
-            played_sugg.append({
-                **{k: e.get(k) for k in ("badge", "over", "p", "action", "drop", "reference", "why", "mu_over")},
-                "player": card, "over_result": results.get(over) if over else None,
-                "outcome": weeklog.outcome(results.get(w), over, results.get(over) if over else None),
-            })  # fmt: skip
-        played_sugg.sort(key=lambda x: (-((x["player"]["result"] or {}).get("pts") or -1.0), -(x["player"]["mu"] or 0)))
-        my_out[slot] = {
-            "players": cards,
-            "count": pnl["count"],
-            "limit": pnl["limit"],  # K: null (the league sets none); `open_spots` is what limits a kicker add
-            **({"open_spots": pnl["open_spots"]} if slot == K else {}),
-            "starter_locked": pnl["starter_locked"],
-            "suggestions": suggestions,
-            "byes": bye_lookahead(pnl["players"], pnl["reserve"], players, sched, week),
-            "played_suggestions": played_sugg[:6],
-            "played_suggestions_hidden": max(0, len(played_sugg) - 6),
-            "names": names,
-        }
+    my_out = {slot: my_slot_out(slot, my_panel[slot], players, tracked, cons, status_of, panel_status, results,
+                                tiers_by_slot[slot], z, badge_doc, now, sched, week)
+              for slot in page_slots}  # fmt: skip
+    k_leagues_out = {}
+    for o in others:  # each other league's kicker block (SPEC D25): its Yours, its moves and last week's results
+        entry = {"label": o.label, "name": o.league.get("name"), "status": o.status, "note": o.note}
+        my = _quiet(lambda o=o: my_slot_out(K, o_panels[o.key][K], players, tracked, cons, status_of, o_status[o.key],
+                                            results, tiers_by_slot[K], z, o_badges.get(o.key), now, sched, week),
+                    None, log) if o.ok and o.key in o_panels else None  # fmt: skip
+        if o.ok and my is None:
+            o.status, o.note = "failed", "its panel couldn't be built this sync"
+        entry.update(status=o.status, note=o.note)
+        if my is not None:
+            o_settings = o.league.get("settings") or {}
+            waiver_type = {0: "rolling", 1: "reverse standings", 2: "FAAB"}.get(o_settings.get("waiver_type"), "?")
+            entry.update(waiver_type=waiver_type, my=my)
+        entry["last_week"] = _quiet(lambda o=o: last_week_recap(data_dir, season, week, sched, sc, players, o.key),
+                                    None, log)  # fmt: skip
+        k_leagues_out[o.key] = entry
 
     archives = {**SOURCES, **SIGNALS, **K_SOURCES}  # the kicker archives last: they take what budget is left
     backfilled = _guard("backfill", lambda: backfillmod.run(archives, cfg, data_dir, season, range(1, week), now,
@@ -1064,6 +1209,7 @@ def run_sync(
         backfilled=backfilled,
         actuals_written=actuals,
         **({"kicker_actuals_added": actuals_k} if actuals_k else {}),  # settled weeks that gained kicker lines
+        **({"kicker_leagues": {o.key: o.summary() for o in others}} if others else {}),  # SPEC D25
         impute_priors=(priors or {}).get("season"),  # None: built-in position rates (§6.2)
         window=window.id if window else "forced",
     )
@@ -1083,6 +1229,7 @@ def run_sync(
         "swing": swing_coef,  # the per-player swing settings in force, or null (§6.7)
         "sources": {name: footer_info(info) for name, info in run["sources"].items()},
         "warnings": warnings,
+        **({"k_leagues": k_leagues_out} if k_leagues_out else {}),  # your other leagues' kickers (SPEC D25)
     }
     if k_on:  # the kicker note's number (SPEC §6.8): how often a 1-point edge wins at a typical kicker's swing
         typical = ((run.get("swing") or {}).get("mean") or {}).get(K) or sigma_out.get(K)  # their mean, else σ_out,K
@@ -1119,6 +1266,10 @@ def run_sync(
     week_players, _ = storage.merge_rows(week_players, slim, now, kickoff_of)
     storage.write_json(wdir / "players.json", {"schema_version": 1, "players": week_players})
     storage.write_json(season_dir / "schedule.json", sched.to_json())
+    for o in others:  # each other league's own folder (other_leagues.py); nothing of SADL's is written there
+        _quiet(lambda o=o: otherlg.save(o, data_dir, season, week), None, log)
+        if o_badges.get(o.key) is not None:
+            storage.write_json(wdir / o.key / "badges.json", o_badges[o.key])
     storage.write_json(
         season_dir / "league.json",
         {

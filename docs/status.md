@@ -1,4 +1,4 @@
-# SADL IDP streamer: open goals (updated 2026-11-17)
+# SADL IDP streamer: open goals (updated 2026-11-21)
 
 The two working sessions are now one. Merged on `main`:
 - #2–#5: MVP; locked suggestions and results; Stats page with per-player breakdown; ESPN.
@@ -262,6 +262,24 @@ Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. 
   - **Week 13:** report only.
   - **Season end:** if α̂ is within 2 SE of 0.6 and no source's ratio is 2 SE from 1, the result is recorded as "not distinguishable from the priors", and the owner decides whether the kicker weights are simply fixed at the priors for 2027. Otherwise the weights stay as the shrunk rule gives them. K is a single position, so a "differs" claim needs |t| ≥ 2.5 (protocol rule 6).
   - No in-season change either way.
+
+## 8. The Crooked League's kickers (2026-11-21, owner decision D25)
+Owner decisions, 2026-11-21:
+- **Combined, with labels:** one kicker list on the K tab for SADL and Kusch's Crooked League, each kicker tagged with the leagues he is free in. "Same page and combined. Just include labels (since the scoring is the same, right?)": yes, both leagues score kickers identically (SPEC D25).
+- **This week card:** the Crooked moves, tagged "K · Crooked"; your Crooked kicker in the starters strip and the heads-ups.
+- **FAAB:** a kicker claims line for the Crooked League ($1,000 budget), in Waiver notes.
+- **Last week:** the Crooked kicker suggestions with their own tally, never added to SADL's; the report card names your kicker in each league.
+
+**In flight** on branch `claude/crooked-kickers` (cut from `main` at 89aa344), pushed, not merged; a box is ticked when it merges.
+- [ ] **Spec:** D25 and the sections it touches (§2, §3.2, §3.3, §6.6, §6.7, §6.8, §9, §10, §12).
+- [ ] **Pipeline:** `other_leagues.py` reads the league after SADL's fetches and before the tiers; the combined kicker list; the league's own panel, badge log and files under `crooked/`; nothing raises out of it.
+- [ ] **Page:** the K tab's labelled Yours blocks and tagged Available list, the This week card, Waiver notes, Last week, the report card and How to read.
+- [ ] **Isolation, on real data:** main against the branch on the committed data, offline. Forced week-11 syncs (Saturday afternoon, Sunday with games locked, the league unreachable): every file byte-identical except `consensus.json`, `run.json` and `tiers_log.json`, which differ in kicker leaves only. Replays of weeks 1–11 byte-identical, inner files included. The site: every data file and `stats.json` identical, pages identical outside the style block; DL, LB and DB panels identical with the league read (SPEC §10).
+- [ ] **After merge:** the first sync from Actions with the league. It saves 3 earlier transaction legs a sync, so the Crooked FAAB line appears once its 5th kicker claim is on file (7 had been won by week 11).
+
+**What changed for SADL's kickers:** their tiers are counted over the combined list, so a SADL kicker can read a tier lower when a better one is free only in the Crooked League. SADL's kicker moves, odds and numbers are unchanged.
+
+**Not done, on purpose:** past weeks (the league's rosters then weren't saved), the Stats page (kicker accuracy doesn't depend on the league), and the waiver-or-free-agent status of a dropped kicker.
 
 ## Owner questions still open
 - Vegas player props (would need an Odds API key): untested. Game lines (spread, total, implied points) were tested and rejected (ledger in `docs/methods-review.md`), apart from the DL game total, which stays shadow-only inside the DL matchup candidate.

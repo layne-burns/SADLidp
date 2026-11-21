@@ -27,12 +27,19 @@
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
 
-{%- macro chip(b) -%}
+{%- macro chip(b, lg=none) -%}
   {%- if b.reference -%}
-    <span class="chip ref">{{ b.badge }} · ref</span>
+    <span class="chip ref">{{ b.badge }}{% if lg %} · {{ lg }}{% endif %} · ref</span>
   {%- else -%}
-    <span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>
+    <span class="chip {{ b.badge|lower }}">{{ b.badge }}{% if lg %} · {{ lg }}{% endif %}</span>
   {%- endif -%}
+{%- endmacro %}
+
+{#- the combined kicker list (SPEC D25): each league he is free in, as its badge when it has one for him -#}
+{%- macro lgtags(p) -%}
+  {%- for l in p.leagues -%}
+    {%- if l.badge %}{{ chip(l.badge, l.label) }}{% else %}<span class="tag lg">{{ l.label }}</span>{% endif -%}
+  {%- endfor -%}
 {%- endmacro %}
 
 {#- a player's score once his game has started -#}
@@ -192,13 +199,13 @@
 {#- One suggested move. The This-week card shows it short, with its position in front (`full` false); the
     position's own panel adds the other players the same move could be made with, the sources and, once he has
     played, the result. -#}
-{%- macro move(slot, m, s, full) %}
+{%- macro move(slot, m, s, full, lg=none) %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
-        {{ chip(s) }}{% if not full %} <span class="tag pos">{{ slot }}</span>{% endif %}
+        {{ chip(s, lg if full else none) }}{% if not full %} <span class="tag pos">{{ slot }}{% if lg %} · {{ lg }}{% endif %}</span>{% endif %}
         <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
         · {{ '%.1f'|format(s.player.mu) }} pts
         {%- if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}
-        {%- else %}; you have no playable {{ slot }} this week
+        {%- else %}; you have no playable {{ slot }}{% if lg and lg != 'SADL' %} in {{ lg }}{% endif %} this week
         {%- endif %}.
         {% if full and s.others -%}
         <div class="sub">Same move, slightly lower odds: {{ s.others[:4]|join(', ') }}
@@ -219,6 +226,48 @@
         {{ outcome(s) }}
         {%- endif %}
       </div>
+{%- endmacro %}
+
+{#- a position's count line: "1/2 rostered", or for K "1 rostered · roster full" -#}
+{%- macro count_line(m) -%}
+          {%- if m.limit is not none %}{{ m.count }}/{{ m.limit }} rostered
+          {%- else %}{{ m.count }} rostered
+            {%- if m.open_spots is defined and m.open_spots is not none %} · {% if m.open_spots > 0 %}{{ m.open_spots }} free roster spot{{ 's' if m.open_spots != 1 }}{% else %}roster full{% endif %}{% endif %}
+          {%- endif %}
+{%- endmacro %}
+
+{#- one league's Yours block at a position: your players, notes, moves and the moves that have played. `lg`
+    names the league on the combined kicker panel (SPEC D25); none everywhere else. -#}
+{%- macro yours_body(slot, m, pos, lg=none) %}
+        <div class="slot">
+          <ul>
+            {% for p in m.players %}
+            {{ card_open(p) }}
+              <div><span class="name">{{ p.name }}</span>
+                {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
+                {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
+                {{ tags(p) }}
+                <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(pos.tier_count) }}{% endif %}</div></div>
+              <div class="pts">{{ pts(p) }}</div>
+{{ card_close(p) }}
+            {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
+          </ul>
+          {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
+          {% for b in m.byes or [] %}<p class="note">Bye ahead: {{ b.name }} ({{ b.team }}) has a bye in week {{ b.week }}.</p>{% endfor %}
+          {% for s in m.suggestions %}{{ move(slot, m, s, true, lg) }}{% endfor %}
+          {% if m.played_suggestions %}
+          <p class="tierhead" style="margin-top:10px">This week's suggestions that have played</p>
+          {% for s in m.played_suggestions %}
+          <div class="sugg">
+            {{ chip(s, lg) }} <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
+            · projected {{ '%.1f'|format(s.player.mu) }}, {{ pts_text(s.player.result) }}
+            {% if s.over %}<div class="sub">vs {{ m.names.get(s.over, 'your player') }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+            {{ outcome(s) }}
+          </div>
+          {% endfor %}
+          {% if m.played_suggestions_hidden %}<p class="hidden-note">{{ m.played_suggestions_hidden }} more not shown.</p>{% endif %}
+          {% endif %}
+        </div>
 {%- endmacro %}
 
 {#- ---- the report card ---- -#}
@@ -309,10 +358,11 @@
   {% set lw = d.last_week %}
   {% set lw_slots = [] %}
   {% if lw %}{% for slot in all_slots if lw.slots[slot] %}{% set _ = lw_slots.append(slot) %}{% endfor %}{% endif %}
+  {%- set lw_others = [] %}{% for o in (d.k_leagues or {}).values() if o.last_week and o.last_week.slots.K %}{% set _ = lw_others.append(o) %}{% endfor %}
   <section class="now" aria-labelledby="now-h">
     <h2 id="now-h">{% if live %}This week{% else %}Week {{ d.week }} at a glance{% endif %}</h2>
     <div class="slot">
-      {% for x in now.moves %}{{ move(x.slot, x.m, x.s, false) }}{% endfor %}
+      {% for x in now.moves %}{{ move(x.slot, x.m, x.s, false, x.lg) }}{% endfor %}
       {% if now.quiet %}<p class="quiet">No move {{ 'suggested' if live else 'was suggested' }} at: {{ now.quiet|join(', ') }}</p>{% endif %}
       {% if live and now.heads -%}
       <div class="heads"><span class="lbl">Heads-up</span>
@@ -347,42 +397,25 @@
       <p class="legend">Big number = projected points · ± = how far the sources disagree{% if d.swing %} · range = where 3 games in 5 land{% endif %}</p>
       {% for slot in slots %}{% set m = d.my_idps[slot] %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
-        <h3 class="grp">Yours <span class="count">
-          {%- if m.limit is not none %}{{ m.count }}/{{ m.limit }} rostered
-          {%- else %}{{ m.count }} rostered
-            {%- if m.open_spots is defined and m.open_spots is not none %} · {% if m.open_spots > 0 %}{{ m.open_spots }} free roster spot{{ 's' if m.open_spots != 1 }}{% else %}roster full{% endif %}{% endif %}
-          {%- endif %}</span></h3>
-        <div class="slot">
-          <ul>
-            {% for p in m.players %}
-            {{ card_open(p) }}
-              <div><span class="name">{{ p.name }}</span>
-                {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
-                {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
-                {{ tags(p) }}
-                <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(pos.tier_count) }}{% endif %}</div></div>
-              <div class="pts">{{ pts(p) }}</div>
-{{ card_close(p) }}
-            {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
-          </ul>
-          {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
-          {% for b in m.byes or [] %}<p class="note">Bye ahead: {{ b.name }} ({{ b.team }}) has a bye in week {{ b.week }}.</p>{% endfor %}
-          {% for s in m.suggestions %}{{ move(slot, m, s, true) }}{% endfor %}
-          {% if m.played_suggestions %}
-          <p class="tierhead" style="margin-top:10px">This week's suggestions that have played</p>
-          {% for s in m.played_suggestions %}
-          <div class="sugg">
-            {{ chip(s) }} <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
-            · projected {{ '%.1f'|format(s.player.mu) }}, {{ pts_text(s.player.result) }}
-            {% if s.over %}<div class="sub">vs {{ m.names.get(s.over, 'your player') }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
-            {{ outcome(s) }}
-          </div>
-          {% endfor %}
-          {% if m.played_suggestions_hidden %}<p class="hidden-note">{{ m.played_suggestions_hidden }} more not shown.</p>{% endif %}
-          {% endif %}
-        </div>
+        {%- set kl = (d.k_leagues or {}).values()|list if slot == 'K' else [] %}
+        {%- if kl %}
+        <h3 class="grp">Yours</h3>
+        <p class="lghead"><span class="tag lg">SADL</span> <span class="count">{{ count_line(m) }}</span></p>
+        {{- yours_body(slot, m, pos, 'SADL') }}
+        {%- for o in kl %}
+        <p class="lghead"><span class="tag lg">{{ o.label }}</span>
+          {%- if o.my %} <span class="count">{{ count_line(o.my) }}</span>{% else %} <span class="note">{{ o.name or o.label }}: {{ o.note }}; the kicker list below is SADL's alone.</span>{% endif %}</p>
+        {%- if o.my %}{{ yours_body(slot, o.my, pos, o.label) }}{% endif %}
+        {%- endfor %}
+        {%- else %}
+        <h3 class="grp">Yours <span class="count">{{ count_line(m) }}</span></h3>
+        {{- yours_body(slot, m, pos) }}
+        {%- endif %}
 
         <h3 class="grp">Available</h3>
+        {%- if kl and kl|selectattr('my')|list %}
+        <p class="legend">Tags: the leagues he's free in. A START or UPGRADE names its league and is worked out against your kicker there.</p>
+        {%- endif %}
         {% if pos.since_tuesday -%}
         <div class="note since"><b>Changed since Tuesday's list:</b>
           <ul>{% for x in pos.since_tuesday %}<li>{{ x.name }}{% if x.rank %} (Tuesday #{{ x.rank }}){% endif %}: {{ x.changes|join('; ') }}</li>{% endfor %}</ul>
@@ -407,7 +440,7 @@
             {% for p in t.players %}
             {{ card_open(p) }}
               <div><span class="name">{{ p.name }}</span>
-                {% if p.badge %}{{ chip(p.badge) }}{% endif %}
+                {% if p.leagues is defined %}{{ lgtags(p) }}{% elif p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
                 <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · sources say {{ '%.1f'|format(p.min) }} to {{ '%.1f'|format(p.max) }} ({{ p.n }}){% endif %}</div></div>
               <div class="pts">{{ pts(p) }}</div>
@@ -424,7 +457,7 @@
           <ul>
             {% for p in pos.played %}
             {{ card_open(p) }}
-              <div><span class="name">{{ p.name }}</span>
+              <div><span class="name">{{ p.name }}</span>{% if p.leagues is defined %} {{ lgtags(p) }}{% endif %}
                 <div class="sub">{{ p.team }} {{ opp(p) }} · {{ ('Tier ' ~ p.tier ~ ' before kickoff') if p.tier else 'not tiered before kickoff' }}</div></div>
               <div class="pts">{{ pts(p) }}</div>
 {{ card_close(p) }}
@@ -438,10 +471,10 @@
     </div>
   </section>
 
-  {% if card or lw_slots %}
+  {% if card or lw_slots or lw_others %}
   <details class="fold"{% if not live %} open{% endif %}>
     <summary><h2 id="lw-h">{% if live %}Last week{% else %}How week {{ d.week }} went{% endif %}</h2>
-      <small>({% if card %}report card{% endif %}{% if card and lw_slots %}, {% endif %}{% if lw_slots %}{% if live %}suggestions{% else %}the week before's suggestions{% endif %}{% endif %})</small></summary>
+      <small>({% if card %}report card{% endif %}{% if card and (lw_slots or lw_others) %}, {% endif %}{% if lw_slots or lw_others %}{% if live %}suggestions{% else %}the week before's suggestions{% endif %}{% endif %})</small></summary>
     <div class="foldbody">
       {% if card %}{% set c = card %}
       <h3 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h3>
@@ -467,7 +500,7 @@
           {% endfor %}
         </ul>
         {% for x in c.kickers or [] -%}
-        <p class="rck">Your kicker: {{ x.name }}, {{ rc_num(x, true) }}</p>
+        <p class="rck">Your {% if x.league %}{{ x.league }} {% endif %}kicker: {{ x.name }}, {{ rc_num(x, true) }}</p>
         {%- endfor %}
         {% set mm = c.median_miss or {} %}
         {% set mm_any = [] %}{% for slot in idp_slots if mm[slot] is defined and mm[slot] is not none %}{% set _ = mm_any.append(slot) %}{% endfor %}
@@ -505,18 +538,38 @@
       </div>
       {% endfor %}{% endfor %}
       {% endif %}
+      {%- for o in lw_others %}{% set ol = o.last_week %}
+      <h3>{{ o.name or o.label }}: last week's kicker suggestions (week {{ ol.week }})</h3>
+      <p class="note">
+        {%- if ol.summary_k and ol.summary_k.decided %}{{ ol.summary_k.hits }} of {{ ol.summary_k.decided }} paid off, counted apart from SADL's.
+        {%- else %}None were decided.
+        {%- endif %}
+        {% if ol.provisional %}Scores are provisional until stat corrections close {{ ol.settles|et }}.{% else %}Final scores.{% endif %}</p>
+      {% for s in ol.slots.K %}
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s, o.label) }} <b>{{ s.name }}</b> <span class="sub">{{ s.team or '' }} · K</span>
+        · projected {{ '%.1f'|format(s.mu_w) }}, {{ pts_text(s.result) }}
+        {% if s.over %}<div class="sub">vs {{ s.over_name }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+        {{ outcome(s) }}
+        {% if s.reference %}<div class="why">Shown for reference at the time; not counted.</div>{% endif %}
+      </div>
+      {% endfor %}
+      {%- endfor %}
     </div>
   </details>
   {% endif %}
 
   {% set show_tueq = tueq is defined and tueq and tueq.tagged >= 20 %}
-  {% if show_tueq or (faab is defined and faab) %}
+  {% if show_tueq or (faab is defined and faab) or faab_k %}
   <details class="fold">
     <summary><h2>Waiver notes</h2></summary>
     <div class="foldbody">
       {% if show_tueq %}<p class="note">Questionable on Tuesday: {{ tueq.sat }} of the {{ tueq.tagged }} waiver players tagged Q on a pre-waiver page this season sat out (untagged: {{ (100 * tueq.untagged_sat / tueq.untagged)|round|int }}%).</p>{% endif %}
       {# One line on purpose: a test renders this block alone, from its first tag to its last, and pins its text. #}
       {% if faab is defined and faab %}<p class="note">IDP waivers this season: {{ faab.won_token }} of {{ faab.claims }} claims were won with a token bid (at most {{ faab.token_label }}% of the starting budget){% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested, won at {{ faab.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '%.0f'|format(faab.budget) }}.)</small>{% if faab.fa_adds %} {{ faab.fa_adds }} {{ 'IDP was picked up as a free agent' if faab.fa_adds == 1 else 'IDPs were picked up as free agents' }}{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
+      {%- for f in faab_k or [] %}
+      <p class="note">{{ f.name or f.label }}, kicker waivers this season: {{ f.won_token }} of {{ f.claims }} claims were won with a token bid (at most {{ f.token_label }}% of the starting budget){% if f.contested %}; {{ f.contested }} {{ 'was' if f.contested == 1 else 'were' }} contested, won at {{ f.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '{:,.0f}'.format(f.budget) }}.)</small>{% if f.fa_adds %} {{ f.fa_adds }} {{ 'kicker was picked up as a free agent' if f.fa_adds == 1 else 'kickers were picked up as free agents' }}{% if f.fa_top_day %}, most often on a {{ f.fa_top_day[0] }} ({{ f.fa_top_day[1] }}){% endif %}.{% endif %}</p>
+      {%- endfor %}
     </div>
   </details>
   {% endif %}
@@ -534,6 +587,9 @@
         {% if 'K' in slots -%}
         <li>Kickers: no form is added to a kicker's number. His range, when one is shown, comes from how many field goals and extra points he is projected for; without one, his odds use the typical kicker spread above.</li>
         <li>Kicker moves: the league sets no limit on kickers, so only roster room counts. With a free roster spot you just add; with a full roster you drop your other kicker, or swap the new one for your starter.</li>
+        {%- if d.k_leagues %}
+        <li>Other leagues: the K tab also covers {{ (d.k_leagues.values()|map(attribute='name')|select|list or d.k_leagues.values()|map(attribute='label')|list)|join(', ') }}, which scores kickers exactly as SADL does, so a kicker's number is the same in both. The tags show where he is free; each league's moves use your roster, lineup and roster room there. The kicker tiers are counted over the whole list.</li>
+        {%- endif %}
         {%- endif %}
         <li>Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).</li>
         <li>* Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start.</li>

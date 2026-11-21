@@ -244,9 +244,10 @@ def test_synced_week_with_kickers_renders_and_the_faab_line_stays_idp_only(tmp_p
     seen = {}
     real = league_tx.faab_summary
 
-    def spy(data_dir, season, slots, settings):
-        seen.update(slots)
-        return real(data_dir, season, slots, settings)
+    def spy(data_dir, season, slots, settings, **kw):
+        if not kw.get("sub"):  # SADL's own line; another league's kicker line reads its own folder (SPEC D25)
+            seen.update(slots)
+        return real(data_dir, season, slots, settings, **kw)
 
     monkeypatch.setattr(league_tx, "faab_summary", spy)
     html = build_site(data, tmp_path / "site", CFG).read_text(encoding="utf-8")

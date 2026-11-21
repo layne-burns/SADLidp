@@ -741,7 +741,7 @@ Tiers are computed over the available pool after §2 filters, locked players rem
     - the site: on the committed data, every `data-*.json` and `stats.json` byte-identical and all 13 pages identical outside the shared style block (two new rules); with the league read, the week-11 data differs in kicker leaves only and the DL, LB and DB panels' HTML is identical.
   - **Unit and end-to-end tests** (`tests/unit/test_other_leagues.py`): the scoring check, the combined list and its tags, each league's moves on its own free kickers, the league's own files, every DL/LB/DB part identical to SADL alone (league read, not found, scoring differs), the not-shown notes, the FAAB line, the recap, the This week card, the page, and a replay that never reads another league.
   - **Phone:** the K panel at 375 px, no sideways scroll; checked with the league read, and with a what-if (your Crooked kicker Out) that draws Crooked moves.
-  - **Live, still to run:** the first sync from Actions with the league (the branch's preview sync).
+  - **Live from Actions, run once (2026-11-21, 3:27 PM ET):** the branch's CI preview sync on a GitHub runner read the league: status ok, your kicker there (Cairo Santos, 9.9, the starter, roster full), 14 kickers on the combined list in 4 tiers, no warnings; the league's files were written under `crooked/`. **Still to run:** the first sync from `main`.
 
 ## 11. Known limitations (accepted)
 - **Weekly decisions only.** There is no look-ahead (D10).

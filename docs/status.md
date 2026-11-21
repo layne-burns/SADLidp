@@ -275,7 +275,8 @@ Owner decisions, 2026-11-21:
 - [ ] **Pipeline:** `other_leagues.py` reads the league after SADL's fetches and before the tiers; the combined kicker list; the league's own panel, badge log and files under `crooked/`; nothing raises out of it.
 - [ ] **Page:** the K tab's labelled Yours blocks and tagged Available list, the This week card, Waiver notes, Last week, the report card and How to read.
 - [ ] **Isolation, on real data:** main against the branch on the committed data, offline. Forced week-11 syncs (Saturday afternoon, Sunday with games locked, the league unreachable): every file byte-identical except `consensus.json`, `run.json` and `tiers_log.json`, which differ in kicker leaves only. Replays of weeks 1–11 byte-identical, inner files included. The site: every data file and `stats.json` identical, pages identical outside the style block; DL, LB and DB panels identical with the league read (SPEC §10).
-- [ ] **After merge:** the first sync from Actions with the league. It saves 3 earlier transaction legs a sync, so the Crooked FAAB line appears once its 5th kicker claim is on file (7 had been won by week 11).
+- [x] **Preview sync from Actions (2026-11-21, 3:27 PM ET):** CI tests passed; the runner read the league (status ok, 14 kickers in 4 tiers, no warnings).
+- [ ] **After merge:** the first sync from `main` with the league. It saves 3 earlier transaction legs a sync, so the Crooked FAAB line appears once its 5th kicker claim is on file (7 had been won by week 11).
 
 **What changed for SADL's kickers:** their tiers are counted over the combined list, so a SADL kicker can read a tier lower when a better one is free only in the Crooked League. SADL's kicker moves, odds and numbers are unchanged.
 

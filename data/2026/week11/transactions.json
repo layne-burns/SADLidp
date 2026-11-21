@@ -1,0 +1,57 @@
+{
+ "fetched_at": "2026-11-21T15:30:19-05:00",
+ "leg": 11,
+ "schema_version": 1,
+ "transactions": [
+  {
+   "adds": {
+    "11292": 4
+   },
+   "bid": null,
+   "created": 1795038628160,
+   "drops": {
+    "12472": 4
+   },
+   "leg": 11,
+   "roster_ids": [
+    4
+   ],
+   "status": "complete",
+   "status_updated": 1795038628160,
+   "transaction_id": "1428899208034779136",
+   "type": "free_agent"
+  },
+  {
+   "adds": {
+    "13968": 9
+   },
+   "bid": null,
+   "created": 1795039952561,
+   "drops": null,
+   "leg": 11,
+   "roster_ids": [
+    9
+   ],
+   "status": "complete",
+   "status_updated": 1795039952561,
+   "transaction_id": "1428904762975203330",
+   "type": "free_agent"
+  },
+  {
+   "adds": null,
+   "bid": null,
+   "created": 1795290920654,
+   "drops": {
+    "7694": 8
+   },
+   "leg": 11,
+   "roster_ids": [
+    8
+   ],
+   "status": "complete",
+   "status_updated": 1795290920654,
+   "transaction_id": "1429957399451557888",
+   "type": "free_agent"
+  }
+ ]
+}

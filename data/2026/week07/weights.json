@@ -1,0 +1,50 @@
+{
+ "alpha": 0.6687,
+ "alpha_hat": 0.7236,
+ "alpha_hat_raw": 0.7236,
+ "alpha_n": 5,
+ "computed_at": "2026-10-20T15:14:08-04:00",
+ "from_weeks": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "k": 4.0,
+ "method": "accuracy",
+ "prior_split": 0.6,
+ "priors": {
+  "fantasydata": 1.0,
+  "fp_ecr": 2.0,
+  "rotoballer": 1.0
+ },
+ "schema_version": 1,
+ "sources": {
+  "espn_proj": {
+   "mean_r": 1.0163,
+   "n": 4,
+   "w": 1.0033,
+   "w_data": 1.0065
+  },
+  "fp_ecr": {
+   "mean_r": 1.028,
+   "n": 4,
+   "w": 2.0077,
+   "w_data": 1.0077
+  },
+  "rotoballer": {
+   "mean_r": 1.0439,
+   "n": 5,
+   "w": 0.9957,
+   "w_data": 0.9923
+  },
+  "sleeper_proj": {
+   "mean_r": 1.0297,
+   "n": 5,
+   "w": 0.9964,
+   "w_data": 0.9935
+  }
+ },
+ "week": 7
+}

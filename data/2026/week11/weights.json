@@ -1,0 +1,77 @@
+{
+ "alpha": 0.6043,
+ "alpha_hat": 0.6062,
+ "alpha_hat_raw": 0.6062,
+ "alpha_n": 9,
+ "computed_at": "2026-11-17T12:27:59-05:00",
+ "from_weeks": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9
+ ],
+ "k": 4.0,
+ "kickers": {
+  "alpha": 0.6,
+  "alpha_hat": null,
+  "alpha_n": 0,
+  "computed_at": "2026-11-21T12:39:31-05:00",
+  "from_weeks": [],
+  "k": 4.0,
+  "method": "prior",
+  "prior_split": 0.6,
+  "priors": {
+   "fantasydata_k": 1.0,
+   "fp_k": 2.0,
+   "rotoballer_k": 1.0
+  },
+  "reason": "0 evaluated week(s); data weights start at 3",
+  "sources": {}
+ },
+ "method": "accuracy",
+ "prior_split": 0.6,
+ "priors": {
+  "fantasydata": 1.0,
+  "fp_ecr": 2.0,
+  "rotoballer": 1.0
+ },
+ "schema_version": 1,
+ "sources": {
+  "espn_proj": {
+   "mean_r": 1.0083,
+   "n": 8,
+   "w": 1.0137,
+   "w_data": 1.0206
+  },
+  "fantasydata": {
+   "mean_r": 1.0406,
+   "n": 4,
+   "w": 0.9973,
+   "w_data": 0.9945
+  },
+  "fp_ecr": {
+   "mean_r": 1.0165,
+   "n": 8,
+   "w": 2.0243,
+   "w_data": 1.0182
+  },
+  "rotoballer": {
+   "mean_r": 1.0483,
+   "n": 9,
+   "w": 0.9912,
+   "w_data": 0.9873
+  },
+  "sleeper_proj": {
+   "mean_r": 1.0506,
+   "n": 9,
+   "w": 0.9858,
+   "w_data": 0.9794
+  }
+ },
+ "week": 11
+}

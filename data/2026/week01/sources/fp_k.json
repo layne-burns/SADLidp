@@ -1,0 +1,58 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-11-21T12:39:34-05:00"
+ ],
+ "kind": "rank",
+ "last_success": "2026-11-21T12:39:34-05:00",
+ "lists": {
+  "K": {"10937":35,"10955":27,"11261":33,"11533":1,"11539":7,"11653":31,"11786":3,"11792":12,"12185":24,"12711":8,"12713":20,"12961":22,"13545":19,"13833":28,"13968":30,"1945":10,"2020":11,"2747":6,"3451":4,"3678":17,"4195":15,"4227":16,"5095":23,"5119":32,"5189":14,"6083":26,"650":25,"6528":21,"6650":9,"6703":34,"7042":18,"7839":5,"7922":29,"8259":2}
+ },
+ "no_projection_ids": [],
+ "published_at": "2026-09-13T16:58:56+00:00",
+ "rows": {
+  "10937": {"ave":{"K":24.0},"backfill":true,"fp_id":"24009","ranks":{"K":35},"std":{"K":14.17},"team":"ATL"},
+  "10955": {"ave":{"K":26.81},"backfill":true,"fp_id":"25354","ranks":{"K":27},"std":{"K":2.27},"team":"ARI"},
+  "11261": {"ave":{"K":31.84},"backfill":true,"fp_id":"25713","ranks":{"K":33},"std":{"K":0.85},"team":"CLE"},
+  "11533": {"ave":{"K":1.64},"backfill":true,"fp_id":"26068","ranks":{"K":1},"std":{"K":1.55},"team":"DAL"},
+  "11539": {"ave":{"K":6.69},"backfill":true,"fp_id":"26075","ranks":{"K":7},"std":{"K":2.9},"team":"DET"},
+  "11653": {"ave":{"K":26.41},"backfill":true,"fp_id":"26444","ranks":{"K":31},"std":{"K":4.6},"team":"NO"},
+  "11786": {"ave":{"K":4.1},"backfill":true,"fp_id":"26475","ranks":{"K":3},"std":{"K":1.95},"team":"JAX"},
+  "11792": {"ave":{"K":11.74},"backfill":true,"fp_id":"26341","ranks":{"K":12},"std":{"K":2.92},"team":"MIN"},
+  "12185": {"ave":{"K":22.51},"backfill":true,"fp_id":"26763","ranks":{"K":24},"std":{"K":3.99},"team":"IND"},
+  "12711": {"ave":{"K":7.93},"backfill":true,"fp_id":"27534","ranks":{"K":8},"std":{"K":3.59},"team":"BAL"},
+  "12713": {"ave":{"K":19.79},"backfill":true,"fp_id":"27291","ranks":{"K":20},"std":{"K":3.22},"team":"NE"},
+  "12961": {"ave":{"K":22.65},"backfill":true,"fp_id":"27261","ranks":{"K":22},"std":{"K":2.02},"team":"CAR"},
+  "13545": {"ave":{"K":18.37},"backfill":true,"fp_id":"28507","ranks":{"K":19},"std":{"K":2.5},"team":"GB"},
+  "13833": {"ave":{"K":26.09},"backfill":true,"fp_id":"28176","ranks":{"K":28},"std":{"K":4.13},"team":"NYG"},
+  "13968": {"ave":{"K":29.41},"backfill":true,"fp_id":"28175","ranks":{"K":30},"std":{"K":2.38},"team":"WAS"},
+  "1945": {"ave":{"K":10.44},"backfill":true,"fp_id":"13029","ranks":{"K":10},"std":{"K":2.61},"team":"PIT"},
+  "2020": {"ave":{"K":11.71},"backfill":true,"fp_id":"13731","ranks":{"K":11},"std":{"K":2.31},"team":"CHI"},
+  "2747": {"ave":{"K":6.62},"backfill":true,"fp_id":"14003","ranks":{"K":6},"std":{"K":1.82},"team":"SEA"},
+  "3451": {"ave":{"K":5.68},"backfill":true,"fp_id":"15756","ranks":{"K":4},"std":{"K":4.02},"team":"HOU"},
+  "3678": {"ave":{"K":18.15},"backfill":true,"fp_id":"16026","ranks":{"K":17},"std":{"K":3.3},"team":"DEN"},
+  "4195": {"ave":{"K":15.01},"backfill":true,"fp_id":"16540","ranks":{"K":15},"std":{"K":3.12},"team":"PHI"},
+  "4227": {"ave":{"K":16.31},"backfill":true,"fp_id":"16712","ranks":{"K":16},"std":{"K":2.89},"team":"KC"},
+  "5095": {"ave":{"K":22.39},"backfill":true,"fp_id":"17420","ranks":{"K":23},"std":{"K":2.85},"team":"MIA"},
+  "5119": {"ave":{"K":28.02},"backfill":true,"fp_id":"17533","ranks":{"K":32},"std":{"K":3.96},"team":"NYJ"},
+  "5189": {"ave":{"K":13.1},"backfill":true,"fp_id":"17575","ranks":{"K":14},"std":{"K":3.02},"team":"SF"},
+  "6083": {"ave":{"K":24.33},"backfill":true,"fp_id":"18545","ranks":{"K":26},"std":{"K":4.0},"team":"LV"},
+  "650": {"ave":{"K":25.96},"backfill":true,"fp_id":"9491","ranks":{"K":25},"std":{"K":2.76},"team":null},
+  "6528": {"ave":{"K":22.18},"backfill":true,"fp_id":"19028","ranks":{"K":21},"std":{"K":2.73},"team":"TEN"},
+  "6650": {"ave":{"K":9.87},"backfill":true,"fp_id":"19058","ranks":{"K":9},"std":{"K":2.91},"team":"TB"},
+  "6703": {"ave":{"K":30.0},"backfill":true,"fp_id":"9019","ranks":{"K":34},"std":{"K":2.98},"team":"CAR"},
+  "7042": {"ave":{"K":18.64},"backfill":true,"fp_id":"19760","ranks":{"K":18},"std":{"K":2.79},"team":"BUF"},
+  "7839": {"ave":{"K":6.29},"backfill":true,"fp_id":"23297","ranks":{"K":5},"std":{"K":3.0},"team":"CIN"},
+  "7922": {"ave":{"K":28.57},"backfill":true,"fp_id":"23370","ranks":{"K":29},"std":{"K":2.62},"team":"BAL"},
+  "8259": {"ave":{"K":2.21},"backfill":true,"fp_id":"23901","ranks":{"K":2},"std":{"K":1.0},"team":"LAC"}
+ },
+ "schema_version": 2,
+ "source": "fp_k",
+ "universe": {
+  "K": {
+   "complete": false,
+   "depth": 36
+  }
+ },
+ "week": 1
+}

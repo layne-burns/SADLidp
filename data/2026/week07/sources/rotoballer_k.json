@@ -1,0 +1,52 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-11-21T12:39:34-05:00"
+ ],
+ "kind": "rank",
+ "last_success": "2026-11-21T12:39:34-05:00",
+ "lists": {
+  "K": {"10955":22,"11261":24,"11533":5,"11539":8,"11792":1,"12185":2,"12711":4,"12713":20,"12961":14,"13545":10,"13833":17,"1433":23,"1945":13,"2020":12,"2747":7,"3451":3,"3678":21,"4195":26,"4227":16,"4233":28,"5095":18,"5119":25,"5189":9,"6083":11,"650":19,"6528":27,"6650":15,"7839":6}
+ },
+ "no_projection_ids": [],
+ "published_at": "2026-10-21T06:37:59-04:00",
+ "rows": {
+  "10955": {"backfill":true,"flags":{},"ranks":{"K":22},"team":"ARI"},
+  "11261": {"backfill":true,"flags":{},"ranks":{"K":24},"team":"CLE"},
+  "11533": {"backfill":true,"flags":{},"ranks":{"K":5},"team":"DAL"},
+  "11539": {"backfill":true,"flags":{},"ranks":{"K":8},"team":"DET"},
+  "11792": {"backfill":true,"flags":{},"ranks":{"K":1},"team":"MIN"},
+  "12185": {"backfill":true,"flags":{},"ranks":{"K":2},"team":"IND"},
+  "12711": {"backfill":true,"flags":{},"ranks":{"K":4},"team":"BAL"},
+  "12713": {"backfill":true,"flags":{},"ranks":{"K":20},"team":"NE"},
+  "12961": {"backfill":true,"flags":{},"ranks":{"K":14},"team":"CAR"},
+  "13545": {"backfill":true,"flags":{},"ranks":{"K":10},"team":"GB"},
+  "13833": {"backfill":true,"flags":{},"ranks":{"K":17},"team":"NYG"},
+  "1433": {"backfill":true,"flags":{},"ranks":{"K":23},"team":"LAR"},
+  "1945": {"backfill":true,"flags":{},"ranks":{"K":13},"team":"PIT"},
+  "2020": {"backfill":true,"flags":{},"ranks":{"K":12},"team":"CHI"},
+  "2747": {"backfill":true,"flags":{},"ranks":{"K":7},"team":"SEA"},
+  "3451": {"backfill":true,"flags":{},"ranks":{"K":3},"team":"HOU"},
+  "3678": {"backfill":true,"flags":{},"ranks":{"K":21},"team":"DEN"},
+  "4195": {"backfill":true,"flags":{},"ranks":{"K":26},"team":"PHI"},
+  "4227": {"backfill":true,"flags":{},"ranks":{"K":16},"team":"KC"},
+  "4233": {"backfill":true,"flags":{},"ranks":{"K":28},"team":"MIA"},
+  "5095": {"backfill":true,"flags":{},"ranks":{"K":18},"team":"NO"},
+  "5119": {"backfill":true,"flags":{},"ranks":{"K":25},"team":"NYJ"},
+  "5189": {"backfill":true,"flags":{},"ranks":{"K":9},"team":"SF"},
+  "6083": {"backfill":true,"flags":{},"ranks":{"K":11},"team":"LV"},
+  "650": {"backfill":true,"flags":{},"ranks":{"K":19},"team":"ATL"},
+  "6528": {"backfill":true,"flags":{},"ranks":{"K":27},"team":"TEN"},
+  "6650": {"backfill":true,"flags":{},"ranks":{"K":15},"team":"TB"},
+  "7839": {"backfill":true,"flags":{},"ranks":{"K":6},"team":"CIN"}
+ },
+ "schema_version": 2,
+ "source": "rotoballer_k",
+ "universe": {
+  "K": {
+   "complete": false,
+   "depth": 28
+  }
+ },
+ "week": 7
+}

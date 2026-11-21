@@ -1,0 +1,54 @@
+{
+ "covered_keys": [
+  "fga",
+  "fgm",
+  "fgm_0_19",
+  "fgm_20_29",
+  "fgm_30_39",
+  "fgm_40_49",
+  "fgm_50p",
+  "xpa",
+  "xpm"
+ ],
+ "fetches": [
+  "2026-11-21T12:39:34-05:00"
+ ],
+ "kind": "projection",
+ "last_success": "2026-11-21T12:39:34-05:00",
+ "no_projection_ids": [],
+ "published_at": null,
+ "rows": {
+  "10955": {"cbs_id":"2964074","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":1.8,"fgm":1.5,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.1,"fgm_yds":54.95,"fgmiss":0.3,"gp":1.0,"xpa":1.5,"xpm":1.5,"xpmiss":0.0},"team":"ARI"},
+  "11533": {"cbs_id":"2815718","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.9,"fgm":2.4,"fgm_0_19":0.0,"fgm_20_29":0.7,"fgm_30_39":0.7,"fgm_40_49":0.7,"fgm_50p":0.4,"fgm_yds":94.5,"fgmiss":0.5,"gp":1.0,"xpa":3.6,"xpm":3.4,"xpmiss":0.2},"team":"DAL"},
+  "11539": {"cbs_id":"3173439","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.2,"fgm":2.0,"fgm_0_19":0.0,"fgm_20_29":0.5,"fgm_30_39":0.6,"fgm_40_49":0.7,"fgm_50p":0.2,"fgm_yds":75.2,"fgmiss":0.2,"gp":1.0,"xpa":3.3,"xpm":3.3,"xpmiss":0.0},"team":"DET"},
+  "11653": {"cbs_id":"29375393","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":1.9,"fgm":1.6,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.4,"fgm_50p":0.2,"fgm_yds":55.9,"fgmiss":0.3,"gp":1.0,"xpa":2.2,"xpm":2.1,"xpmiss":0.1},"team":"NO"},
+  "11786": {"cbs_id":"26702477","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.1,"fgm":1.9,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.7,"fgm_50p":0.3,"fgm_yds":74.61,"fgmiss":0.2,"gp":1.0,"xpa":3.3,"xpm":3.2,"xpmiss":0.1},"team":"JAX"},
+  "11792": {"cbs_id":"3121084","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T20:20:00-05:00","opponent":null,"stats":{"fga":2.0,"fgm":1.8,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":65.73,"fgmiss":0.2,"gp":1.0,"xpa":2.2,"xpm":2.2,"xpmiss":0.0},"team":"MIN"},
+  "12961": {"cbs_id":"3126649","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.2,"fgm":1.9,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.6,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":69.17,"fgmiss":0.3,"gp":1.0,"xpa":2.5,"xpm":2.2,"xpmiss":0.3},"team":"CAR"},
+  "13833": {"cbs_id":"28876817","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":1.8,"fgm":1.4,"fgm_0_19":0.0,"fgm_20_29":0.3,"fgm_30_39":0.5,"fgm_40_49":0.3,"fgm_50p":0.2,"fgm_yds":48.92,"fgmiss":0.4,"gp":1.0,"xpa":2.0,"xpm":2.0,"xpmiss":0.0},"team":"NYG"},
+  "13968": {"cbs_id":"28873746","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-23T20:15:00-05:00","opponent":null,"stats":{"fga":1.9,"fgm":1.6,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.4,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":62.29,"fgmiss":0.3,"gp":1.0,"xpa":2.6,"xpm":2.3,"xpmiss":0.3},"team":"WAS"},
+  "1945": {"cbs_id":"1724930","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:25:00-05:00","opponent":null,"stats":{"fga":2.0,"fgm":1.7,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":65.73,"fgmiss":0.3,"gp":1.0,"xpa":2.0,"xpm":2.0,"xpmiss":0.0},"team":"PIT"},
+  "2020": {"cbs_id":"2132690","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.5,"fgm":2.1,"fgm_0_19":0.0,"fgm_20_29":0.5,"fgm_30_39":0.6,"fgm_40_49":0.6,"fgm_50p":0.4,"fgm_yds":81.54,"fgmiss":0.4,"gp":1.0,"xpa":3.4,"xpm":3.3,"xpmiss":0.1},"team":"CHI"},
+  "3678": {"cbs_id":"2008545","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:25:00-05:00","opponent":null,"stats":{"fga":2.4,"fgm":2.1,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.7,"fgm_40_49":0.6,"fgm_50p":0.3,"fgm_yds":77.05,"fgmiss":0.3,"gp":1.0,"xpa":3.2,"xpm":3.1,"xpmiss":0.1},"team":"DEN"},
+  "4195": {"cbs_id":"2080295","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:25:00-05:00","opponent":null,"stats":{"fga":1.6,"fgm":1.3,"fgm_0_19":0.0,"fgm_20_29":0.3,"fgm_30_39":0.4,"fgm_40_49":0.4,"fgm_50p":0.2,"fgm_yds":49.92,"fgmiss":0.3,"gp":1.0,"xpa":1.9,"xpm":1.9,"xpmiss":0.0},"team":"PHI"},
+  "4227": {"cbs_id":"2078888","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.7,"fgm":2.1,"fgm_0_19":0.0,"fgm_20_29":0.6,"fgm_30_39":0.6,"fgm_40_49":0.6,"fgm_50p":0.3,"fgm_yds":78.69,"fgmiss":0.6,"gp":1.0,"xpa":3.5,"xpm":3.3,"xpmiss":0.2},"team":"KC"},
+  "5119": {"cbs_id":"2131909","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:05:00-05:00","opponent":null,"stats":{"fga":2.0,"fgm":1.8,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.7,"fgm_40_49":0.4,"fgm_50p":0.3,"fgm_yds":68.17,"fgmiss":0.2,"gp":1.0,"xpa":2.1,"xpm":1.9,"xpmiss":0.2},"team":"NYJ"},
+  "5189": {"cbs_id":"2221833","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T20:20:00-05:00","opponent":null,"stats":{"fga":2.0,"fgm":1.6,"fgm_0_19":0.0,"fgm_20_29":0.5,"fgm_30_39":0.5,"fgm_40_49":0.4,"fgm_50p":0.3,"fgm_yds":63.83,"fgmiss":0.4,"gp":1.0,"xpa":2.3,"xpm":2.0,"xpmiss":0.3},"team":"SF"},
+  "6083": {"cbs_id":"2870511","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:25:00-05:00","opponent":null,"stats":{"fga":1.8,"fgm":1.6,"fgm_0_19":0.0,"fgm_20_29":0.3,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.2,"fgm_yds":57.8,"fgmiss":0.2,"gp":1.0,"xpa":2.0,"xpm":2.0,"xpmiss":0.0},"team":"LV"},
+  "6528": {"cbs_id":"3116871","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.0,"fgm":1.8,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":65.73,"fgmiss":0.2,"gp":1.0,"xpa":2.6,"xpm":2.6,"xpmiss":0.0},"team":"TEN"},
+  "6650": {"cbs_id":"2165272","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":1.8,"fgm":1.6,"fgm_0_19":0.0,"fgm_20_29":0.4,"fgm_30_39":0.5,"fgm_40_49":0.4,"fgm_50p":0.3,"fgm_yds":61.29,"fgmiss":0.2,"gp":1.0,"xpa":2.3,"xpm":2.3,"xpmiss":0.0},"team":"TB"},
+  "7042": {"cbs_id":"2188356","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":2.3,"fgm":2.1,"fgm_0_19":0.0,"fgm_20_29":0.6,"fgm_30_39":0.6,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":74.25,"fgmiss":0.2,"gp":1.0,"xpa":3.8,"xpm":3.5,"xpmiss":0.3},"team":"BUF"},
+  "7839": {"cbs_id":"2962681","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-23T20:15:00-05:00","opponent":null,"stats":{"fga":2.2,"fgm":1.9,"fgm_0_19":0.0,"fgm_20_29":0.6,"fgm_30_39":0.5,"fgm_40_49":0.5,"fgm_50p":0.3,"fgm_yds":70.81,"fgmiss":0.3,"gp":1.0,"xpa":3.4,"xpm":3.3,"xpmiss":0.1},"team":"CIN"},
+  "7922": {"cbs_id":"2865368","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T13:00:00-05:00","opponent":null,"stats":{"fga":1.8,"fgm":1.5,"fgm_0_19":0.0,"fgm_20_29":0.5,"fgm_30_39":0.5,"fgm_40_49":0.4,"fgm_50p":0.1,"fgm_yds":53.05,"fgmiss":0.3,"gp":1.0,"xpa":2.7,"xpm":2.5,"xpmiss":0.2},"team":"BAL"},
+  "8259": {"cbs_id":"2961997","fetched_at":"2026-11-21T12:39:34-05:00","imputed":["fgm_yds","fgmiss","xpmiss"],"kickoff":"2026-11-22T16:05:00-05:00","opponent":null,"stats":{"fga":2.5,"fgm":2.3,"fgm_0_19":0.0,"fgm_20_29":0.5,"fgm_30_39":0.9,"fgm_40_49":0.6,"fgm_50p":0.3,"fgm_yds":86.47,"fgmiss":0.2,"gp":1.0,"xpa":2.8,"xpm":2.7,"xpmiss":0.1},"team":"LAC"}
+ },
+ "schema_version": 2,
+ "source": "cbs_k",
+ "universe": {
+  "K": {
+   "complete": false,
+   "depth": null
+  }
+ },
+ "week": 11
+}

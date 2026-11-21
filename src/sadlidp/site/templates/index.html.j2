@@ -397,7 +397,7 @@
           {%- endif %}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a class="pad" href="stats.html#season">More</a></p>
         {%- endif %}
         {% if slot == 'K' and d.kicker and d.kicker.one_point_edge -%}
-        <p class="note dbnote">Kickers are hard to tell apart. With a typical game-to-game swing of {{ '%.1f'|format(d.kicker.sigma_out) }} points, a kicker projected 1 point higher outscores the other only about {{ (d.kicker.one_point_edge * 100)|round|int }}% of the time, so treat these tiers as rough.
+        <p class="note dbnote">Kickers are hard to tell apart. With a typical game-to-game swing of {{ '%.1f'|format(d.kicker.swing or d.kicker.sigma_out) }} points, a kicker projected 1 point higher outscores the other only about {{ (d.kicker.one_point_edge * 100)|round|int }}% of the time, so treat these tiers as rough.
           {%- if knote is defined and knote and knote.r is not none and (knote.weeks or 0) >= 4 %} Measured over {{ knote.weeks }} weeks this season, our order of {{ 'the waiver kickers shown' if knote.band else 'the top 20 kickers' }} matched the real one with r {{ '%.2f'|format(knote.r) }}{% if knote.margin is not none %} ± {{ '%.2f'|format(knote.margin) }}{% endif %} (1 = exactly, 0 = not at all).{% endif %}</p>
         {%- endif %}
         {% for t in pos.tiers %}

@@ -300,20 +300,26 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
 
         def out_of(pid: str, slot: str, by_group=by_group, cfg_w=swing_cfg, so_w=so_week) -> float:
             _, rows, kinds_w, _ = by_group[group_of(slot)]
-            if slot == K:  # a kicker's swing is `swing.kicker_var`'s; without an answer he keeps σ_out,K
-                lam = swing.mix(pid, rows, kinds_w, sc, slot=K) if cfg_w else None
+            if slot == K:  # a kicker's swing is `swing.kicker_var`'s, on a page made with it; else σ_out,K
+                with_model = bool(((cfg_w or {}).get("kicker") or {}).get("model"))  # pages from 2026-11-21 on
+                lam = swing.mix(pid, rows, kinds_w, sc, slot=K) if with_model else None
                 own = swing.kicker_sigma(lam, cfg_w, sc, yards) if lam is not None else None
                 return own if own is not None else so_w[slot]
             lam = swing.mix(pid, rows, kinds_w, sc) if cfg_w else None
             return swing.sigma(lam, slot, cfg_w, sc) if lam is not None else so_w[slot]
 
-        def shown(pid: str, slot: str, frozen=frozen, out_of=out_of):
+        def shown(pid: str, slot: str, frozen=frozen, out_of=out_of, so_w=so_week):
             """The number the page showed (§6.8): (μ, base, σ_pred, floor, ceiling, rebuilt), else None."""
             f = frozen.get(pid) or {}
             if f.get("mu") is None:
                 return None
             sig_mu = float(f["sigma"]) if f.get("sigma") is not None else s_mu[slot]
-            out = float(f["swing"]) if f.get("swing") is not None else out_of(pid, slot)
+            if f.get("swing") is not None:
+                out = float(f["swing"])
+            elif slot == K:  # the page gave him no swing of his own (before `kicker_var`, or no answer): σ_out,K
+                out = so_w[slot]
+            else:
+                out = out_of(pid, slot)
             return (float(f["mu"]), float(f.get("base", f["mu"])), (sig_mu**2 + out**2) ** 0.5, f.get("floor"),
                     f.get("ceiling"), bool(f.get("rebuilt")))  # fmt: skip
 

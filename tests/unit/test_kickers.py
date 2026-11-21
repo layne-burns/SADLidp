@@ -491,14 +491,78 @@ def test_a_kicker_variance_becomes_his_swing_when_the_model_gives_one(monkeypatc
     assert not {"swing", "floor", "ceiling"} & cons["k"].keys()
 
 
-def test_kicker_var_takes_the_line_the_scoring_and_the_yards_table():
-    """Whatever the model says, it is a variance or None; the pipeline must work with either."""
-    line = swing.mix("k", K_ROWS, K_KINDS, SC, {"sleeper_k": 1.0}, "K")
-    v = swing.kicker_var(line, SC, kicker.yards_per_make(CFG))
-    assert v is None or (isinstance(v, float | int) and v >= 0)
-    assert swing.kicker_var({}, SC) is None or swing.kicker_var({}, SC) >= 0
+FAIRBAIRN = {"fga": 2.72, "fgm": 2.36, "fgm_yds": 82.31, "fgmiss": 0.36, "xpa": 2.86, "xpm": 2.79, "xpmiss": 0.07,
+             "fgm_20_29": 0.41, "fgm_30_39": 0.53, "fgm_40_49": 0.59, "fgm_50p": 0.41}  # Sleeper wk 11  # fmt: skip
+Y = kicker.YARDS_PER_MAKE
+
+
+def test_kicker_var_is_a_compound_poisson_sum_over_his_kicks():
+    """Var = Σ λ · E[X²]: a make from bucket b adds 0.01 · (m_b² + 2.8²), a miss or an extra point adds 1."""
+    makes = sum(FAIRBAIRN[f"fgm_{b}"] * 0.01 * (Y[b] ** 2 + 2.8**2) for b in ("20_29", "30_39", "40_49", "50p"))
+    expected = makes * 2.36 / 1.94 + 0.36 + 2.79 + 0.07  # his buckets (1.94) scaled up to his 2.36 makes
+    assert swing.kicker_var(FAIRBAIRN, SC, Y) == pytest.approx(expected) == pytest.approx(42.89, abs=0.01)
+    espn = {"fgm": 2.0, "fgm_0_39": 1.0, "fgm_40_49": 0.6, "fgm_50p": 0.4}  # ESPN's band under 40: 30.47 ± 5.3 yd
+    one = 0.01 * ((30.47**2 + 5.3**2) + 0.6 * (44.4**2 + 2.8**2) + 0.4 * (53.9**2 + 2.8**2))
+    assert swing.kicker_var(espn, SC, Y) == pytest.approx(one)
+    bare = {"fgm": 1.8, "fgm_yds": 70.2}  # makes with no bucket: his average make, 39 yards ± 10.5
+    assert swing.kicker_var(bare, SC, Y) == pytest.approx(1.8 * 0.01 * (39.0**2 + 10.5**2))
+    assert swing.kicker_var({"fgm": 1.8}, SC) == pytest.approx(1.8 * 0.01 * (39.0**2 + 10.5**2))  # no yards either
+    assert swing.kicker_var(FAIRBAIRN, SC) == swing.kicker_var(FAIRBAIRN, SC, kicker.yards_per_make(CFG))
+
+
+def test_long_kicks_swing_more_and_the_buckets_give_only_the_shape():
+    short, long = {"fgm": 2.0, "fgm_20_29": 2.0}, {"fgm": 2.0, "fgm_50p": 2.0}
+    assert swing.kicker_var(long, SC, Y) > 4 * swing.kicker_var(short, SC, Y)  # (53.9² + 2.8²) / (25.4² + 2.8²)
+    assert swing.kicker_var({"fgm": 2.0, "fgm_20_29": 0.5}, SC, Y) == pytest.approx(swing.kicker_var(short, SC, Y))
+    assert swing.kicker_var({"fgm_20_29": 2.0}, SC, Y) == pytest.approx(swing.kicker_var(short, SC, Y))  # no fgm
+    tried = {"fga": 2.5, "fgm": 2.0, "fgm_20_29": 2.0, "xpa": 3.0, "xpm": 2.8}  # misses from attempts if not given
+    assert swing.kicker_var(tried, SC, Y) == pytest.approx(swing.kicker_var(short, SC, Y) + 0.5 + 2.8 + 0.2)
+    given = {**tried, "fgmiss": 0.3, "xpmiss": 0.1}  # given misses win over attempts − makes
+    assert swing.kicker_var(given, SC, Y) == pytest.approx(swing.kicker_var(short, SC, Y) + 0.3 + 2.8 + 0.1)
+
+
+def test_kicker_var_has_no_answer_without_kicks_or_for_scoring_it_does_not_price():
+    assert swing.kicker_var({}, SC) is None and swing.kicker_var({"fgm": 0.0, "xpm": 0.0}, SC) is None
+    assert swing.kicker_var({"fga": None, "gp": 1.0}, SC) is None
+    assert swing.kicker_var({"xpm": 3.0}, SC) == pytest.approx(3.0)  # extra points alone still swing
+    assert swing.kicker_var({"fgm": "n/a", "xpm": 2.0}, SC) == swing.kicker_var({"fgm": -1.0, "xpm": 2.0}, SC) == 2.0
+    with_bad_fgm = {"fgm": "n/a", "fgm_20_29": 2.0, "xpm": 2.0}  # not a number: not given, so not 0 makes
+    assert swing.kicker_var(with_bad_fgm, SC, Y) == swing.kicker_var({"fgm_20_29": 2.0, "xpm": 2.0}, SC, Y) > 10
+    assert swing.kicker_var({"fgm": float("nan"), "fgm_20_29": 2.0}, SC, Y) == swing.kicker_var(
+        {"fgm_20_29": 2.0}, SC, Y)  # fmt: skip
+    assert swing.kicker_sigma({"xpm": float("inf")}, COEF, SC) is None  # never an infinite swing
+    league_cut = {"fgm": 2.0, "fgm_40_49": 0.8, "fgm_50_59": 1.0, "fgm_60p": 0.2}  # the league's own 50+ bands
+    one = 0.01 * (0.8 * (44.4**2 + 2.8**2) + 1.0 * (53.53**2 + 2.8**2) + 0.2 * (62.35**2 + 2.8**2))
+    assert swing.kicker_var(league_cut, SC, Y) == pytest.approx(one)
+    standard = {**SC, "fgm_0_19": 3.0, "fgm_50p": 5.0}  # points by distance band: the band mix isn't modelled
+    assert swing.kicker_var(FAIRBAIRN, standard, Y) is None
+    assert swing.kicker_var(FAIRBAIRN, {**SC, "fgm": 3.0}, Y) > swing.kicker_var(FAIRBAIRN, SC, Y)  # a flat 3 a make
+
+
+def test_the_model_gives_every_projected_kicker_a_swing_and_a_range():
+    cons = {"k": {"mu": 9.0, "sigma": 1.0, "eff": {"sleeper_k": 0.5, "espn_k": 0.5}}}
+    info = swing.apply(cons, {"k": "K"}, K_ROWS, K_KINDS, SC, COEF, ("K",), Y)
+    s = math.sqrt(swing.kicker_var(swing.mix("k", K_ROWS, K_KINDS, SC, cons["k"]["eff"], "K"), SC, Y))
+    measured = swing.kicker_coefficients(CFG, swing.coefficients(CFG))  # b_K 0.85, lo -0.88, hi 0.87
+    again = {"k": {"mu": 9.0, "sigma": 1.0, "eff": {"sleeper_k": 0.5, "espn_k": 0.5}}}
+    swing.apply(again, {"k": "K"}, K_ROWS, K_KINDS, SC, measured, ("K",), Y)
+    s85 = math.sqrt(0.85) * s
+    assert again["k"]["swing"] == round(s85, 2)
+    assert (again["k"]["floor"], again["k"]["ceiling"]) == (round(9 - 0.88 * s85, 1), round(9 + 0.87 * s85, 1))
+    assert info == {"players": 1, "mean": {"K": round(s, 2)}} and cons["k"]["swing"] == round(s, 2)
+    assert 4.0 < s < 7.0 and (cons["k"]["floor"], cons["k"]["ceiling"]) == (
+        round(9 - 0.8 * s, 1),
+        round(9 + 0.75 * s, 1),
+    )
+
+
+def test_kicker_var_settings_in_config():
     cfg = swing.coefficients(CFG)
-    assert (cfg["a"]["K"], cfg["b"]["K"]) == (0.0, 1.0) and CFG["sigma_out"]["K"] == 5.0
+    assert (cfg["a"]["K"], cfg["b"]["K"]) == (0.0, 0.85) and CFG["sigma_out"]["K"] == 5.0  # measured 2026-11-21
+    k = swing.kicker_coefficients(CFG, cfg)
+    assert (k["lo"], k["hi"], k["kicker_model"]) == (-0.88, 0.87, swing.KICKER_MODEL) and k["b"] == cfg["b"]
+    assert (cfg["lo"], cfg["hi"]) == (-0.8, 0.75) and "kicker_model" not in cfg  # IDP's settings are untouched
+    assert (swing.kicker_coefficients({}, cfg)["lo"], swing.kicker_coefficients({}, cfg)["hi"]) == (-0.8, 0.75)
     assert CFG["tiers"]["sigma_floor"]["K"] == 0.75 and CFG["net"]["host_interval_s"]["www.cbssports.com"] == 3.0
     assert kicker.yards_per_make({}) == kicker.YARDS_PER_MAKE == kicker.yards_per_make({"kicker": CFG["kicker"]})
 

@@ -17,7 +17,7 @@ import test_kickers_isolation as iso
 import test_sync_site as site
 from jinja2 import Environment, PackageLoader
 
-from sadlidp import backtest, league_tx, metrics, scoreboard, stats, tune
+from sadlidp import backtest, league_tx, metrics, scoreboard, stats, swing, tune
 from sadlidp.config import load_config
 from sadlidp.sleeper import API, V1
 from sadlidp.sources import registry
@@ -337,13 +337,32 @@ def test_a_kicker_week_is_graded_on_a_pool_of_20_with_top_5_hits(seasons):
     assert season["by_slot"]["K"]["weeks"] == 3 and season["by_slot"]["K"]["top12"][1] == 15
     assert season["by_slot"]["K"]["live_mae"] == pytest.approx(k4["mae"])  # week 4 alone showed kicker numbers
     assert _view(ek, "w2")["by_slot"]["K"]["partial"] and _view(ek, "w2")["k"]["weeks"] == [2]
-    # a kicker's σ_pred: his frozen σ_μ and, with no swing of his own (`kicker_var` has no answer), σ_out,K
+    # a kicker's σ_pred: his frozen σ_μ and, as his frozen record has no swing of his own, σ_out,K: never the
+    # swing `kicker_var` would give now (these weeks' pages were made without one)
     pairs = metrics.pairwise(mu, dict.fromkeys(pool, (0.9**2 + 5.0**2) ** 0.5), {p: act[p] for p in pool})
     assert _view(ek, "w4")["by_slot"]["K"]["brier"] == pytest.approx(metrics.brier(pairs))
     assert ek["weekly"][2]["k"]["fallback"] == 20 and ek["weekly"][2]["fallback"] == eb["weekly"][2]["fallback"]
     assert ek["k_note"]["settled"] == 3 and ek["k_note"]["band"] and ek["k_note"]["weeks"] == 1  # week 4's band
     assert ek["k_note"]["live"] == 1 and set(ek["k_note"]) == {"r", "margin", "weeks", "band", "settled", "live"}
     assert ek["k_note"]["r"] == _view(ek, "season")["scoreboard"]["K"]["rows"][-1]["r"]["mean"]
+
+
+def test_stand_in_kickers_get_a_swing_only_on_a_page_made_with_kicker_var(seasons, tmp_path):
+    """Week 3 has no frozen kicker records: its 20 kickers are graded on stand-ins. Its page predates
+    `kicker_var` (no model tag), so they are graded on σ_out,K, as that page showed; tag the page and the same
+    kickers are graded on the model's swings. Nothing else moves."""
+    _, kick, _, ek = seasons
+    tagged = tmp_path / "tagged"
+    shutil.copytree(kick, tagged)
+    wd = tagged / "2026" / "week03"
+    page = _read(wd / "consensus.json")
+    page["swing"]["kicker"] = {"lo": -0.88, "hi": 0.87, "model": swing.KICKER_MODEL}
+    _write(wd / "consensus.json", page)
+    et = stats.evaluate(tagged, 2026, CFG)
+    assert ek["weekly"][2]["k"]["fallback"] == et["weekly"][2]["k"]["fallback"] == 20
+    assert et["weekly"][2]["by_slot"]["K"] != ek["weekly"][2]["by_slot"]["K"]  # graded on the model's swings
+    assert all(et["weekly"][2]["by_slot"][s] == ek["weekly"][2]["by_slot"][s] for s in IDP)
+    assert all(et["weekly"][w]["by_slot"] == ek["weekly"][w]["by_slot"] for w in (0, 1, 3))
 
 
 def test_kicker_sources_are_scored_on_kickers_only_and_archive_rows_are_marked(seasons):

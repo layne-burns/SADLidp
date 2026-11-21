@@ -826,10 +826,13 @@ def run_sync(
         run["swing"] = {**swing_coef, **swing.apply(idp_cons, slots, of(source_rows, "idp"), groups, sc, swing_coef)}
         if k_on:  # a kicker's swing comes from `swing.kicker_var`; without it he keeps σ_out,K
             k_cons = {pid: c for pid, c in cons.items() if pid not in idp_ids}
-            ks = swing.apply(k_cons, slots, of(source_rows, "k"), groups, sc, swing_coef, (K,),
+            k_coef = swing.kicker_coefficients(cfg, swing_coef)  # his own floor/ceiling multipliers, the model tag
+            ks = swing.apply(k_cons, slots, of(source_rows, "k"), groups, sc, k_coef, (K,),
                              kickermod.yards_per_make(cfg))  # fmt: skip
             run["swing"]["mean"][K] = ks["mean"][K]
-            run["swing"]["kickers"] = {"players": ks["players"], "no_var": ks.get("no_var", 0)}
+            k_rec = {"lo": k_coef["lo"], "hi": k_coef["hi"], "model": k_coef["kicker_model"]}
+            run["swing"]["kickers"] = {"players": ks["players"], "no_var": ks.get("no_var", 0), **k_rec}
+            swing_coef = {**swing_coef, "kicker": k_rec}  # the page records it; the Stats page reads `model`
     late = {pid for name in values for pid, r in late_rows.get(name, {}).items() if r.get("late")}
     for pid in late & cons.keys():
         cons[pid]["late"] = True  # projection first captured after his kickoff (SPEC §6.5)
@@ -1081,9 +1084,11 @@ def run_sync(
         "sources": {name: footer_info(info) for name, info in run["sources"].items()},
         "warnings": warnings,
     }
-    if k_on:  # the kicker note's number (SPEC §6.8): how often a 1-point edge wins at σ_out,K
-        edge = kickermod.one_point_edge(sigma_out.get(K))
-        site_data["kicker"] = {"sigma_out": sigma_out.get(K), "one_point_edge": round(edge, 3) if edge else None}
+    if k_on:  # the kicker note's number (SPEC §6.8): how often a 1-point edge wins at a typical kicker's swing
+        typical = ((run.get("swing") or {}).get("mean") or {}).get(K) or sigma_out.get(K)  # their mean, else σ_out,K
+        edge = kickermod.one_point_edge(typical)
+        site_data["kicker"] = {"sigma_out": sigma_out.get(K), "swing": typical,
+                               "one_point_edge": round(edge, 3) if edge else None}  # fmt: skip
     attach_breakdowns(
         site_data,
         lambda pid: breakdown(

@@ -15,10 +15,11 @@ a floor and a ceiling, μ + lo·swing and μ + hi·swing, where lo and hi are th
 of (actual − μ)/swing on 2025: one game in five lands below the floor, one in five above the ceiling.
 Tiers are unchanged (they use σ_μ, the sources' disagreement).
 
-Kickers (2026-11-17) have no fitted a_p and b_p. A kicker's points are not a sum of counts (a made field goal
-scores a tenth of its distance), so V comes from `kicker_var`, a model of his projected kicking line, with the
-prior a_K = 0, b_K = 1: swing² = kicker_var. Where `kicker_var` has no answer the kicker gets no swing of his
-own and everything falls back to σ_out,K, exactly as for an IDP no projection source has stats for.
+Kickers (2026-11-17) are different. A kicker's points are not a sum of counts (a made field goal scores a tenth
+of its distance), so V comes from `kicker_var`, a compound-Poisson model of his projected kicking line, and
+swing² = b_K · kicker_var with b_K = 0.85 measured on real kicker-games (2026-11-21). His floor and ceiling use
+his own multipliers (`[swing.kicker]`). Where `kicker_var` has no answer the kicker gets no swing of his own and
+everything falls back to σ_out,K, exactly as for an IDP no projection source has stats for.
 """
 
 from __future__ import annotations
@@ -27,6 +28,8 @@ import math
 
 from . import kicker, scoring
 from .positions import IDP_SLOTS, SLOTS, K
+
+_num = scoring.num  # `kicker_var`'s own `scoring` argument hides the module
 
 
 def coefficients(cfg: dict) -> dict | None:
@@ -47,62 +50,86 @@ def poisson_var(stats: dict, sc: dict) -> float:
     return sum(scoring.num(sc.get(k)) ** 2 * scoring.num(v) for k, v in stats.items() if k in sc)
 
 
+# Kick distances behind `kicker_var`, beyond the bucket means in `[kicker.yards_per_make]` (nflverse made field
+# goals, 2024–26, n = 2,398; the probe of 2026-11-17)
+MAKE_SD_IN_BUCKET = 2.8  # yards: a make's distance around its ten-yard bucket's mean (2.7–3.1 by bucket)
+ESPN_0_39 = (30.47, 5.3)  # ESPN's one band under 40 yards: a make's mean distance there and its SD
+LEAGUE_BANDS = {"50_59": 53.53, "60p": 62.35}  # the league's own cut of 50+ yards, should a source use it
+MAKE_MEAN, MAKE_SD = 39.0, 10.5  # any make, for a line that gives makes but no bucket at all
+KICK_KEYS_MODELLED = ("fgm", "fgm_yds", "fgmiss", "xpm", "xpmiss")  # the scoring keys `kicker_var` prices
+KICKER_MODEL = "poisson-bands-2026-11-21"  # recorded on each page whose kickers got a swing (the Stats page reads it)
+
+
 def kicker_var(line: dict, scoring: dict, yards: dict | None = None) -> float | None:
-    """The variance of a kicker's league points in one game, given his projected line.
+    """The variance of a kicker's league points in one game, given his projected line (points squared).
 
-    Returns a number (points squared), or None when the line lacks what the model needs. None is always
-    safe: the kicker then has no swing of his own and the page uses the position's typical swing instead.
+    His points are 0.1 · (the distances of his made field goals, summed) − missed field goals + extra points
+    − missed extra points. Each part is treated as a Poisson count, independent of the others: the makes in
+    each distance bucket, the misses, the made and the missed extra points. For independent Poisson counts
+    the variance of the total is Σ λ · E[X²], λ the expected count and X the points one event scores:
+    - a miss or an extra point scores ±1, so it adds λ;
+    - a make from a bucket with mean distance m scores 0.1 · d, d spread about 2.8 yards around m, so it adds
+      λ · 0.01 · (m² + 2.8²): long kicks swing more than short ones.
 
-    Inputs
-    - `line`: his projected game as expected values (floats), averaged over his projection sources by their
-      share of his number. Any key may be absent; read an absent key as "not given", not as 0.
-        "fga", "fgm"               expected field-goal attempts and makes
-        "fgm_yds"                  expected total yards of his made field goals
-        "fgmiss"                   expected missed field goals
-        "xpa", "xpm", "xpmiss"     expected extra-point attempts, makes and misses
-        "fgm_0_19", "fgm_20_29", "fgm_30_39", "fgm_40_49", "fgm_50p"
-                                   expected makes in each distance bucket (yards)
-        "fgm_0_39"                 ESPN's one bucket for every make under 40 yards
-      The sources cut the buckets differently (Sleeper and CBS by ten yards, ESPN 0-39 / 40-49 / 50+). Each
-      source's line enters with its share, so no make is counted in two buckets, but the bucket keys present
-      need NOT add up to "fgm": Sleeper's own bands often fall short of its "fgm" (2026 week 11: 21 of 26
-      kickers by more than 0.15), and a key a source lacks counts 0 for that source (so "fgm_0_39" carries
-      only ESPN's share). Treat "fgm" minus the buckets' sum as makes of unknown distance, or use
-      "fgm_yds" / "fgm" as their mean distance. Example, Sleeper alone (buckets 1.94, "fgm" 2.36):
-        {"fga": 2.72, "fgm": 2.36, "fgm_yds": 82.31, "fgmiss": 0.36, "xpa": 2.86, "xpm": 2.79,
-         "xpmiss": 0.07, "fgm_20_29": 0.41, "fgm_30_39": 0.53, "fgm_40_49": 0.59, "fgm_50p": 0.41}
-    - `scoring`: the league's points per unit of each stat. For a kicker the non-zero ones are
-      {"fgm_yds": 0.1, "fgmiss": -1.0, "xpm": 1.0, "xpmiss": -1.0}; the dict also holds the other positions'
-      keys, so read it with `scoring.get(key, 0)`.
-    - `yards`: `[kicker.yards_per_make]` from config/sadl.toml, the mean distance in yards of a made field
-      goal in each bucket: {"0_19": 19.0, "20_29": 25.4, "30_39": 34.4, "40_49": 44.4, "50p": 53.9}. The key
-      is the bucket's key without "fgm_". It has no entry for ESPN's "0_39".
+    `line` is his projected game as expected values, averaged over his projection sources by their share of
+    his number (`mix`); an absent key means "not given". Keys: "fga", "fgm", "fgm_yds", "fgmiss", "xpa",
+    "xpm", "xpmiss", the ten-yard buckets "fgm_0_19" … "fgm_50p" (Sleeper, CBS) and ESPN's "fgm_0_39". The
+    buckets give the spread of his kicks and "fgm" their number: Sleeper's own buckets often add up to less
+    than its "fgm" (2026 week 11: 21 of 26 kickers short by more than 0.15) while its "fgm" sits at the real
+    level, so the buckets are scaled up or down to "fgm". `yards` is `[kicker.yards_per_make]`, each bucket's
+    mean distance (the key without "fgm_"); ESPN's "0_39" and the league's "50_59" / "60p" have their own. Each
+    source uses one cut, so no make is in two buckets. A value that isn't a number counts as not given.
 
-    A kicker's points for the game are
-        0.1 · (the distances of his made field goals, summed) − missed field goals
-            + extra points − missed extra points.
+    Checked on real kicks (2026-11-21): the distance facts hold and each bucket alone is close to Poisson, but a
+    game has only so many scoring drives, so a kicker's makes vary less than Poisson (variance/mean 0.87) and
+    trade off against his extra points (r −0.21). The real variance is about 0.85 of this model's, which
+    `[swing.b] K` applies.
 
-    Modelling facts you may use (measured on 2024–26 games; none of them is applied for you):
-    - the makes in one distance bucket can be treated as a Poisson count, independent of the other buckets;
-    - a made kick from d yards scores scoring["fgm_yds"] · d = 0.1 · d points;
-    - within a bucket, the distance of a make has a standard deviation of about 2.8 yards around the
-      bucket's mean in `yards`;
-    - missed field goals, made extra points and missed extra points are counts, worth −1, +1 and −1 each.
-
-    How the result is used: swing² = a_K + b_K · kicker_var(...), with `[swing.a] K = 0` and `[swing.b] K = 1`,
-    so the kicker's game-to-game standard deviation is √kicker_var. For scale, kickers' realised game-to-game
-    standard deviation is about 5 points (4.8 within kicker-seasons 2022–25). If this function raises, the
-    sync treats it as None for that kicker (`kicker_sigma`), so a mistake here never stops a sync; run.json's
-    `swing.kickers.no_var` counts the kickers left without a swing.
+    Returns None when the line gives no field goals and no extra points, or when the league scores a kicking
+    stat this model doesn't price (a distance-bucket bonus, say): the kicker then keeps σ_out,K. The sync
+    uses swing² = a_K + b_K · kicker_var (`[swing.a]`, `[swing.b]`), and an error raised here is treated as
+    None (`kicker_sigma`), so it never stops a sync.
     """
-    # TODO(human)
-    return None
+    pts = {k: _num(scoring.get(k, 0)) for k in KICK_KEYS_MODELLED}
+    if any(_num(v) for k, v in scoring.items() if k.startswith(("fg", "xp")) and k not in KICK_KEYS_MODELLED):
+        return None  # e.g. 3 points a make from 0-39: the bucket mix would matter, and it isn't modelled
+
+    def given(key: str) -> float | None:  # a number ≥ 0, or None when absent, not a number, or NaN
+        try:
+            v = float(line[key])
+        except (KeyError, TypeError, ValueError):
+            return None
+        return max(0.0, v) if v == v else None
+
+    mean = {**kicker.YARDS_PER_MAKE, **(yards or {}), **LEAGUE_BANDS}
+    bands = {b: (float(mean[b]), MAKE_SD_IN_BUCKET) for b in (*kicker.BUCKETS, *LEAGUE_BANDS)} | {"0_39": ESPN_0_39}
+    lam = {b: given(f"fgm_{b}") or 0.0 for b in bands}
+    in_bands = sum(lam.values())
+    fgm = given("fgm")
+    fgm = in_bands if fgm is None else fgm
+    if in_bands <= 0:  # makes with no bucket: the average make
+        made = given("fgm_yds")
+        lam, in_bands = {"all": fgm}, fgm
+        bands = {"all": (made / fgm if made and fgm else MAKE_MEAN, MAKE_SD)}
+
+    def per_event(m: float, sd: float) -> float:  # E[X²] for one make, X = (points a make) + 0.1 · d, d ≈ m ± sd
+        x = pts["fgm"] + pts["fgm_yds"] * m
+        return x * x + (pts["fgm_yds"] * sd) ** 2
+
+    var = sum(lam[b] * fgm / in_bands * per_event(*bands[b]) for b in bands) if in_bands > 0 else 0.0
+    fga, xpa, xpm = given("fga"), given("xpa"), given("xpm") or 0.0
+    miss = given("fgmiss")
+    miss = max(0.0, fga - fgm) if miss is None and fga is not None else (miss or 0.0)
+    xpmiss = given("xpmiss")
+    xpmiss = max(0.0, xpa - xpm) if xpmiss is None and xpa is not None else (xpmiss or 0.0)
+    var += pts["fgmiss"] ** 2 * miss + pts["xpm"] ** 2 * xpm + pts["xpmiss"] ** 2 * xpmiss
+    return var if var > 0 else None
 
 
 def kicker_sigma(lam: dict, coef: dict, sc: dict, yards: dict | None = None) -> float | None:
-    """A kicker's swing from his projected kicking line, √(a_K + b_K · kicker_var); None when `kicker_var`
-    has no answer, raises, or the result isn't a positive number (never a zero-width range, SPEC §6.7): an error in
-    the owner's model leaves that kicker on σ_out,K instead of failing the whole sync, DL/LB/DB included."""
+    """A kicker's swing from his projected kicking line, √(a_K + b_K · kicker_var); None when `kicker_var` has
+    no answer, raises, or gives something that isn't a positive finite number (never a zero-width range, SPEC
+    §6.7): an error there leaves that kicker on σ_out,K instead of failing the whole sync, DL/LB/DB included."""
     try:
         v = kicker_var(lam, sc, yards)
         if v is None:
@@ -110,7 +137,16 @@ def kicker_sigma(lam: dict, coef: dict, sc: dict, yards: dict | None = None) -> 
         s2 = coef["a"].get(K, 0.0) + coef["b"].get(K, 1.0) * float(v)
     except Exception:
         return None
-    return math.sqrt(s2) if s2 > 0 else None
+    return math.sqrt(s2) if 0 < s2 < math.inf else None
+
+
+def kicker_coefficients(cfg: dict, coef: dict) -> dict:
+    """The swing settings the kickers use: `coef` with a kicker's own floor and ceiling multipliers
+    (`[swing.kicker]` lo and hi; the IDP ones when absent) and `kicker_model`, the tag of the `kicker_var` in force,
+    which the page records so the Stats page can tell a week whose kickers had a swing from one before."""
+    k = (cfg.get("swing") or {}).get("kicker") or {}
+    return {**coef, "lo": float(k.get("lo", coef["lo"])), "hi": float(k.get("hi", coef["hi"])),
+            "kicker_model": KICKER_MODEL}  # fmt: skip
 
 
 def mix(pid: str, source_rows: dict, groups: dict, sc: dict, eff: dict | None = None,

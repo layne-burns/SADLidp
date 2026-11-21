@@ -37,13 +37,18 @@ hi = 0.75
 DL = 4.3                    # DL re-fitted on 2025 + 2026 weeks 1–9 at the week-9 checkpoint (2026-11-17); LB, DB unchanged
 LB = 18.0
 DB = 27.0
-K = 0.0                     # kickers: swing² = a + b · kicker_var (swing.py), a prior, not a fit (2026-11-17)
+K = 0.0                     # kickers: swing² = b · kicker_var (swing.py); see [swing.b] K and [swing.kicker]
 
 [swing.b]
 DL = 2.23
 LB = 1.35
 DB = 0.65
-K = 1.0
+K = 0.85                    # measured 2026-11-21: real/model variance 0.92 Sleeper 2024–26 (n = 1,366), 0.84 in
+                            # 2026, 0.83 on real counts 2022–26; a game has only so many scoring drives
+
+[swing.kicker]              # a kicker's own floor and ceiling: his points are near normal, the IDP lo/hi skewed
+lo = -0.88                  # 20th / 80th percentiles of (actual − μ)/swing at b_K 0.85, 1,366 kicker-games 2024–26
+hi = 0.87
 
 [sigma_out]                 # per-position weekly outcome SD: the fallback when a player has no projected stats
 method = "last_season"      # "residuals": this season's errors once 3 settled weeks exist (SPEC §6.7)

@@ -215,7 +215,7 @@ Owner decisions, 2026-11-17:
 - [ ] **The five other kicker adapters:** `espn_k`, `cbs_k`, `fp_k`, `fantasydata_k`, `rotoballer_k`.
 - [ ] **Statistics:** K as a separate scope on the Stats page, the report card and the kicker note.
 - [ ] **The page:** This week card, position bar, Yours and Available, folded sections.
-- [ ] **Owner:** write the body of `swing.kicker_var`. Until then every kicker's odds use σ_out,K = 5.0 and no kicker has a floor–ceiling.
+- [x] **`swing.kicker_var`** (2026-11-21): compound Poisson over his projected kicks. b_K = 0.85 and the kicker floor and ceiling multipliers measured on 2022–25 and 2026 weeks 1–10 (SPEC §6.7). Re-checked against main on the preview data: every DL/LB/DB leaf identical (week-11 sync, weeks 9–11 replay).
 - [ ] **Integration (2026-11-17, in the working tree):** all five parts together. The old code and the new one give identical DL/LB/DB output on the season's real data, offline (replays of weeks 1–11, a week-11 sync, the Stats page, the audit; SPEC §10). Re-run on 2026-11-19 on the data of the preview sync from Actions, which holds real kicker rows: every DL/LB/DB leaf identical.
 - [ ] **After merge:** the first sync from Actions with the kicker sources, and the kicker backfill at its normal budget. Run once so far, on 2026-11-17, from a home connection into a scratch copy (nothing committed; SPEC §10): all six kicker sources `ok` with no warning; the backfill, capped at 3 requests a host, wrote weeks 1–3 of three archives; the add-only merge added kicker results to weeks 6–9. Then once from Actions, by the branch's preview sync that night: all six `ok` with no warning; the backfill, at its normal budget, filled weeks 1–10 of `sleeper_k`, `espn_k` and `fp_k` and weeks 2–10 of `rotoballer_k`; the same add-only merge (SPEC §10). Still to run: the first sync from `main`.
 - [ ] **A probe from Actions** of the six kicker sources under the pipeline's user agent. Read from a runner once so far, by the branch's preview sync of 2026-11-17 under the pipeline's user agent: all six `ok`, every row with a team matched (SPEC §10).
@@ -226,7 +226,7 @@ Owner decisions, 2026-11-17:
 **What did not change:** anything about DL, LB or DB. Every IDP number, stored record, weight and statistic comes out as before; the check that proves it is the first kicker item of SPEC §10. The evaluation protocol's definitions and items 1–9 of the week-13 agenda stand as registered.
 
 **No kicker term was fitted on this season's results.**
-- a_K = 0, b_K = 1, the σ floor, the rank priors 2 : 1 : 1 and the 60:40 split are priors.
+- a_K = 0, the σ floor, the rank priors 2 : 1 : 1 and the 60:40 split are priors; b_K = 0.85 and the kicker lo/hi are measured (SPEC §6.7).
 - σ_out,K = 5.0 is a level set from 2022–25 (4.78 within a kicker's season). The 2026 figure (5.20 over weeks 5–10) was read beside it, not fitted.
 - The yards-per-make table is a league-wide unit conversion. Its 2,398 kicks do include 530 from 2026 weeks 1–10.
 - The probe looked at five sampled weeks of Sleeper kicker projections against results (r 0.15) to size how predictable kickers are. Nothing was tuned on it.
@@ -250,9 +250,9 @@ Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. 
   - **Sample:** the kicker pool (the 20 best by the plain average of the kicker projection sources, among kickers who played) on live, settled kicker weeks. σ_pred comes from the frozen record: √(σ_μ² + swing²), or σ_out,K where the record has no swing.
   - **Primary statistic:** the spread ratio RMS((actual − μ)/σ_pred), aim 1.00, with a week-clustered margin of 2 SE.
   - **Guardrail, shown beside it:** range coverage below / inside / above the floor–ceiling against 20/60/20, on the weeks where kickers had a swing of their own.
-  - **Weeks before `kicker_var` was written** are graded on σ_out,K alone and reported apart.
+  - **Weeks before `kicker_var` was written** (pages without `swing.kicker.model`) are graded on σ_out,K alone and reported apart.
   - **Week 13:** report only.
-  - **Season end:** keep a_K = 0 and b_K = 1 (and σ_out,K = 5.0) if the margin contains 1.00. Otherwise refit them on the season's live kicker weeks for 2027. One season can't both fit and test the refit, so it enters 2027 as a prior to be checked on 2027's weeks.
+  - **Season end:** keep a_K = 0 and b_K = 0.85 (and σ_out,K = 5.0 and the kicker lo/hi) if the margin contains 1.00. Otherwise refit them on the season's live kicker weeks for 2027. One season can't both fit and test the refit, so it enters 2027 as a prior to be checked on 2027's weeks.
   - No in-season change either way.
 - **K3. Do the kicker weights differ from their priors at all?**
   - **Why ask:** kicker projections explain little of a kicker's week (r about 0.15, SPEC §11), so the expected answer is no.

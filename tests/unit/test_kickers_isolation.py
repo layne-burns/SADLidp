@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 from test_sync_site import CFG, FIXTURES, FRIDAY, LID, NOW, ROSTERS, SCHED, TNF, FakeClient, routes
 
-from sadlidp import accuracy
+from sadlidp import accuracy, kicker, swing
 from sadlidp.net import Response
 from sadlidp.replay import replay_week
 from sadlidp.sleeper import API, V1
@@ -91,7 +91,8 @@ def idp_view(name: str, doc, kickers: set[str]):
         v.update(positions=slots(v["positions"]), my_idps=slots(v["my_idps"]), sigma_out=slots(v["sigma_out"]),
                  sources=no_k(v["sources"]), warnings=_warnings(v["warnings"]))  # fmt: skip
         if v.get("swing"):
-            v["swing"] = {**v["swing"], "a": slots(v["swing"]["a"]), "b": slots(v["swing"]["b"])}
+            sw = {k: x for k, x in v["swing"].items() if k != "kicker"}  # the kickers' own range and model tag
+            v["swing"] = {**sw, "a": slots(sw["a"]), "b": slots(sw["b"])}
         if v.get("last_week"):
             lw = {k: x for k, x in v["last_week"].items() if k != "summary_k"}
             v["last_week"] = {**lw, "slots": slots(lw["slots"])}
@@ -204,7 +205,14 @@ def test_the_kicker_run_carries_the_k_data_the_page_builds_on(runs):
     d = json.loads((week / "consensus.json").read_text())
     assert d["league"]["limits"] == {"DL": 2, "LB": 2, "DB": 2}  # no K limit, and no warning about it
     assert not [w for w in d["warnings"] if "position limit" in w]
-    assert d["sigma_out"]["K"] == 5.0 and d["kicker"] == {"sigma_out": 5.0, "one_point_edge": 0.556}
+    run = json.loads((week / "run.json").read_text())
+    typical = run["swing"]["mean"]["K"]  # the note's swing: the kickers' mean, no longer σ_out,K
+    edge = round(kicker.one_point_edge(typical), 3)
+    assert d["sigma_out"]["K"] == 5.0 and d["kicker"] == {"sigma_out": 5.0, "swing": typical, "one_point_edge": edge}
+    assert 4.0 < typical < 6.0 and run["swing"]["kickers"]["no_var"] == 0 and run["swing"]["kickers"]["players"] >= 4
+    k_rec = {"lo": -0.88, "hi": 0.87, "model": swing.KICKER_MODEL}
+    assert d["swing"]["kicker"] == k_rec and {k: run["swing"]["kickers"][k] for k in k_rec} == k_rec
+    assert (d["swing"]["lo"], d["swing"]["hi"]) == (-0.8, 0.75)  # the IDP multipliers stay as they were
     src = d["sources"]["sleeper_k"]
     assert (src["label"], src["group"], src["kind"]) == ("Sleeper", "k", "projection") and src["rows_used"] >= 6
     pos = d["positions"]["K"]
@@ -246,6 +254,9 @@ def test_the_kicker_run_carries_the_k_data_the_page_builds_on(runs):
     assert run["swing"]["mean"].keys() == {"DL", "LB", "DB", "K"} and set(run["swing"]["kickers"]) == {
         "players",
         "no_var",
+        "lo",
+        "hi",
+        "model",
     }
     assert set(run["form"]["miss"]) == {"DL", "LB", "DB"}
     players = json.loads((week / "players.json").read_text())["players"]

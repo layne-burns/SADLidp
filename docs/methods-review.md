@@ -113,3 +113,30 @@ The table uses these abbreviations:
 
 Previously recorded elsewhere: tier z (`docs/tier-tuning.md`; every z within noise at week 9) and the week-9
 checkpoint (`docs/status.md` §3).
+
+### Kickers (added 2026-11-17 with SPEC D23)
+Kickers are a separate scope: their own sources, weights, pool (the 20 best-projected kickers who played)
+and statistics. Nothing here touches a DL, LB or DB number, and no row above changes.
+
+**No kicker term was fitted on this season's results.** The kicker swing (a 0, b 1), the σ floor, the
+60:40 split and the rank priors 2 : 1 : 1 are priors. σ_out for kickers (5.0) is a level set from 2022–25.
+The yards-per-make table is a league-wide unit conversion, not a model term.
+
+**Registered before any kicker result was graded** (the full text is in `docs/status.md` §7; results are
+entered here when they exist):
+
+| Check | Sample | Primary statistic | Rule | Result |
+|---|---|---|---|---|
+| K1. Archive integrity of `sleeper_k`, `espn_k`, `fp_k`, `rotoballer_k` | Rows read live in settled live kicker weeks, re-read from the archive after the games; at least 2 weeks and 40 rows a source | Share of rows equal on what feeds μ (stat line or rank) | Pass at ≥ 99%, as for the IDP archives. On a pass the source's archive rows count toward kicker weights; on a fail they stay display-only | Not run yet (week 13 if the sample is there, else season end) |
+| K2. Kicker swing | Kicker pool, live settled weeks, σ_pred from the frozen record | Spread ratio RMS((actual − μ)/σ_pred), aim 1.00, ± 2 SE by week | Report at week 13. At season end keep a 0, b 1 if the margin contains 1.00; otherwise refit for 2027, as a prior to check on 2027 | Not run yet |
+| K3. Do kicker weights differ from their priors | Kicker pool, the settled weeks the kicker weights count | α̂ for kickers ± its leave-one-week-out margin, against 0.6 | Report at week 13. At season end, "not distinguishable" unless beyond 2 SE (\|t\| ≥ 2.5 for a claim at this one position); no in-season change | Not run yet |
+
+**Screened while choosing kicker sources (2026-11-17), by one analyst, not reproduced:**
+
+| Idea | Seasons, sample | Result | Verdict | Re-test only if |
+|---|---|---|---|---|
+| Kicker points from game lines and roof (implied team total, favourite margin, indoor) | nflverse 2022–25, 2,148 kicker-games; fitted on 2022–24, scored on 2025 (535) | R² 0.022 in sample; on 2025 r 0.200, within-week rank correlation 0.171, RMSE 5.04 against an outcome SD of 5.11. Implied total moves extra points (r 0.36), not field goals | No verdict (not reproduced); not used | It is registered first and tested under the D18 rule |
+| Wind as a kicker flag | 2022–25 outdoor games; 32 at 18+ mph | 8.11 points at 0–8 mph down to 7.10 at 18+ | No verdict (not reproduced; 32 games); not used | — |
+| A kicker's own average to date | 2022–25 | Within-week rank correlation +0.056 | No verdict (not reproduced); not used | — |
+| Sleeper's kicker projections against results | Five sampled weeks, 144 kicker-games (2025 weeks 3, 7, 11, 15; 2026 week 8), read from the archive | r 0.154, average miss 4.23; per-week rank correlation −0.14 to +0.28 | Recorded as the size of the problem, not as a test: the rows can't be shown to be pre-game | K1 passes for `sleeper_k` |
+| Standard-scoring kicker ranks used as they are for decimal scoring | nflverse 2022–2026, 2,448 kicker-games | Game-level correlation of the two scorings 0.992; within-week rank correlation 0.988; inside week 11's sources 0.957–0.998 | Adopted with D23 as a design fact, not a fitted term | — |

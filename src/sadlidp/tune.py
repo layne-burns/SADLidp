@@ -11,7 +11,8 @@ the week's rosters) how well the page tracked the actual scores:
 - **chance out of order**: if μ were exactly each player's expected score, how often a table of this
   size would still show some tier averaging less than the one below it (game-to-game swing alone).
 
-It reads the same saved sources as the Stats page and never writes anything.
+It reads the same saved sources as the Stats page and never writes anything. DL, LB and DB only: the kicker
+sources' files are never opened and a kicker is never tiered here (z was tuned on the IDP weeks).
 """
 
 from __future__ import annotations
@@ -25,7 +26,7 @@ from pathlib import Path
 
 from . import form, scoring, storage, weeklog
 from .consensus import consensus
-from .positions import IDP_SLOTS
+from .positions import IDP_SLOTS, K
 from .stats import _positions, _weeks, source_points
 from .tiers import build_tiers
 
@@ -53,11 +54,12 @@ def load_weeks(data_dir: Path | str, season: int, rostered: dict[int, set[str]])
     for week, wd in _weeks(season_dir):
         if week not in rostered:
             continue
-        values, _, kinds, _ = source_points(wd, sc, slots)
+        values, _, kinds, _ = source_points(wd, sc, slots, group="idp")  # the IDP sources' files and players only
         if not values:
             continue
         lines = (storage.read_json(wd / "actuals.json") or {}).get("stats") or {}
-        actual = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
+        actual = {pid: scoring.points(line, sc) for pid, line in lines.items()
+                  if weeklog.played(line) and slots.get(pid) != K}  # fmt: skip
         idp = {pid: slots[pid] for vals in values.values() for pid in vals if slots.get(pid) in IDP_SLOTS}
         out.append(Week(week, values, kinds, idp, actual, rostered[week], form.history(data_dir, season, week, sc)))
     return out

@@ -13,7 +13,8 @@ Checks (thresholds fixed in advance as relative rules, so they don't drift to si
   games already started than were saved before them, and over half of what it fetched.
 - **kickoff:** every frozen record's kickoff is one of the week's scheduled kickoffs.
 - **page:** each week's page has the per-player swing, and a live week has its pre-waiver tiers log.
-- **weights:** each recorded `weights.json` (method `accuracy`) reproduces from the saved data.
+- **weights:** each recorded `weights.json` (method `accuracy`) reproduces from the saved data; so does its
+  kicker record (the `"kickers"` key, weeks from 2026 week 11 on), checked on its own as `weights k`.
 - **unmatched:** a source name left unmatched in 3 or more weeks.
 
 A week listed in `[audit] acknowledged` ("2026-w05") has been looked at and written up; its warnings show as
@@ -112,6 +113,21 @@ def run(data_dir: Path | str, season: int, cfg: dict) -> list[dict]:
             if abs(float(rec.get("alpha", 0)) - float(again.get("alpha", 0))) > 1e-3:
                 diffs.append("alpha")
             out.append(_row("weights", week, not diffs, "reproduces" if not diffs else "differs: " + ", ".join(diffs)))
+        krec = (rec or {}).get(accuracy.K_KEY) or {}
+        if krec.get("method") == "accuracy":  # the kicker record: same check, the kicker sources and slot only
+            as_of = datetime.fromisoformat(krec["computed_at"]) if krec.get("computed_at") else None
+            again = accuracy.weights(
+                accuracy.measure(data_dir, season, week - accuracy.LAG, sched, cfg, as_of, group="k"), cfg, group="k"
+            )
+            diffs = [
+                n
+                for n, s in (krec.get("sources") or {}).items()
+                if abs(float(s["w"]) - float(((again.get("sources") or {}).get(n) or {}).get("w", -1))) > 1e-3
+            ]
+            if abs(float(krec.get("alpha", 0)) - float(again.get("alpha", 0))) > 1e-3:
+                diffs.append("alpha")
+            detail = "reproduces" if not diffs else "differs: " + ", ".join(diffs)
+            out.append(_row("weights k", week, not diffs, detail))
     for (name, who), weeks in sorted(unmatched.items()):
         if len(weeks) >= UNMATCHED_WEEKS:
             out.append(_row("unmatched", None, False, f"{name}: {who} unmatched in weeks {sorted(weeks)}"))

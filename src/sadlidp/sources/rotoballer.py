@@ -30,10 +30,11 @@ MIN_ROWS = 20  # a table shorter than this is not the ranking (the article has 5
 FLAG = re.compile(r"\s*\((Q|D|O|IR|PUP|NA|SUS)\)\s*$", re.IGNORECASE)
 
 
-def find_article(ctx: FetchContext) -> tuple[str | None, str, str | None]:
-    """(article URL, status, error): the feed item for the target week and season."""
+def find_article(ctx: FetchContext, rss: str = RSS, link_re: re.Pattern = LINK) -> tuple[str | None, str, str | None]:
+    """(article URL, status, error): the feed item for the target week and season (`rss` and `link_re` default
+    to the IDP article's; `rotoballer_k` passes the kicker article's)."""
     for page in range(1, RSS_PAGES + 1):
-        resp = ctx.client.get(RSS.format(page=page))
+        resp = ctx.client.get(rss.format(page=page))
         if getattr(resp, "challenged", False) or resp.status in (403, 429, 503):
             return None, "blocked", "bot challenge" if getattr(resp, "challenged", False) else f"HTTP {resp.status}"
         if resp.status == 404 and page > 1:
@@ -42,7 +43,7 @@ def find_article(ctx: FetchContext) -> tuple[str | None, str, str | None]:
             return None, "failed", f"feed page {page}: {resp.error or f'HTTP {resp.status}'}"
         links = re.findall(r"<link>\s*([^<\s]+)\s*</link>", resp.text())
         for link in links:
-            m = LINK.search(link)
+            m = link_re.search(link)
             if m and (int(m.group(1)), int(m.group(2))) == (ctx.week, ctx.season):
                 return link, OK, None
         if "<item>" not in resp.text():

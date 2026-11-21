@@ -9,6 +9,14 @@ Per week with final stats (actuals.json) and a projection snapshot (every saved 
 - the naive baseline is the player's average SADL points over his earlier games this season (2+).
 Suggestions come from the decision log (live weeks) or the rebuilt page (replayed weeks); tiers from
 each week's page. Nothing here feeds back into the numbers on the main page.
+
+Two groups, kept apart (positions.GROUPS, 2026-11-17). Everything above is the IDP group: DL, LB and DB, the
+five IDP sources, a pool of 50. Kickers are graded the same way on their own sources (sources/registry.py),
+with a pool of 20 and top-5 hits (positions.EVAL: about 28 kickers play a week), and only once a week with
+final stats holds a kicker source file; until then nothing here has a K entry. Every figure that pools
+positions (the scoreboard's "all", the suggestion tallies, `decisions_to_date`, `db_note`, `tuesday_q`, the
+shares, the residual σ_out) is DL/LB/DB only and reads no kicker file, row or record: K sits beside them
+under its own keys (`by_slot["K"]`, `suggestions["k"]`, `weights_history_k`, ...).
 """
 
 from __future__ import annotations
@@ -19,14 +27,16 @@ import statistics
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import metrics, scoreboard, scoring, storage, swing, weeklog
-from .positions import IDP_SLOTS, slot_of
+from . import accuracy, kicker, metrics, scoreboard, scoring, storage, swing, weeklog
+from .positions import EVAL, GROUPS, IDP_SLOTS, K, group_of, slot_of
 from .rankmap import rank_values
 from .schedule import Schedule
+from .sources import registry
 from .sync import SOURCE_LABELS
 
-N_EVAL = 50
+N_EVAL = EVAL["idp"]["pool"]  # 50; a kicker pool is EVAL["k"]["pool"]
 MIN_CORR_N = 100  # correlations and R² only season to date, and only with this many player-games
+K_RUNGS = {"sleeper": "sleeper_k", "espn": "espn_k"}  # the scoreboard's single-source rungs for a kicker
 
 
 def _weeks(season_dir: Path) -> list[tuple[int, Path]]:
@@ -67,13 +77,23 @@ def _names(season_dir: Path) -> dict[str, str]:
     return names
 
 
-def _projection_sources(wd: Path, kind: str = "projection", as_of: datetime | None = None) -> dict[str, dict]:
-    """name -> rows of every source of `kind` saved for the week, in the sync's source order. With `as_of`, rows
-    first read after it are left out (what the week's files held then)."""
+def _k_weeks(weeks: list[tuple[int, Path]]) -> set[int]:
+    """The weeks that hold a kicker source file (any declared kicker source, registered or not)."""
+    names = registry.names_for("k")
+    return {week for week, wd in weeks if any((wd / "sources" / f"{n}.json").exists() for n in names)}
+
+
+def _projection_sources(wd: Path, kind: str = "projection", as_of: datetime | None = None,
+                        group: str = "idp") -> dict[str, dict]:  # fmt: skip
+    """name -> rows of every source of `kind` and `group` saved for the week, in the sync's source order. With
+    `as_of`, rows first read after it are left out (what the week's files held then). The other group's files
+    are never opened."""
     order = list(SOURCE_LABELS)
     out = {}
     for path in sorted((wd / "sources").glob("*.json"), key=lambda p: (order.index(p.stem) if p.stem in order
                                                                        else len(order), p.stem)):  # fmt: skip
+        if registry.group_of_source(path.stem) != group:
+            continue
         doc = storage.read_json(path) or {}
         if as_of is not None:
             doc = {**doc, "rows": {pid: r for pid, r in (doc.get("rows") or {}).items() if not r.get("fetched_at")
@@ -83,10 +103,12 @@ def _projection_sources(wd: Path, kind: str = "projection", as_of: datetime | No
     return out
 
 
-def source_points(wd: Path, sc: dict, slots: dict[str, str], as_of: datetime | None = None):
-    """Each saved source's SADL points for the week: (points[source][pid], rows[source], kind[source],
-    equal-weight projection mean). Rank sources are mapped to points against that mean (§6.4)."""
-    sources = _projection_sources(wd, as_of=as_of)
+def source_points(wd: Path, sc: dict, slots: dict[str, str], as_of: datetime | None = None, group: str = "idp"):
+    """Each saved source of `group` in SADL points for the week: (points[source][pid], rows[source],
+    kind[source], equal-weight projection mean). Rank sources are mapped to points against that mean (§6.4).
+    Only the group's own files and players are read, so a kicker can't enter an IDP number here."""
+    slots = {pid: s for pid, s in slots.items() if group_of(s) == group}
+    sources = _projection_sources(wd, as_of=as_of, group=group)
     kinds = dict.fromkeys(sources, "projection")
     preds = {
         name: {pid: scoring.projected_points(r.get("stats") or {}, sc) for pid, r in rows.items()}
@@ -97,7 +119,7 @@ def source_points(wd: Path, sc: dict, slots: dict[str, str], as_of: datetime | N
         for pid, v in pred_s.items():
             covering.setdefault(pid, []).append(v)
     pred_all = {pid: sum(vs) / len(vs) for pid, vs in covering.items()}  # equal-weight consensus (§6.8)
-    for name, doc in _projection_sources(wd, "rank", as_of).items():  # scored on their mapped points (§6.4)
+    for name, doc in _projection_sources(wd, "rank", as_of, group).items():  # on their mapped points (§6.4)
         rows = {pid: r for pid, r in (doc.get("rows") or {}).items() if pid in slots}
         universe, members = doc.get("universe") or {}, doc.get("lists") or {}
         preds[name], _ = rank_values(rows, pred_all, slots.get, universe, lambda pid: False, members=members)
@@ -121,18 +143,27 @@ def _order(path: Path) -> tuple[int, str]:
     return (order.index(path.stem) if path.stem in order else len(order), path.stem)
 
 
-def weights_history(season_dir: Path, prior_split: float, priors: dict[str, float] | None = None) -> list[dict]:
+def weights_history(season_dir: Path, prior_split: float, priors: dict[str, float] | None = None,
+                    group: str = "idp") -> list[dict]:  # fmt: skip
     """Per synced week, the shares in force (§6.5 Implementation): each source's share of a player's number
-    when every source that week covers him, from the week's `weights.json` ("default shares" before it)."""
+    when every source that week covers him, from the week's `weights.json` ("default shares" before it).
+    One group's sources and record only: the IDP record is the file's top level, the kickers' its `"kickers"`
+    key; for the kickers, only the weeks that have a kicker source file or record are listed."""
     out = []
     for d in sorted(season_dir.glob("week*")):
         m = re.fullmatch(r"week(\d+)", d.name)
         if not m or not (d / "consensus.json").exists():
             continue
+        paths = [p for p in sorted((d / "sources").glob("*.json"), key=_order)
+                 if registry.group_of_source(p.stem) == group]  # fmt: skip
         kinds = {name: (doc.get("kind") or "projection") for name, doc in
-                 ((p.stem, storage.read_json(p) or {}) for p in sorted((d / "sources").glob("*.json"), key=_order))
+                 ((p.stem, storage.read_json(p) or {}) for p in paths)
                  if (doc.get("kind") or "projection") in ("projection", "rank")}  # fmt: skip
         rec = storage.read_json(d / "weights.json") or {}
+        if group != "idp":
+            rec = rec.get(accuracy.K_KEY) or {}
+            if not kinds and not rec:
+                continue
         pri = {**(priors or {}), **(rec.get("priors") or {})}
         w = {n: float(((rec.get("sources") or {}).get(n) or {}).get("w", pri.get(n, 1.0))) for n in kinds}
         alpha = float(rec.get("alpha", prior_split))
@@ -213,9 +244,14 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     tcfg = cfg.get("tiers") or {}
     floor_cfg = tcfg.get("sigma_floor") or {}
     depth = int((cfg.get("display") or {}).get("depth", 25))
+    k_weeks = _k_weeks(weeks)  # the weeks with a kicker source file: K is graded there, in its own entries
+    has_k = bool(k_weeks)
+    ev_slots = IDP_SLOTS + ((K,) if has_k else ())  # with no kicker data anywhere, exactly the three IDP slots
     so_saved = storage.read_json(Path(data_dir) / str(season - 1) / "sigma_out.json") or {}
-    so = {s: float(so_saved.get(s) or (cfg.get("sigma_out") or {}).get(s, 5.0)) for s in IDP_SLOTS}
-    s_mu = {s: max(float(tcfg.get("s0_default", 1.0)), float(floor_cfg.get(s, 0.75))) for s in IDP_SLOTS}
+    so = {s: float(so_saved.get(s) or (cfg.get("sigma_out") or {}).get(s, 5.0)) for s in ev_slots}
+    s_mu = {s: max(float(tcfg.get("s0_default", 1.0)), float(floor_cfg.get(s, 0.75))) for s in ev_slots}
+    yards = kicker.yards_per_make(cfg)
+    priors_k = accuracy.prior_weights(cfg, "k")
 
     history: dict[str, list[float]] = {}  # pid -> SADL points of earlier games this season
     resid: dict[str, dict[int, tuple[bool, list[float]]]] = {}  # slot -> week -> (provisional, actual − predicted)
@@ -224,56 +260,83 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     raw_src: dict[int, dict[str, dict[str, dict]]] = {}  # week -> source -> slot -> pred/act/sig/base/covered/pool
     tiers_wk: dict[int, dict[str, list[tuple[int, int, float]]]] = {}  # week -> slot -> (shown rank, tier, pts)
     board_wk: dict[int, dict] = {}  # week -> the decision scoreboard's per-position numbers (§6.8)
+    board_k: dict[int, dict] = {}  # the same for the kickers' shown band; never part of the scoreboard's "all"
     tue_q: dict = {"q": [0, 0], "untagged": [0, 0], "weeks": []}  # [tagged, sat] on Tuesday's waiver list
     wcfg = cfg.get("weights") or {}
     priors = {k: float(v) for k, v in (wcfg.get("prior") or {}).items()}
     split = float(wcfg.get("prior_split", 0.6))
     provisional_wk: dict[int, bool] = {}
     live_wk: dict[int, bool] = {}  # synced live before kickoff: neither replayed nor carrying rebuilt records
+    live_k: dict[int, bool] = {}  # the same for the week's kicker numbers (a week with none is not live)
+    k_wk: dict[int, dict] = {}  # week -> the kicker counters of its weekly row
     played_out: dict[int, bool] = {}  # week -> every game over (last kickoff + 4 h) when its stats were captured
     weekly, suggestions = [], []
+    suggestions_k: list[dict] = []  # kicker suggestions: tallied apart, never in the IDP decisions
     kinds: dict[str, str] = {}  # source -> projection or rank
+    kinds_k: dict[str, str] = {}
+    none = ({}, {}, {}, {})  # a group with no source file this week
     for week, wd in weeks:
         act_doc = storage.read_json(wd / "actuals.json") or {}
         lines = act_doc.get("stats") or {}
         played = {pid: scoring.points(line, sc) for pid, line in lines.items() if weeklog.played(line)}
         settles, captured = sched.settles_at(week), act_doc.get("captured_at")
         provisional = settles is None or captured is None or datetime.fromisoformat(captured) < settles
-        preds, sources, week_kinds, pred_all = source_points(wd, sc, slots)
+        by_group = {"idp": source_points(wd, sc, slots),
+                    "k": source_points(wd, sc, slots, group="k") if week in k_weeks else none}  # fmt: skip
+        preds, sources, week_kinds, pred_all = by_group["idp"]
         kinds.update(week_kinds)
+        kinds_k.update(by_group["k"][2])
         late = sum(1 for rows in sources.values() for r in rows.values() if r.get("late"))
         backfill = sum(1 for rows in sources.values() for r in rows.values() if r.get("backfill"))
         page = storage.read_json(wd / "consensus.json") or {}
         frozen = (storage.read_json(wd / "frozen.json") or {}).get("players") or {}
         row = {"week": week, "provisional": provisional, "late": late, "backfill": backfill, "by_slot": {},
                "by_source": {}, "replayed": bool(page.get("replayed")), "rebuilt": 0, "fallback": 0}  # fmt: skip
-        so_week = {s: float((page.get("sigma_out") or {}).get(s) or so[s]) for s in IDP_SLOTS}  # as the page used
+        # the kickers' own counters: the row's `late`, `backfill`, `rebuilt` and `fallback` stay DL/LB/DB
+        row_k = {flag: sum(1 for rows in by_group["k"][1].values() for r in rows.values() if r.get(flag))
+                 for flag in ("late", "backfill")} | {"rebuilt": 0, "fallback": 0, "n": 0}  # fmt: skip
+        so_week = {s: float((page.get("sigma_out") or {}).get(s) or so[s]) for s in ev_slots}  # as the page used
         swing_cfg = page.get("swing")  # the per-player swing the page used (§6.7), if any
 
-        def out_of(pid: str, slot: str, rows=sources, kinds_w=week_kinds, cfg_w=swing_cfg, so_w=so_week) -> float:
+        def out_of(pid: str, slot: str, by_group=by_group, cfg_w=swing_cfg, so_w=so_week) -> float:
+            _, rows, kinds_w, _ = by_group[group_of(slot)]
+            if slot == K:  # a kicker's swing is `swing.kicker_var`'s, on a page made with it; else σ_out,K
+                with_model = bool(((cfg_w or {}).get("kicker") or {}).get("model"))  # pages from 2026-11-21 on
+                lam = swing.mix(pid, rows, kinds_w, sc, slot=K) if with_model else None
+                own = swing.kicker_sigma(lam, cfg_w, sc, yards) if lam is not None else None
+                return own if own is not None else so_w[slot]
             lam = swing.mix(pid, rows, kinds_w, sc) if cfg_w else None
             return swing.sigma(lam, slot, cfg_w, sc) if lam is not None else so_w[slot]
 
-        def shown(pid: str, slot: str, frozen=frozen, out_of=out_of):
+        def shown(pid: str, slot: str, frozen=frozen, out_of=out_of, so_w=so_week):
             """The number the page showed (§6.8): (μ, base, σ_pred, floor, ceiling, rebuilt), else None."""
             f = frozen.get(pid) or {}
             if f.get("mu") is None:
                 return None
             sig_mu = float(f["sigma"]) if f.get("sigma") is not None else s_mu[slot]
-            out = float(f["swing"]) if f.get("swing") is not None else out_of(pid, slot)
+            if f.get("swing") is not None:
+                out = float(f["swing"])
+            elif slot == K:  # the page gave him no swing of his own (before `kicker_var`, or no answer): σ_out,K
+                out = so_w[slot]
+            else:
+                out = out_of(pid, slot)
             return (float(f["mu"]), float(f.get("base", f["mu"])), (sig_mu**2 + out**2) ** 0.5, f.get("floor"),
                     f.get("ceiling"), bool(f.get("rebuilt")))  # fmt: skip
 
-        for slot in IDP_SLOTS:
-            cand = {pid: v for pid, v in pred_all.items() if slots.get(pid) == slot and pid in played}
-            pool = sorted(cand, key=lambda pid: (-cand[pid], pid))[:N_EVAL]  # chosen by the plain average (§6.8)
+        for slot in ev_slots:
+            group = group_of(slot)
+            preds_g, rows_g, _, pred_g = by_group[group]  # the slot's own group: its sources, its plain average
+            n_eval, top_k = EVAL[group]["pool"], EVAL[group]["top"]  # 50 and 12; for kickers 20 and 5
+            tally = row if group == "idp" else row_k
+            cand = {pid: v for pid, v in pred_g.items() if slots.get(pid) == slot and pid in played}
+            pool = sorted(cand, key=lambda pid: (-cand[pid], pid))[:n_eval]  # chosen by the plain average (§6.8)
             act = [played[pid] for pid in pool]
             plain = [cand[pid] for pid in pool]
             pred, base_pred, sig, cov = [], [], [], ([], [], [])
             for pid in pool:
                 x = shown(pid, slot)
                 if x is None:  # no frozen record: the plain average stands in, counted
-                    row["fallback"] += 1
+                    tally["fallback"] += 1
                     pred.append(cand[pid])
                     base_pred.append(cand[pid])
                     sig.append((s_mu[slot] ** 2 + out_of(pid, slot) ** 2) ** 0.5)
@@ -281,25 +344,29 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 pred.append(x[0])
                 base_pred.append(x[1])
                 sig.append(x[2])
-                row["rebuilt"] += x[5]
+                tally["rebuilt"] += x[5]
                 if x[3] is not None and x[4] is not None:
                     cov[0].append(played[pid])
                     cov[1].append(float(x[3]))
                     cov[2].append(float(x[4]))
             ours = dict(zip(pool, pred, strict=True))
-            partial = 0 < len(pool) < N_EVAL  # a snapshot missing games: shown, but kept out of the season numbers
+            partial = 0 < len(pool) < n_eval  # a snapshot missing games: shown, but kept out of the season numbers
             base = []
             for pid, p in ours.items():
                 past = history.get(pid) or []
                 if len(past) >= 2:
                     base.append((p, played[pid], sum(past) / len(past)))
             everyone = {pid: pts for pid, pts in played.items() if slots.get(pid) == slot}
-            top = None if partial else metrics.top_k_hits(ours, everyone, 12)
-            rand = None if partial else metrics.top_k_random(pool, everyone, 12)
+            top = None if partial else metrics.top_k_hits(ours, everyone, top_k)
+            rand = None if partial else metrics.top_k_random(pool, everyone, top_k)
             summ = _summary(pred, act, sig, base)
             summ.update(top12=top, pearson=None, spearman=None, r2=None, partial=partial,  # weekly: no correlations
                         ref={"base": metrics.mae(base_pred, act), "plain": metrics.mae(plain, act)})  # fmt: skip
             row["by_slot"][slot] = summ
+            if group == "k":
+                row_k["n"] = len(pool)
+                if not pool:
+                    continue  # no kicker both projected and scored this week: it isn't one of K's weeks
             pairs = metrics.pairwise(ours, dict(zip(pool, sig, strict=True)), dict(zip(pool, act, strict=True)),
                                      tag=f"{week}:")  # fmt: skip
             raw.setdefault(week, {})[slot] = {
@@ -307,7 +374,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                 "partial": partial, "base_pred": base_pred, "plain": plain, "cov": cov,
                 "r": metrics.spearman(pred, act, 3),
             }  # fmt: skip
-            for name, pred_s in preds.items():  # each source on the pool players it covers
+            for name, pred_s in preds_g.items():  # each source on the pool players it covers
                 cv = [pid for pid in pool if pid in pred_s]
                 p_s, a_s = [pred_s[pid] for pid in cv], [played[pid] for pid in cv]
                 sig_s = [sig[pool.index(pid)] for pid in cv]
@@ -319,6 +386,9 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                     "pred": p_s, "act": a_s, "sig": sig_s, "base": base_s, "covered": len(cv), "pool": len(pool),
                     "partial": partial,
                 }  # fmt: skip
+                if group == "k":  # how many of them came from the source's archive (shown, marked; §6.5)
+                    arch = sum(1 for pid in cv if (rows_g[name].get(pid) or {}).get("backfill"))
+                    summ_s["archive"] = raw_src[week][name][slot]["archive"] = arch
             if not partial:
                 resid.setdefault(slot, {})[week] = (provisional, [a - p for p, a in zip(pred, act, strict=True)])
         row["partial_slots"] = [slot for slot in IDP_SLOTS if row["by_slot"][slot]["partial"]]
@@ -328,9 +398,17 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             if not any(r.get("backfill") for r in rows.values())
             and any(x["pool"] and x["covered"] < x["pool"] / 2 for x in row["by_source"].get(name, {}).values())
         )  # fmt: skip
+        if has_k:
+            row_k["joined_midweek"] = sorted(
+                name for name, rows in by_group["k"][1].items()
+                if not any(r.get("backfill") for r in rows.values())
+                and any(x["pool"] and x["covered"] < x["pool"] / 2 for x in row["by_source"].get(name, {}).values())
+            )  # fmt: skip
+            row["k"] = k_wk[week] = row_k
         weekly.append(row)
         provisional_wk[week] = provisional
         live_wk[week] = not row["replayed"] and not row["rebuilt"] and not row["fallback"]
+        live_k[week] = bool(row_k["n"]) and not row["replayed"] and not row_k["rebuilt"] and not row_k["fallback"]
         kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
         played_out[week] = bool(kicks and captured) and datetime.fromisoformat(captured) >= max(kicks) + timedelta(
             hours=4
@@ -360,7 +438,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             e["outcome"] = weeklog.outcome(w_res, e["over"], o_res)
             e.update(name=names.get(e["w"], e["w"]), over_name=names.get(e["over"]) if e["over"] else None,
                      pts=w_res.get("pts"), over_pts=(o_res or {}).get("pts"))  # fmt: skip
-            suggestions.append(e)
+            (suggestions_k if e.get("slot") == K else suggestions).append(e)
 
         # tiers as shown when you set waivers (the pre-waiver sync's log); a rebuilt week's page is that
         # moment. A live week's final page is not: by then it lists only the players yet to play. Only the
@@ -368,10 +446,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         log = ((storage.read_json(wd / "tiers_log.json") or {}).get("prewaiver") or {}).get("players") or {}
         by_slot_shown: dict[str, list[tuple[float, float, str]]] = {}
         for pid, r in log.items():
-            if r.get("slot") in IDP_SLOTS and r.get("tier") is not None:
+            if r.get("slot") in ev_slots and r.get("tier") is not None:
                 by_slot_shown.setdefault(r["slot"], []).append((r["tier"], -(r.get("mu") or 0.0), pid))
         if not log and page.get("replayed"):
-            for slot in IDP_SLOTS:
+            for slot in ev_slots:
                 for t in ((page.get("positions") or {}).get(slot) or {}).get("tiers") or []:
                     by_slot_shown.setdefault(slot, []).extend((t["tier"], -(p.get("mu") or 0.0), p["id"])
                                                               for p in t["players"])  # fmt: skip
@@ -381,6 +459,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             and ((storage.read_json(wd / "tiers_log.json") or {}).get("prewaiver") or {}).get("tags")
         ):  # Tuesday's questionable tags and who sat (§6.6): weeks whose log recorded the tags
             for pid, r in log.items():
+                if r.get("slot") == K:
+                    continue  # the Tuesday-Q line counts the waiver IDPs, as it always did
                 k = "q" if "Q" in (r.get("flags") or []) else "untagged"
                 tue_q[k][0] += 1
                 tue_q[k][1] += pid not in played
@@ -391,10 +471,14 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             for rank, (tier, _, pid) in enumerate(sorted(lst)[:depth], start=1):
                 if pid in played:
                     tiers_wk.setdefault(week, {}).setdefault(slot, []).append((rank, tier, played[pid]))
+        band_k = band.pop(K, None)  # the kickers' band is scored apart: its own sources, never in "all"
+        tue = {pid: float(r["mu"]) for pid, r in log.items() if r.get("mu") is not None}
         if band:  # the decision scoreboard on the same shown band (§6.8); Tuesday's μ only from a live log
-            tue = {pid: float(r["mu"]) for pid, r in log.items() if r.get("mu") is not None}
             rows = scoreboard.band_rows(band, frozen, played, tue, week_kinds, priors, split)
             board_wk[week] = scoreboard.week_stats(rows)
+        if band_k:
+            rows = scoreboard.band_rows({K: band_k}, frozen, played, tue, by_group["k"][2], priors_k, split, K_RUNGS)
+            board_k[week] = scoreboard.week_stats(rows)
 
         for pid, pts in played.items():
             history.setdefault(pid, []).append(pts)
@@ -405,7 +489,8 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         with a week-clustered margin (docs/eval-protocol.md)."""
         keep_partial = len(sel) == 1
         by_slot = {}
-        for slot in IDP_SLOTS:
+        for slot in ev_slots:
+            live = live_k if slot == K else live_wk
             acc = {"pred": [], "act": [], "sig": [], "base": [], "pairs": []}
             top12, partial, rand = [0, 0], False, [0.0, 0.0]
             wk = {"r": [], "bias": [], "sq": [], "diff": {k: [] for k in REFS}, "ref": {k: ([], []) for k in REFS},
@@ -434,7 +519,7 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                     wk["ref"][k][1].extend(r["act"])
                 for i in range(3):
                     wk["cov"][i].extend(r["cov"][i])
-                if live_wk.get(w):
+                if live.get(w):
                     wk["live"][0].extend(r["pred"])
                     wk["live"][1].extend(r["act"])
             summ = _summary(acc["pred"], acc["act"], acc["sig"], acc["base"])
@@ -468,8 +553,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         names_src = sorted({n for w in sel for n in raw_src.get(w) or {}},
                            key=lambda n: (order.index(n) if n in order else len(order), n))  # fmt: skip
         for name in names_src:
-            for slot in IDP_SLOTS:
+            for slot in GROUPS[registry.group_of_source(name)]:  # a source's own slots only
                 acc = {"pred": [], "act": [], "sig": [], "base": [], "covered": 0, "pool": 0}
+                if slot == K:
+                    acc["archive"] = 0
                 groups = []
                 for w in sel:
                     r = ((raw_src.get(w) or {}).get(name) or {}).get(slot)
@@ -484,13 +571,23 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
                     n_g = len([g for g in groups if g])
                     summ.update(covered=acc["covered"], pool=acc["pool"], weeks=n_g,
                                 bias_margin=metrics.margin(b_se, n_g))  # fmt: skip
+                    if slot == K:
+                        summ["archive"] = acc["archive"]
                     by_src.setdefault(name, {})[slot] = summ
-        picked = [e for e in suggestions if e["week"] in sel]
-        tallies = {kind: _decisions(picked, kind) for kind in ("live", "rebuilt")}
-        rep_ids = set().union(*(t.pop("reps") for t in tallies.values()))
+
+        def calls(issued: list[dict]) -> dict:
+            """One group's suggestions in the view: the live and rebuilt tallies and the list behind them."""
+            picked = [e for e in issued if e["week"] in sel]
+            tallies = {kind: _decisions(picked, kind) for kind in ("live", "rebuilt")}
+            rep_ids = set().union(*(t.pop("reps") for t in tallies.values()))
+            listed = sorted(picked, key=lambda e: (e["week"], bool(e.get("reference")), e.get("slot") or "",
+                                                   -(e.get("pts") or -1.0)))  # fmt: skip
+            keys = ("week", "slot", "badge", "kind", "reference", "p", "name", "pts", "over_name", "over_pts",
+                    "outcome")  # fmt: skip
+            return {**tallies, "list": [{**{k: e.get(k) for k in keys}, "counted": id(e) in rep_ids} for e in listed]}
 
         tier_rows, buckets, tier_r = {}, {}, {}
-        for slot in IDP_SLOTS:  # margin = 2 standard errors of the tier's average (None below 2 player-games)
+        for slot in ev_slots:  # margin = 2 standard errors of the tier's average (None below 2 player-games)
             pts: dict = {}
             bk: dict = {b: [] for b in BUCKETS}
             rs = []
@@ -517,19 +614,13 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             ]  # fmt: skip
             m, se = metrics.mean_se(rs)
             tier_r[slot] = {"r": m, "margin": metrics.margin(se, len(rs)), "weeks": len(rs)}
-        listed = sorted(picked, key=lambda e: (e["week"], bool(e.get("reference")), e.get("slot") or "",
-                                               -(e.get("pts") or -1.0)))  # fmt: skip
-        keys = ("week", "slot", "badge", "kind", "reference", "p", "name", "pts", "over_name", "over_pts", "outcome")
-        return {
+        out = {
             "weeks": sel,
             "live_weeks": [w for w in sel if live_wk.get(w)],
             "provisional": any(provisional_wk.get(w) for w in sel),
             "by_slot": by_slot,
             "by_source": by_src,
-            "suggestions": {
-                **tallies,
-                "list": [{**{k: e.get(k) for k in keys}, "counted": id(e) in rep_ids} for e in listed],
-            },
+            "suggestions": calls(suggestions),
             "tiers": tier_rows,
             "tier_buckets": buckets,
             "tier_order": tier_r,
@@ -537,6 +628,20 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             if len(sel) > 1
             else None,
         }
+        if has_k:  # the kickers' own entries, beside the DL/LB/DB ones above (never inside them)
+            mine = [w for w in sel if K in (raw.get(w) or {}) and (keep_partial or not raw[w][K]["partial"])]
+            out["slots"] = [*IDP_SLOTS, *((K,) if any(w in k_weeks for w in sel) else ())]  # what this view lists
+            out["k"] = {
+                "weeks": mine,  # the weeks behind the K figures of this view
+                "live_weeks": [w for w in mine if live_k.get(w)],
+                "stand_in": [w for w in mine if k_wk[w]["fallback"]],  # no kicker number was shown: plain average
+                "archive": [w for w in mine if k_wk[w]["backfill"]],  # kicker projections fetched after the week
+                "partial": [w for w in sel if (raw.get(w) or {}).get(K, {}).get("partial")],
+            }
+            out["suggestions"]["k"] = calls(suggestions_k)
+            if out["scoreboard"] is not None:
+                out["scoreboard"][K] = scoreboard.aggregate({w: board_k[w] for w in sel if w in board_k}, (K,))[K]
+        return out
 
     all_weeks = [w for w, _ in weeks]
     settled = [w for w in all_weeks if not provisional_wk.get(w)] or all_weeks  # season figures: settled weeks only
@@ -560,6 +665,37 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
     db = {"r": band["mean"], "margin": band["margin"]} if band else season_out["DB"]["rank"]
     db_note = {"r": db["r"], "margin": db["margin"], "band": bool(band),
                "show": db["r"] is None or db["margin"] is None or db["r"] - db["margin"] <= 0.1}  # fmt: skip
+    hist_k = weights_history(season_dir, split, priors_k, group="k")
+    extra: dict = {}  # the kickers' own top-level keys; none at all in a season without kicker data
+    if hist_k or has_k:
+        # kicker sources whose archive rows are shown but don't count toward the kicker shares yet (§6.5)
+        untrusted = set((cfg.get("accuracy") or {}).get("untrusted") or [])
+        extra["weights_history_k"] = hist_k
+        extra["k_untrusted"] = [SOURCE_LABELS.get(n, n) for n in registry.names_for("k") if n in untrusted]
+    if has_k:
+        to_date_k = {}
+        for w in all_weeks:
+            upto = [e for e in suggestions_k if e["week"] <= w]
+            to_date_k[w] = {kind: {k: v for k, v in _decisions(upto, kind).items() if k != "reps"}
+                            for kind in ("live", "rebuilt")}  # fmt: skip
+        # the kicker note's measured figure, read the way the DB note is: the shown band, else the pool of 20
+        sb_k = ((season_view.get("scoreboard") or {}).get(K) or {}).get("rows") or []
+        band_k = next((r["r"] for r in sb_k if r["key"] == "form" and r["r"]["weeks"]), None)
+        kr = season_out[K]["rank"]  # {r, margin, weeks}
+        if band_k:
+            kr = {"r": band_k["mean"], "margin": band_k["margin"], "weeks": band_k["weeks"]}
+        # for the kicker note: `weeks` are those behind `r`; `settled` the settled kicker weeks graded, `live`
+        # those of them whose kicker numbers the page showed before the games
+        k_graded = {"settled": len(season_view["k"]["weeks"]), "live": len(season_view["k"]["live_weeks"])}
+        extra.update(
+            slots=list(ev_slots),
+            pools={s: {"pool": EVAL[group_of(s)]["pool"], "top": EVAL[group_of(s)]["top"]} for s in ev_slots},
+            k_weeks=sorted(k_weeks),
+            k_note={**kr, "band": bool(band_k), **k_graded},
+            decisions_to_date_k=to_date_k,
+            sources_k=_shares(kinds_k, registry.of_group(season_by_source, "k"), split),
+            weights_now_k=_weights_now(data_dir, season, all_weeks, sched, cfg, "k"),
+        )
     return {
         "season": season,
         "weeks": [w for w, _ in weeks],
@@ -578,9 +714,10 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
             "weeks": tue_q["weeks"],
         },  # fmt: skip
         "season_by_source": season_by_source,
-        "source_labels": {name: SOURCE_LABELS.get(name, name) for name in season_by_source},
+        # the season's sources, plus every kicker source of any week (its first week is shown before it settles)
+        "source_labels": {name: SOURCE_LABELS.get(name, name) for name in [*season_by_source, *kinds_k]},
         # equal priors within each group, 60:40 between them (D11); PR 6 records the accuracy weights in force
-        "sources": _shares(kinds, season_by_source, float((cfg.get("weights") or {}).get("prior_split", 0.6)))
+        "sources": _shares(kinds, registry.of_group(season_by_source, "idp"), split)
         or [{"name": "Sleeper", "share": 1.0, "kind": "projection"}],
         "prior_split": float((cfg.get("weights") or {}).get("prior_split", 0.6)),
         "dst_backtest": storage.read_json(Path(data_dir) / str(season - 1) / "dst_backtest.json"),
@@ -595,18 +732,19 @@ def evaluate(data_dir: Path | str, season: int, cfg: dict) -> dict | None:
         "depth": depth,
         "min_corr_n": MIN_CORR_N,
         "sigma_mu": s_mu,
+        **extra,
         "_resid": resid,  # internal (σ_out from residuals); not written to stats.json
     }
 
 
-def _weights_now(data_dir, season: int, weeks: list[int], sched: Schedule, cfg: dict) -> dict | None:
+def _weights_now(data_dir, season: int, weeks: list[int], sched: Schedule, cfg: dict,
+                 group: str = "idp") -> dict | None:  # fmt: skip
     """The projection : ranking mix and the sources' error ratios measured on every settled week so far, with
-    their week-to-week margins (§6.8; display only: the weights in force are the recorded `weights.json`)."""
-    from . import accuracy
-
+    their week-to-week margins (§6.8; display only: the weights in force are the recorded `weights.json`).
+    One group's sources on its own slots (`accuracy.measure`)."""
     if not weeks:
         return None
-    m = accuracy.measure(data_dir, season, max(weeks), sched, cfg)
+    m = accuracy.measure(data_dir, season, max(weeks), sched, cfg, group=group)
     if not m["from_weeks"]:
         return None
     return {

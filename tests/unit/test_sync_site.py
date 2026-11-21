@@ -11,7 +11,7 @@ import pytest
 from sadlidp import cli, scoring, storage, swing
 from sadlidp.config import load_config
 from sadlidp.net import Response
-from sadlidp.positions import slot_of
+from sadlidp.positions import is_idp
 from sadlidp.roster import p_outscores as roster_p
 from sadlidp.schedule import NFLVERSE_GAMES, Schedule
 from sadlidp.site.build import build_site, latest_week_dir
@@ -75,7 +75,7 @@ def _players_and_projections():
     for pid in ROSTERS[0]["players"]:  # weak projections for my IDPs that the sample lacks
         p = players.get(pid, {})
         opp = SCHED.opponent(p.get("team"), 5)
-        if slot_of(p) and opp and not any(r["player_id"] == pid for r in proj):
+        if is_idp(p) and opp and not any(r["player_id"] == pid for r in proj):  # the IDP payload holds no kicker
             row = copy.deepcopy(template)
             row.update(player_id=pid, team=p["team"], opponent=opp.lstrip("@"))
             row["stats"] = {"gp": 1.0, "idp_tkl_solo": 1.0, "idp_tkl_ast": 1.0, "idp_tkl": 2.0}
@@ -133,7 +133,9 @@ def test_site_data_tiers_and_my_idps(synced):
         "limits": {"DL": 2, "LB": 2, "DB": 2},
     }
     rostered = {pid for r in ROSTERS for k in ("players", "reserve", "taxi") for pid in r.get(k) or []}
-    for slot, pos in d["positions"].items():
+    assert list(d["positions"]) == ["DB", "DL", "K", "LB"] and d["positions"]["K"]["tiers"] == []  # no K rows here
+    for slot in ("DL", "LB", "DB"):
+        pos = d["positions"][slot]
         cards = [p for t in pos["tiers"] for p in t["players"]]
         assert cards, slot
         assert not {p["id"] for p in cards} & rostered
@@ -239,7 +241,8 @@ def test_build_site_renders_the_latest_week(synced, tmp_path):
     assert latest_week_dir(data) == data / "2026" / "week05"
     index = build_site(data, tmp_path / "site")
     html = index.read_text()
-    assert "Week 5" in html and "My IDPs" in html and "START" in html and "UPGRADE" in html
+    assert "Week 5" in html and "This week" in html and "START" in html and "UPGRADE" in html
+    assert ">Yours <" in html and ">Available<" in html  # each position's panel: your players, then the waiver tiers
     assert "Alex &lt;i&gt;Anzalone&lt;/i&gt;" in html and "<i>Anzalone" not in html
     assert "drop Kamari Lassiter" in html and "1 available LB has no projection" in html
     site = index.parent
@@ -595,7 +598,7 @@ def test_form_term_from_earlier_weeks(tmp_path):
         and "from the sources" in html
         and "of his team's defensive snaps last game (week 4)" in html
     )
-    tk = html[html.index("Tykee") :]
+    tk = html[html.index('<span class="name">Tykee') :]  # his own row (the This-week card names him first)
     assert f"{'+' if f['pts'] >= 0 else '−'} {abs(f['pts']):.1f} form." in tk[: tk.index("</details>")]
     # off: nothing changes and nothing is recorded
     run_sync(CFG_PLAIN, data, tmp_path / "c", NOW, force=True, client=FakeClient(routes()), log=lambda m: None)

@@ -14,6 +14,7 @@ from .net import Client
 V1 = "https://api.sleeper.app/v1"
 API = "https://api.sleeper.com"
 IDP_POSITIONS_QUERY = "position[]=DL&position[]=LB&position[]=DB"
+K_POSITIONS_QUERY = "position[]=K"  # the kickers' own request: the IDP query string never changes
 
 
 class SleeperError(RuntimeError):
@@ -83,6 +84,9 @@ class Sleeper:
     def projections(self, season: int, week: int):
         return self._optional(f"{API}/projections/nfl/{season}/{week}?season_type=regular&{IDP_POSITIONS_QUERY}")
 
+    def kicker_projections(self, season: int, week: int):
+        return self._optional(f"{API}/projections/nfl/{season}/{week}?season_type=regular&{K_POSITIONS_QUERY}")
+
     def stats(self, season: int, week: int):
         """Weekly actual stats for every player, as {player_id: stats}."""
         return self._optional(f"{V1}/stats/nfl/regular/{season}/{week}")
@@ -111,12 +115,27 @@ def resolve_league(sleeper: Sleeper, cfg: dict, season: int, cached_user_id: str
 
 
 def position_limits(settings: dict, fallback: int) -> dict[str, int]:
-    """{'DL': 2, 'LB': 2, 'DB': 2} from settings.position_limit_*; missing keys use the config fallback."""
+    """{'DL': 2, 'LB': 2, 'DB': 2} from settings.position_limit_*; missing keys use the config fallback.
+    K is in the result only where the league sets `position_limit_k` (SADL doesn't: a kicker is limited by
+    roster room alone, roster.py)."""
     out = {}
     for slot in ("DL", "LB", "DB"):
         v = (settings or {}).get(f"position_limit_{slot.lower()}")
         out[slot] = int(v) if isinstance(v, (int, float)) and v else fallback
+    k = (settings or {}).get("position_limit_k")
+    if isinstance(k, (int, float)) and k:
+        out["K"] = int(k)
     return out
+
+
+def open_spots(roster: dict | None, roster_positions: list | None) -> int | None:
+    """Free active roster spots: the league's roster size (one per `roster_positions` entry, bench included)
+    less the roster's players who are not on reserve (IR) or taxi. None when either is unknown."""
+    if not roster or not roster_positions:
+        return None
+    off = set(roster.get("reserve") or []) | set(roster.get("taxi") or [])
+    active = sum(1 for pid in roster.get("players") or [] if pid not in off)
+    return max(0, len(roster_positions) - active)
 
 
 def my_roster(rosters: list[dict], user_id: str) -> dict | None:

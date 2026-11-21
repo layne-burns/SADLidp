@@ -1,4 +1,4 @@
-"""My IDPs panel (D15, SPEC.md §6.7).
+"""My IDPs panel (D15, SPEC.md §6.7), and the kicker's (2026-11-17).
 
 Per position: S = your comparable player with the highest μ, B = your other comparable player. A
 player is comparable if he isn't on IR, has a μ, and nothing but `locked` keeps him off the field (a
@@ -12,6 +12,13 @@ A suggestion that can't pay off this week is still shown, flagged `reference` wi
 `starter_locked` when the lineup starter at the position is locked (or, with no lineup known, S is): SADL
 starts exactly one DL/LB/DB, so nothing added there can score this week; `drop_locked` when the player
 it would drop is locked (Sleeper won't drop him).
+
+Kickers (K) follow the same comparisons with their own add rule, because the league sets no kicker limit:
+only roster room counts. With a free roster spot the move is `add`; with none it is `add_drop` of your other
+kicker: B when B exists, else (S exists) an unlocked kicker of yours who can't play this week (bye, out, no
+μ; never IR or taxi), so the kicker who can play is the one kept; else `swap` (drop S, your kicker W would
+replace: a straight swap), else `choose_drop` (no kicker of yours can be compared this week, so the drop is
+yours to choose anywhere on the roster; it is never flagged `drop_locked`). UPGRADE still needs a comparable B.
 """
 
 from __future__ import annotations
@@ -19,7 +26,7 @@ from __future__ import annotations
 import math
 
 from .pool import PlayerStatus
-from .positions import IDP_SLOTS, slot_of
+from .positions import SLOTS, K, slot_of
 
 
 def phi(x: float) -> float:
@@ -34,15 +41,29 @@ def p_outscores(mu_w: float, sp_w: float, mu_ref: float, sp_ref: float) -> float
 
 
 def starter_slots(roster_positions: list[str], starters: list[str] | None) -> dict[str, str | None]:
-    """Who sits in your lineup's DL/LB/DB slot (matchups `starters` is aligned with roster_positions)."""
+    """Who sits in your lineup's DL/LB/DB/K slot (matchups `starters` is aligned with roster_positions)."""
     if not starters:
         return {}  # lineup unknown (distinct from an empty slot, which maps to None)
     out: dict[str, str | None] = {}
     for idx, slot in enumerate(roster_positions or []):
-        if slot in IDP_SLOTS and slot not in out:
+        if slot in SLOTS and slot not in out:
             pid = starters[idx] if idx < len(starters) else None
             out[slot] = pid if pid not in (None, "0") else None
     return out
+
+
+def kicker_action(open_spots: int | None, limit: int | None, count: int, starter: str | None,
+                  other: str | None) -> tuple[str, str | None]:  # fmt: skip
+    """(action, drop) for adding a waiver kicker. `open_spots` = your free active roster spots (None: unknown,
+    taken as room); `limit` = the league's kicker limit, if it sets one; `other` = the kicker to drop before S
+    (B, or with no B one of yours who can't play this week)."""
+    if (open_spots is None or open_spots > 0) and (limit is None or count < limit):
+        return "add", None
+    if other:
+        return "add_drop", other
+    if starter:
+        return "swap", starter
+    return "choose_drop", None
 
 
 def panel(
@@ -55,13 +76,16 @@ def panel(
     sigma_out: dict[str, float],
     threshold: float,
     lineup: dict[str, str | None],
+    open_spots: int | None = None,
+    slots: tuple[str, ...] = SLOTS,
 ) -> dict[str, dict]:
-    """waiver_ids[slot] = available, playable players with a μ (best first)."""
+    """waiver_ids[slot] = available, playable players with a μ (best first). `open_spots` = your free active
+    roster spots (the kicker rule); `slots` = the positions to build."""
     reserve = set(roster.get("reserve") or [])
     taxi = set(roster.get("taxi") or [])
     mine = [pid for pid in roster.get("players") or [] if slot_of(players.get(pid, {})) is not None]
     out: dict[str, dict] = {}
-    for slot in IDP_SLOTS:
+    for slot in slots:
         so = float(sigma_out.get(slot) or 0.0)
 
         def sp(pid: str, so: float = so) -> float:
@@ -84,27 +108,38 @@ def panel(
         mu_s, sp_s = (cons[starter]["mu"], sp(starter)) if starter else (0.0, 0.0)
         # with no comparable B, the drop is yours to choose among all non-IR players here (S included)
         drop_pool = [pid for pid in here if pid not in reserve]
+        # K with S but no B: drop your kicker who can't play this week, not S (an unlocked one; taxi frees no spot)
+        idle = [pid for pid in drop_pool if pid != starter and pid not in taxi and not locked(pid)]
+        k_other = other or (idle[0] if slot == K and starter and idle else None)
 
         badges: dict[str, dict] = {}
         for w in waiver_ids.get(slot, []):
             p_start = p_outscores(cons[w]["mu"], sp(w), mu_s, sp_s)
             if p_start >= threshold:
-                # under the limit: just add; else drop B; with no B, your other player is unavailable (you choose)
-                action = "add" if count < limits.get(slot, 2) else ("add_drop" if other else "choose_drop")
+                if slot == K:  # no kicker limit: roster room decides (module docstring)
+                    action, drop = kicker_action(open_spots, limits.get(K), count, starter, k_other)
+                else:
+                    # under the limit: just add; else drop B; with no B, your other player is unavailable (you choose)
+                    action = "add" if count < limits.get(slot, 2) else ("add_drop" if other else "choose_drop")
+                    drop = other if action == "add_drop" else None
                 why = ["starter_locked"] if starter_locked else []
-                if (action == "add_drop" and locked(other)) or (
-                    action == "choose_drop" and drop_pool and all(locked(pid) for pid in drop_pool)
+                if (drop and locked(drop)) or (
+                    slot != K and action == "choose_drop" and drop_pool and all(locked(pid) for pid in drop_pool)
                 ):
                     why.append("drop_locked")
                 badges[w] = {"badge": "START", "over": starter, "p": round(p_start, 3), "action": action,
-                             "drop": other if action == "add_drop" else None, "reference": bool(why),
-                             "why": why}  # fmt: skip
+                             "drop": drop, "reference": bool(why), "why": why}  # fmt: skip
             elif other:
                 p_up = p_outscores(cons[w]["mu"], sp(w), cons[other]["mu"], sp(other))
                 if p_up >= threshold:
-                    why = (["starter_locked"] if starter_locked else []) + (["drop_locked"] if locked(other) else [])
-                    badges[w] = {"badge": "UPGRADE", "over": other, "p": round(p_up, 3), "action": "add_drop",
-                                 "drop": other, "reference": bool(why), "why": why}  # fmt: skip
+                    action, drop = "add_drop", other
+                    if slot == K:
+                        action, drop = kicker_action(open_spots, limits.get(K), count, starter, other)
+                    why = (["starter_locked"] if starter_locked else []) + (
+                        ["drop_locked"] if drop and locked(drop) else []
+                    )
+                    badges[w] = {"badge": "UPGRADE", "over": other, "p": round(p_up, 3), "action": action,
+                                 "drop": drop, "reference": bool(why), "why": why}  # fmt: skip
         out[slot] = {
             "players": here,
             "reserve": sorted(pid for pid in here if pid in reserve),
@@ -112,7 +147,8 @@ def panel(
             "starter": starter,
             "other": other,
             "count": count,
-            "limit": limits.get(slot, 2),
+            "limit": limits.get(K) if slot == K else limits.get(slot, 2),  # K: None unless the league sets one
+            **({"open_spots": open_spots} if slot == K else {}),
             "starter_locked": starter_locked,
             "lineup_starter": lineup_pid,
             "badges": badges,

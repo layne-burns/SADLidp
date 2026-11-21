@@ -15,7 +15,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from .positions import also_eligible, player_name, slot_of
+from .positions import IDP_SLOTS, also_eligible, player_name, slot_of
 
 # Outcomes in precedence order (§6.1 steps 1, 2, 4–8); a lower index wins a conflict.
 METHODS = (
@@ -72,7 +72,9 @@ def _symmetric(table: dict[str, list[str]] | None) -> dict[str, list[str]]:
 
 
 class Matcher:
-    """Indexes the Sleeper players DB once; `match` is then a few dict lookups per source row."""
+    """Indexes the Sleeper players DB once; `match` is then a few dict lookups per source row. Only players
+    at `slots` are indexed: the IDPs by default, the kickers for a kicker source (`slots=("K",)`), never both,
+    so a kicker's name or id can't change how an IDP source's row matches (and the other way round)."""
 
     def __init__(
         self,
@@ -80,14 +82,16 @@ class Matcher:
         overrides: dict[str, dict[str, str]] | None = None,
         nicknames: dict[str, list[str]] | None = None,
         crosswalk: dict[str, dict[str, str]] | None = None,
+        slots: tuple[str, ...] = IDP_SLOTS,
     ):
         self.players = players
+        self.slots = tuple(slots)
         self.nicknames = _symmetric(nicknames)
         self.crosswalk = crosswalk or {}  # crosswalk name -> {source id: Sleeper id} (crosswalk.py)
         self._idp: set[str] = set()
         self._by_name: dict[str, list[str]] = {}
         for pid, p in players.items():
-            if slot_of(p) is None or p.get("full_name") == DUPLICATE:
+            if slot_of(p) not in self.slots or p.get("full_name") == DUPLICATE:
                 continue
             self._idp.add(pid)
             first_last = f"{p.get('first_name') or ''} {p.get('last_name') or ''}"

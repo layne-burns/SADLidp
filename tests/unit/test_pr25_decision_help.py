@@ -86,6 +86,25 @@ def test_faab_is_read_as_a_share_of_the_leagues_starting_budget(tmp_path):
     assert small["budget"] == 50.0
 
 
+def test_faab_line_never_counts_a_kicker(tmp_path):
+    """Kickers are tracked too since 2026-11-17 (slot "K"): the line stays about IDP claims and IDP pickups."""
+    slots = {f"p{i}": "LB" for i in range(10)} | {"k1": "K", "k2": "K"}
+    faab100 = {"waiver_type": 2, "waiver_budget": 100}
+    idp = [{"type": "waiver", "status": "complete", "adds": {f"p{i}": 1}, "bid": b, "leg": 3}
+           for i, b in enumerate((0, 1, 1, 4, 15))]  # fmt: skip
+    kick = [{"type": "waiver", "status": "complete", "adds": {"k1": 1}, "bid": 60, "leg": 3},
+            {"type": "waiver", "status": "failed", "adds": {"k1": 2}, "bid": 50, "leg": 3},  # contested, at K
+            {"type": "free_agent", "status": "complete", "adds": {"k2": 1}, "created": 1793203200000,
+             "leg": 3}]  # fmt: skip
+    _tx(tmp_path, 3, idp)
+    before = league_tx.faab_summary(tmp_path, 2026, slots, faab100)
+    _tx(tmp_path, 3, idp + kick)
+    assert league_tx.faab_summary(tmp_path, 2026, slots, faab100) == before
+    assert (before["claims"], before["contested"], before["fa_adds"]) == (5, 0, 0)
+    _tx(tmp_path, 3, idp[:4] + kick)
+    assert league_tx.faab_summary(tmp_path, 2026, slots, faab100) is None  # 4 IDP claims: the kicker one isn't a fifth
+
+
 class _Sleeper:
     def __init__(self, legs):
         self.legs, self.calls = legs, []

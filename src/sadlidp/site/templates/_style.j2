@@ -33,7 +33,8 @@ li.item:first-child { border-top: 0; }
 .bdbody { padding: 2px 0 10px 14px; font-size: .88rem; }
 .part { padding: 3px 0; }
 .part.missing { color: var(--muted); }
-.mini > summary { list-style: none; cursor: pointer; color: var(--accent); font-size: .85rem; }
+.mini > summary { list-style: none; cursor: pointer; color: var(--accent); font-size: .85rem;
+  display: inline-flex; align-items: center; min-height: 40px; }
 .mini > summary::-webkit-details-marker { display: none; }
 .name { font-weight: 600; }
 .sub { font-size: .85rem; }
@@ -44,6 +45,7 @@ li.item:first-child { border-top: 0; }
   border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
 .tag.q { color: var(--warn); border-color: var(--warn); }
 .tag.bad { color: var(--bad); border-color: var(--bad); }
+.tag.pos { color: var(--text); font-weight: 700; }
 .chip.start { background: var(--start-bg); color: var(--start); border-color: transparent; font-weight: 700; }
 .chip.upgrade { background: var(--up-bg); color: var(--up); border-color: transparent; font-weight: 700; }
 .sugg { padding: 8px 0 2px; border-top: 1px dashed var(--line); font-size: .92rem; }
@@ -56,19 +58,12 @@ li.item:first-child { border-top: 0; }
 .out { font-weight: 700; }
 .out.hit { color: var(--start); } .out.miss { color: var(--bad); } .out.push { color: var(--muted); }
 .card.played { opacity: .95; border-style: dashed; }
-.weeks { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; margin: 6px 0 0; }
-.weeks a { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
-  color: var(--text); text-decoration: none; font-size: .85rem; }
-.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
 .pastweek { background: var(--ref-bg); color: var(--text); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: .9rem; }
 .tabs > input { position: absolute; opacity: 0; pointer-events: none; }
 .tabs > label { display: inline-block; padding: 8px 16px; margin-right: 6px; border-radius: 999px; cursor: pointer;
   border: 1px solid var(--line); background: var(--card); font-weight: 600; }
 .tabs > input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tabpanel { display: none; margin-top: 12px; }
-{% for slot in slots %}#tab-{{ slot }}:checked + label { background: var(--accent); color: var(--card); border-color: var(--accent); }
-#tab-{{ slot }}:checked ~ #panel-{{ slot }} { display: block; }
-{% endfor %}
 .tierhead { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 2px; }
 table { width: 100%; border-collapse: collapse; font-size: .85rem; }
 td, th { text-align: left; padding: 4px 6px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
@@ -80,9 +75,67 @@ a { color: var(--accent); }
 .rc li { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-top: 1px solid var(--line); font-size: .9rem; }
 .rc li:first-child { border-top: 0; }
 .rc .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.rc .up { color: var(--start); } .rc .down { color: var(--bad); }
+.rc .up, .rck .up { color: var(--start); } .rc .down, .rck .down { color: var(--bad); }
+.rck { margin: 6px 0 0; padding-top: 6px; border-top: 1px solid var(--line); font-size: .9rem; }
 .rcx { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; margin: 8px 0 4px; font-size: .88rem; }
 .rcx dt { color: var(--muted); } .rcx dd { margin: 0; min-width: 0; }
 .dbnote { border-left: 3px solid var(--warn); padding-left: 8px; margin: 0 0 10px; }
 .since { border-left: 3px solid var(--accent); padding-left: 8px; margin: 0 0 10px; } .since ul { margin: 4px 0 0; padding-left: 18px; }
 table.sources td, table.sources th { overflow-wrap: normal; word-break: normal; }
+
+/* the main page's position-first layout (SPEC §2): header row, week picker, This-week card, sticky position
+   bar, folded sections. Everything below works without JavaScript and at 375 px. */
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 10px; }
+.top .meta { margin: 0; font-size: .85rem; }
+.tap { display: inline-flex; align-items: center; min-height: 40px; }
+.weeks { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 4px; }
+.weeks a, .weeks summary { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--text);
+  text-decoration: none; font-size: .9rem; white-space: nowrap; }
+.weeks a.here { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+.weeks details { margin-left: auto; }
+.weeks summary { list-style: none; cursor: pointer; color: var(--accent); }
+.weeks summary::-webkit-details-marker { display: none; }
+.weeks .all { position: absolute; left: 0; right: 0; top: 100%; z-index: 5; display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 4px; padding: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .2); }
+.now h2 { margin-top: 14px; }
+.now .sugg:first-child { border-top: 0; padding-top: 0; }
+.lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 4px; }
+.quiet { margin: 6px 0; color: var(--muted); font-size: .92rem; }
+.heads { margin: 8px 0; padding-left: 8px; border-left: 3px solid var(--warn); font-size: .92rem; }
+.lineup { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); font-size: .92rem; }
+.lineup .st { white-space: nowrap; }
+.lastline { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 14px; margin: 6px 0 -8px; font-size: .9rem; }
+#pos, #lw-h { scroll-margin-top: 8px; }
+/* The hidden radios ride along with the bar (sticky, 1 px): tapping a position in the stuck bar then focuses a
+   radio that is already on screen, so the browser has no reason to jump the page. */
+#pos .tabs > input { position: sticky; top: 0; display: block; appearance: none; width: 1px; height: 1px;
+  margin: 0 0 -1px; padding: 0; border: 0; }
+.tabbar { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; padding: 8px 0; background: var(--bg); }
+.tabbar label { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 44px;
+  border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-weight: 700; cursor: pointer; }
+{% for slot in slots %}#tab-{{ slot }}:checked ~ .tabbar label[for="tab-{{ slot }}"] { background: var(--accent); color: var(--card); border-color: var(--accent); }
+#tab-{{ slot }}:focus-visible ~ .tabbar label[for="tab-{{ slot }}"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+#tab-{{ slot }}:checked ~ #panel-{{ slot }} { display: block; }
+{% endfor %}
+.legend { margin: 0 2px; font-size: .85rem; color: var(--muted); }
+h3.grp { margin: 12px 2px 6px; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+h3.grp .count { text-transform: none; letter-spacing: 0; }
+.fold { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; }
+.fold > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px;
+  min-height: 44px; padding: 6px 12px; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before { content: "▸"; color: var(--muted); }
+.fold[open] > summary::before { content: "▾"; }
+.fold > summary h2 { font-size: 1rem; margin: 0; }
+.fold > summary small { font-size: .85rem; }
+.foldbody { padding: 0 12px 12px; }
+.foldbody h3 { margin-top: 12px; }
+.howto { list-style: disc; padding-left: 18px; } .howto li { margin: 5px 0; }
+table.sources td, table.sources th { white-space: nowrap; }
+table.sources td:nth-child(2) { min-width: 150px; white-space: normal; }
+table.sources .mini small { display: block; min-width: 200px; white-space: normal; }
+a.pad { padding: 10px 0; }  /* an inline link inside a sentence: a 40 px tap target without moving the line */
+table.sources tr.grp th { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }

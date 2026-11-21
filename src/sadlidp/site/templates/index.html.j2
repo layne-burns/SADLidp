@@ -3,132 +3,403 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SADL IDP Streamer</title>
+<title>SADL streamer</title>
 <style>
 {% include "_style.j2" %}
 </style>
 </head>
 <body>
-{%- macro opp(p) -%}{% if p.opp %}{% if p.opp.startswith('@') %}@ {{ p.opp[1:] }}{% else %}vs {{ p.opp }}{% endif %}{% endif %}{%- endmacro %}
+{#- Page order (SPEC §2): header and week picker, the This-week card, the sticky position bar with one panel
+    per position (Yours, then Available), then the folded sections. `slots` are this page's own positions. -#}
+{%- set live = latest is not defined or latest %}
+
+{#- ---- small pieces of a player row ---- -#}
+{%- macro opp(p) -%}
+  {%- if p.opp -%}
+    {%- if p.opp.startswith('@') %}@ {{ p.opp[1:] }}{% else %}vs {{ p.opp }}{% endif -%}
+  {%- endif -%}
+{%- endmacro %}
+
 {%- macro tags(p) -%}
 {% for a in p.also %}<span class="tag">also {{ a }}</span>{% endfor %}
 {% if 'Q' in p.flags %}<span class="tag q">Q</span>{% endif %}
 {% for f in p.flags if f != 'Q' %}<span class="tag q">{{ f }}</span>{% endfor %}
 {% for r in p.unavailable %}<span class="tag bad">{{ r }}</span>{% endfor %}
 {%- endmacro %}
-{%- macro chip(b) -%}{% if b.reference %}<span class="chip ref">{{ b.badge }} · ref</span>{% else %}<span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>{% endif %}{%- endmacro %}
-{%- macro pts(p) -%}{% if p.mu is not none %}{{ '%.1f'|format(p.mu) }}{% if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif %}{% if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif %}{% else %}<small>no projection</small>{% endif %}{{ result(p.result) }}{% if not p.result %}{% if p.breakdown and p.breakdown.form and p.breakdown.form.pts|abs >= 0.5 %}<div class="band">form {{ '%+.1f'|format(p.breakdown.form.pts) }}</div>{% endif %}{% if p.floor is defined and p.floor is not none %}<div class="band">range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>{% endif %}{% endif %}{%- endmacro %}
-{%- macro result(r) -%}{% if r %}{% if r.state == 'final' %}<span class="res">scored {{ '%.1f'|format(r.pts) }}</span>{% elif r.state == 'live' %}<span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>{% elif r.state == 'unavailable' %}<span class="res dnp">score unavailable</span>{% else %}<span class="res dnp">did not play</span>{% endif %}{% endif %}{%- endmacro %}
-{%- macro card_open(p) -%}{% if p.breakdown %}<li class="item"><details class="bd"><summary><div class="row">{% else %}<li class="item"><div class="row">{% endif %}{%- endmacro %}
-{%- macro card_close(p) -%}{% if p.breakdown %}</div></summary>{{ bdbody(p) }}</details></li>{% else %}</div></li>{% endif %}{%- endmacro %}
-{%- macro bdbody(p) -%}{% if p.breakdown %}<div class="bdbody">
-{% for part in p.breakdown.parts %}{% if part.missing %}<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
-{% else %}<div class="part"><b>{{ part.source }}</b> · {{ '%.1f'|format(part.pts) }} pts{% if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif %}{% if part.zero %} · not on its list, so it counts as 0{% endif %}{% if part.rank is defined and part.rank is not none %} · {% if part.censored %}not on its {{ part.list }} list, so ranked just past its end (#{{ part.rank }}){% else %}{{ part.list }} rank #{{ part.rank }}{% endif %}{% endif %}{% if part.late %} · captured after kickoff{% endif %}
-{% if part.stats %}<div class="sub">{% for st in part.stats %}{{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}</div>
-{% endif %}{% endfor %}
-{% if p.breakdown.form %}{% set f = p.breakdown.form %}<div class="part"><b>Form</b> · {{ '%+.1f'|format(f.pts) }} pts
-{% if f.miss %}<div class="sub">{{ '%+.1f'|format(f.miss.pts) }} · he has {{ 'beaten' if f.miss.mean >= 0 else 'trailed' }} his projection by {{ '%.1f'|format(f.miss.mean|abs) }} pts a game over {{ f.miss.games }} game{{ 's' if f.miss.games != 1 }}. Part of that is luck, so it counts as {{ '%+.1f'|format(f.miss.shrunk) }} a game{% if f.miss.shrunk %}, and {{ (f.miss.pts / f.miss.shrunk * 100)|round|int }}% of that carries into this week{% endif %}.</div>{% endif %}
-{% if f.snap %}<div class="sub">{{ '%+.1f'|format(f.snap.pts) }} · he played {{ (f.snap.share * 100)|round|int }}% of his team's defensive snaps last game (week {{ f.snap.week }}); the top 60 {{ p.slot }}s averaged {{ (f.snap.avg * 100)|round|int }}%.</div>{% endif %}
+
+{%- macro chip(b) -%}
+  {%- if b.reference -%}
+    <span class="chip ref">{{ b.badge }} · ref</span>
+  {%- else -%}
+    <span class="chip {{ b.badge|lower }}">{{ b.badge }}</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{#- a player's score once his game has started -#}
+{%- macro result(r) -%}
+  {%- if r -%}
+    {%- if r.state == 'final' -%}
+      <span class="res">scored {{ '%.1f'|format(r.pts) }}</span>
+    {%- elif r.state == 'live' -%}
+      <span class="res live">{{ '%.1f'|format(r.pts) }} so far</span>
+    {%- elif r.state == 'unavailable' -%}
+      <span class="res dnp">score unavailable</span>
+    {%- else -%}
+      <span class="res dnp">did not play</span>
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro %}
+
+{#- the points column: his number, ± (how far the sources disagree), then his score, or his form and range.
+    A kicker never carries a form term. -#}
+{%- macro pts(p) -%}
+  {%- if p.mu is not none -%}
+    {{ '%.1f'|format(p.mu) }}
+    {%- if p.late %}<sup title="projection captured after kickoff">*</sup>{% endif -%}
+    {%- if p.sigma is not none %}<small>±{{ '%.1f'|format(p.sigma) }}</small>{% endif -%}
+  {%- else -%}
+    <small>no projection</small>
+  {%- endif -%}
+  {{ result(p.result) }}
+  {%- if not p.result -%}
+    {%- set form = p.breakdown.form if p.breakdown and p.slot != 'K' else none -%}
+    {%- if form and form.pts|abs >= 0.5 -%}
+      <div class="band">form {{ '%+.1f'|format(form.pts) }}</div>
+    {%- endif -%}
+    {%- if p.floor is defined and p.floor is not none -%}
+      <div class="band">range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}</div>
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro %}
+
+{#- a player row opens as a tap-to-expand breakdown when the page data has one for him -#}
+{%- macro card_open(p) -%}
+  {%- if p.breakdown -%}
+    <li class="item"><details class="bd"><summary><div class="row">
+  {%- else -%}
+    <li class="item"><div class="row">
+  {%- endif -%}
+{%- endmacro %}
+
+{%- macro card_close(p) -%}
+  {%- if p.breakdown -%}
+    </div></summary>{{ bdbody(p) }}</details></li>
+  {%- else -%}
+    </div></li>
+  {%- endif -%}
+{%- endmacro %}
+
+{#- ---- the breakdown under a player (D19): one line per source, the form term, the sum, the range ---- -#}
+{%- macro part_line(part) -%}
+  {{ '%.1f'|format(part.pts) }} pts
+  {%- if part.share is not none %} · {{ (part.share * 100)|round|int }}% of his number{% endif -%}
+  {%- if part.zero %} · not on its list, so it counts as 0{% endif -%}
+  {%- if part.rank is defined and part.rank is not none %} · {% if part.censored -%}
+      not on its {{ part.list }} list, so ranked just past its end (#{{ part.rank }})
+    {%- else -%}
+      {{ part.list }} rank #{{ part.rank }}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if part.late %} · captured after kickoff{% endif -%}
+{%- endmacro %}
+
+{%- macro part_stats(part) -%}
+  {%- for st in part.stats -%}
+    {{ '%.1f'|format(st[1]) }} {{ st[0] }}{% if st[2] %}*{% endif %}{% if not loop.last %} · {% endif %}
+  {%- endfor -%}
+{%- endmacro %}
+
+{#- IDPs only: the miss term, then the snap term -#}
+{%- macro form_part(p, f) -%}
+<div class="part"><b>Form</b> · {{ '%+.1f'|format(f.pts) }} pts
+{% if f.miss -%}
+<div class="sub">{{ '%+.1f'|format(f.miss.pts) }} · he has {{ 'beaten' if f.miss.mean >= 0 else 'trailed' }} his projection by {{ '%.1f'|format(f.miss.mean|abs) }} pts a game over {{ f.miss.games }} game{{ 's' if f.miss.games != 1 }}. Part of that is luck, so it counts as {{ '%+.1f'|format(f.miss.shrunk) }} a game
+  {%- if f.miss.shrunk %}, and {{ (f.miss.pts / f.miss.shrunk * 100)|round|int }}% of that carries into this week{% endif %}.</div>
+{% endif -%}
+{% if f.snap -%}
+<div class="sub">{{ '%+.1f'|format(f.snap.pts) }} · he played {{ (f.snap.share * 100)|round|int }}% of his team's defensive snaps last game (week {{ f.snap.week }}); the top 60 {{ p.slot }}s averaged {{ (f.snap.avg * 100)|round|int }}%.</div>
+{% endif -%}
 </div>
-{% endif %}{% if p.breakdown.mu is not none %}{% set kinds = p.breakdown.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list %}<div class="sum"><b>{{ '%.1f'|format(p.breakdown.mu) }} pts</b> = {{ '%.1f'|format(p.breakdown.base if p.breakdown.form else p.breakdown.mu) }} from the sources{% if kinds|length == 1 %} ({{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif %}{% if p.breakdown.form %} {{ '+' if p.breakdown.form.pts >= 0 else '−' }} {{ '%.1f'|format(p.breakdown.form.pts|abs) }} form{% endif %}.</div>{% endif %}
-{% if p.breakdown.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
-{% if p.swing is defined and p.swing is not none and not p.result %}<div class="sub">Range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}: 3 games in 5 land inside it, 1 in 5 below and 1 in 5 above. It comes from his projected stat mix; players whose points lean on sacks and turnovers swing more (±{{ '%.1f'|format(p.swing) }} here).</div>{% endif %}
-</div>{% endif %}{%- endmacro %}
-{%- macro outcome(s) -%}{% if s.outcome == 'hit' %}<div class="out hit">✓ paid off</div>{% elif s.outcome == 'miss' %}<div class="out miss">✗ didn't pay off</div>{% elif s.outcome == 'push' %}<div class="out push">= tied</div>{% elif s.outcome == 'void' %}<div class="out push">— void (one of them didn't play)</div>{% endif %}{%- endmacro %}
-{%- macro pts_text(r) -%}{% if r %}{% if r.state == 'final' %}scored {{ '%.1f'|format(r.pts) }}{% elif r.state == 'live' %}{{ '%.1f'|format(r.pts) }} so far{% elif r.state == 'unavailable' %}score unavailable{% else %}did not play{% endif %}{% else %}not played yet{% endif %}{%- endmacro %}
+{%- endmacro %}
+
+{%- macro sum_line(b, form) -%}
+  {%- set kinds = b.parts|selectattr('kind', 'defined')|map(attribute='kind')|unique|list -%}
+  <div class="sum"><b>{{ '%.1f'|format(b.mu) }} pts</b> = {{ '%.1f'|format(b.base if form else b.mu) }} from the sources
+  {%- if kinds|length == 1 %} ({{ 'projections' if kinds[0] == 'projection' else 'rankings' }} only this week){% endif -%}
+  {%- if form %} {{ '+' if form.pts >= 0 else '−' }} {{ '%.1f'|format(form.pts|abs) }} form{% endif -%}
+  .</div>
+{%- endmacro %}
+
+{#- where his range comes from: an IDP's stat mix, a kicker's projected kicks -#}
+{%- macro swing_line(p) -%}
+<div class="sub">Range {{ '%.0f'|format(p.floor) }}–{{ '%.0f'|format(p.ceiling) }}: 3 games in 5 land inside it, 1 in 5 below and 1 in 5 above.
+  {%- if p.slot == 'K' %} It comes from how many field goals and extra points he is projected for
+  {%- else %} It comes from his projected stat mix; players whose points lean on sacks and turnovers swing more
+  {%- endif %} (±{{ '%.1f'|format(p.swing) }} here).</div>
+{%- endmacro %}
+
+{%- macro bdbody(p) -%}
+{%- if p.breakdown -%}
+{%- set b = p.breakdown -%}
+{%- set form = b.form if p.slot != 'K' else none -%}
+<div class="bdbody">
+{% for part in b.parts -%}
+  {%- if part.missing -%}
+<div class="part missing"><b>{{ part.source }}</b> · {{ part.missing }}</div>
+  {%- else -%}
+<div class="part"><b>{{ part.source }}</b> · {{ part_line(part) }}
+    {%- if part.stats %}
+<div class="sub">{{ part_stats(part) }}</div>{% endif -%}
+</div>
+  {%- endif %}
+{% endfor -%}
+{%- if form %}{{ form_part(p, form) }}
+{% endif -%}
+{%- if b.mu is not none %}{{ sum_line(b, form) }}{% endif %}
+{% if b.est %}<div class="sub">* = our estimate (the source doesn't project that stat)</div>{% endif %}
+{% if p.swing is defined and p.swing is not none and not p.result %}{{ swing_line(p) }}{% endif %}
+</div>
+{%- endif -%}
+{%- endmacro %}
+
+{#- ---- suggestions ---- -#}
+{%- macro outcome(s) -%}
+  {%- if s.outcome == 'hit' -%}
+    <div class="out hit">✓ paid off</div>
+  {%- elif s.outcome == 'miss' -%}
+    <div class="out miss">✗ didn't pay off</div>
+  {%- elif s.outcome == 'push' -%}
+    <div class="out push">= tied</div>
+  {%- elif s.outcome == 'void' -%}
+    <div class="out push">— void (one of them didn't play)</div>
+  {%- endif -%}
+{%- endmacro %}
+
+{%- macro pts_text(r) -%}
+  {%- if not r -%}
+    not played yet
+  {%- elif r.state == 'final' -%}
+    scored {{ '%.1f'|format(r.pts) }}
+  {%- elif r.state == 'live' -%}
+    {{ '%.1f'|format(r.pts) }} so far
+  {%- elif r.state == 'unavailable' -%}
+    score unavailable
+  {%- else -%}
+    did not play
+  {%- endif -%}
+{%- endmacro %}
+
+{#- One suggested move. The This-week card shows it short, with its position in front (`full` false); the
+    position's own panel adds the other players the same move could be made with, the sources and, once he has
+    played, the result. -#}
+{%- macro move(slot, m, s, full) %}
+      <div class="sugg{% if s.reference %} ref{% endif %}">
+        {{ chip(s) }}{% if not full %} <span class="tag pos">{{ slot }}</span>{% endif %}
+        <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
+        · {{ '%.1f'|format(s.player.mu) }} pts
+        {%- if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}
+        {%- else %}; you have no playable {{ slot }} this week
+        {%- endif %}.
+        {% if full and s.others -%}
+        <div class="sub">Same move, slightly lower odds: {{ s.others[:4]|join(', ') }}
+          {%- if s.others|length > 4 %} and {{ s.others|length - 4 }} more{% endif %}.</div>
+        {%- endif %}
+        {% if live -%}
+        <div class="sub">{{ action(s, m.names, slot, m.open_spots) }}</div>
+        {% if s.reference %}<div class="why">For reference: {{ why(s, m.names, slot) }}.</div>{% endif %}
+        {%- endif %}
+        {% if full and s.player.breakdown -%}
+        <details class="mini"><summary>sources ▾</summary>{{ bdbody(s.player) }}</details>
+        {%- endif %}
+        {% if s.player.result -%}
+        {% if full -%}
+        <div class="sub">Result: {{ pts_text(s.player.result) }}
+          {%- if s.over %} vs {{ m.names.get(s.over, 'your player') }} {{ pts_text(s.over_result) }}{% endif %}</div>
+        {%- endif %}
+        {{ outcome(s) }}
+        {%- endif %}
+      </div>
+{%- endmacro %}
+
+{#- ---- the report card ---- -#}
+{#- one player's projected → scored; `words` spells it out for the kicker line -#}
+{%- macro rc_num(x, words=false) -%}
+  {%- if x.mu is not none %}{{ '%.1f'|format(x.mu) }}{{ ' projected' if words }}{% else %}<small>no projection</small>{% endif %} →
+  {%- if x.pts is not none %} {{ 'scored ' if words }}<b>{{ '%.0f'|format(x.pts) }}</b>
+  {%- elif x.state == 'dnp' %} <small>did not play</small>
+  {%- else %} <small>—</small>
+  {%- endif -%}
+  {%- if x.diff is not none %} <small class="{{ 'up' if x.diff >= 0 else 'down' }}">{{ '%+.1f'|format(x.diff) }}</small>{% endif -%}
+{%- endmacro %}
+
+{%- macro call(x) -%}
+  {{ x.badge }} {{ x.name }} {{ '%.0f'|format(x.pts or 0) }}
+  {%- if x.over_name %} over {{ x.over_name }} {{ '%.0f'|format(x.over_pts or 0) }}{% endif -%}
+{%- endmacro %}
+
+{#- ---- the Sources table ---- -#}
+{%- macro usually(s) -%}
+  {%- if s.expected_by %} <small>(usually by {{ s.expected_by|et('%a %-I:%M %p ET') }})</small>{% endif -%}
+{%- endmacro %}
+
+{#- `short`: the bare status for the folded summary line -#}
+{%- macro src_status(s, short=false) -%}
+  {%- if s.pending -%}
+    not posted yet{{ '' if short else usually(s) }}
+  {%- elif s.late -%}
+    late{{ '' if short else usually(s) }}
+  {%- elif s.status == 'not_yet_published' -%}
+    not posted yet
+  {%- else -%}
+    {{ 'from saved data' if s.status == 'saved' else s.status }}
+  {%- endif -%}
+  {%- if s.stale and not short %} (stale, not used){% endif -%}
+{%- endmacro %}
+
+{%- macro src_matched(s) -%}
+  {%- if s.match and s.match.rate is not none -%}
+    {{ '%.1f'|format(s.match.rate * 100) }}%
+    {%- if s.match.unmatched -%}
+      {%- if s.match.names -%}
+        <details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>
+      {%- else %} <small>{{ s.match.unmatched }} unmatched</small>
+      {%- endif -%}
+    {%- endif -%}
+  {%- else -%}
+    —
+  {%- endif -%}
+{%- endmacro %}
 <header>
-  <h1>SADL IDP streamer</h1>
-  <p class="meta"><a href="stats.html">How the numbers did →</a></p>
-  <p class="meta">{{ d.league.name }} · {{ d.season }} Week {{ d.week }} · data as of <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et }}</time> · {{ d.league.waiver_type }} waivers</p>
-  {% if nav and nav|length > 1 %}<nav class="weeks" aria-label="Weeks">{% for n in nav %}<a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here" aria-current="page"{% endif %}>{{ n.label }}{% if n.latest %} · now{% endif %}</a>{% endfor %}</nav>{% endif %}
+  <div class="top">
+    <h1>SADL streamer</h1>
+    <p class="meta">{{ d.season }} Week {{ d.week }} · <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et('%a %-I:%M %p' if live else '%a %b %-d') }}</time></p>
+  </div>
+  {% if nav and nav|length > 1 -%}
+  <nav class="weeks" aria-label="Weeks">
+    {% if nav_prev %}<a href="{{ nav_prev.href }}">‹ Wk {{ nav_prev.week }}</a>{% endif %}
+    {% for n in nav if (n.season, n.week) == here -%}
+    <a href="{{ n.href }}" class="here" aria-current="page">{{ n.label }}{% if n.latest %} · now{% endif %}</a>
+    {%- endfor %}
+    {% if nav_next %}<a href="{{ nav_next.href }}">Wk {{ nav_next.week }} ›</a>{% endif %}
+    <details>
+      <summary>all weeks ▾</summary>
+      <div class="all">
+        {% for n in nav -%}
+        <a href="{{ n.href }}"{% if (n.season, n.week) == here %} class="here"{% endif %}>{{ n.label }}{% if n.latest %} · now{% endif %}</a>
+        {% endfor %}
+      </div>
+    </details>
+  </nav>
+  {%- endif %}
   {% if d.replayed %}<p class="pastweek">{{ d.replayed.note }}</p>{% endif %}
-  {% if not latest %}<p class="pastweek">You're looking at a past week. {% if final %}{% if final.provisional %}Scores are provisional (stat corrections still possible).{% else %}All scores are final.{% endif %}{% else %}Final stats weren't captured for this week, so scores are as of the last sync.{% endif %}{% if not d.replayed %} Suggestions and tiers are as they stood at the week's last sync.{% endif %}</p>{% endif %}
+  {% if not latest -%}
+  <p class="pastweek">You're looking at a past week.
+    {%- if final %}
+      {%- if final.provisional %} Scores are provisional (stat corrections still possible).
+      {%- else %} All scores are final.
+      {%- endif %}
+    {%- else %} Final stats weren't captured for this week, so scores are as of the last sync.
+    {%- endif %}
+    {%- if not d.replayed %} Suggestions and tiers are as they stood at the week's last sync.{% endif %}</p>
+  {%- endif %}
   <p id="stale" class="banner" hidden>This data is more than 36 hours old. Run <b>sync</b> in the repo's Actions tab to refresh.</p>
   {% for w in d.warnings %}<p class="banner">{{ w }}</p>{% endfor %}
-  {% if d.last_week and d.last_week.summary.decided %}<p class="meta"><a href="#lw-h">Last week: {{ d.last_week.summary.hits }} of {{ d.last_week.summary.decided }} suggestions paid off ↓</a></p>{% endif %}
 </header>
 <main>
-  {% if card %}{% set c = card %}
-  <section aria-labelledby="rc-h">
-    <h2 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h2>
-    <div class="slot report">
-      <p class="headline">{% if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).{% else %}None of your IDPs had both a projection and a final score.{% endif %}
-        {% if c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}{% if c.badges > c.decided %} <small>({{ c.badges }} badges; several over the same player count once)</small>{% endif %}{% if c.rebuilt %} (rebuilt){% endif %}.{% else %}No suggestions were decided that week.{% endif %}
-        {% if c.so_far %}Season to week {{ c.week }}: {% for k, t in c.so_far.items() %}{{ 'live ' if k == 'live' else 'rebuilt weeks ' }}{{ t.hits }} of {{ t.decided }}{% if t.net is not none %}, {{ '%+.1f'|format(t.net) }} pts each{% endif %}{{ '; ' if not loop.last else '.' }}{% endfor %}{% endif %}</p>
-      <ul class="rc">
-        {% for x in c.players %}
-        <li><span>{{ x.name }} <small>{{ x.slot }}</small></span>
-          <span class="num">{% if x.mu is not none %}{{ '%.1f'|format(x.mu) }}{% else %}<small>no projection</small>{% endif %} → {% if x.pts is not none %}<b>{{ '%.0f'|format(x.pts) }}</b>{% elif x.state == 'dnp' %}<small>did not play</small>{% else %}<small>—</small>{% endif %}{% if x.diff is not none %} <small class="{{ 'up' if x.diff >= 0 else 'down' }}">{{ '%+.1f'|format(x.diff) }}</small>{% endif %}</span></li>
-        {% endfor %}
-      </ul>
-      {% set mm = c.median_miss or {} %}{% if mm.DL is not none or mm.LB is not none or mm.DB is not none %}<p class="note">For comparison, the typical top-50 player that week scored {% for slot in slots %}{% if mm[slot] is not none %}{{ '%+.1f'|format(mm[slot]) }} ({{ slot }}){% else %}— ({{ slot }}){% endif %}{{ ', ' if not loop.last else '' }}{% endfor %} against his projection.</p>{% endif %}
-      {% if c.beat or c.short or c.best_call or c.worst_call %}<dl class="rcx">
-        {% if c.beat %}<dt>Biggest beat</dt><dd>{{ c.beat.name }}: {{ '%.0f'|format(c.beat.pts) }} vs {{ '%.1f'|format(c.beat.mu) }} projected</dd>{% endif %}
-        {% if c.short %}<dt>Biggest shortfall</dt><dd>{{ c.short.name }}: {{ '%.0f'|format(c.short.pts) }} vs {{ '%.1f'|format(c.short.mu) }} projected</dd>{% endif %}
-        {% if c.best_call %}<dt>Best call</dt><dd>{{ c.best_call.badge }} {{ c.best_call.name }} {{ '%.0f'|format(c.best_call.pts or 0) }}{% if c.best_call.over_name %} over {{ c.best_call.over_name }} {{ '%.0f'|format(c.best_call.over_pts or 0) }}{% endif %}</dd>{% endif %}
-        {% if c.worst_call %}<dt>Worst call</dt><dd>{{ c.worst_call.badge }} {{ c.worst_call.name }} {{ '%.0f'|format(c.worst_call.pts or 0) }}{% if c.worst_call.over_name %} over {{ c.worst_call.over_name }} {{ '%.0f'|format(c.worst_call.over_pts or 0) }}{% endif %}</dd>{% endif %}
-      </dl>{% endif %}
-      <p class="meta"><a href="stats.html#w{{ c.week }}">All of week {{ c.week }}'s numbers →</a></p>
-    </div>
-  </section>
-  {% endif %}
-  <section aria-labelledby="my-h">
-    <h2 id="my-h">My IDPs</h2>
-    {% for slot in slots %}{% set m = d.my_idps[slot] %}
+  {% set lw = d.last_week %}
+  {% set lw_slots = [] %}
+  {% if lw %}{% for slot in all_slots if lw.slots[slot] %}{% set _ = lw_slots.append(slot) %}{% endfor %}{% endif %}
+  <section class="now" aria-labelledby="now-h">
+    <h2 id="now-h">{% if live %}This week{% else %}Week {{ d.week }} at a glance{% endif %}</h2>
     <div class="slot">
-      <h3>{{ slot }} <span class="count">{{ m.count }}/{{ m.limit }} rostered</span></h3>
-      <ul>
-        {% for p in m.players %}
-        {{ card_open(p) }}
-          <div><span class="name">{{ p.name }}</span>
-            {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
-            {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
-            {{ tags(p) }}
-            <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(d.positions[slot].tier_count) }}{% endif %}</div></div>
-          <div class="pts">{{ pts(p) }}</div>
-{{ card_close(p) }}
-        {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
-      </ul>
-      {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
-      {% for b in m.byes or [] %}<p class="note">Bye ahead: {{ b.name }} ({{ b.team }}) has a bye in week {{ b.week }}.</p>{% endfor %}
-      {% for s in m.suggestions %}
-      <div class="sugg{% if s.reference %} ref{% endif %}">
-        {{ chip(s) }}
-        <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
-        · {{ '%.1f'|format(s.player.mu) }} pts{% if s.over %}, {{ [(s.p * 100)|round|int, 99]|min }}% to outscore {{ m.names.get(s.over, 'your player') }}{% else %}; you have no playable {{ slot }} this week{% endif %}.
-        {% if s.others %}<div class="sub">Same move, slightly lower odds: {{ s.others[:4]|join(', ') }}{% if s.others|length > 4 %} and {{ s.others|length - 4 }} more{% endif %}.</div>{% endif %}
-        {% if latest is not defined or latest %}<div class="sub">{{ action(s, m.names) }}</div>
-        {% if s.reference %}<div class="why">For reference: {{ why(s, m.names, slot) }}.</div>{% endif %}{% endif %}
-        {% if s.player.breakdown %}<details class="mini"><summary>sources ▾</summary>{{ bdbody(s.player) }}</details>{% endif %}
-        {% if s.player.result %}<div class="sub">Result: {{ pts_text(s.player.result) }}{% if s.over %} vs {{ m.names.get(s.over, 'your player') }} {{ pts_text(s.over_result) }}{% endif %}</div>{{ outcome(s) }}{% endif %}
+      {% for x in now.moves %}{{ move(x.slot, x.m, x.s, false) }}{% endfor %}
+      {% if now.quiet %}<p class="quiet">No move {{ 'suggested' if live else 'was suggested' }} at: {{ now.quiet|join(', ') }}</p>{% endif %}
+      {% if live and now.heads -%}
+      <div class="heads"><span class="lbl">Heads-up</span>
+        <ul>{% for h in now.heads %}<li>{{ h }}</li>{% endfor %}</ul>
       </div>
-      {% endfor %}
-      {% if m.played_suggestions %}
-      <p class="tierhead" style="margin-top:10px">This week's suggestions that have played</p>
-      {% for s in m.played_suggestions %}
-      <div class="sugg">
-        {{ chip(s) }} <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
-        · projected {{ '%.1f'|format(s.player.mu) }}, {{ pts_text(s.player.result) }}
-        {% if s.over %}<div class="sub">vs {{ m.names.get(s.over, 'your player') }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
-        {{ outcome(s) }}
-      </div>
-      {% endfor %}
-      {% if m.played_suggestions_hidden %}<p class="hidden-note">{{ m.played_suggestions_hidden }} more not shown.</p>{% endif %}
-      {% endif %}
+      {%- endif %}
+      <p class="lineup"><span class="lbl">Projected starters</span>
+        {% for x in now.starters -%}
+        <span class="st"><b>{{ x.slot }}</b>
+          {%- if x.p %} {{ x.p.name }}{% if x.p.mu is not none %} {{ '%.1f'|format(x.p.mu) }}{% endif %}
+            {%- if x.p.result %} ({{ pts_text(x.p.result) }}){% endif %}
+          {%- else %} —
+          {%- endif %}</span>{% if not loop.last %} · {% endif %}
+        {% endfor %}</p>
+      <p class="lastline">
+        {% if card and card.counted %}<span class="tap">Week {{ card.week }}: your IDPs scored {{ '%.0f'|format(card.scored) }} against {{ '%.0f'|format(card.projected) }} projected.</span>{% endif %}
+        {% if lw and lw.summary.decided -%}
+        <a class="tap" href="#lw-h">Last week: {{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off ↓</a>
+        {%- elif card or lw_slots -%}
+        <a class="tap" href="#lw-h">{% if card %}Week {{ card.week }} report card{% else %}Last week's suggestions{% endif %} ↓</a>
+        {%- endif %}
+        <a class="tap" href="stats.html">How the numbers did →</a>
+      </p>
     </div>
-    {% endfor %}
   </section>
 
-  <section aria-labelledby="tiers-h">
-    <h2 id="tiers-h">Streaming tiers (available players)</h2>
-    {% if tueq is defined and tueq and tueq.tagged >= 20 %}<p class="note">Questionable on Tuesday: {{ tueq.sat }} of the {{ tueq.tagged }} waiver players tagged Q on a pre-waiver page this season sat out (untagged: {{ (100 * tueq.untagged_sat / tueq.untagged)|round|int }}%).</p>{% endif %}
-    {% if faab is defined and faab %}<p class="note">IDP waivers this season: {{ faab.won_token }} of {{ faab.claims }} claims were won with a token bid (at most {{ faab.token_label }}% of the starting budget){% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested, won at {{ faab.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '%.0f'|format(faab.budget) }}.)</small>{% if faab.fa_adds %} {{ faab.fa_adds }} {{ 'IDP was picked up as a free agent' if faab.fa_adds == 1 else 'IDPs were picked up as free agents' }}{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
+  <section id="pos" aria-labelledby="pos-h">
+    <h2 id="pos-h" class="vh">Positions</h2>
     <div class="tabs">
-      {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}><label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}
-      {% for slot in slots %}{% set pos = d.positions[slot] %}
+      {% for slot in slots %}<input type="radio" name="pos" id="tab-{{ slot }}"{% if loop.first %} checked{% endif %}>{% endfor %}
+      <div class="tabbar">{% for slot in slots %}<label for="tab-{{ slot }}">{{ slot }}</label>{% endfor %}</div>
+      <p class="legend">Big number = projected points · ± = how far the sources disagree{% if d.swing %} · range = where 3 games in 5 land{% endif %}</p>
+      {% for slot in slots %}{% set m = d.my_idps[slot] %}{% set pos = d.positions[slot] %}
       <div class="tabpanel" id="panel-{{ slot }}">
-        {% if pos.since_tuesday %}<div class="note since"><b>Changed since Tuesday's list:</b><ul>{% for x in pos.since_tuesday %}<li>{{ x.name }}{% if x.rank %} (Tuesday #{{ x.rank }}){% endif %}: {{ x.changes|join('; ') }}</li>{% endfor %}</ul></div>{% elif pos.since_tuesday is not none and pos.since_tuesday is defined %}<p class="note since">Since Tuesday's list: no changes to its top 5.</p>{% endif %}
-        {% if slot == 'DB' and dbnote is defined and dbnote and dbnote.show %}<p class="note dbnote">Projections barely tell waiver DBs apart (this season r {% if dbnote.r is not none %}{{ '%.2f'|format(dbnote.r) }}{% if dbnote.margin is not none %} ± {{ '%.2f'|format(dbnote.margin) }}{% endif %}{% else %}not measured yet{% endif %}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a href="stats.html#season">More</a></p>{% endif %}
+        <h3 class="grp">Yours <span class="count">
+          {%- if m.limit is not none %}{{ m.count }}/{{ m.limit }} rostered
+          {%- else %}{{ m.count }} rostered
+            {%- if m.open_spots is defined and m.open_spots is not none %} · {% if m.open_spots > 0 %}{{ m.open_spots }} free roster spot{{ 's' if m.open_spots != 1 }}{% else %}roster full{% endif %}{% endif %}
+          {%- endif %}</span></h3>
+        <div class="slot">
+          <ul>
+            {% for p in m.players %}
+            {{ card_open(p) }}
+              <div><span class="name">{{ p.name }}</span>
+                {% if p.role == 'starter' %}<span class="tag">projected starter</span>{% endif %}
+                {% if p.reserve %}<span class="tag">IR</span>{% endif %}{% if p.taxi %}<span class="tag">taxi</span>{% endif %}
+                {{ tags(p) }}
+                <div class="sub">{{ p.team or 'FA' }} {{ opp(p) }}{% if 'locked' not in p.unavailable %} · {{ p.tier|tier(pos.tier_count) }}{% endif %}</div></div>
+              <div class="pts">{{ pts(p) }}</div>
+{{ card_close(p) }}
+            {% else %}<li class="item"><div class="row"><span class="sub">No {{ slot }} rostered</span></div></li>{% endfor %}
+          </ul>
+          {% if m.starter_locked %}<p class="note">Your {{ slot }} starter's game has started, so suggestions here are for reference.</p>{% endif %}
+          {% for b in m.byes or [] %}<p class="note">Bye ahead: {{ b.name }} ({{ b.team }}) has a bye in week {{ b.week }}.</p>{% endfor %}
+          {% for s in m.suggestions %}{{ move(slot, m, s, true) }}{% endfor %}
+          {% if m.played_suggestions %}
+          <p class="tierhead" style="margin-top:10px">This week's suggestions that have played</p>
+          {% for s in m.played_suggestions %}
+          <div class="sugg">
+            {{ chip(s) }} <b>{{ s.player.name }}</b> <span class="sub">{{ s.player.team }} {{ opp(s.player) }}</span>
+            · projected {{ '%.1f'|format(s.player.mu) }}, {{ pts_text(s.player.result) }}
+            {% if s.over %}<div class="sub">vs {{ m.names.get(s.over, 'your player') }}: projected {{ '%.1f'|format(s.mu_over or 0) }}, {{ pts_text(s.over_result) }}</div>{% endif %}
+            {{ outcome(s) }}
+          </div>
+          {% endfor %}
+          {% if m.played_suggestions_hidden %}<p class="hidden-note">{{ m.played_suggestions_hidden }} more not shown.</p>{% endif %}
+          {% endif %}
+        </div>
+
+        <h3 class="grp">Available</h3>
+        {% if pos.since_tuesday -%}
+        <div class="note since"><b>Changed since Tuesday's list:</b>
+          <ul>{% for x in pos.since_tuesday %}<li>{{ x.name }}{% if x.rank %} (Tuesday #{{ x.rank }}){% endif %}: {{ x.changes|join('; ') }}</li>{% endfor %}</ul>
+        </div>
+        {%- elif pos.since_tuesday is not none and pos.since_tuesday is defined -%}
+        <p class="note since">Since Tuesday's list: no changes to its top 5.</p>
+        {%- endif %}
+        {% if slot == 'DB' and dbnote is defined and dbnote and dbnote.show -%}
+        <p class="note dbnote">Projections barely tell waiver DBs apart (this season r
+          {%- if dbnote.r is not none %} {{ '%.2f'|format(dbnote.r) }}{% if dbnote.margin is not none %} ± {{ '%.2f'|format(dbnote.margin) }}{% endif %}
+          {%- else %} not measured yet
+          {%- endif %}, last season 0.01), so treat these tiers as rough. Tap a DB to see his snap share and form; they say more than a point or two of projection. <a class="pad" href="stats.html#season">More</a></p>
+        {%- endif %}
+        {% if slot == 'K' and d.kicker and d.kicker.one_point_edge -%}
+        <p class="note dbnote">Kickers are hard to tell apart. With a typical game-to-game swing of {{ '%.1f'|format(d.kicker.swing or d.kicker.sigma_out) }} points, a kicker projected 1 point higher outscores the other only about {{ (d.kicker.one_point_edge * 100)|round|int }}% of the time, so treat these tiers as rough.
+          {%- if knote is defined and knote and knote.r is not none and (knote.weeks or 0) >= 4 %} Measured over {{ knote.weeks }} weeks this season, our order of {{ 'the waiver kickers shown' if knote.band else 'the top 20 kickers' }} matched the real one with r {{ '%.2f'|format(knote.r) }}{% if knote.margin is not none %} ± {{ '%.2f'|format(knote.margin) }}{% endif %} (1 = exactly, 0 = not at all).{% endif %}</p>
+        {%- endif %}
         {% for t in pos.tiers %}
         <div class="card">
           <p class="tierhead">Tier {{ t.tier }}</p>
@@ -138,7 +409,7 @@
               <div><span class="name">{{ p.name }}</span>
                 {% if p.badge %}{{ chip(p.badge) }}{% endif %}
                 {{ tags(p) }}
-                <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · range {{ '%.1f'|format(p.min) }}–{{ '%.1f'|format(p.max) }} ({{ p.n }} sources){% endif %}</div></div>
+                <div class="sub">{{ p.team }} {{ opp(p) }}{% if p.n > 1 %} · sources say {{ '%.1f'|format(p.min) }} to {{ '%.1f'|format(p.max) }} ({{ p.n }}){% endif %}</div></div>
               <div class="pts">{{ pts(p) }}</div>
 {{ card_close(p) }}
             {% endfor %}
@@ -166,14 +437,65 @@
       {% endfor %}
     </div>
   </section>
-  {% set lw = d.last_week %}
-  {% if lw and (lw.slots.DL or lw.slots.LB or lw.slots.DB) %}
-  <section aria-labelledby="lw-h">
-    <h2 id="lw-h">Last week's suggestions (week {{ lw.week }})</h2>
-    <div class="slot">
-      <p class="note">{% if lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).{% else %}No suggestions were decided.{% endif %}
+
+  {% if card or lw_slots %}
+  <details class="fold"{% if not live %} open{% endif %}>
+    <summary><h2 id="lw-h">{% if live %}Last week{% else %}How week {{ d.week }} went{% endif %}</h2>
+      <small>({% if card %}report card{% endif %}{% if card and lw_slots %}, {% endif %}{% if lw_slots %}{% if live %}suggestions{% else %}the week before's suggestions{% endif %}{% endif %})</small></summary>
+    <div class="foldbody">
+      {% if card %}{% set c = card %}
+      <h3 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h3>
+      <div class="report">
+        <p class="headline">
+          {%- if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).
+          {%- else %}None of your IDPs had both a projection and a final score.
+          {%- endif %}
+          {% if c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}
+            {%- if c.badges > c.decided %} <small>({{ c.badges }} badges; several over the same player count once)</small>{% endif %}
+            {%- if c.rebuilt %} (rebuilt){% endif %}.
+          {%- else %}No suggestions were decided that week.
+          {%- endif %}
+          {% if c.so_far %}Season to week {{ c.week }}:
+            {%- for k, t in c.so_far.items() %} {{ 'live ' if k == 'live' else 'rebuilt weeks ' }}{{ t.hits }} of {{ t.decided }}
+              {%- if t.net is not none %}, {{ '%+.1f'|format(t.net) }} pts each{% endif %}{{ ';' if not loop.last else '.' }}
+            {%- endfor %}
+          {%- endif %}</p>
+        <ul class="rc">
+          {% for x in c.players %}
+          <li><span>{{ x.name }} <small>{{ x.slot }}</small></span>
+            <span class="num">{{ rc_num(x) }}</span></li>
+          {% endfor %}
+        </ul>
+        {% for x in c.kickers or [] -%}
+        <p class="rck">Your kicker: {{ x.name }}, {{ rc_num(x, true) }}</p>
+        {%- endfor %}
+        {% set mm = c.median_miss or {} %}
+        {% set mm_any = [] %}{% for slot in idp_slots if mm[slot] is defined and mm[slot] is not none %}{% set _ = mm_any.append(slot) %}{% endfor %}
+        {% if mm_any -%}
+        <p class="note">For comparison, the typical top-50 player that week scored
+          {%- for slot in idp_slots %} {% if mm[slot] is defined and mm[slot] is not none %}{{ '%+.1f'|format(mm[slot]) }}{% else %}—{% endif %} ({{ slot }}){{ ',' if not loop.last else '' }}
+          {%- endfor %} against his projection.</p>
+        {%- endif %}
+        {% if c.beat or c.short or c.best_call or c.worst_call -%}
+        <dl class="rcx">
+          {% if c.beat %}<dt>Biggest beat</dt><dd>{{ c.beat.name }}: {{ '%.0f'|format(c.beat.pts) }} vs {{ '%.1f'|format(c.beat.mu) }} projected</dd>{% endif %}
+          {% if c.short %}<dt>Biggest shortfall</dt><dd>{{ c.short.name }}: {{ '%.0f'|format(c.short.pts) }} vs {{ '%.1f'|format(c.short.mu) }} projected</dd>{% endif %}
+          {% if c.best_call %}<dt>Best call</dt><dd>{{ call(c.best_call) }}</dd>{% endif %}
+          {% if c.worst_call %}<dt>Worst call</dt><dd>{{ call(c.worst_call) }}</dd>{% endif %}
+        </dl>
+        {%- endif %}
+        <p class="meta"><a class="tap" href="stats.html#w{{ c.week }}">All of week {{ c.week }}'s numbers →</a></p>
+      </div>
+      {% endif %}
+      {% if lw_slots %}
+      <h3>Last week's suggestions (week {{ lw.week }})</h3>
+      <p class="note">
+        {%- if lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).
+        {%- else %}No suggestions were decided.
+        {%- endif %}
+        {%- if lw.summary_k and lw.summary_k.decided %} Kicker suggestions, counted apart: {{ lw.summary_k.hits }} of {{ lw.summary_k.decided }} paid off.{% endif %}
         {% if lw.provisional %}Scores are provisional until stat corrections close {{ lw.settles|et }}.{% else %}Final scores.{% endif %}</p>
-      {% for slot in slots %}{% for s in lw.slots[slot] %}
+      {% for slot in lw_slots %}{% for s in lw.slots[slot] %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
         {{ chip(s) }} <b>{{ s.name }}</b> <span class="sub">{{ s.team or '' }} · {{ slot }}</span>
         · projected {{ '%.1f'|format(s.mu_w) }}, {{ pts_text(s.result) }}
@@ -182,27 +504,92 @@
         {% if s.reference %}<div class="why">Shown for reference at the time; not counted.</div>{% endif %}
       </div>
       {% endfor %}{% endfor %}
+      {% endif %}
     </div>
-  </section>
+  </details>
+  {% endif %}
+
+  {% set show_tueq = tueq is defined and tueq and tueq.tagged >= 20 %}
+  {% if show_tueq or (faab is defined and faab) %}
+  <details class="fold">
+    <summary><h2>Waiver notes</h2></summary>
+    <div class="foldbody">
+      {% if show_tueq %}<p class="note">Questionable on Tuesday: {{ tueq.sat }} of the {{ tueq.tagged }} waiver players tagged Q on a pre-waiver page this season sat out (untagged: {{ (100 * tueq.untagged_sat / tueq.untagged)|round|int }}%).</p>{% endif %}
+      {# One line on purpose: a test renders this block alone, from its first tag to its last, and pins its text. #}
+      {% if faab is defined and faab %}<p class="note">IDP waivers this season: {{ faab.won_token }} of {{ faab.claims }} claims were won with a token bid (at most {{ faab.token_label }}% of the starting budget){% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested, won at {{ faab.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '%.0f'|format(faab.budget) }}.)</small>{% if faab.fa_adds %} {{ faab.fa_adds }} {{ 'IDP was picked up as a free agent' if faab.fa_adds == 1 else 'IDPs were picked up as free agents' }}{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
+    </div>
+  </details>
   {% endif %}
 </main>
 <footer>
-  <h2>Sources</h2>
-  <div class="scroll"><table class="sources">
-    <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
-    {% for name, s in d.sources.items() %}
-    <tr><td>{{ s.label or name }}</td><td>{% if s.pending %}not posted yet{% if s.expected_by %} <small>(usually by {{ s.expected_by|et('%a %-I:%M %p ET') }})</small>{% endif %}{% elif s.late %}late{% if s.expected_by %} <small>(usually by {{ s.expected_by|et('%a %-I:%M %p ET') }})</small>{% endif %}{% elif s.status == 'not_yet_published' %}not posted yet{% else %}{{ 'from saved data' if s.status == 'saved' else s.status }}{% endif %}{% if s.stale %} (stale, not used){% endif %}</td>
-      <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
-      <td>{% if s.match and s.match.rate is not none %}{{ '%.1f'|format(s.match.rate * 100) }}%{% if s.match.unmatched %}{% if s.match.names %}<details class="mini"><summary>{{ s.match.unmatched }} unmatched</summary><small>{{ s.match.names|join(', ') }}</small></details>{% else %} <small>{{ s.match.unmatched }} unmatched</small>{% endif %}{% endif %}{% else %}—{% endif %}</td>
-      <td>{{ s.last_success|et }}</td></tr>
-    {% endfor %}
-  </table></div>
-  <p>Points are SADL scoring. ± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing{% if d.swing %}, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or{% endif %} the position's typical spread (σ<sub>out</sub> DL {{ d.sigma_out.DL }}, LB {{ d.sigma_out.LB }}, DB {{ d.sigma_out.DB }}).
-  Tiers group players statistically indistinguishable from each tier's best.
-  Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.
-  Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).
-  * Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start. Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff. <a href="{{ data_href or 'data.json' }}">data.json</a></p>
+  <details class="fold">
+    <summary><h2>How to read this page</h2></summary>
+    <div class="foldbody">
+      <ul class="howto">
+        <li>Points are SADL scoring.</li>
+        <li>± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing{% if d.swing %}, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or{% endif %} the position's typical spread (σ<sub>out</sub>
+          {%- for slot in slots if d.sigma_out[slot] is defined %} {{ slot }} {{ d.sigma_out[slot] }}{{ ',' if not loop.last else '' }}{% endfor %}).</li>
+        <li>Tiers group players statistically indistinguishable from each tier's best.</li>
+        <li>Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.</li>
+        {% if 'K' in slots -%}
+        <li>Kickers: no form is added to a kicker's number. His range, when one is shown, comes from how many field goals and extra points he is projected for; without one, his odds use the typical kicker spread above.</li>
+        <li>Kicker moves: the league sets no limit on kickers, so only roster room counts. With a free roster spot you just add; with a full roster you drop your other kicker, or swap the new one for your starter.</li>
+        {%- endif %}
+        <li>Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).</li>
+        <li>* Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start.</li>
+        <li>Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="fold">
+    <summary><h2>Sources</h2>
+      <small>
+        {%- for g in source_groups %}{% if source_groups|length > 1 %}{{ 'IDP' if g.key == 'idp' else 'kickers' }} {% endif %}{{ g.used }} of {{ g.rows|length }} in{{ ' · ' if not loop.last else '' }}{% endfor %}
+        {%- for g in source_groups %}{% for name, s in g.out[:2] %} · {{ s.label or name }}{{ ' (kickers)' if g.key == 'k' else '' }} {{ src_status(s, true) }}{% endfor %}{% endfor -%}
+      </small></summary>
+    <div class="foldbody">
+      <div class="scroll"><table class="sources">
+        <tr><th>Source</th><th>Status</th><th>Players</th><th>Matched</th><th>Last success</th></tr>
+        {% for g in source_groups %}
+        {% if source_groups|length > 1 %}<tr class="grp"><th colspan="5">{{ g.title }}</th></tr>{% endif %}
+        {% for name, s in g.rows %}
+        <tr><td>{{ s.label or name }}</td><td>{{ src_status(s) }}</td>
+          <td>{{ s.rows_used }}{% if s.no_projection %} <small>+{{ s.no_projection }} without a projection</small>{% endif %}</td>
+          <td>{{ src_matched(s) }}</td>
+          <td>{{ s.last_success|et }}</td></tr>
+        {% endfor %}
+        {% endfor %}
+      </table></div>
+    </div>
+  </details>
+  <p class="meta">{{ d.league.name }} · {{ d.league.waiver_type }} waivers · data as of {{ d.generated_at|et }}</p>
+  <p class="meta"><a class="tap" href="stats.html">How the numbers did →</a> · <a class="tap" href="{{ data_href or 'data.json' }}">data.json</a></p>
 </footer>
+<script>
+/* Optional: without it the page works the same, it just forgets the chosen position. */
+(function () {
+  try {
+    var tabs = document.querySelector(".tabs");
+    var pick = function () {
+      var radio = document.getElementById("tab-" + location.hash.slice(1));  // "#K" -> the K tab
+      if (radio) radio.checked = true;
+    };
+    pick();
+    window.addEventListener("hashchange", pick);
+    document.querySelectorAll('input[name="pos"]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        history.replaceState(null, "", "#" + radio.id.slice(4));
+        if (tabs.getBoundingClientRect().top < 0) tabs.scrollIntoView();
+      });
+    });
+    document.querySelectorAll('a[href="#lw-h"]').forEach(function (link) {
+      link.addEventListener("click", function () {
+        document.getElementById("lw-h").closest("details").open = true;
+      });
+    });
+  } catch (e) {}
+})();
+</script>
 {% if latest is not defined or latest %}<script>
 (function () {
   var t = document.getElementById("asof");

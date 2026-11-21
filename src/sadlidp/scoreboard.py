@@ -16,6 +16,9 @@ played. Top-k lift is the average score of the rung's top k minus the band's ave
 didn't play scores 0. That is what picking him would have got you. Rungs are compared with Sleeper alone
 as paired per-week differences. Pick timing compares the Tuesday order with the kickoff order on the same
 Tuesday band. Nothing here feeds the model.
+
+Kickers (2026-11-17) have a band of their own, scored on the kicker sources (`rungs` names the two behind the
+single-source rungs) and aggregated in a call of their own. The scope "all" is DL, LB and DB, always.
 """
 
 from __future__ import annotations
@@ -32,6 +35,7 @@ LADDER = (
 )
 KS = (1, 3, 5)
 MIN_PLAYED = 5  # band players who played before a position-week's rank skill counts
+IDP_RUNGS = {"sleeper": "sleeper_proj", "espn": "espn_proj"}  # the source behind each single-source rung
 
 
 def prior_blend(parts: dict[str, float], kinds: dict[str, str], priors: dict[str, float], split: float) -> float | None:
@@ -47,9 +51,11 @@ def prior_blend(parts: dict[str, float], kinds: dict[str, str], priors: dict[str
 
 
 def band_rows(shown: dict[str, list[str]], frozen: dict, played: dict[str, float], tuesday: dict[str, float],
-              kinds: dict[str, str], priors: dict[str, float], split: float) -> dict[str, list[dict]]:  # fmt: skip
+              kinds: dict[str, str], priors: dict[str, float], split: float,
+              rungs: dict[str, str] = IDP_RUNGS) -> dict[str, list[dict]]:  # fmt: skip
     """Per position, the shown band: each player's score (0 if he didn't play), whether he played, his
-    Tuesday μ and his value at every rung of the ladder (None where the record has none)."""
+    Tuesday μ and his value at every rung of the ladder (None where the record has none). `rungs` names the
+    source behind the two single-source rungs; `kinds` and `priors` are those of the same group's sources."""
     out = {}
     for slot, pids in shown.items():
         rows = []
@@ -57,8 +63,8 @@ def band_rows(shown: dict[str, list[str]], frozen: dict, played: dict[str, float
             f = frozen.get(pid) or {}
             parts = f.get("parts") or {}
             vals = {
-                "sleeper": parts.get("sleeper_proj"),
-                "espn": parts.get("espn_proj"),
+                "sleeper": parts.get(rungs["sleeper"]),
+                "espn": parts.get(rungs["espn"]),
                 "blend": prior_blend(parts, kinds, priors, split) if parts else None,
                 "weights": f.get("base", f.get("mu")),
                 "form": f.get("mu"),
@@ -117,12 +123,13 @@ def _summ(xs: list[float]) -> dict:
     return {"mean": m, "margin": margin(se, len(xs)), "weeks": len(xs)}
 
 
-def aggregate(weeks: dict[int, dict[str, dict]]) -> dict:
+def aggregate(weeks: dict[int, dict[str, dict]], positions: tuple[str, ...] = IDP_SLOTS) -> dict:
     """Across weeks: per position and for all positions together (a week's three positions averaged first, so
     the week is the unit), each rung's rank skill, its paired difference with Sleeper alone, and its lifts;
-    and the Tuesday vs kickoff pick lift on live weeks."""
+    and the Tuesday vs kickoff pick lift on live weeks. "all" is always DL, LB and DB and nothing else:
+    kickers are aggregated in a call of their own (`positions=("K",)`), whose "all" is not used."""
     out = {}
-    for scope in (*IDP_SLOTS, "all"):
+    for scope in (*positions, "all"):
         slots = IDP_SLOTS if scope == "all" else (scope,)
         rows = []
         for key, label in LADDER:

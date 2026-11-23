@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-21T14:11:54-05:00",
+ "fetched_at": "2026-11-22T20:40:08-05:00",
  "leg": 11,
  "schema_version": 1,
  "transactions": [
@@ -35,6 +35,38 @@
    "status": "complete",
    "status_updated": 1795039952561,
    "transaction_id": "1428904762975203330",
+   "type": "free_agent"
+  },
+  {
+   "adds": null,
+   "bid": null,
+   "created": 1795290920654,
+   "drops": {
+    "7694": 8
+   },
+   "leg": 11,
+   "roster_ids": [
+    8
+   ],
+   "status": "complete",
+   "status_updated": 1795290920654,
+   "transaction_id": "1429957399451557888",
+   "type": "free_agent"
+  },
+  {
+   "adds": {
+    "6901": 11
+   },
+   "bid": null,
+   "created": 1795391559625,
+   "drops": null,
+   "leg": 11,
+   "roster_ids": [
+    11
+   ],
+   "status": "complete",
+   "status_updated": 1795391559625,
+   "transaction_id": "1430379509885960192",
    "type": "free_agent"
   }
  ]

@@ -122,6 +122,7 @@ def run(
     start = clock()
     used: Counter[str] = Counter()
     done: dict[str, list[int]] = {}
+    pages = {} if pages is None else pages  # one memo for the whole run: fp_dst and fp_def share each dst.php
     for name, (module, _kind) in sources.items():
         scfg = (cfg.get("sources") or {}).get(name) or {}
         if only and name != only:
@@ -157,7 +158,7 @@ def run(
                                (matchers or {}).get(group, matcher if group == "idp" else None),
                                imputer_for(cfg, priors, data_dir, season, w, mine) if group == "idp" else None,
                                archive=True, kickoff_of=week_kickoffs(sched, mine, w),
-                               pages=pages if pages is not None else {})  # fmt: skip
+                               pages=pages)  # fmt: skip
             try:
                 res = module.fetch(ctx)
                 why = None if res.ok else res.status + (f" ({res.error})" if res.error else "")

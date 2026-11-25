@@ -605,23 +605,27 @@ def league_slots(roster_positions: list | None, on: dict[str, bool]) -> tuple[st
 
 
 def scoring_differences(sc_a: dict, sc_b: dict, groups: set[str], lines: list[dict]) -> list[str]:
-    """The scoring keys two leagues score differently among those a group's lines can carry: every key of
-    `lines` and every key `GROUP_KEYS` names for `groups`. Empty: the shared consensus is in both leagues'
-    points (D26)."""
+    """The scoring keys two leagues score differently among those a group's projected lines can carry: every
+    key of `lines` and every key `GROUP_KEYS` names for `groups`. Empty: the shared consensus is in both
+    leagues' points (D26). Results are not part of it: each league scores its own players' results in its own
+    points (a kicker's rare forced fumble on a return, `idp_ff`, is worth 3 in SADL and 0 in Crooked)."""
     prefixes = tuple(x for g in groups for x in GROUP_KEYS.get(g, ()))
     keys = {k for line in lines for k in line} | {k for k in {*sc_a, *sc_b} if k.startswith(prefixes)}
     return sorted(k for k in keys if scoring.num(sc_a.get(k)) != scoring.num(sc_b.get(k)))
 
 
 def extra_league(sleeper: Sleeper, cfg: dict, key: str, table: dict, data_dir: Path, season: int, week: int,
-                 on: dict[str, bool], sc: dict, source_rows: dict, live_stats, tracked: dict,
-                 ) -> tuple[LeagueView | None, str | None]:  # fmt: skip
+                 on: dict[str, bool], sc: dict, source_rows: dict,
+                 primary_user_id: str | None = None) -> tuple[LeagueView | None, str | None]:  # fmt: skip
     """An extra league's view (D26), or (None, why) when it isn't rendered this sync: its season is over, it
-    starts none of the tracked slots, or it scores their lines differently from the primary league (the
-    shared consensus would be in the wrong points; a per-league consensus is future work)."""
+    starts none of the tracked slots, or it scores their projected lines differently from the primary league
+    (the shared consensus would be in the wrong points; a per-league consensus is future work). The check reads
+    the week's projections only, so its verdict holds for the whole week. A table with no `username` of its
+    own is the primary league's user, whose id the sync already has."""
     base = data_dir / "leagues" / key
-    cached = storage.read_json(base / str(season) / "league.json", {})
-    league, user_id = resolve_league(sleeper, cfg, season, cached.get("user_id"), table=table)
+    cached = storage.read_json(base / str(season) / "league.json", {}).get("user_id")
+    fallback = cached or (None if "username" in table else primary_user_id)
+    league, user_id = resolve_league(sleeper, cfg, season, fallback, table=table)
     settings = league.get("settings") or {}
     if league.get("status") == "complete":
         return None, "league is complete"
@@ -633,13 +637,6 @@ def extra_league(sleeper: Sleeper, cfg: dict, key: str, table: dict, data_dir: P
     groups = {group_of(s) for s in slots}
     lines = [r.get("stats") or {} for name, rows in source_rows.items() if registry.group_of_source(name) in groups
              for r in (rows or {}).values() if isinstance(r, dict)]  # fmt: skip
-    lines += [
-        ln
-        for pid, ln in (live_stats or {}).items()
-        if isinstance(ln, dict)
-        and group_of(slot_of(tracked.get(str(pid)) or {})) in groups
-        and slot_of(tracked.get(str(pid)) or {})
-    ]
     differ = scoring_differences(sc, league.get("scoring_settings") or {}, groups, lines)
     if differ:
         return None, f"its scoring differs from the primary league's on {', '.join(differ[:6])}"
@@ -1136,8 +1133,9 @@ def run_sync(
                 live_warnings.append(
                     f"Live scores unavailable this sync ({stats_err}); games already played show no score."
                 )
-            shared["live"] = (live_stats, live_results(live_stats, started, sc, status_of, now), live_warnings)
-        live_stats, results, live_warnings = shared["live"]
+            shared["live"] = (live_stats, started, live_warnings)
+        live_stats, started, live_warnings = shared["live"]
+        results = live_results(live_stats, started, lg.sc, status_of, now)  # in the league's own points (D26)
         page_warnings.extend(live_warnings)
 
         def was_playable(pid: str) -> bool:
@@ -1271,7 +1269,7 @@ def run_sync(
         page_warnings.extend(shared["backfill_warnings"])
 
         recap = _guard("last week's results",
-                       lambda: last_week_recap(data_dir, season, week, sched, sc, players, league_dir=lg.base,
+                       lambda: last_week_recap(data_dir, season, week, sched, lg.sc, players, league_dir=lg.base,
                                                idp=any(s in IDP_SLOTS for s in page_slots)),
                        None, page_warnings, log)  # fmt: skip
 
@@ -1370,7 +1368,7 @@ def run_sync(
             continue
         try:
             view, why = extra_league(sleeper, cfg, key, table, data_dir, season, week, on, sc, source_rows,
-                                     live_stats, tracked)  # fmt: skip
+                                     user_id)  # fmt: skip
             if view is None:
                 extra[key] = {"status": "skipped", "reason": why}
                 log(f"sync: league {key} skipped: {why}")

@@ -7,10 +7,11 @@ is DEF are kept. A DEF's Sleeper id is its team code ("KC"), so nothing needs ma
 
 The line is stored as published. Sleeper projects a numeric `pts_allow` and sets the one-hot `pts_allow_<tier>`
 key of the tier that number falls in, so the league's points-allowed tiers score the tier of the projected mean
-(Sleeper's own `pts_*` totals leave the tier out; they are dropped, like `adp_*`). Whether the expected tier
+(Sleeper's own `pts_*` totals are dropped, like `adp_*`: they don't always count the tier). Whether the expected tier
 points (a spread of points allowed instead of one tier) rank defenses better is registered test T1
-(`docs/status.md` §8); until it passes, nothing is derived. The universe is complete for DEF: a team with a
-game and no row is listed as "no projection" by the zero-fill rule, and a team on bye has no row at all.
+(`docs/status.md` §8; run 2026-11-25, it did not pass), so nothing is derived. The universe is complete for DEF:
+a team with a game and no row counts as 0 under the zero-fill rule (§6.4; never seen in 48 weeks of Sleeper's
+DEF responses, which list every team with a game), and a team on bye has no row and no game.
 """
 
 from __future__ import annotations

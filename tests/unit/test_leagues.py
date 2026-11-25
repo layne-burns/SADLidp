@@ -174,3 +174,54 @@ def test_the_site_gets_a_folder_and_a_switcher_per_league(worlds, tmp_path):
     build_all(tmp / "one", alone, CFG_TWO)
     assert (alone / "index.html").read_bytes() == (one / "index.html").read_bytes()
     assert not (alone / "crooked").exists()
+
+
+def test_a_results_only_key_never_stops_the_second_league_and_is_scored_its_way(tmp_path):
+    """The scoring check reads the week's projections only, so a kicker's forced fumble on a return (`idp_ff`:
+    3 in SADL, 0 in Crooked) can't switch the league off mid-week; each league scores the result its own way."""
+    from test_kickers_isolation import DAL_K
+
+    crooked = {**CROOKED, "scoring_settings": {**CROOKED["scoring_settings"]}}
+    sadl_ff = json.loads((FIXTURES / "sleeper_league.json").read_text())["scoring_settings"]["idp_ff"]
+    assert sadl_ff and not crooked["scoring_settings"].get("idp_ff")
+    line = {"gp": 1.0, "fgm_yds": 40.0, "xpm": 2.0, "idp_ff": 1.0}
+    stats5 = {f"{V1}/stats/nfl/regular/2026/5": {DAL_K: line}}
+    data, cache = tmp_path / "data", tmp_path / "cache"
+    outs = [run_sync(CFG_TWO, data, cache, now, force=force, client=DefClient(def_routes(**stats5)), log=lambda m: None)
+            for now, force in ((NOW, False), (TNF, True))]  # fmt: skip
+    assert [o.leagues["crooked"]["status"] for o in outs] == ["rendered", "rendered"]
+    page = json.loads((data / "leagues" / "crooked" / "2026" / "week05" / "consensus.json").read_text())
+    sadl = json.loads((data / "2026" / "week05" / "consensus.json").read_text())
+
+    def played(d):
+        return {p["id"]: (p.get("result") or {}).get("pts") for p in d["positions"]["K"]["played"]}
+
+    assert played(page)[DAL_K] == 6.0  # 0.1 · 40 yards + 2 extra points, no forced fumble in Crooked
+    sadl_pts = played(sadl).get(DAL_K)  # (rostered in SADL: if listed, it is in SADL's points)
+    assert sadl_pts in (None, 6.0 + sadl_ff)
+
+
+def test_the_second_league_finds_its_user_through_the_first(tmp_path):
+    data, cache = tmp_path / "data", tmp_path / "cache"
+    run_sync(CFG_ONE, data, cache, NOW, client=DefClient(def_routes()), log=lambda m: None)  # SADL knows the user
+    down = def_routes(**{f"{V1}/user/lbburnsy": 503})
+    out = run_sync(CFG_TWO, data, cache, TNF, force=True, client=DefClient(down), log=lambda m: None)
+    assert out.synced and out.leagues["crooked"]["status"] == "rendered"
+
+
+def test_a_manual_backfill_reads_each_dst_page_once(tmp_path):
+    from datetime import UTC, datetime
+
+    from test_sync_site import FakeClient
+
+    from sadlidp import backfill
+    from sadlidp.sources import fp_def, fp_dst
+
+    page = (FIXTURES / "fp_dst_week12_trimmed.html").read_text().replace('"week": "12"', '"week": "3"')
+    client = FakeClient({"https://www.fantasypros.com/nfl/rankings/dst.php": page})
+    players = {t: defense(t) for t in ("MIN", "JAX", "DEN", "TB")}
+    cfg = {**CFG, "backfill": {"budget_s": 60, "max_requests": 40}}
+    done = backfill.run({"fp_dst": (fp_dst, "signal"), "fp_def": (fp_def, "rank")}, cfg, tmp_path, 2026, [3],
+                        datetime(2026, 11, 25, tzinfo=UTC), client=client, sleeper=None, players=players,
+                        sched=SCHED)  # fmt: skip
+    assert done == {"fp_dst": [3], "fp_def": [3]} and len(client.calls) == 1

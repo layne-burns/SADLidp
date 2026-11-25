@@ -5,6 +5,21 @@
  "alpha_n": 10,
  "alpha_se": 0.1303,
  "computed_at": "2026-11-24T18:52:47-05:00",
+ "defenses": {
+  "alpha": 0.6,
+  "alpha_hat": null,
+  "alpha_n": 0,
+  "computed_at": "2026-11-25T15:29:48-05:00",
+  "from_weeks": [],
+  "k": 4.0,
+  "method": "prior",
+  "prior_split": 0.6,
+  "priors": {
+   "fp_def": 2.0
+  },
+  "reason": "0 evaluated week(s); data weights start at 3",
+  "sources": {}
+ },
  "from_weeks": [
   1,
   2,

@@ -1,0 +1,5271 @@
+{
+ "generated_at": "2026-11-25T15:13:20-05:00",
+ "kicker": {
+  "one_point_edge": 0.555,
+  "sigma_out": 5.0,
+  "swing": 5.15
+ },
+ "last_week": null,
+ "league": {
+  "limits": {},
+  "name": "Kusch's Crooked League",
+  "waiver_type": "FAAB"
+ },
+ "my_idps": {
+  "DEF": {
+   "byes": [],
+   "count": 2,
+   "limit": null,
+   "names": {
+    "KC": "Kansas City Chiefs",
+    "MIN": "Minnesota Vikings"
+   },
+   "open_spots": 0,
+   "played_suggestions": [],
+   "played_suggestions_hidden": 0,
+   "players": [
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "est": false,
+      "mu": 5.69,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 5.61,
+        "share": 0.6,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "pts allowed",
+          24.5,
+          false
+         ],
+         [
+          "sack",
+          2.05,
+          false
+         ],
+         [
+          "INT",
+          0.57,
+          false
+         ],
+         [
+          "FR",
+          0.43,
+          false
+         ],
+         [
+          "FF",
+          0.62,
+          false
+         ],
+         [
+          "TD",
+          0.14,
+          false
+         ],
+         [
+          "blocked kick",
+          0.05,
+          false
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "DEF",
+        "pts": 5.82,
+        "rank": 22,
+        "share": 0.4,
+        "source": "FantasyPros",
+        "stats": [],
+        "zero": false
+       }
+      ]
+     },
+     "ceiling": null,
+     "flags": [],
+     "floor": null,
+     "id": "KC",
+     "kickoff": "2026-11-26T20:20:00-05:00",
+     "late": false,
+     "max": 5.82,
+     "min": 5.61,
+     "mine": true,
+     "mu": 5.69,
+     "n": 2,
+     "name": "Kansas City Chiefs",
+     "opp": "@BUF",
+     "reserve": false,
+     "result": null,
+     "role": "other",
+     "sigma": 0.82,
+     "slot": "DEF",
+     "swing": null,
+     "taxi": false,
+     "team": "KC",
+     "tier": 2,
+     "unavailable": []
+    },
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "est": false,
+      "mu": 8.98,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 8.8,
+        "share": 0.6,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "pts allowed",
+          17.25,
+          false
+         ],
+         [
+          "sack",
+          2.76,
+          false
+         ],
+         [
+          "INT",
+          0.82,
+          false
+         ],
+         [
+          "FR",
+          0.63,
+          false
+         ],
+         [
+          "FF",
+          0.88,
+          false
+         ],
+         [
+          "TD",
+          0.13,
+          false
+         ],
+         [
+          "blocked kick",
+          0.06,
+          false
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "DEF",
+        "pts": 9.26,
+        "rank": 1,
+        "share": 0.4,
+        "source": "FantasyPros",
+        "stats": [],
+        "zero": false
+       }
+      ]
+     },
+     "ceiling": null,
+     "flags": [],
+     "floor": null,
+     "id": "MIN",
+     "kickoff": "2026-11-29T13:00:00-05:00",
+     "late": false,
+     "max": 9.26,
+     "min": 8.8,
+     "mine": true,
+     "mu": 8.98,
+     "n": 2,
+     "name": "Minnesota Vikings",
+     "opp": "ATL",
+     "reserve": false,
+     "result": null,
+     "role": "starter",
+     "sigma": 0.83,
+     "slot": "DEF",
+     "swing": null,
+     "taxi": false,
+     "team": "MIN",
+     "tier": "above",
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": [
+    {
+     "action": "add_drop",
+     "badge": "UPGRADE",
+     "drop": "KC",
+     "others": [
+      "New England Patriots"
+     ],
+     "over": "KC",
+     "p": 0.61,
+     "player": {
+      "also": [],
+      "badge": null,
+      "breakdown": {
+       "est": false,
+       "mu": 7.97,
+       "parts": [
+        {
+         "kind": "projection",
+         "late": false,
+         "pts": 7.99,
+         "share": 0.6,
+         "source": "Sleeper",
+         "stats": [
+          [
+           "pts allowed",
+           18.5,
+           false
+          ],
+          [
+           "sack",
+           3.0,
+           false
+          ],
+          [
+           "INT",
+           0.62,
+           false
+          ],
+          [
+           "FR",
+           0.62,
+           false
+          ],
+          [
+           "FF",
+           0.79,
+           false
+          ],
+          [
+           "TD",
+           0.09,
+           false
+          ],
+          [
+           "blocked kick",
+           0.09,
+           false
+          ]
+         ],
+         "zero": false
+        },
+        {
+         "censored": false,
+         "kind": "rank",
+         "late": false,
+         "list": "DEF",
+         "pts": 7.94,
+         "rank": 10,
+         "share": 0.4,
+         "source": "FantasyPros",
+         "stats": [],
+         "zero": false
+        }
+       ]
+      },
+      "ceiling": null,
+      "flags": [],
+      "floor": null,
+      "id": "NYJ",
+      "kickoff": "2026-11-29T13:00:00-05:00",
+      "late": false,
+      "max": 7.99,
+      "min": 7.94,
+      "mine": false,
+      "mu": 7.97,
+      "n": 2,
+      "name": "New York Jets",
+      "opp": "@MIA",
+      "result": null,
+      "sigma": 0.82,
+      "slot": "DEF",
+      "swing": null,
+      "team": "NYJ",
+      "tier": null,
+      "unavailable": []
+     },
+     "reference": false,
+     "why": []
+    }
+   ]
+  },
+  "K": {
+   "byes": [],
+   "count": 1,
+   "limit": null,
+   "names": {
+    "2020": "Cairo Santos"
+   },
+   "open_spots": 0,
+   "played_suggestions": [],
+   "played_suggestions_hidden": 0,
+   "players": [
+    {
+     "also": [],
+     "badge": null,
+     "breakdown": {
+      "est": true,
+      "mu": 9.01,
+      "parts": [
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 8.72,
+        "share": 0.2,
+        "source": "Sleeper",
+        "stats": [
+         [
+          "FG yards",
+          65.66,
+          false
+         ],
+         [
+          "XP",
+          2.6,
+          false
+         ],
+         [
+          "missed FG",
+          0.32,
+          true
+         ],
+         [
+          "missed XP",
+          0.13,
+          false
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 9.12,
+        "share": 0.2,
+        "source": "ESPN",
+        "stats": [
+         [
+          "FG yards",
+          70.55,
+          false
+         ],
+         [
+          "XP",
+          2.5,
+          false
+         ],
+         [
+          "missed FG",
+          0.32,
+          false
+         ],
+         [
+          "missed XP",
+          0.11,
+          false
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "kind": "projection",
+        "late": false,
+        "pts": 8.42,
+        "share": 0.2,
+        "source": "CBS",
+        "stats": [
+         [
+          "FG yards",
+          63.19,
+          true
+         ],
+         [
+          "XP",
+          2.5,
+          false
+         ],
+         [
+          "missed FG",
+          0.3,
+          true
+         ],
+         [
+          "missed XP",
+          0.1,
+          true
+         ]
+        ],
+        "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "K",
+        "pts": 9.58,
+        "rank": 10,
+        "share": 0.2,
+        "source": "FantasyPros",
+        "stats": [],
+        "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "K",
+        "pts": 8.71,
+        "rank": 15,
+        "share": 0.1,
+        "source": "FantasyData",
+        "stats": [],
+        "zero": false
+       },
+       {
+        "censored": false,
+        "kind": "rank",
+        "late": false,
+        "list": "K",
+        "pts": 9.67,
+        "rank": 6,
+        "share": 0.1,
+        "source": "RotoBaller",
+        "stats": [],
+        "zero": false
+       }
+      ]
+     },
+     "ceiling": 13.5,
+     "flags": [],
+     "floor": 4.5,
+     "id": "2020",
+     "kickoff": "2026-11-26T13:00:00-05:00",
+     "late": false,
+     "max": 9.67,
+     "min": 8.42,
+     "mine": true,
+     "mu": 9.01,
+     "n": 6,
+     "name": "Cairo Santos",
+     "opp": "@DET",
+     "reserve": false,
+     "result": null,
+     "role": "starter",
+     "sigma": 0.75,
+     "slot": "K",
+     "swing": 5.17,
+     "taxi": false,
+     "team": "CHI",
+     "tier": 1,
+     "unavailable": []
+    }
+   ],
+   "starter_locked": false,
+   "suggestions": []
+  }
+ },
+ "positions": {
+  "DEF": {
+   "hidden": 0,
+   "no_projection": 0,
+   "played": [],
+   "played_hidden": 0,
+   "since_tuesday": null,
+   "tier_count": 5,
+   "tiers": [
+    {
+     "anchor_mu": 7.97,
+     "players": [
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "KC",
+        "over": "KC",
+        "p": 0.61,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "est": false,
+        "mu": 7.97,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.99,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            18.5,
+            false
+           ],
+           [
+            "sack",
+            3.0,
+            false
+           ],
+           [
+            "INT",
+            0.62,
+            false
+           ],
+           [
+            "FR",
+            0.62,
+            false
+           ],
+           [
+            "FF",
+            0.79,
+            false
+           ],
+           [
+            "TD",
+            0.09,
+            false
+           ],
+           [
+            "blocked kick",
+            0.09,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 7.94,
+          "rank": 10,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "NYJ",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 7.99,
+       "min": 7.94,
+       "mine": false,
+       "mu": 7.97,
+       "n": 2,
+       "name": "New York Jets",
+       "opp": "@MIA",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "NYJ",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": {
+        "action": "add_drop",
+        "badge": "UPGRADE",
+        "drop": "KC",
+        "over": "KC",
+        "p": 0.601,
+        "reference": false,
+        "why": []
+       },
+       "breakdown": {
+        "est": false,
+        "mu": 7.78,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.95,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            18.25,
+            false
+           ],
+           [
+            "sack",
+            2.45,
+            false
+           ],
+           [
+            "INT",
+            0.73,
+            false
+           ],
+           [
+            "FR",
+            0.56,
+            false
+           ],
+           [
+            "FF",
+            0.78,
+            false
+           ],
+           [
+            "TD",
+            0.11,
+            false
+           ],
+           [
+            "blocked kick",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 7.52,
+          "rank": 13,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "NE",
+       "kickoff": "2026-11-29T16:05:00-05:00",
+       "late": false,
+       "max": 7.95,
+       "min": 7.52,
+       "mine": false,
+       "mu": 7.78,
+       "n": 2,
+       "name": "New England Patriots",
+       "opp": "@LAC",
+       "result": null,
+       "sigma": 0.83,
+       "slot": "DEF",
+       "swing": null,
+       "team": "NE",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 7.67,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.52,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            17.25,
+            false
+           ],
+           [
+            "sack",
+            2.73,
+            false
+           ],
+           [
+            "INT",
+            0.78,
+            false
+           ],
+           [
+            "FR",
+            0.59,
+            false
+           ],
+           [
+            "FF",
+            0.13,
+            false
+           ],
+           [
+            "TD",
+            0.13,
+            false
+           ],
+           [
+            "blocked kick",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 7.9,
+          "rank": 11,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "LAC",
+       "kickoff": "2026-11-29T16:05:00-05:00",
+       "late": false,
+       "max": 7.9,
+       "min": 7.52,
+       "mine": false,
+       "mu": 7.67,
+       "n": 2,
+       "name": "Los Angeles Chargers",
+       "opp": "NE",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "LAC",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 7.16,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.9,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            19.75,
+            false
+           ],
+           [
+            "sack",
+            2.71,
+            false
+           ],
+           [
+            "INT",
+            0.77,
+            false
+           ],
+           [
+            "FR",
+            0.58,
+            false
+           ],
+           [
+            "FF",
+            0.65,
+            false
+           ],
+           [
+            "TD",
+            0.06,
+            false
+           ],
+           [
+            "blocked kick",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 6.06,
+          "rank": 18,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "DAL",
+       "kickoff": "2026-11-26T16:30:00-05:00",
+       "late": false,
+       "max": 7.9,
+       "min": 6.06,
+       "mine": false,
+       "mu": 7.16,
+       "n": 2,
+       "name": "Dallas Cowboys",
+       "opp": "PHI",
+       "result": null,
+       "sigma": 0.97,
+       "slot": "DEF",
+       "swing": null,
+       "team": "DAL",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 6.16,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 6.16,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.16,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            22.5,
+            false
+           ],
+           [
+            "sack",
+            2.53,
+            false
+           ],
+           [
+            "INT",
+            0.61,
+            false
+           ],
+           [
+            "FR",
+            0.54,
+            false
+           ],
+           [
+            "FF",
+            0.69,
+            false
+           ],
+           [
+            "TD",
+            0.08,
+            false
+           ],
+           [
+            "blocked kick",
+            0.08,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 6.16,
+          "rank": 17,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "LV",
+       "kickoff": "2026-11-29T20:20:00-05:00",
+       "late": false,
+       "max": 6.16,
+       "min": 6.16,
+       "mine": false,
+       "mu": 6.16,
+       "n": 2,
+       "name": "Las Vegas Raiders",
+       "opp": "@CLE",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "LV",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.87,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.87,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            22.0,
+            false
+           ],
+           [
+            "sack",
+            2.18,
+            false
+           ],
+           [
+            "INT",
+            0.65,
+            false
+           ],
+           [
+            "FR",
+            0.49,
+            false
+           ],
+           [
+            "FF",
+            0.65,
+            false
+           ],
+           [
+            "TD",
+            0.11,
+            false
+           ],
+           [
+            "blocked kick",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.86,
+          "rank": 21,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "BUF",
+       "kickoff": "2026-11-26T20:20:00-05:00",
+       "late": false,
+       "max": 5.87,
+       "min": 5.86,
+       "mine": false,
+       "mu": 5.87,
+       "n": 2,
+       "name": "Buffalo Bills",
+       "opp": "KC",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "BUF",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.64,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.82,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            24.0,
+            false
+           ],
+           [
+            "sack",
+            2.18,
+            false
+           ],
+           [
+            "INT",
+            0.65,
+            false
+           ],
+           [
+            "FR",
+            0.49,
+            false
+           ],
+           [
+            "FF",
+            0.6,
+            false
+           ],
+           [
+            "TD",
+            0.11,
+            false
+           ],
+           [
+            "blocked kick",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.38,
+          "rank": 27,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "IND",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 5.82,
+       "min": 5.38,
+       "mine": false,
+       "mu": 5.64,
+       "n": 2,
+       "name": "Indianapolis Colts",
+       "opp": "NYG",
+       "result": null,
+       "sigma": 0.83,
+       "slot": "DEF",
+       "swing": null,
+       "team": "IND",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.54,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.38,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            22.0,
+            false
+           ],
+           [
+            "sack",
+            2.37,
+            false
+           ],
+           [
+            "INT",
+            0.49,
+            false
+           ],
+           [
+            "FR",
+            0.42,
+            false
+           ],
+           [
+            "FF",
+            0.63,
+            false
+           ],
+           [
+            "TD",
+            0.07,
+            false
+           ],
+           [
+            "blocked kick",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.79,
+          "rank": 23,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "MIA",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 5.79,
+       "min": 5.38,
+       "mine": false,
+       "mu": 5.54,
+       "n": 2,
+       "name": "Miami Dolphins",
+       "opp": "NYJ",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "MIA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.49,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.49,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            24.25,
+            false
+           ],
+           [
+            "sack",
+            2.11,
+            false
+           ],
+           [
+            "INT",
+            0.57,
+            false
+           ],
+           [
+            "FR",
+            0.46,
+            false
+           ],
+           [
+            "FF",
+            0.62,
+            false
+           ],
+           [
+            "TD",
+            0.1,
+            false
+           ],
+           [
+            "blocked kick",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.49,
+          "rank": 26,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "ATL",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 5.49,
+       "min": 5.49,
+       "mine": false,
+       "mu": 5.49,
+       "n": 2,
+       "name": "Atlanta Falcons",
+       "opp": "@MIN",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "ATL",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.38,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.54,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            27.25,
+            false
+           ],
+           [
+            "sack",
+            1.97,
+            false
+           ],
+           [
+            "INT",
+            0.61,
+            false
+           ],
+           [
+            "FR",
+            0.44,
+            false
+           ],
+           [
+            "FF",
+            0.61,
+            false
+           ],
+           [
+            "TD",
+            0.13,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.14,
+          "rank": 28,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "BAL",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 5.54,
+       "min": 5.14,
+       "mine": false,
+       "mu": 5.38,
+       "n": 2,
+       "name": "Baltimore Ravens",
+       "opp": "@HOU",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "BAL",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 5.03,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 5.03,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 4.69,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            28.25,
+            false
+           ],
+           [
+            "sack",
+            1.97,
+            false
+           ],
+           [
+            "INT",
+            0.61,
+            false
+           ],
+           [
+            "FR",
+            0.52,
+            false
+           ],
+           [
+            "FF",
+            0.52,
+            false
+           ],
+           [
+            "TD",
+            0.09,
+            false
+           ],
+           [
+            "blocked kick",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 5.54,
+          "rank": 25,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "DET",
+       "kickoff": "2026-11-26T13:00:00-05:00",
+       "late": false,
+       "max": 5.54,
+       "min": 4.69,
+       "mine": false,
+       "mu": 5.03,
+       "n": 2,
+       "name": "Detroit Lions",
+       "opp": "CHI",
+       "result": null,
+       "sigma": 0.85,
+       "slot": "DEF",
+       "swing": null,
+       "team": "DET",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 4.65,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 5.14,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            24.25,
+            false
+           ],
+           [
+            "sack",
+            2.17,
+            false
+           ],
+           [
+            "INT",
+            0.51,
+            false
+           ],
+           [
+            "FR",
+            0.45,
+            false
+           ],
+           [
+            "FF",
+            0.57,
+            false
+           ],
+           [
+            "TD",
+            0.06,
+            false
+           ],
+           [
+            "blocked kick",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 3.92,
+          "rank": 30,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "ARI",
+       "kickoff": "2026-11-29T16:25:00-05:00",
+       "late": false,
+       "max": 5.14,
+       "min": 3.92,
+       "mine": false,
+       "mu": 4.65,
+       "n": 2,
+       "name": "Arizona Cardinals",
+       "opp": "WAS",
+       "result": null,
+       "sigma": 0.89,
+       "slot": "DEF",
+       "swing": null,
+       "team": "ARI",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 4.07,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 4.07,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.66,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            30.0,
+            false
+           ],
+           [
+            "sack",
+            1.96,
+            false
+           ],
+           [
+            "INT",
+            0.5,
+            false
+           ],
+           [
+            "FR",
+            0.4,
+            false
+           ],
+           [
+            "FF",
+            0.5,
+            false
+           ],
+           [
+            "blocked kick",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 4.69,
+          "rank": 29,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "NO",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 4.69,
+       "min": 3.66,
+       "mine": false,
+       "mu": 4.07,
+       "n": 2,
+       "name": "New Orleans Saints",
+       "opp": "@CIN",
+       "result": null,
+       "sigma": 0.87,
+       "slot": "DEF",
+       "swing": null,
+       "team": "NO",
+       "tier": 4,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 3.82,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 3.92,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            28.25,
+            false
+           ],
+           [
+            "sack",
+            1.64,
+            false
+           ],
+           [
+            "INT",
+            0.53,
+            false
+           ],
+           [
+            "FR",
+            0.36,
+            false
+           ],
+           [
+            "FF",
+            0.5,
+            false
+           ],
+           [
+            "TD",
+            0.14,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 3.66,
+          "rank": 31,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "PHI",
+       "kickoff": "2026-11-26T16:30:00-05:00",
+       "late": false,
+       "max": 3.92,
+       "min": 3.66,
+       "mine": false,
+       "mu": 3.82,
+       "n": 2,
+       "name": "Philadelphia Eagles",
+       "opp": "@DAL",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "PHI",
+       "tier": 4,
+       "unavailable": []
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 2.65,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 2.65,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 2.65,
+          "share": 0.6,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "pts allowed",
+            31.5,
+            false
+           ],
+           [
+            "sack",
+            1.47,
+            false
+           ],
+           [
+            "INT",
+            0.4,
+            false
+           ],
+           [
+            "FR",
+            0.31,
+            false
+           ],
+           [
+            "FF",
+            0.44,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "DEF",
+          "pts": 2.65,
+          "rank": 32,
+          "share": 0.4,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "TEN",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 2.65,
+       "min": 2.65,
+       "mine": false,
+       "mu": 2.65,
+       "n": 2,
+       "name": "Tennessee Titans",
+       "opp": "@JAX",
+       "result": null,
+       "sigma": 0.82,
+       "slot": "DEF",
+       "swing": null,
+       "team": "TEN",
+       "tier": 5,
+       "unavailable": []
+      }
+     ],
+     "tier": 5
+    }
+   ]
+  },
+  "K": {
+   "hidden": 0,
+   "no_projection": 3,
+   "played": [],
+   "played_hidden": 0,
+   "since_tuesday": null,
+   "tier_count": 5,
+   "tiers": [
+    {
+     "anchor_mu": 9.61,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 9.61,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.25,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            71.25,
+            false
+           ],
+           [
+            "XP",
+            2.68,
+            false
+           ],
+           [
+            "missed FG",
+            0.42,
+            true
+           ],
+           [
+            "missed XP",
+            0.14,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.6,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            84.75,
+            false
+           ],
+           [
+            "XP",
+            2.53,
+            false
+           ],
+           [
+            "missed FG",
+            0.34,
+            false
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.17,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            72.71,
+            true
+           ],
+           [
+            "XP",
+            2.6,
+            false
+           ],
+           [
+            "missed FG",
+            0.4,
+            true
+           ],
+           [
+            "missed XP",
+            0.3,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.5,
+          "rank": 11,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.66,
+          "rank": 7,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.37,
+          "rank": 12,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 14.3,
+       "flags": [],
+       "floor": 4.8,
+       "id": "13968",
+       "kickoff": "2026-11-29T16:25:00-05:00",
+       "late": false,
+       "max": 10.6,
+       "min": 9.17,
+       "mine": false,
+       "mu": 9.61,
+       "n": 6,
+       "name": "Drew Stevens",
+       "opp": "@ARI",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 5.43,
+       "team": "WAS",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 9.48,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.79,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            63.93,
+            false
+           ],
+           [
+            "XP",
+            2.85,
+            false
+           ],
+           [
+            "missed FG",
+            0.32,
+            true
+           ],
+           [
+            "missed XP",
+            0.13,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.86,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            73.91,
+            false
+           ],
+           [
+            "XP",
+            2.87,
+            false
+           ],
+           [
+            "missed FG",
+            0.31,
+            false
+           ],
+           [
+            "missed XP",
+            0.09,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 10.07,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            72.71,
+            true
+           ],
+           [
+            "XP",
+            3.1,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.14,
+          "rank": 13,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.37,
+          "rank": 12,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.66,
+          "rank": 7,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 14.1,
+       "flags": [],
+       "floor": 4.8,
+       "id": "11539",
+       "kickoff": "2026-11-26T13:00:00-05:00",
+       "late": false,
+       "max": 10.07,
+       "min": 8.79,
+       "mine": false,
+       "mu": 9.48,
+       "n": 6,
+       "name": "Jake Bates",
+       "opp": "CHI",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 5.34,
+       "team": "DET",
+       "tier": 1,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 9.32,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.97,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            60.46,
+            false
+           ],
+           [
+            "XP",
+            2.33,
+            false
+           ],
+           [
+            "missed FG",
+            0.34,
+            true
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 11.33,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            88.48,
+            false
+           ],
+           [
+            "XP",
+            2.91,
+            false
+           ],
+           [
+            "missed FG",
+            0.35,
+            false
+           ],
+           [
+            "missed XP",
+            0.08,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.66,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            73.61,
+            true
+           ],
+           [
+            "XP",
+            2.8,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.56,
+          "rank": 16,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.5,
+          "rank": 11,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.71,
+          "rank": 15,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 14.1,
+       "flags": [],
+       "floor": 4.5,
+       "id": "11261",
+       "kickoff": "2026-11-29T20:20:00-05:00",
+       "late": false,
+       "max": 11.33,
+       "min": 7.97,
+       "mine": false,
+       "mu": 9.32,
+       "n": 6,
+       "name": "Andre Szmyt",
+       "opp": "LV",
+       "result": null,
+       "sigma": 1.02,
+       "slot": "K",
+       "swing": 5.46,
+       "team": "CLE",
+       "tier": 1,
+       "unavailable": []
+      }
+     ],
+     "tier": 1
+    },
+    {
+     "anchor_mu": 8.57,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 8.57,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.32,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            58.19,
+            false
+           ],
+           [
+            "XP",
+            1.81,
+            false
+           ],
+           [
+            "missed FG",
+            0.26,
+            true
+           ],
+           [
+            "missed XP",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.85,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            78.3,
+            false
+           ],
+           [
+            "XP",
+            2.32,
+            false
+           ],
+           [
+            "missed FG",
+            0.26,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.52,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            67.22,
+            true
+           ],
+           [
+            "XP",
+            2.0,
+            false
+           ],
+           [
+            "missed FG",
+            0.1,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.48,
+          "rank": 17,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.75,
+          "rank": 14,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.56,
+          "rank": 16,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 13.0,
+       "flags": [],
+       "floor": 4.1,
+       "id": "8259",
+       "kickoff": "2026-11-29T16:05:00-05:00",
+       "late": false,
+       "max": 9.85,
+       "min": 7.32,
+       "mine": false,
+       "mu": 8.57,
+       "n": 6,
+       "name": "Cameron Dicker",
+       "opp": "NE",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 5.13,
+       "team": "LAC",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 8.28,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.34,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            62.72,
+            false
+           ],
+           [
+            "XP",
+            2.49,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.7,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            60.61,
+            false
+           ],
+           [
+            "XP",
+            1.93,
+            false
+           ],
+           [
+            "missed FG",
+            0.24,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.37,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            65.73,
+            true
+           ],
+           [
+            "XP",
+            2.2,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.71,
+          "rank": 15,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.56,
+          "rank": 16,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.97,
+          "rank": 19,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.7,
+       "flags": [],
+       "floor": 3.8,
+       "id": "2747",
+       "kickoff": "2026-11-29T16:25:00-05:00",
+       "late": false,
+       "max": 8.71,
+       "min": 7.7,
+       "mine": false,
+       "mu": 8.28,
+       "n": 6,
+       "name": "Jason Myers",
+       "opp": "@SF",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 5.05,
+       "team": "SEA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 8.22,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.99,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            60.46,
+            false
+           ],
+           [
+            "XP",
+            2.3,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 9.37,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            80.05,
+            false
+           ],
+           [
+            "XP",
+            1.81,
+            false
+           ],
+           [
+            "missed FG",
+            0.37,
+            false
+           ],
+           [
+            "missed XP",
+            0.08,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.78,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            70.81,
+            true
+           ],
+           [
+            "XP",
+            2.3,
+            false
+           ],
+           [
+            "missed FG",
+            0.4,
+            true
+           ],
+           [
+            "missed XP",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.34,
+          "rank": 27,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.14,
+          "rank": 18,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.1,
+          "rank": 30,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.8,
+       "flags": [],
+       "floor": 3.6,
+       "id": "5095",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 9.37,
+       "min": 7.1,
+       "mine": false,
+       "mu": 8.22,
+       "n": 6,
+       "name": "Daniel Carlson",
+       "opp": "NYJ",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 5.28,
+       "team": "MIA",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 8.12,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.4,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            55.78,
+            false
+           ],
+           [
+            "XP",
+            2.21,
+            false
+           ],
+           [
+            "missed FG",
+            0.28,
+            true
+           ],
+           [
+            "missed XP",
+            0.11,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.07,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            66.82,
+            false
+           ],
+           [
+            "XP",
+            1.76,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            false
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.32,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            67.22,
+            true
+           ],
+           [
+            "XP",
+            2.1,
+            false
+           ],
+           [
+            "missed FG",
+            0.4,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.75,
+          "rank": 14,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.97,
+          "rank": 19,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.14,
+          "rank": 18,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.5,
+       "flags": [],
+       "floor": 3.7,
+       "id": "3678",
+       "kickoff": "2026-11-27T15:00:00-05:00",
+       "late": false,
+       "max": 8.75,
+       "min": 7.4,
+       "mine": false,
+       "mu": 8.12,
+       "n": 6,
+       "name": "Wil Lutz",
+       "opp": "@PIT",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.99,
+       "team": "DEN",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.92,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.38,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            66.01,
+            false
+           ],
+           [
+            "XP",
+            2.21,
+            false
+           ],
+           [
+            "missed FG",
+            0.31,
+            true
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.2,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            66.16,
+            false
+           ],
+           [
+            "XP",
+            1.95,
+            false
+           ],
+           [
+            "missed FG",
+            0.29,
+            false
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.34,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            53.36,
+            true
+           ],
+           [
+            "XP",
+            2.2,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.93,
+          "rank": 20,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.89,
+          "rank": 21,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.59,
+          "rank": 25,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.1,
+       "flags": [],
+       "floor": 3.7,
+       "id": "6083",
+       "kickoff": "2026-11-29T20:20:00-05:00",
+       "late": false,
+       "max": 8.38,
+       "min": 7.34,
+       "mine": false,
+       "mu": 7.92,
+       "n": 6,
+       "name": "Matt Gay",
+       "opp": "@CLE",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.81,
+       "team": "LV",
+       "tier": 2,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.8,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.03,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            52.72,
+            false
+           ],
+           [
+            "XP",
+            2.19,
+            false
+           ],
+           [
+            "missed FG",
+            0.37,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.22,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            70.94,
+            false
+           ],
+           [
+            "XP",
+            1.5,
+            false
+           ],
+           [
+            "missed FG",
+            0.32,
+            false
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.43,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            61.29,
+            true
+           ],
+           [
+            "XP",
+            2.6,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.59,
+          "rank": 25,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.66,
+          "rank": 23,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.79,
+          "rank": 22,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.1,
+       "flags": [],
+       "floor": 3.4,
+       "id": "11653",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 8.43,
+       "min": 7.03,
+       "mine": false,
+       "mu": 7.8,
+       "n": 6,
+       "name": "Charlie Smyth",
+       "opp": "@CIN",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.96,
+       "team": "NO",
+       "tier": 2,
+       "unavailable": []
+      }
+     ],
+     "tier": 2
+    },
+    {
+     "anchor_mu": 7.75,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.75,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.62,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            51.35,
+            false
+           ],
+           [
+            "XP",
+            1.82,
+            false
+           ],
+           [
+            "missed FG",
+            0.28,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.42,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            74.74,
+            false
+           ],
+           [
+            "XP",
+            1.26,
+            false
+           ],
+           [
+            "missed FG",
+            0.29,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.93,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            61.29,
+            true
+           ],
+           [
+            "XP",
+            2.0,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.65,
+          "rank": 24,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.79,
+          "rank": 22,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.48,
+          "rank": 17,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 12.0,
+       "flags": [],
+       "floor": 3.4,
+       "id": "6528",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 8.48,
+       "min": 6.62,
+       "mine": false,
+       "mu": 7.75,
+       "n": 6,
+       "name": "Joey Slye",
+       "opp": "@JAX",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.93,
+       "team": "TEN",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.69,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.54,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            58.24,
+            false
+           ],
+           [
+            "XP",
+            2.16,
+            false
+           ],
+           [
+            "missed FG",
+            0.33,
+            true
+           ],
+           [
+            "missed XP",
+            0.11,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.46,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            65.52,
+            false
+           ],
+           [
+            "XP",
+            1.34,
+            false
+           ],
+           [
+            "missed FG",
+            0.35,
+            false
+           ],
+           [
+            "missed XP",
+            0.09,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.37,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            72.71,
+            true
+           ],
+           [
+            "XP",
+            1.8,
+            false
+           ],
+           [
+            "missed FG",
+            0.5,
+            true
+           ],
+           [
+            "missed XP",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.47,
+          "rank": 26,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.59,
+          "rank": 25,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.65,
+          "rank": 24,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.9,
+       "flags": [],
+       "floor": 3.4,
+       "id": "13545",
+       "kickoff": "2026-11-25T20:00:00-05:00",
+       "late": false,
+       "max": 8.37,
+       "min": 7.46,
+       "mine": false,
+       "mu": 7.69,
+       "n": 6,
+       "name": "Trey Smack",
+       "opp": "@LAR",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.89,
+       "team": "GB",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.62,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.56,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            51.0,
+            false
+           ],
+           [
+            "XP",
+            2.83,
+            false
+           ],
+           [
+            "missed FG",
+            0.31,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.28,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            59.28,
+            false
+           ],
+           [
+            "XP",
+            2.8,
+            false
+           ],
+           [
+            "missed FG",
+            0.29,
+            false
+           ],
+           [
+            "missed XP",
+            0.15,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.11,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            46.07,
+            true
+           ],
+           [
+            "XP",
+            2.8,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.66,
+          "rank": 23,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.93,
+          "rank": 20,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.11,
+          "rank": 29,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.6,
+       "flags": [],
+       "floor": 3.6,
+       "id": "1433",
+       "kickoff": "2026-11-25T20:00:00-05:00",
+       "late": false,
+       "max": 8.28,
+       "min": 7.11,
+       "mine": false,
+       "mu": 7.62,
+       "n": 6,
+       "name": "Brandon McManus",
+       "opp": "GB",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.61,
+       "team": "LAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.59,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.03,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            52.86,
+            false
+           ],
+           [
+            "XP",
+            2.1,
+            false
+           ],
+           [
+            "missed FG",
+            0.26,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.51,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            54.39,
+            false
+           ],
+           [
+            "XP",
+            2.57,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            false
+           ],
+           [
+            "missed XP",
+            0.19,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.49,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            56.9,
+            true
+           ],
+           [
+            "XP",
+            2.3,
+            false
+           ],
+           [
+            "missed FG",
+            0.4,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 8.14,
+          "rank": 18,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.65,
+          "rank": 24,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.93,
+          "rank": 20,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.7,
+       "flags": [],
+       "floor": 3.4,
+       "id": "4227",
+       "kickoff": "2026-11-26T20:20:00-05:00",
+       "late": false,
+       "max": 8.14,
+       "min": 7.03,
+       "mine": false,
+       "mu": 7.59,
+       "n": 6,
+       "name": "Harrison Butker",
+       "opp": "@BUF",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.78,
+       "team": "KC",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.49,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.63,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            58.01,
+            false
+           ],
+           [
+            "XP",
+            2.19,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.64,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            60.25,
+            false
+           ],
+           [
+            "XP",
+            1.91,
+            false
+           ],
+           [
+            "missed FG",
+            0.24,
+            false
+           ],
+           [
+            "missed XP",
+            0.05,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.74,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            53.36,
+            true
+           ],
+           [
+            "XP",
+            1.8,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ],
+           [
+            "missed XP",
+            0.2,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.89,
+          "rank": 21,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.47,
+          "rank": 26,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.66,
+          "rank": 23,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.7,
+       "flags": [],
+       "floor": 3.3,
+       "id": "12961",
+       "kickoff": "2026-11-30T20:15:00-05:00",
+       "late": false,
+       "max": 7.89,
+       "min": 6.74,
+       "mine": false,
+       "mu": 7.49,
+       "n": 6,
+       "name": "Ryan Fitzgerald",
+       "opp": "@TB",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.82,
+       "team": "CAR",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.46,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.28,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            61.94,
+            false
+           ],
+           [
+            "XP",
+            2.52,
+            false
+           ],
+           [
+            "missed FG",
+            0.31,
+            true
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.6,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            37.39,
+            false
+           ],
+           [
+            "XP",
+            3.08,
+            false
+           ],
+           [
+            "missed FG",
+            0.14,
+            false
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.4,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            48.02,
+            true
+           ],
+           [
+            "XP",
+            2.2,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.3,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.79,
+          "rank": 22,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.33,
+          "rank": 28,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 9.14,
+          "rank": 13,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.4,
+       "flags": [],
+       "floor": 3.5,
+       "id": "5189",
+       "kickoff": "2026-11-29T16:25:00-05:00",
+       "late": false,
+       "max": 9.14,
+       "min": 6.4,
+       "mine": false,
+       "mu": 7.46,
+       "n": 6,
+       "name": "Eddy Pineiro",
+       "opp": "SEA",
+       "result": null,
+       "sigma": 0.81,
+       "slot": "K",
+       "swing": 4.55,
+       "team": "SF",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.39,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.1,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            55.34,
+            false
+           ],
+           [
+            "XP",
+            1.98,
+            false
+           ],
+           [
+            "missed FG",
+            0.29,
+            true
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.49,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            63.31,
+            false
+           ],
+           [
+            "XP",
+            1.49,
+            false
+           ],
+           [
+            "missed FG",
+            0.28,
+            false
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 8.18,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            64.78,
+            true
+           ],
+           [
+            "XP",
+            2.0,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.11,
+          "rank": 29,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.11,
+          "rank": 29,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.01,
+          "rank": 31,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.6,
+       "flags": [],
+       "floor": 3.1,
+       "id": "10955",
+       "kickoff": "2026-11-29T16:25:00-05:00",
+       "late": false,
+       "max": 8.18,
+       "min": 7.01,
+       "mine": false,
+       "mu": 7.39,
+       "n": 6,
+       "name": "Chad Ryland",
+       "opp": "WAS",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.9,
+       "team": "ARI",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.34,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.85,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            63.89,
+            false
+           ],
+           [
+            "XP",
+            1.84,
+            false
+           ],
+           [
+            "missed FG",
+            0.32,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.57,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            62.23,
+            false
+           ],
+           [
+            "XP",
+            1.69,
+            false
+           ],
+           [
+            "missed FG",
+            0.28,
+            false
+           ],
+           [
+            "missed XP",
+            0.07,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.0,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            53.05,
+            true
+           ],
+           [
+            "XP",
+            2.1,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.1,
+          "rank": 30,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.01,
+          "rank": 31,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.34,
+          "rank": 27,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.5,
+       "flags": [],
+       "floor": 3.2,
+       "id": "7922",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 7.85,
+       "min": 7.0,
+       "mine": false,
+       "mu": 7.34,
+       "n": 6,
+       "name": "Riley Patterson",
+       "opp": "@HOU",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.75,
+       "team": "BAL",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.13,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.31,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            53.58,
+            false
+           ],
+           [
+            "XP",
+            2.31,
+            false
+           ],
+           [
+            "missed FG",
+            0.24,
+            true
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.97,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            53.83,
+            false
+           ],
+           [
+            "XP",
+            1.91,
+            false
+           ],
+           [
+            "missed FG",
+            0.24,
+            false
+           ],
+           [
+            "missed XP",
+            0.08,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.75,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            46.48,
+            true
+           ],
+           [
+            "XP",
+            2.4,
+            false
+           ],
+           [
+            "missed FG",
+            0.2,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.33,
+          "rank": 28,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.1,
+          "rank": 30,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.47,
+          "rank": 26,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.2,
+       "flags": [],
+       "floor": 3.1,
+       "id": "4195",
+       "kickoff": "2026-11-26T16:30:00-05:00",
+       "late": false,
+       "max": 7.47,
+       "min": 6.75,
+       "mine": false,
+       "mu": 7.13,
+       "n": 6,
+       "name": "Jake Elliott",
+       "opp": "@DAL",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.63,
+       "team": "PHI",
+       "tier": 3,
+       "unavailable": []
+      },
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 7.01,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.07,
+          "share": 0.3,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            52.12,
+            false
+           ],
+           [
+            "XP",
+            2.31,
+            false
+           ],
+           [
+            "missed FG",
+            0.34,
+            true
+           ],
+           [
+            "missed XP",
+            0.11,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 7.14,
+          "share": 0.3,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            58.4,
+            false
+           ],
+           [
+            "XP",
+            1.74,
+            false
+           ],
+           [
+            "missed FG",
+            0.32,
+            false
+           ],
+           [
+            "missed XP",
+            0.12,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "missing": "no projection for him",
+          "source": "CBS"
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 6.4,
+          "rank": 32,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.34,
+          "rank": 27,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.33,
+          "rank": 28,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 11.2,
+       "flags": [],
+       "floor": 2.8,
+       "id": "12713",
+       "kickoff": "2026-11-29T16:05:00-05:00",
+       "late": false,
+       "max": 7.34,
+       "min": 6.4,
+       "mine": false,
+       "mu": 7.01,
+       "n": 5,
+       "name": "Andy Borregales",
+       "opp": "@LAC",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.77,
+       "team": "NE",
+       "tier": 3,
+       "unavailable": []
+      }
+     ],
+     "tier": 3
+    },
+    {
+     "anchor_mu": 6.52,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": true,
+        "mu": 6.52,
+        "parts": [
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.48,
+          "share": 0.2,
+          "source": "Sleeper",
+          "stats": [
+           [
+            "FG yards",
+            50.04,
+            false
+           ],
+           [
+            "XP",
+            1.9,
+            false
+           ],
+           [
+            "missed FG",
+            0.36,
+            true
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.71,
+          "share": 0.2,
+          "source": "ESPN",
+          "stats": [
+           [
+            "FG yards",
+            59.94,
+            false
+           ],
+           [
+            "XP",
+            1.08,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            false
+           ],
+           [
+            "missed XP",
+            0.06,
+            false
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 6.0,
+          "share": 0.2,
+          "source": "CBS",
+          "stats": [
+           [
+            "FG yards",
+            48.02,
+            true
+           ],
+           [
+            "XP",
+            1.6,
+            false
+           ],
+           [
+            "missed FG",
+            0.3,
+            true
+           ],
+           [
+            "missed XP",
+            0.1,
+            true
+           ]
+          ],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 7.01,
+          "rank": 31,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 6.4,
+          "rank": 32,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": false,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 6.4,
+          "rank": 32,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": 10.5,
+       "flags": [],
+       "floor": 2.5,
+       "id": "10937",
+       "kickoff": "2026-11-29T13:00:00-05:00",
+       "late": false,
+       "max": 7.01,
+       "min": 6.0,
+       "mine": false,
+       "mu": 6.52,
+       "n": 6,
+       "name": "Jake Moody",
+       "opp": "@MIN",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": 4.6,
+       "team": "ATL",
+       "tier": 4,
+       "unavailable": []
+      }
+     ],
+     "tier": 4
+    },
+    {
+     "anchor_mu": 0.0,
+     "players": [
+      {
+       "also": [],
+       "badge": null,
+       "breakdown": {
+        "est": false,
+        "mu": 0.0,
+        "parts": [
+         {
+          "missing": "no projection for him",
+          "source": "Sleeper"
+         },
+         {
+          "missing": "no projection for him",
+          "source": "ESPN"
+         },
+         {
+          "kind": "projection",
+          "late": false,
+          "pts": 0.0,
+          "share": 0.6,
+          "source": "CBS",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 0.0,
+          "rank": 33,
+          "share": 0.2,
+          "source": "FantasyPros",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 0.0,
+          "rank": 33,
+          "share": 0.1,
+          "source": "FantasyData",
+          "stats": [],
+          "zero": false
+         },
+         {
+          "censored": true,
+          "kind": "rank",
+          "late": false,
+          "list": "K",
+          "pts": 0.0,
+          "rank": 33,
+          "share": 0.1,
+          "source": "RotoBaller",
+          "stats": [],
+          "zero": false
+         }
+        ]
+       },
+       "ceiling": null,
+       "flags": [],
+       "floor": null,
+       "id": "11789",
+       "kickoff": "2026-11-25T20:00:00-05:00",
+       "late": false,
+       "max": 0.0,
+       "min": 0.0,
+       "mine": false,
+       "mu": 0.0,
+       "n": 4,
+       "name": "Joshua Karty",
+       "opp": "GB",
+       "result": null,
+       "sigma": 0.75,
+       "slot": "K",
+       "swing": null,
+       "team": "LAR",
+       "tier": 5,
+       "unavailable": []
+      }
+     ],
+     "tier": 5
+    }
+   ]
+  }
+ },
+ "season": 2026,
+ "sigma_out": {
+  "DEF": 5.7,
+  "K": 5.0
+ },
+ "sources": {
+  "cbs_k": {
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "projection",
+   "label": "CBS",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "match": {
+    "names": [
+     "Andres Borregales NE K"
+    ],
+    "rate": 0.9696969696969697,
+    "unmatched": 1
+   },
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 9,
+    "updated": 23
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-24T18:52:47-05:00",
+   "published_at": null,
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12,
+   "zero_filled": 0
+  },
+  "espn_k": {
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "projection",
+   "label": "ESPN",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 31,
+    "updated": 1
+   },
+   "no_projection": 16,
+   "observed_after": "2026-11-24T18:52:47-05:00",
+   "published_at": null,
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12,
+   "zero_filled": 0
+  },
+  "fantasydata_k": {
+   "censored": 1,
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "rank",
+   "label": "FantasyData",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "mapped": 32,
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 20,
+    "updated": 12
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-24T18:52:47-05:00",
+   "published_at": null,
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12
+  },
+  "fp_def": {
+   "censored": 0,
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "def",
+   "kind": "rank",
+   "label": "FantasyPros",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "mapped": 32,
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 32,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-25T15:13:20-05:00",
+   "published_at": "2026-11-25T19:34:48+00:00",
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12
+  },
+  "fp_k": {
+   "censored": 1,
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "rank",
+   "label": "FantasyPros",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "mapped": 32,
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 0,
+    "updated": 32
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-25T19:34:48+00:00",
+   "published_at": "2026-11-25T19:34:48+00:00",
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12
+  },
+  "rotoballer_k": {
+   "censored": 1,
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "rank",
+   "label": "RotoBaller",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "mapped": 32,
+   "match": {
+    "names": [],
+    "rate": 1.0,
+    "unmatched": 0
+   },
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 32,
+    "updated": 0
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-25T11:10:13-05:00",
+   "published_at": "2026-11-25T11:10:13-05:00",
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12
+  },
+  "sleeper_def": {
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "def",
+   "kind": "projection",
+   "label": "Sleeper",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "merge": {
+    "added": 32,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 0,
+    "updated": 0
+   },
+   "no_projection": 0,
+   "observed_after": "2026-11-25T15:13:20-05:00",
+   "published_at": null,
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12,
+   "zero_filled": 0
+  },
+  "sleeper_k": {
+   "error": null,
+   "fetched_at": "2026-11-25T15:13:20-05:00",
+   "group": "k",
+   "kind": "projection",
+   "label": "Sleeper",
+   "last_success": "2026-11-25T15:13:20-05:00",
+   "merge": {
+    "added": 0,
+    "deleted": 0,
+    "frozen": 0,
+    "late": 0,
+    "skipped_after_kickoff": 0,
+    "unchanged": 16,
+    "updated": 16
+   },
+   "no_projection": 121,
+   "observed_after": "2026-11-24T18:52:47-05:00",
+   "published_at": null,
+   "rows": 32,
+   "rows_used": 32,
+   "status": "ok",
+   "week": 12,
+   "zero_filled": 0
+  }
+ },
+ "swing": {
+  "a": {
+   "K": 0.0
+  },
+  "b": {
+   "K": 0.85
+  },
+  "hi": 0.75,
+  "kicker": {
+   "hi": 0.87,
+   "lo": -0.88,
+   "model": "poisson-bands-2026-11-21"
+  },
+  "lo": -0.8
+ },
+ "warnings": [],
+ "week": 12
+}

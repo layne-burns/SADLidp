@@ -1,0 +1,56 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-11-25T15:13:20-05:00"
+ ],
+ "kind": "rank",
+ "last_success": "2026-11-25T15:13:20-05:00",
+ "lists": {
+  "DEF": {"ARI":10,"ATL":24,"BAL":2,"BUF":6,"CAR":31,"CHI":12,"CIN":25,"CLE":8,"DAL":21,"DEN":19,"DET":14,"GB":5,"HOU":9,"IND":18,"JAX":22,"KC":7,"LAC":29,"LAR":11,"LV":27,"MIA":30,"MIN":1,"NE":28,"NO":13,"NYG":20,"NYJ":23,"PHI":17,"PIT":3,"SEA":4,"SF":16,"TB":15,"TEN":32,"WAS":26}
+ },
+ "no_projection_ids": [],
+ "published_at": "2026-10-04T16:58:30+00:00",
+ "rows": {
+  "ARI": {"ave":{"DEF":10.53},"backfill":true,"fp_id":"8000","ranks":{"DEF":10},"std":{"DEF":2.3},"team":"ARI"},
+  "ATL": {"ave":{"DEF":22.11},"backfill":true,"fp_id":"8010","ranks":{"DEF":24},"std":{"DEF":4.27},"team":"ATL"},
+  "BAL": {"ave":{"DEF":2.68},"backfill":true,"fp_id":"8020","ranks":{"DEF":2},"std":{"DEF":1.29},"team":"BAL"},
+  "BUF": {"ave":{"DEF":6.48},"backfill":true,"fp_id":"8030","ranks":{"DEF":6},"std":{"DEF":1.88},"team":"BUF"},
+  "CAR": {"ave":{"DEF":30.93},"backfill":true,"fp_id":"8040","ranks":{"DEF":31},"std":{"DEF":1.25},"team":"CAR"},
+  "CHI": {"ave":{"DEF":12.03},"backfill":true,"fp_id":"8050","ranks":{"DEF":12},"std":{"DEF":4.74},"team":"CHI"},
+  "CIN": {"ave":{"DEF":23.24},"backfill":true,"fp_id":"8060","ranks":{"DEF":25},"std":{"DEF":2.57},"team":"CIN"},
+  "CLE": {"ave":{"DEF":9.88},"backfill":true,"fp_id":"8070","ranks":{"DEF":8},"std":{"DEF":2.39},"team":"CLE"},
+  "DAL": {"ave":{"DEF":21.6},"backfill":true,"fp_id":"8080","ranks":{"DEF":21},"std":{"DEF":3.54},"team":"DAL"},
+  "DEN": {"ave":{"DEF":19.0},"backfill":true,"fp_id":"8090","ranks":{"DEF":19},"std":{"DEF":2.97},"team":"DEN"},
+  "DET": {"ave":{"DEF":14.8},"backfill":true,"fp_id":"8100","ranks":{"DEF":14},"std":{"DEF":2.67},"team":"DET"},
+  "GB": {"ave":{"DEF":4.65},"backfill":true,"fp_id":"8110","ranks":{"DEF":5},"std":{"DEF":0.85},"team":"GB"},
+  "HOU": {"ave":{"DEF":10.05},"backfill":true,"fp_id":"8120","ranks":{"DEF":9},"std":{"DEF":2.46},"team":"HOU"},
+  "IND": {"ave":{"DEF":17.9},"backfill":true,"fp_id":"8130","ranks":{"DEF":18},"std":{"DEF":3.33},"team":"IND"},
+  "JAX": {"ave":{"DEF":21.72},"backfill":true,"fp_id":"8140","ranks":{"DEF":22},"std":{"DEF":3.39},"team":"JAX"},
+  "KC": {"ave":{"DEF":8.5},"backfill":true,"fp_id":"8150","ranks":{"DEF":7},"std":{"DEF":1.58},"team":"KC"},
+  "LAC": {"ave":{"DEF":26.86},"backfill":true,"fp_id":"8250","ranks":{"DEF":29},"std":{"DEF":2.67},"team":"LAC"},
+  "LAR": {"ave":{"DEF":10.78},"backfill":true,"fp_id":"8280","ranks":{"DEF":11},"std":{"DEF":2.95},"team":"LAR"},
+  "LV": {"ave":{"DEF":26.84},"backfill":true,"fp_id":"8220","ranks":{"DEF":27},"std":{"DEF":2.52},"team":"LV"},
+  "MIA": {"ave":{"DEF":28.66},"backfill":true,"fp_id":"8160","ranks":{"DEF":30},"std":{"DEF":2.69},"team":"MIA"},
+  "MIN": {"ave":{"DEF":1.03},"backfill":true,"fp_id":"8170","ranks":{"DEF":1},"std":{"DEF":0.16},"team":"MIN"},
+  "NE": {"ave":{"DEF":28.05},"backfill":true,"fp_id":"8180","ranks":{"DEF":28},"std":{"DEF":2.13},"team":"NE"},
+  "NO": {"ave":{"DEF":12.9},"backfill":true,"fp_id":"8190","ranks":{"DEF":13},"std":{"DEF":3.96},"team":"NO"},
+  "NYG": {"ave":{"DEF":19.95},"backfill":true,"fp_id":"8200","ranks":{"DEF":20},"std":{"DEF":2.82},"team":"NYG"},
+  "NYJ": {"ave":{"DEF":22.26},"backfill":true,"fp_id":"8210","ranks":{"DEF":23},"std":{"DEF":3.12},"team":"NYJ"},
+  "PHI": {"ave":{"DEF":17.73},"backfill":true,"fp_id":"8230","ranks":{"DEF":17},"std":{"DEF":2.97},"team":"PHI"},
+  "PIT": {"ave":{"DEF":3.08},"backfill":true,"fp_id":"8240","ranks":{"DEF":3},"std":{"DEF":0.72},"team":"PIT"},
+  "SEA": {"ave":{"DEF":4.0},"backfill":true,"fp_id":"8260","ranks":{"DEF":4},"std":{"DEF":1.02},"team":"SEA"},
+  "SF": {"ave":{"DEF":17.68},"backfill":true,"fp_id":"8270","ranks":{"DEF":16},"std":{"DEF":3.7},"team":"SF"},
+  "TB": {"ave":{"DEF":15.33},"backfill":true,"fp_id":"8290","ranks":{"DEF":15},"std":{"DEF":3.27},"team":"TB"},
+  "TEN": {"ave":{"DEF":31.32},"backfill":true,"fp_id":"8300","ranks":{"DEF":32},"std":{"DEF":0.8},"team":"TEN"},
+  "WAS": {"ave":{"DEF":25.37},"backfill":true,"fp_id":"8310","ranks":{"DEF":26},"std":{"DEF":3.47},"team":"WAS"}
+ },
+ "schema_version": 2,
+ "source": "fp_def",
+ "universe": {
+  "DEF": {
+   "complete": false,
+   "depth": 32
+  }
+ },
+ "week": 4
+}

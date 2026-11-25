@@ -1,0 +1,53 @@
+{
+ "covered_keys": [],
+ "fetches": [
+  "2026-11-21T12:39:31-05:00"
+ ],
+ "kind": "rank",
+ "last_success": "2026-11-21T12:39:31-05:00",
+ "lists": {
+  "K": {"10955":14,"11261":27,"11533":1,"11539":3,"11786":5,"11792":4,"12185":9,"12711":15,"12713":16,"13545":20,"13833":25,"13968":22,"1945":11,"2020":12,"2747":7,"3451":6,"3678":19,"4195":28,"5095":21,"5119":23,"5189":13,"6083":17,"650":18,"6528":30,"6650":24,"7042":10,"7839":2,"7922":29,"8259":26}
+ },
+ "no_projection_ids": [],
+ "published_at": "2026-10-11T16:59:29+00:00",
+ "rows": {
+  "10955": {"ave":{"K":14.92},"backfill":true,"fp_id":"25354","ranks":{"K":14},"std":{"K":3.58},"team":"ARI"},
+  "11261": {"ave":{"K":26.41},"backfill":true,"fp_id":"25713","ranks":{"K":27},"std":{"K":2.16},"team":"CLE"},
+  "11533": {"ave":{"K":1.37},"backfill":true,"fp_id":"26068","ranks":{"K":1},"std":{"K":0.81},"team":"DAL"},
+  "11539": {"ave":{"K":4.26},"backfill":true,"fp_id":"26075","ranks":{"K":3},"std":{"K":2.64},"team":"DET"},
+  "11786": {"ave":{"K":5.71},"backfill":true,"fp_id":"26475","ranks":{"K":5},"std":{"K":1.93},"team":"JAX"},
+  "11792": {"ave":{"K":4.32},"backfill":true,"fp_id":"26341","ranks":{"K":4},"std":{"K":2.03},"team":"MIN"},
+  "12185": {"ave":{"K":9.92},"backfill":true,"fp_id":"26763","ranks":{"K":9},"std":{"K":4.02},"team":"IND"},
+  "12711": {"ave":{"K":15.66},"backfill":true,"fp_id":"27534","ranks":{"K":15},"std":{"K":5.71},"team":"BAL"},
+  "12713": {"ave":{"K":16.37},"backfill":true,"fp_id":"27291","ranks":{"K":16},"std":{"K":3.94},"team":"NE"},
+  "13545": {"ave":{"K":18.84},"backfill":true,"fp_id":"28507","ranks":{"K":20},"std":{"K":2.6},"team":"GB"},
+  "13833": {"ave":{"K":23.89},"backfill":true,"fp_id":"28176","ranks":{"K":25},"std":{"K":2.81},"team":"NYG"},
+  "13968": {"ave":{"K":21.33},"backfill":true,"fp_id":"28175","ranks":{"K":22},"std":{"K":3.35},"team":"WAS"},
+  "1945": {"ave":{"K":11.29},"backfill":true,"fp_id":"13029","ranks":{"K":11},"std":{"K":2.65},"team":"PIT"},
+  "2020": {"ave":{"K":12.79},"backfill":true,"fp_id":"13731","ranks":{"K":12},"std":{"K":2.62},"team":"CHI"},
+  "2747": {"ave":{"K":7.18},"backfill":true,"fp_id":"14003","ranks":{"K":7},"std":{"K":1.27},"team":"SEA"},
+  "3451": {"ave":{"K":5.92},"backfill":true,"fp_id":"15756","ranks":{"K":6},"std":{"K":2.44},"team":"HOU"},
+  "3678": {"ave":{"K":17.37},"backfill":true,"fp_id":"16026","ranks":{"K":19},"std":{"K":4.09},"team":"DEN"},
+  "4195": {"ave":{"K":27.34},"backfill":true,"fp_id":"16540","ranks":{"K":28},"std":{"K":2.23},"team":"PHI"},
+  "5095": {"ave":{"K":20.11},"backfill":true,"fp_id":"17420","ranks":{"K":21},"std":{"K":2.91},"team":"MIA"},
+  "5119": {"ave":{"K":22.68},"backfill":true,"fp_id":"17533","ranks":{"K":23},"std":{"K":2.28},"team":"NYJ"},
+  "5189": {"ave":{"K":14.13},"backfill":true,"fp_id":"17575","ranks":{"K":13},"std":{"K":3.49},"team":"SF"},
+  "6083": {"ave":{"K":16.97},"backfill":true,"fp_id":"18545","ranks":{"K":17},"std":{"K":2.12},"team":"LV"},
+  "650": {"ave":{"K":16.84},"backfill":true,"fp_id":"9491","ranks":{"K":18},"std":{"K":4.55},"team":null},
+  "6528": {"ave":{"K":29.17},"backfill":true,"fp_id":"19028","ranks":{"K":30},"std":{"K":1.31},"team":"TEN"},
+  "6650": {"ave":{"K":23.24},"backfill":true,"fp_id":"19058","ranks":{"K":24},"std":{"K":3.39},"team":"TB"},
+  "7042": {"ave":{"K":10.71},"backfill":true,"fp_id":"19760","ranks":{"K":10},"std":{"K":3.02},"team":"BUF"},
+  "7839": {"ave":{"K":3.58},"backfill":true,"fp_id":"23297","ranks":{"K":2},"std":{"K":1.76},"team":"CIN"},
+  "7922": {"ave":{"K":28.85},"backfill":true,"fp_id":"23370","ranks":{"K":29},"std":{"K":1.18},"team":"BAL"},
+  "8259": {"ave":{"K":24.44},"backfill":true,"fp_id":"23901","ranks":{"K":26},"std":{"K":1.67},"team":"LAC"}
+ },
+ "schema_version": 2,
+ "source": "fp_k",
+ "universe": {
+  "K": {
+   "complete": false,
+   "depth": 30
+  }
+ },
+ "week": 5
+}

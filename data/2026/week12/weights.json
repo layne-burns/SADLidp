@@ -1,0 +1,110 @@
+{
+ "alpha": 0.6347,
+ "alpha_hat": 0.6485,
+ "alpha_hat_raw": 0.6485,
+ "alpha_n": 10,
+ "alpha_se": 0.1303,
+ "computed_at": "2026-11-24T18:52:47-05:00",
+ "defenses": {
+  "alpha": 0.6,
+  "alpha_hat": null,
+  "alpha_n": 0,
+  "computed_at": "2026-11-25T15:13:20-05:00",
+  "from_weeks": [],
+  "k": 4.0,
+  "method": "prior",
+  "prior_split": 0.6,
+  "priors": {
+   "fp_def": 2.0
+  },
+  "reason": "0 evaluated week(s); data weights start at 3",
+  "sources": {}
+ },
+ "from_weeks": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10
+ ],
+ "k": 4.0,
+ "kickers": {
+  "alpha": 0.6,
+  "alpha_hat": null,
+  "alpha_n": 0,
+  "computed_at": "2026-11-24T18:52:47-05:00",
+  "from_weeks": [],
+  "k": 4.0,
+  "method": "prior",
+  "prior_split": 0.6,
+  "priors": {
+   "fantasydata_k": 1.0,
+   "fp_k": 2.0,
+   "rotoballer_k": 1.0
+  },
+  "reason": "0 evaluated week(s); data weights start at 3",
+  "sources": {}
+ },
+ "method": "accuracy",
+ "prior_split": 0.6,
+ "priors": {
+  "fantasydata": 1.0,
+  "fp_ecr": 2.0,
+  "rotoballer": 1.0
+ },
+ "projection_rule": {
+  "n": 10,
+  "raw": 0.2701,
+  "rule": "ls",
+  "se": 0.0723,
+  "share": 0.3358,
+  "sources": [
+   "sleeper_proj",
+   "espn_proj"
+  ]
+ },
+ "schema_version": 1,
+ "sources": {
+  "espn_proj": {
+   "mean_r": 1.0096,
+   "n": 10,
+   "r_se": 0.0066,
+   "w": 1.3284,
+   "w_data": 1.0216
+  },
+  "fantasydata": {
+   "mean_r": 1.0512,
+   "n": 5,
+   "r_se": 0.0149,
+   "w": 0.9935,
+   "w_data": 0.9883
+  },
+  "fp_ecr": {
+   "mean_r": 1.0214,
+   "n": 9,
+   "r_se": 0.0086,
+   "w": 2.0237,
+   "w_data": 1.0171
+  },
+  "rotoballer": {
+   "mean_r": 1.0446,
+   "n": 10,
+   "r_se": 0.0155,
+   "w": 0.9961,
+   "w_data": 0.9946
+  },
+  "sleeper_proj": {
+   "mean_r": 1.0541,
+   "n": 10,
+   "r_se": 0.0116,
+   "w": 0.6716,
+   "w_data": 0.9784
+  }
+ },
+ "week": 12
+}

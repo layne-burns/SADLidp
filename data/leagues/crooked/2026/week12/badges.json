@@ -1,0 +1,7 @@
+{
+ "badges": {
+  "NE|UPGRADE|KC": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"KC","first_p":0.601,"first_seen":"2026-11-25T15:13:20-05:00","last_seen":"2026-11-25T15:13:20-05:00","lock_at":"2026-11-26T20:20:00-05:00","mu_over":5.694,"mu_w":7.778,"over":"KC","p":0.601,"reference":false,"sigma_out":5.7,"slot":"DEF","swing_over":null,"swing_w":null,"w":"NE","why":[]},
+  "NYJ|UPGRADE|KC": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"KC","first_p":0.61,"first_seen":"2026-11-25T15:13:20-05:00","last_seen":"2026-11-25T15:13:20-05:00","lock_at":"2026-11-26T20:20:00-05:00","mu_over":5.694,"mu_w":7.97,"over":"KC","p":0.61,"reference":false,"sigma_out":5.7,"slot":"DEF","swing_over":null,"swing_w":null,"w":"NYJ","why":[]}
+ },
+ "schema_version": 1
+}

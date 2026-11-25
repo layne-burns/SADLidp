@@ -315,6 +315,9 @@ Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. 
   - **Adoption:** a Crooked launch choice for the owner: it can apply from the next pre-waiver page, and never during
     Crooked's playoffs (week 15 on); if it is not adopted by the week-14 pre-waiver page (Tue 2026-12-08), it waits
     for 2027. Whatever the result, it goes in the ledger.
+  - **Result (run 2026-11-25, after this text was committed): fails.** Fit 2024 → score 2025: +0.017 ± 0.011
+    (t +1.6); fit 2025 → score 2024: −0.005 ± 0.009 (t −0.5); the MAE guardrail holds both ways. Not 2 SE better
+    in either direction, so the tier of the projected mean stays (`docs/methods-review.md`).
 
 ## Owner questions still open
 - Vegas player props (would need an Odds API key): untested. Game lines (spread, total, implied points) were tested and rejected (ledger in `docs/methods-review.md`), apart from the DL game total, which stays shadow-only inside the DL matchup candidate.

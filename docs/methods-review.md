@@ -155,7 +155,7 @@ within a team's season, 544 team-games each); the σ floor, the 60:40 split and 
 | DEF1. Archive integrity of `sleeper_def`, `fp_def` | Rows read live in settled weeks, re-read from the archive; at least 2 weeks and 40 rows a source | Share of rows equal on what feeds μ | Pass at ≥ 99%, as K1 | Not run yet |
 | DEF2. The DEF range | DEF pool, live settled weeks, σ_pred from the frozen record | Spread ratio RMS((actual − μ)/σ_pred), aim 1.00, ± 2 SE by week | Report in-season; season end: keep 5.7 if the margin contains 1.00 | Not run yet |
 | DEF3. DEF weights against their priors | DEF pool, the weeks the DEF weights count | α̂ ± leave-one-week-out margin against 0.6 | Report only; \|t\| ≥ 2.5 for a claim | Not run yet |
-| T1. Expected points-allowed tier points | Sleeper DEF archives 2024 and 2025, fit on one season, scored on the other | Paired within-week Spearman difference, SE by week | ≥ 2 SE better in both directions, MAE not worse by > 1 SE; owner adopts, never in Crooked's playoffs | Not run yet |
+| T1. Expected points-allowed tier points | Sleeper DEF archives 2024 and 2025, fit on one season, scored on the other | Paired within-week Spearman difference, SE by week | ≥ 2 SE better in both directions, MAE not worse by > 1 SE; owner adopts, never in Crooked's playoffs | **Run 2026-11-25: fails.** Fit 2024 → 2025 (537 team-games, 18 weeks): +0.017 ± 0.011 (t +1.6); fit 2025 → 2024 (541): −0.005 ± 0.009 (t −0.5). MAE −0.011 ± 0.020 and −0.003 ± 0.017. The tier of the mean stays. Re-test only with a third season that agrees in sign. |
 
 **Screened while adding team defenses (2026-11-25), by one analyst, not reproduced:**
 

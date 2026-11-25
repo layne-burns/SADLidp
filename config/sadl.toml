@@ -5,6 +5,12 @@ username = "lbburnsy"
 names = ["SADL", "Slow Ass Draft League"]
 # league_id = ""            # optional override of the name match (SPEC §4.2)
 
+# Extra leagues (D26): each gets its own page (site/<key>/) from the same consensus, showing the slots its roster
+# starts; its files go under data/leagues/<key>/. It uses [league]'s username unless it names its own.
+[leagues.crooked]
+names = ["Kusch's Crooked League"]
+league_id = "1364651976209473536"  # 2026: a renewed league gets a new id; drop this line then and the name matches
+
 [espn]
 league_id = "942104146"     # owner's public IDP league (Phase 3 source)
 
@@ -24,6 +30,7 @@ DL = 0.75
 LB = 0.75
 DB = 0.75
 K = 0.75
+DEF = 0.75                  # a prior, as for kickers: not tuned on team defenses (D25)
 
 [swap]
 threshold = 0.6             # START/UPGRADE badge probability (SPEC §6.7)
@@ -57,6 +64,9 @@ LB = 5.5
 DB = 5.0
 K = 5.0                     # measured: 4.78 within kicker-seasons 2022–25, 5.3 in 2026 weeks 5–8; used as is (the
                             # 2025 cache has no K and is not rebuilt for it)
+DEF = 5.7                   # team defenses (D25), no swing of their own: SD of actual − Sleeper's projected points
+                            # within a team's season, 5.55 in 2024 and 5.82 in 2025 (544 team-games each, Crooked
+                            # scoring = SADL's); 20/80 of the miss at −0.83/+0.82 and −0.78/+0.82 SD, so a normal range
 
 [weights]
 prior_split = 0.6           # projection : rank group prior (D11)
@@ -70,12 +80,13 @@ fantasydata = 1.0
 fp_k = 2.0                  # the kicker rank sources (their own group: these never meet the three above)
 rotoballer_k = 1.0
 fantasydata_k = 1.0
+fp_def = 2.0                # the team-defense rank source (its own group, D25)
 
 [accuracy]                  # accuracy weights (SPEC §6.5 Implementation)
 # sources whose archived/late rows don't count yet; Sleeper, ESPN and FP have passed for IDP (§13). The four
 # kicker archives have not been checked for pre-game values: their backfilled rows are stored and shown, but
 # only rows read live move the kicker weights until the check passes (docs/status.md).
-untrusted = ["sleeper_k", "espn_k", "fp_k", "rotoballer_k"]
+untrusted = ["sleeper_k", "espn_k", "fp_k", "rotoballer_k", "sleeper_def", "fp_def"]  # DEF archives: not checked yet
 
 [form]                      # the form term added to μ (SPEC §6.4): his earlier misses this season and his last game's snaps
 enabled = true
@@ -158,6 +169,17 @@ enabled = true
 archive = true
 late_rows = false
 expected_by = "Thu 12:00"
+
+# Team-defense sources (2026-11-25, D25): their own group, blended and weighted apart from the others (SPEC §5.2).
+[sources.sleeper_def]       # Sleeper projections, position DEF (own request)
+enabled = true
+late_rows = true
+archive = true
+
+[sources.fp_def]            # FantasyPros weekly D/ST ECR: the page the fp_dst signal reads, one request for both
+enabled = true
+archive = true
+late_rows = false
 
 [kicker.yards_per_make]     # mean distance of a made FG in each bucket, 2024–26 (n = 2,398); for sources that give counts, not yards
 "0_19" = 19.0

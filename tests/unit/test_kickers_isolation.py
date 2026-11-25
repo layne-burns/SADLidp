@@ -166,7 +166,8 @@ def test_every_dl_lb_db_part_is_identical_with_and_without_kickers(runs):
     w_base, w_kick = b[week + "weights.json"], k[week + "weights.json"]
     idp_keys = {"alpha", "alpha_hat", "alpha_n", "computed_at", "from_weeks", "k", "method", "prior_split", "priors",
                 "reason", "schema_version", "sources", "week"}  # fmt: skip
-    assert set(w_base) == set(w_kick) == idp_keys | {"kickers"}  # one new key, beside the IDP record
+    # one new key each beside the IDP record: the kickers', and the team defenses' (D25, in both worlds)
+    assert set(w_base) == set(w_kick) == idp_keys | {"kickers", "defenses"}
     assert {key: w_kick[key] for key in idp_keys} == {key: w_base[key] for key in idp_keys}  # every IDP key, untouched
     assert w_kick["k"] == 4.0 and w_kick["priors"] == {"fp_ecr": 2.0, "rotoballer": 1.0, "fantasydata": 1.0}
     # the view is not vacuous: the kicker run really does hold kicker data in the files compared above

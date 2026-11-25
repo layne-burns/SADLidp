@@ -3,6 +3,8 @@
 Hidden from the waiver pool: injury codes Out/Doubtful/IR/PUP/NFI/Sus/NA/DNR/COV, `status` other than
 Active, `active` false, no team, on bye, or locked (his game has kicked off). Questionable is shown with
 a flag; any other code is shown flagged as unknown. Your own players are always shown, with badges.
+A team defense (Sleeper `position` "DEF") has no `status` at all; it counts as Active (D25), and its bye,
+opponent and kickoff come from the schedule like anyone's.
 """
 
 from __future__ import annotations
@@ -32,7 +34,7 @@ class PlayerStatus:
 
     @property
     def comparable(self) -> bool:
-        """Can anchor a My IDPs comparison: nothing but his game having started keeps him off the field."""
+        """Can anchor a comparison on your roster: nothing but his game having started keeps him off the field."""
         return all(r == "locked" for r in self.reasons)
 
 
@@ -45,8 +47,11 @@ def player_status(player: dict, schedule: Schedule, week: int, now: datetime) ->
         st.flags.append("Q")
     elif injury:
         st.flags.append(f"unknown injury code {injury}")
-    if player.get("status") != "Active":
-        st.reasons.append(str(player.get("status") or "no status").lower())
+    status = player.get("status")
+    if status is None and str(player.get("position") or "").upper() == "DEF":
+        status = "Active"  # Sleeper gives a team defense no status (D25)
+    if status != "Active":
+        st.reasons.append(str(status or "no status").lower())
     if player.get("active") is False and "inactive" not in st.reasons:
         st.reasons.append("inactive")
     team = player.get("team")

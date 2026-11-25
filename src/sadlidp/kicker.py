@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from . import scoring, storage
-from .positions import is_kicker
+from .positions import GROUPS, slot_of
 
 KICK_KEYS = ("fga", "fgm", "fgm_yds", "fgmiss", "xpa", "xpm", "xpmiss")
 BUCKETS = ("0_19", "20_29", "30_39", "40_49", "50p")  # the `fgm_<bucket>` bands `[kicker.yards_per_make]` covers
@@ -53,13 +53,24 @@ def one_point_edge(sigma_out: float | None) -> float | None:
 
 
 def add_past_actuals(sleeper, data_dir: Path | str, season: int, sched, now: datetime, players: dict,
-                     limit: int = MAX_ADDED_WEEKS) -> list[int]:  # fmt: skip
+                     limit: int = MAX_ADDED_WEEKS, group: str = "k",
+                     fetched: dict | None = None) -> list[int]:  # fmt: skip
     """Add-only merge of kicker stat lines into settled weeks (SPEC §6.5 Actuals): a week captured after its
     stat-correction window is final and never refetched, so the weeks saved before kickers were tracked hold
     no kicker lines. Each such week is refetched once: lines are added for kickers (by Sleeper `position`,
     never by stat key: `TEAM_*` rows carry kicking keys) that have no line yet, no existing line changes, and
     `k_added_at` marks the week done. A week that already holds a kicker line was captured with kickers and is
-    skipped. Newest weeks first, at most `limit` a sync. Returns the weeks written."""
+    skipped. Newest weeks first, at most `limit` a sync. Returns the weeks written.
+
+    `group="def"` does the same for team defenses (D25): their lines (keyed by team code, by Sleeper
+    `position` "DEF", never a `TEAM_*` row) and the marker `def_added_at`. `fetched` is one sync's
+    week -> payload memo, so the kicker and defense passes never request the same week twice."""
+    members = GROUPS[group]
+    marker = f"{group}_added_at"
+
+    def member(pid) -> bool:
+        return slot_of(players.get(str(pid)) or {}) in members
+
     todo = []
     for week in sorted({g.week for g in sched.games}, reverse=True):
         kicks = [g.kickoff for g in sched.week_games(week) if g.kickoff]
@@ -67,22 +78,26 @@ def add_past_actuals(sleeper, data_dir: Path | str, season: int, sched, now: dat
             continue
         doc = storage.read_json(storage.week_dir(data_dir, season, week) / "actuals.json")
         settles, captured = sched.settles_at(week), (doc or {}).get("captured_at")
-        if not doc or doc.get("k_added_at") or not captured or settles is None:
+        if not doc or doc.get(marker) or not captured or settles is None:
             continue
-        if any(is_kicker(players.get(str(pid)) or {}) for pid in doc.get("stats") or {}):
-            continue  # captured with kickers (refresh_actuals keeps their lines): nothing to add, no refetch
+        if any(member(pid) for pid in doc.get("stats") or {}):
+            continue  # captured with this group (refresh_actuals keeps their lines): nothing to add, no refetch
         if datetime.fromisoformat(captured) >= settles:  # final; an open week is rewritten whole, kickers included
             todo.append((week, doc))
     written = []
     for week, doc in todo[:limit]:
-        payload, _ = sleeper.stats(season, week)
+        if fetched is not None and week in fetched:
+            payload = fetched[week]
+        else:
+            payload, _ = sleeper.stats(season, week)
+            if fetched is not None and isinstance(payload, dict):
+                fetched[week] = payload
         if not isinstance(payload, dict):
             continue  # retried next sync
         have = doc.get("stats") or {}
         added = {str(pid): line for pid, line in payload.items()
-                 if isinstance(line, dict) and str(pid) not in have
-                 and is_kicker(players.get(str(pid)) or {})}  # fmt: skip
-        doc = {**doc, "stats": {**added, **have}, "k_added_at": now.isoformat(), "k_added": len(added)}
+                 if isinstance(line, dict) and str(pid) not in have and member(pid)}  # fmt: skip
+        doc = {**doc, "stats": {**added, **have}, marker: now.isoformat(), f"{group}_added": len(added)}
         storage.write_json(storage.week_dir(data_dir, season, week) / "actuals.json", doc)
         written.append(week)
     return written

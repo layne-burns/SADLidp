@@ -15,6 +15,7 @@ V1 = "https://api.sleeper.app/v1"
 API = "https://api.sleeper.com"
 IDP_POSITIONS_QUERY = "position[]=DL&position[]=LB&position[]=DB"
 K_POSITIONS_QUERY = "position[]=K"  # the kickers' own request: the IDP query string never changes
+DEF_POSITIONS_QUERY = "position[]=DEF"  # the team defenses' own request (D25): neither query above changes
 
 
 class SleeperError(RuntimeError):
@@ -87,6 +88,9 @@ class Sleeper:
     def kicker_projections(self, season: int, week: int):
         return self._optional(f"{API}/projections/nfl/{season}/{week}?season_type=regular&{K_POSITIONS_QUERY}")
 
+    def def_projections(self, season: int, week: int):
+        return self._optional(f"{API}/projections/nfl/{season}/{week}?season_type=regular&{DEF_POSITIONS_QUERY}")
+
     def stats(self, season: int, week: int):
         """Weekly actual stats for every player, as {player_id: stats}."""
         return self._optional(f"{V1}/stats/nfl/regular/{season}/{week}")
@@ -96,35 +100,51 @@ def season_of(state: dict, fallback: int) -> int:
     return int(state.get("league_season") or state.get("season") or fallback)
 
 
-def resolve_league(sleeper: Sleeper, cfg: dict, season: int, cached_user_id: str | None = None) -> tuple[dict, str]:
-    """SPEC §4.2: the user's one league named in config for this season. Returns (league, user_id)."""
+def _league_name(name) -> str:
+    """A league name as matched (§4.2): trimmed, case-folded, curly apostrophes made straight."""
+    return str(name or "").replace("\u2019", "'").replace("\u2018", "'").strip().lower()
+
+
+def resolve_league(sleeper: Sleeper, cfg: dict, season: int, cached_user_id: str | None = None,
+                   table: dict | None = None) -> tuple[dict, str]:  # fmt: skip
+    """SPEC §4.2: the user's one league named in config for this season. Returns (league, user_id).
+    `table` is an extra league's `[leagues.<key>]` table (D26); without it, the primary `[league]`. An extra
+    league without its own `username` uses the primary one."""
     lcfg = cfg.get("league") or {}
+    if table is not None:
+        lcfg = {"username": lcfg.get("username", ""), **table}
     user = sleeper.user(lcfg.get("username", ""))
     user_id = (user or {}).get("user_id") or cached_user_id
     if not user_id:
         raise SleeperError(f"Sleeper user {lcfg.get('username')!r} not found and no cached user_id")
     if lcfg.get("league_id"):
         return sleeper.league(str(lcfg["league_id"])), user_id
-    wanted = {str(n).strip().lower() for n in lcfg.get("names", [])}
+    wanted = {_league_name(n) for n in lcfg.get("names", [])}
     leagues = sleeper.leagues(user_id, season)
-    matched = [lg for lg in leagues if str(lg.get("name") or "").strip().lower() in wanted]
+    matched = [lg for lg in leagues if _league_name(lg.get("name")) in wanted]
     if len(matched) != 1:
         found = ", ".join(f"{lg.get('name')} ({lg.get('league_id')})" for lg in leagues) or "none"
         raise SleeperError(f"expected exactly 1 league named {sorted(wanted)} in {season}, got {len(matched)}: {found}")
     return sleeper.league(matched[0]["league_id"]), user_id
 
 
-def position_limits(settings: dict, fallback: int) -> dict[str, int]:
+def position_limits(settings: dict, fallback: int, slots: tuple[str, ...] | None = None) -> dict[str, int]:
     """{'DL': 2, 'LB': 2, 'DB': 2} from settings.position_limit_*; missing keys use the config fallback.
-    K is in the result only where the league sets `position_limit_k` (SADL doesn't: a kicker is limited by
-    roster room alone, roster.py)."""
+    K and DEF are in the result only where the league sets `position_limit_k` / `position_limit_def` (SADL
+    and Crooked don't: they are limited by roster room alone, roster.py). `slots`, a league's page slots,
+    leaves out the IDP slots a league doesn't start (D26); None keeps all three, as for SADL."""
     out = {}
     for slot in ("DL", "LB", "DB"):
+        if slots is not None and slot not in slots:
+            continue
         v = (settings or {}).get(f"position_limit_{slot.lower()}")
         out[slot] = int(v) if isinstance(v, (int, float)) and v else fallback
-    k = (settings or {}).get("position_limit_k")
-    if isinstance(k, (int, float)) and k:
-        out["K"] = int(k)
+    for slot in ("K", "DEF"):
+        if slots is not None and slot not in slots:
+            continue
+        v = (settings or {}).get(f"position_limit_{slot.lower()}")
+        if isinstance(v, (int, float)) and v:
+            out[slot] = int(v)
     return out
 
 

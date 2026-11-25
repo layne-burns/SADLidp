@@ -17,7 +17,9 @@ over its own sources (sources/registry.py) and the K slot, with a smaller pool (
 about 28 kickers play a week); its record sits under the one key `"kickers"` of `weights.json` (`K_KEY`; the
 record's own `"k"` is the shrinkage in weeks, so that name was taken). Neither group reads
 the other's source files, players or results. The two-source "ls" rule applies only in a group that declares
-exactly two projection sources, so kickers (three) use the ratio rule.
+exactly two projection sources, so kickers (three) use the ratio rule. The team-defense group (D25) is a third,
+measured the same way over its own sources and the DEF slot (the same pool sizes as kickers), its record under
+`"defenses"` (`DEF_KEY`); with one projection and one rank source, only its split α can move.
 """
 
 from __future__ import annotations
@@ -36,11 +38,13 @@ from .sources import registry
 # rare, unpredictable scores left out of the error that drives the weights (§6.5 "Scoring for weights")
 CORE_DROP = frozenset({
     "idp_def_td", "idp_safe", "idp_blk_kick", "blk_kick", "def_td", "def_st_td", "st_td", "fum_rec_td",
-    "st_ff", "st_fum_rec", "def_st_ff", "def_st_fum_rec",
+    "st_ff", "st_fum_rec", "def_st_ff", "def_st_fum_rec", "safe",  # "safe": a team defense's safety (D25)
 })  # fmt: skip
 MIN_COVER = EVAL["idp"]["min_cover"]  # pool players an IDP source must cover in a position-week to count (15)
 ACTIVATE = 3  # evaluated weeks before the data weights apply
 K_KEY = "kickers"  # the kicker group's record inside weights.json (and run.json's `weights`)
+DEF_KEY = "defenses"  # the team-defense group's record (D25)
+GROUP_KEYS = {"k": K_KEY, "def": DEF_KEY}  # the record of each group other than the IDP one (the top level)
 LAG = 2  # week N uses weeks ≤ N − 2
 
 
@@ -330,20 +334,27 @@ def in_force(data_dir: Path | str, season: int, week: int, sched: Schedule, cfg:
     return rec
 
 
-def in_force_k(data_dir: Path | str, season: int, week: int, sched: Schedule, cfg: dict, now: datetime) -> dict:
-    """Week `week`'s kicker weights: the `"kickers"` record of its `weights.json` (the same shape as the IDP record,
-    with its own `computed_at`), measured and added the first time a sync asks for it. No other key of the
-    file is touched. It is stored only beside the week's IDP record (`in_force` writes the file first); until
-    then it is measured again each sync."""
+def in_force_group(data_dir: Path | str, season: int, week: int, sched: Schedule, cfg: dict, now: datetime,
+                   group: str) -> dict:  # fmt: skip
+    """Week `week`'s weights for a group other than the IDP one: its record in `weights.json` (`GROUP_KEYS`;
+    the same shape as the IDP record, with its own `computed_at`), measured and added the first time a sync asks
+    for it. No other key of the file is touched. It is stored only beside the week's IDP record (`in_force`
+    writes the file first); until then it is measured again each sync."""
+    key = GROUP_KEYS[group]
     path = storage.week_dir(data_dir, season, week) / "weights.json"
     doc = storage.read_json(path) or {}
-    if doc.get(K_KEY):
-        return doc[K_KEY]
-    rec = weights(measure(data_dir, season, week - LAG, sched, cfg, group="k"), cfg, group="k")
+    if doc.get(key):
+        return doc[key]
+    rec = weights(measure(data_dir, season, week - LAG, sched, cfg, group=group), cfg, group=group)
     rec.update(computed_at=now.isoformat())
     if doc.get("method"):
-        storage.write_json(path, {**doc, K_KEY: rec})
+        storage.write_json(path, {**doc, key: rec})
     return rec
+
+
+def in_force_k(data_dir: Path | str, season: int, week: int, sched: Schedule, cfg: dict, now: datetime) -> dict:
+    """Week `week`'s kicker weights: the `"kickers"` record of its `weights.json` (`in_force_group`)."""
+    return in_force_group(data_dir, season, week, sched, cfg, now, "k")
 
 
 def source_weights(rec: dict, cfg: dict | None = None, group: str = "idp") -> dict[str, float]:

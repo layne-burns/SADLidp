@@ -57,12 +57,15 @@ def test_a_kicker_is_position_k_and_nothing_else():
     assert not positions.is_idp({"position": "QB"}) and not positions.is_kicker({"position": "QB"})
 
 
-def test_two_tuples_and_two_groups():
-    assert positions.IDP_SLOTS == ("DL", "LB", "DB") and positions.SLOTS == ("DL", "LB", "DB", "K")
-    assert positions.GROUPS == {"idp": ("DL", "LB", "DB"), "k": ("K",)}
-    assert [positions.group_of(s) for s in ("DL", "LB", "DB", "K", None)] == ["idp", "idp", "idp", "k", "idp"]
-    players = {"a": {"position": "LB"}, "k": KICKER, "q": {"position": "QB"}}
+def test_two_tuples_and_three_groups():
+    assert positions.IDP_SLOTS == ("DL", "LB", "DB") and positions.SLOTS == ("DL", "LB", "DB", "K", "DEF")
+    assert positions.GROUPS == {"idp": ("DL", "LB", "DB"), "k": ("K",), "def": ("DEF",)}  # DEF added with D25
+    assert [positions.group_of(s) for s in ("DL", "LB", "DB", "K", "DEF", None)] == [
+        "idp", "idp", "idp", "k", "def", "idp",
+    ]  # fmt: skip
+    players = {"a": {"position": "LB"}, "k": KICKER, "q": {"position": "QB"}, "KC": {"position": "DEF"}}
     assert set(positions.in_group(players, "k")) == {"k"} and set(positions.in_group(players, "idp")) == {"a", "q"}
+    assert set(positions.in_group(players, "def")) == {"KC"}
     assert positions.EVAL["idp"] == {"pool": 50, "top": 12, "min_cover": 15}
     assert positions.EVAL["k"] == {"pool": 20, "top": 5, "min_cover": 10}
 
@@ -91,7 +94,7 @@ def test_registry_keeps_the_idp_sources_and_declares_the_kicker_ones():
     assert sync.warn_label("espn_k") == "ESPN kickers" and sync.warn_label("espn_proj") == "ESPN"
     for name in registry.names_for("k"):  # every declared kicker source has its config table
         assert name in CFG["sources"], name
-    assert CFG["accuracy"]["untrusted"] == ["sleeper_k", "espn_k", "fp_k", "rotoballer_k"]
+    assert CFG["accuracy"]["untrusted"][:4] == ["sleeper_k", "espn_k", "fp_k", "rotoballer_k"]
 
 
 # ---- the Sleeper kicker adapter ----------------------------------------------------------------------------
@@ -583,7 +586,8 @@ def test_sigma_out_k_comes_from_the_config_when_the_cache_lacks_it(tmp_path):
     storage.write_json(path, cache)
     before = path.read_text()
     out = sync.sigma_out_for(None, CFG, tmp_path, 2026, {}, SC, [])  # no Sleeper call: the cache is never rebuilt for K
-    assert out == {"DL": 5.681, "LB": 5.625, "DB": 5.228, "K": 5.0} and path.read_text() == before
+    assert out == {"DL": 5.681, "LB": 5.625, "DB": 5.228, "K": 5.0, "DEF": CFG["sigma_out"]["DEF"]}
+    assert path.read_text() == before
     storage.write_json(path, {**cache, "K": 4.9})  # a cache built with kickers is used
     assert sync.sigma_out_for(None, CFG, tmp_path, 2026, {}, SC, [])["K"] == 4.9
 

@@ -51,6 +51,8 @@ def cmd_sync(args: argparse.Namespace) -> int:
     )
     verb = "synced" if outcome.synced else "skipped"
     print(f"sync: {verb} ({outcome.reason}); season {outcome.season}, week {outcome.week}")
+    for key, info in outcome.leagues.items():  # extra leagues (D26): rendered, skipped or failed, never fatal
+        print(f"sync: league {key}: {info.get('status')}" + (f" ({info['reason']})" if info.get("reason") else ""))
     _github_output(
         synced=str(outcome.synced).lower(),
         season=outcome.season or "",
@@ -61,9 +63,9 @@ def cmd_sync(args: argparse.Namespace) -> int:
 
 
 def cmd_build(args: argparse.Namespace) -> int:
-    from .site.build import build_site
+    from .site.build import build_all
 
-    print(f"build: wrote {build_site(args.data_dir, args.site_dir, load_config(args.config))}")
+    print(f"build: wrote {build_all(args.data_dir, args.site_dir, load_config(args.config))}")  # every league (D26)
     return 0
 
 
@@ -78,10 +80,10 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     from .impute import load_or_build_priors
     from .positions import slot_of
     from .sleeper import Sleeper, season_of
-    from .sync import K_SOURCES, SIGNALS, SOURCES, build_matcher, fetch_schedule, make_client
+    from .sync import DEF_SOURCES, K_SOURCES, SIGNALS, SOURCES, build_matcher, fetch_schedule, make_client
 
     cfg = load_config(args.config)
-    archives = {**SOURCES, **SIGNALS, **K_SOURCES}
+    archives = {**SOURCES, **SIGNALS, **K_SOURCES, **DEF_SOURCES}  # the later groups take what budget is left
     if args.source and args.source not in archives:
         print(f"backfill: unknown source {args.source!r}; one of {', '.join(archives)}")
         return 2
@@ -94,7 +96,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     target = sched.target_week(now) or max((g.week for g in sched.games), default=0) + 1
     weeks = [w for w in (_weeks(args.weeks) if args.weeks else range(1, target)) if w < target]
     players = {str(k): v for k, v in sleeper.players(now.date().isoformat()).items()}
-    tracked = {pid: p for pid, p in players.items() if slot_of(p)}  # IDPs and kickers; each source gets its group's
+    tracked = {pid: p for pid, p in players.items() if slot_of(p)}  # IDPs, kickers, DEFs; each source its group's
     priors = load_or_build_priors(sleeper, data_dir, season, players)
     xwalk = crosswalk.load(client, args.cache_dir, now.date().isoformat())
     matcher = build_matcher(cfg, players, xwalk)
@@ -109,7 +111,7 @@ def cmd_backfill(args: argparse.Namespace) -> int:
         sleeper=sleeper,
         players=tracked,
         matcher=matcher,
-        matchers={"k": build_matcher(cfg, players, xwalk, group="k")},
+        matchers={g: build_matcher(cfg, players, xwalk, group=g) for g in ("k", "def")},
         priors=priors,
         only=args.source,
         redo=args.redo,

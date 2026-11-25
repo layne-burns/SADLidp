@@ -94,11 +94,13 @@ def cut_text(x: float) -> str:
     return out[:-2] if out.endswith(".0") else out
 
 
-def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], settings: dict) -> dict | None:
+def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], settings: dict,
+                 count_slots: tuple[str, ...] = IDP_SLOTS) -> dict | None:  # fmt: skip
     """Counts behind the FAAB line, bids as a share of the league's starting budget: IDP waiver claims won, how
     many with a token bid, contested claims (two or more teams claimed the same player in a leg) and their
     winning bids, and IDP free-agent adds by day. None for a league without FAAB. `slots` is pid -> slot for
-    every tracked player; only DL, LB and DB count, so the line's numbers are what they were before kickers."""
+    every tracked player; only `count_slots` count (DL, LB and DB, so SADL's line is what it was before kickers;
+    an extra league's line counts its own page slots, e.g. K and DEF, D26)."""
     budget = float(settings.get("waiver_budget") or 0)
     txs = _all(data_dir, season)
     if not txs or settings.get("waiver_type") != FAAB or budget <= 0:
@@ -109,7 +111,7 @@ def faab_summary(data_dir: Path | str, season: int, slots: dict[str, str], setti
         return 100 * float(t.get("bid") or 0) / budget
 
     # IDPs only: `slots` also maps kickers ("K") since 2026-11-17, and a kicker claim is not an IDP claim
-    idp = lambda t: [pid for pid in (t.get("adds") or {}) if slots.get(pid) in IDP_SLOTS]  # noqa: E731
+    idp = lambda t: [pid for pid in (t.get("adds") or {}) if slots.get(pid) in count_slots]  # noqa: E731
     claims: dict[tuple, list[dict]] = {}
     for t in txs:
         if t.get("type") == "waiver":

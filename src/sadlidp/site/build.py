@@ -10,22 +10,24 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import traceback
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
 
 from .. import league_tx, stats, storage, weeklog
-from ..positions import IDP_SLOTS, SLOTS, K
+from ..positions import DEF, IDP_SLOTS, ROOM_SLOTS, SLOTS, K
 from ..schedule import ET, Schedule
 
 ACTION_TEXT = {
     "add": "Add; you're under the limit, so no drop is needed",
     "add_drop": "Add, and drop {drop}",
-    "swap": "Add, and drop {drop}",  # a kicker for your starting kicker: a straight swap (roster.kicker_action)
+    "swap": "Add, and drop {drop}",  # a kicker (or defense) for your starter: a straight swap (roster.kicker_action)
     "choose_drop": "Add; your other player can't play this week, so you choose the drop",
 }
-# A kicker add depends on roster room, not on a position limit (the league sets none for K, SPEC §6.7).
+# A kicker or team-defense add depends on roster room, not on a position limit (none is set, SPEC §6.7).
 K_ACTION_TEXT = {
     "add": "Add; you have a free roster spot, so no drop is needed",
     "add_unknown": "Add; no drop is needed while you have a free roster spot",
@@ -51,6 +53,11 @@ def latest_week_dir(data_dir: Path | str) -> Path | None:
 
 def page_name(season: int, week: int) -> str:
     return f"week-{season}-{week:02d}.html"
+
+
+def week_of(wdir: Path) -> int:
+    """The week of a week<NN> directory."""
+    return int(wdir.name[4:])
 
 
 def final_results(wdir: Path, scoring_settings: dict) -> tuple[dict | None, bool]:
@@ -101,8 +108,9 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
     miss that week for comparison; the suggestions that paid off, counted as decisions (from the Stats page's
     view of the week: the decision log, or the rebuilt page), and the season so far; and the biggest beat,
     shortfall, best and worst call. `data` is the week's page with its final scores overlaid. Every total, beat,
-    shortfall and call is DL/LB/DB only; your rostered kickers are listed apart in `kickers`, never summed in."""
-    mine, kickers = [], []
+    shortfall and call is DL/LB/DB only; your rostered kickers are listed apart in `kickers` and your team
+    defenses in `defenses`, never summed in."""
+    mine, kickers, defenses = [], [], []
     for slot, m in (data.get("my_idps") or {}).items():
         for p in m.get("players") or []:
             if p.get("reserve") or p.get("taxi"):
@@ -111,15 +119,16 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
             pts = r.get("pts") if r.get("state") == "final" else None
             row = {"name": p.get("name"), "slot": slot, "mu": p.get("mu"), "pts": pts, "state": r.get("state"),
                    "diff": pts - p["mu"] if pts is not None and p.get("mu") is not None else None}  # fmt: skip
-            (kickers if slot == K else mine).append(row)
+            (kickers if slot == K else defenses if slot == DEF else mine).append(row)
     mine.sort(key=lambda x: ("DL LB DB".split().index(x["slot"]) if x["slot"] in ("DL", "LB", "DB") else 3,
                              -(x["pts"] or -1.0)))  # fmt: skip
     kickers.sort(key=lambda x: -(x["pts"] or -1.0))
+    defenses.sort(key=lambda x: -(x["pts"] or -1.0))
     both = [x for x in mine if x["diff"] is not None]
     sugg = (view or {}).get("suggestions") or {}
     calls = [e for e in sugg.get("list") or []  # the badge that stands for each decision (§6.8)
              if e.get("counted", True) and not e.get("reference") and e.get("outcome") in ("hit", "miss")
-             and e.get("slot") != K]  # fmt: skip
+             and e.get("slot") not in ROOM_SLOTS]  # fmt: skip
 
     def margin(e):
         return (e.get("pts") or 0.0) - (e.get("over_pts") or 0.0)
@@ -135,6 +144,7 @@ def report_card(data: dict, view: dict | None, week: int, provisional: bool, sea
         "provisional": provisional,
         "players": mine,
         "kickers": kickers,
+        "defenses": defenses,
         "projected": sum(x["mu"] for x in both),
         "scored": sum(x["pts"] for x in both),
         "counted": len(both),
@@ -175,11 +185,11 @@ def _tier_label(t, last: int = 0) -> str:
 
 
 def _action(badge: dict, names: dict, slot: str | None = None, open_spots=None) -> str:
-    """What to do about a suggestion. A kicker's add and free-choice drop are worded by roster room
-    (`open_spots`: your free roster spots, None when unknown); every IDP text is as it always was."""
+    """What to do about a suggestion. A kicker's or team defense's add and free-choice drop are worded by
+    roster room (`open_spots`: your free roster spots, None when unknown); every IDP text is as it always was."""
     action = badge.get("action")
     text = ACTION_TEXT.get(action, "")
-    if slot == K:
+    if slot in ROOM_SLOTS:
         if action == "add" and not (isinstance(open_spots, int) and open_spots > 0):
             action = "add_unknown"
         text = K_ACTION_TEXT.get(action, text)
@@ -253,10 +263,11 @@ def this_week(data: dict, slots: tuple[str, ...]) -> dict:
 
 
 def source_groups(sources: dict | None) -> list[dict]:
-    """The Sources table in its groups (a kicker source carries `"group": "k"`; anything else is an IDP source),
+    """The Sources table in its groups (a kicker source carries `"group": "k"`, a team-defense source
+    `"group": "def"`; anything else is an IDP source),
     each with how many of its sources have rows on this page (`used`) and the ones that don't (`out`)."""
     groups = []
-    for key, title in (("idp", "IDP sources"), ("k", "Kicker sources")):
+    for key, title in (("idp", "IDP sources"), ("k", "Kicker sources"), ("def", "Team-defense sources")):
         rows = [(name, s or {}) for name, s in (sources or {}).items() if (s or {}).get("group", "idp") == key]
         if rows:
             out = [(name, s) for name, s in rows if not s.get("rows_used") or s.get("stale")]
@@ -277,10 +288,21 @@ def kicker_note(ev: dict | None) -> dict | None:
     return note if note.get("r") is not None and behind >= K_NOTE_WEEKS else None
 
 
-def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg: dict | None = None) -> Path:
+PRIMARY = {"key": None, "short": "SADL", "stats": True, "switch": []}  # the primary league's page block
+
+
+def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg: dict | None = None, *,
+               shared_dir: Path | str | None = None, league: dict | None = None) -> Path:  # fmt: skip
+    """Every week of one league's pages into `site_dir`. `league` is the page's league block (its short name,
+    whether it has a Stats page, the league switcher; the primary league's by default). An extra league (D26)
+    keeps only its own page files under `data_dir`; the shared week files (results, schedule, run, players)
+    are read from `shared_dir`, and it gets no Stats page yet."""
     weeks = week_dirs(data_dir)
     if not weeks:
         raise FileNotFoundError(f"no consensus.json under {data_dir}")
+    lg = {**PRIMARY, **(league or {})}
+    primary = lg["key"] is None
+    shared = Path(shared_dir) if shared_dir is not None else Path(data_dir)
     env = Environment(loader=PackageLoader("sadlidp.site", "templates"), autoescape=True)  # names come from Sleeper
     env.filters.update(et=_et, tier=_tier_label)
     env.globals.update(action=_action, why=_why)
@@ -296,21 +318,29 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
          "label": f"{s} · Week {w}" if many else f"Week {w}"}
         for s, w, _ in weeks
     ]  # fmt: skip
-    ev = stats.evaluate(data_dir, latest[0], cfg or {})
+    ev = stats.evaluate(data_dir, latest[0], cfg or {}) if primary else None  # an extra league: no Stats page yet
     views = {v["key"]: v for v in (ev or {}).get("views") or []}
     dbnote = (ev or {}).get("db_note")
     knote = kicker_note(ev)  # the kicker note's measured figure, once 4 live kicker weeks are settled (§6.8)
     tueq = (ev or {}).get("tuesday_q")
     settings = (storage.read_json(Path(data_dir) / str(latest[0]) / "league.json") or {}).get("settings") or {}
-    # the FAAB line counts IDP claims only, as it always has (SPEC §6.8): a kicker claim is not an IDP waiver
-    idp_ids = {pid: s for pid, s in stats._positions(Path(data_dir) / str(latest[0])).items() if s in IDP_SLOTS}
-    faab = league_tx.faab_summary(data_dir, latest[0], idp_ids, settings)
+    # the FAAB line counts IDP claims only, as it always has (SPEC §6.8): a kicker claim is not an IDP waiver;
+    # an extra league's line counts the claims at its own positions (D26)
+    if primary:
+        idp_ids = {pid: s for pid, s in stats._positions(Path(data_dir) / str(latest[0])).items() if s in IDP_SLOTS}
+        faab = league_tx.faab_summary(data_dir, latest[0], idp_ids, settings)
+    else:
+        own = page_slots(json.loads((weeks[-1][2] / "consensus.json").read_text(encoding="utf-8")))
+        ids = {pid: s for pid, s in stats._positions(shared / str(latest[0])).items() if s in own}
+        faab = league_tx.faab_summary(data_dir, latest[0], ids, settings, count_slots=own)
+        if faab:
+            faab["what"] = "/".join(own)
     to_date = {w: {"suggestions": t} for w, t in ((ev or {}).get("decisions_to_date") or {}).items()}
 
     def scored_page(season: int, wdir: Path) -> tuple[dict, dict | None]:
         data = json.loads((wdir / "consensus.json").read_text(encoding="utf-8"))
         sc = (storage.read_json(Path(data_dir) / str(season) / "league.json") or {}).get("scoring_settings") or {}
-        results, provisional = final_results(wdir, sc)
+        results, provisional = final_results(wdir if primary else storage.week_dir(shared, season, week_of(wdir)), sc)
         if results is None:
             return data, None
         overlay_results(data, results)
@@ -339,13 +369,15 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
             now=this_week(data, slots), nav=nav, here=(season, week), latest=(season, week) == latest,
             nav_prev=nav[at - 1] if at else None, nav_next=nav[at + 1] if at + 1 < len(nav) else None,
             final=final, data_href=data_name, card=card, dbnote=dbnote, knote=knote, tueq=tueq, faab=faab,
-            source_groups=source_groups(data.get("sources")),
+            source_groups=source_groups(data.get("sources")), lg=lg,
         )  # fmt: skip
         (site / page_name(season, week)).write_text(html, encoding="utf-8")
         (site / data_name).write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
         if (season, week) == latest:
             (site / "index.html").write_text(html, encoding="utf-8")
             (site / "data.json").write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
+    if not primary:
+        return site / "index.html"
     last = json.loads((weeks[-1][2] / "consensus.json").read_text(encoding="utf-8"))
     league_name = (last.get("league") or {}).get("name")
     (site / "stats.html").write_text(
@@ -356,3 +388,49 @@ def build_site(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg
     (site / "stats.json").write_text(json.dumps(public, indent=1, sort_keys=True, default=list), encoding="utf-8")
     (site / ".nojekyll").write_text("", encoding="utf-8")
     return site / "index.html"
+
+
+def build_all(data_dir: Path | str = "data", site_dir: Path | str = "site", cfg: dict | None = None,
+              log: Callable[[str], None] = print) -> Path:  # fmt: skip
+    """The whole site (D26): the primary league's pages at the root, then each extra league's under
+    `site/<key>/`, each page with a league switcher once more than one league has pages. A league with no
+    synced week yet gets no link and no folder. An extra league whose build fails gets a one-line page saying
+    so, and the primary league's site is built regardless."""
+    cfg = cfg or {}
+    data_dir, site_dir = Path(data_dir), Path(site_dir)
+    extras = [(key, table) for key, table in (cfg.get("leagues") or {}).items()
+              if isinstance(table, dict) and table.get("enabled") is not False
+              and week_dirs(data_dir / "leagues" / key)]  # fmt: skip
+    first = str((cfg.get("league") or {}).get("label") or PRIMARY["short"])
+    labels = [(None, first)] + [(key, str(table.get("label") or key.title())) for key, table in extras]
+
+    def switch(here: str | None) -> list[dict]:
+        if len(labels) < 2:
+            return []
+        out = []
+        for key, label in labels:
+            if here is None:
+                href = "index.html" if key is None else f"{key}/index.html"
+            else:
+                href = "../index.html" if key is None else "index.html" if key == here else f"../{key}/index.html"
+            out.append({"label": label, "href": href, "here": key == here})
+        return out
+
+    index = build_site(data_dir, site_dir, cfg, league={**PRIMARY, "short": first, "switch": switch(None)})
+    for (key, _table), (_k, label) in zip(extras, labels[1:], strict=True):
+        try:
+            build_site(data_dir / "leagues" / key, site_dir / key, cfg, shared_dir=data_dir,
+                       league={"key": key, "short": label, "stats": False, "switch": switch(key)})  # fmt: skip
+        except Exception as e:  # the primary site still deploys; this league's folder says what happened
+            log(traceback.format_exc())
+            folder = site_dir / key
+            if folder.exists():
+                shutil.rmtree(folder)
+            folder.mkdir(parents=True)
+            (folder / "index.html").write_text(
+                f"<!doctype html><meta charset='utf-8'><title>{label} streamer</title>"
+                f"<p>The {label} page couldn't be built this time ({type(e).__name__}). "
+                "<a href='../index.html'>Back</a></p>",
+                encoding="utf-8",
+            )
+    return index

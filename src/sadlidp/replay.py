@@ -76,16 +76,18 @@ def replay_week(
     data_dir = Path(data_dir)
     wdir = storage.week_dir(data_dir, season, week)
     league = storage.read_json(data_dir / str(season) / "league.json")
-    blended = [*SOURCES, *registry.names_for("k")]  # kicker sources too: a week saved before them has none
+    # kicker and team-defense sources too: a week saved before them has none
+    blended = [*SOURCES, *registry.names_for("k"), *registry.names_for("def")]
     saved = {
         name: wdir / "sources" / f"{name}.json" for name in blended if (wdir / "sources" / f"{name}.json").exists()
     }
-    # Kickers are replayed only for a week that tracked them live. A week whose kicker files hold archive rows
-    # alone (backfilled later, for the Stats page) had a page without kickers: its replay has none either, and
-    # no kicker record is made up for it (SPEC §5.3).
-    k_saved = [name for name in saved if registry.group_of_source(name) == "k"]
-    if not any(_has_live_rows(saved[name]) for name in k_saved):
-        saved = {name: path for name, path in saved.items() if name not in k_saved}
+    # Kickers (and team defenses, D25) are replayed only for a week that tracked them live. A week whose kicker
+    # files hold archive rows alone (backfilled later, for the Stats page) had a page without kickers: its
+    # replay has none either, and no kicker record is made up for it (SPEC §5.3).
+    for group in ("k", "def"):
+        g_saved = [name for name in saved if registry.group_of_source(name) == group]
+        if not any(_has_live_rows(saved[name]) for name in g_saved):
+            saved = {name: path for name, path in saved.items() if name not in g_saved}
     sched_json = storage.read_json(data_dir / str(season) / "schedule.json")
     if not league or not saved or not sched_json:
         raise FileNotFoundError(f"week {week}: league.json, schedule.json or every source snapshot is missing")
@@ -120,7 +122,12 @@ def replay_week(
     for name in [*blended, *SIGNALS]:  # signals aren't part of a page: never read in a replay
         if name not in saved:
             sources_cfg[name] = {**(sources_cfg.get(name) or {}), "enabled": False}
-    run_cfg = {**cfg, "sources": sources_cfg, "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0}}
+    run_cfg = {
+        **cfg,
+        "sources": sources_cfg,
+        "backfill": {**(cfg.get("backfill") or {}), "budget_s": 0},
+        "leagues": {},
+    }  # a replay rebuilds the primary league's page only (D26)
     lid = league["league_id"]
     routes = {
         f"{V1}/state/nfl": {"season": str(season), "season_type": "regular", "week": week, "display_week": week},

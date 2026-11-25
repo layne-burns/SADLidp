@@ -140,3 +140,26 @@ entered here when they exist):
 | A kicker's own average to date | 2022–25 | Within-week rank correlation +0.056 | No verdict (not reproduced); not used | — |
 | Sleeper's kicker projections against results | Five sampled weeks, 144 kicker-games (2025 weeks 3, 7, 11, 15; 2026 week 8), read from the archive | r 0.154, average miss 4.23; per-week rank correlation −0.14 to +0.28 | Recorded as the size of the problem, not as a test: the rows can't be shown to be pre-game | K1 passes for `sleeper_k` |
 | Standard-scoring kicker ranks used as they are for decimal scoring | nflverse 2022–2026, 2,448 kicker-games | Game-level correlation of the two scorings 0.992; within-week rank correlation 0.988; inside week 11's sources 0.957–0.998 | Adopted with D23 as a design fact, not a fitted term | — |
+
+### Team defenses (added 2026-11-25 with SPEC D25)
+Team defenses are a third scope: their own sources, weights, pool (the 20 best-projected defenses who played) and
+statistics. Nothing here touches a DL, LB, DB or K number.
+
+**No DEF term was fitted on this season's results.** σ_out,DEF = 5.7 is a level from 2024 and 2025 (5.55 and 5.82
+within a team's season, 544 team-games each); the σ floor, the 60:40 split and the rank prior 2 are priors.
+
+**Registered before any DEF result was graded** (the full text is in `docs/status.md` §8):
+
+| Check | Sample | Primary statistic | Rule | Result |
+|---|---|---|---|---|
+| DEF1. Archive integrity of `sleeper_def`, `fp_def` | Rows read live in settled weeks, re-read from the archive; at least 2 weeks and 40 rows a source | Share of rows equal on what feeds μ | Pass at ≥ 99%, as K1 | Not run yet |
+| DEF2. The DEF range | DEF pool, live settled weeks, σ_pred from the frozen record | Spread ratio RMS((actual − μ)/σ_pred), aim 1.00, ± 2 SE by week | Report in-season; season end: keep 5.7 if the margin contains 1.00 | Not run yet |
+| DEF3. DEF weights against their priors | DEF pool, the weeks the DEF weights count | α̂ ± leave-one-week-out margin against 0.6 | Report only; \|t\| ≥ 2.5 for a claim | Not run yet |
+| T1. Expected points-allowed tier points | Sleeper DEF archives 2024 and 2025, fit on one season, scored on the other | Paired within-week Spearman difference, SE by week | ≥ 2 SE better in both directions, MAE not worse by > 1 SE; owner adopts, never in Crooked's playoffs | Not run yet |
+
+**Screened while adding team defenses (2026-11-25), by one analyst, not reproduced:**
+
+| Idea | Seasons, sample | Result | Verdict | Re-test only if |
+|---|---|---|---|---|
+| Sleeper's own projected DEF total (`pts_std`) as the projection | 2024–25 archives; 2026 week 13 | It leaves out the points-allowed tier in 2024–25 (ours minus Sleeper's equals the tier's points, ±0.04), but not for every row in 2026 | Not used: the line is scored as published, tier included | — |
+

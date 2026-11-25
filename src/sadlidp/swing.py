@@ -27,7 +27,9 @@ from __future__ import annotations
 import math
 
 from . import kicker, scoring
-from .positions import IDP_SLOTS, SLOTS, K
+from .positions import IDP_SLOTS, K
+
+SWING_SLOTS = IDP_SLOTS + (K,)  # the slots with a swing model; a team defense has none, only σ_out,DEF (D25)
 
 _num = scoring.num  # `kicker_var`'s own `scoring` argument hides the module
 
@@ -38,8 +40,8 @@ def coefficients(cfg: dict) -> dict | None:
     if not s.get("enabled"):
         return None
     return {
-        "a": {p: float((s.get("a") or {}).get(p, 0.0)) for p in SLOTS},
-        "b": {p: float((s.get("b") or {}).get(p, 1.0)) for p in SLOTS},
+        "a": {p: float((s.get("a") or {}).get(p, 0.0)) for p in SWING_SLOTS},
+        "b": {p: float((s.get("b") or {}).get(p, 1.0)) for p in SWING_SLOTS},
         "lo": float(s.get("lo", -0.8)),
         "hi": float(s.get("hi", 0.75)),
     }

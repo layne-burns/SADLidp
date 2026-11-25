@@ -24,6 +24,7 @@ LISTS = ("DL", "LB", "DB")  # the combined IDP page repeats the same experts' ra
 CROSSWALK = "fantasypros"  # DynastyProcess column (§6.1 step 3)
 MARKER = "var ecrData = "
 FREE_AGENT = "FA"
+SHARED_PAGES = frozenset({"dst"})  # read by the fp_dst signal and the fp_def ranking: one request a run (D25)
 
 
 def parse_ecr(text: str) -> dict | None:
@@ -39,7 +40,20 @@ def parse_ecr(text: str) -> dict | None:
 
 
 def read_page(ctx: FetchContext, page: str) -> tuple[dict | None, str, str | None]:
-    """(ecrData, status, error) for one ranking page of the target week: status is ok, or why it isn't."""
+    """(ecrData, status, error) for one ranking page of the target week: status is ok, or why it isn't.
+    A page two adapters read (`SHARED_PAGES`) is fetched once per run and week: the outcome is kept in
+    `ctx.pages`, whatever it was, so both adapters report the same status from one request."""
+    memo = getattr(ctx, "pages", None) if page in SHARED_PAGES else None
+    key = (ctx.season, ctx.week, page)
+    if isinstance(memo, dict) and key in memo:
+        return memo[key]
+    out = _read_page(ctx, page)
+    if isinstance(memo, dict):
+        memo[key] = out
+    return out
+
+
+def _read_page(ctx: FetchContext, page: str) -> tuple[dict | None, str, str | None]:
     resp = ctx.client.get(URL.format(page=page, week=ctx.week))
     if getattr(resp, "challenged", False) or resp.status in (403, 429, 503):
         return None, "blocked", "bot challenge" if getattr(resp, "challenged", False) else f"HTTP {resp.status}"

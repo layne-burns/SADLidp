@@ -263,5 +263,61 @@ Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. 
   - **Season end:** if α̂ is within 2 SE of 0.6 and no source's ratio is 2 SE from 1, the result is recorded as "not distinguishable from the priors", and the owner decides whether the kicker weights are simply fixed at the priors for 2027. Otherwise the weights stay as the shrunk rule gives them. K is a single position, so a "differs" claim needs |t| ≥ 2.5 (protocol rule 6).
   - No in-season change either way.
 
+## 8. Team defenses and a second league (2026-11-25, owner request; SPEC D25 and D26)
+Owner request, 2026-11-25: "We want K and DEF now for Crooked", on its own page with a league switcher (Kusch's
+Crooked League: K, DEF and offense, no IDP; the same scoring template as SADL). All waivers (offense) maybe later.
+Also: a sweep for people who post weekly rankings, on Reddit and better on their own sites (`docs/research/weekly-rankers.md`).
+
+**Built** on branch `claude/compassionate-archimedes-fqrz1j` (from `main` at 8486e60):
+- [x] DEF as a third group (D25): `sleeper_def`, `fp_def` (one `dst.php` request with the D18 signal), its own
+  weights record, add-only past results, the kicker roster rule, σ_out,DEF = 5.7, no form, no swing.
+- [x] One consensus, several leagues (D26): Crooked's page at `/crooked/` from the same numbers, its files under
+  `data/leagues/crooked/`, a scoring check, failure isolation, the switcher.
+- [x] SADL unchanged: offline (`tests/unit/test_leagues.py`) and live (record-and-replay against the code before:
+  264 of 273 files byte-identical, 9 differing only by added DEF entries; the site identical apart from the switcher).
+- [ ] After merge: the first scheduled sync renders Crooked; the DEF backfill (weeks 1–11, about 11 FantasyPros
+  requests) runs within the normal budget.
+- [ ] Phase 2, each after a live probe: ESPN, CBS, FantasyData and RotoBaller team-defense sources.
+- [ ] Phase 2: Crooked's Stats page (K is graded on SADL's already; DEF once live weeks settle).
+
+**No DEF term was fitted on this season's results.** σ_out,DEF = 5.7 is a level from the 2024 and 2025 Sleeper
+archives (5.55 and 5.82 within a team's season). The σ floor (0.75), the split (0.6) and the rank prior (2) are
+priors. Two sources: only α can move, and only once live weeks count.
+
+**Registered DEF checks (2026-11-25, before any DEF result was graded)**
+
+Rules: `docs/eval-protocol.md`. One primary statistic each. Settled weeks only. Every result goes in the ledger.
+
+- **DEF1. Archive integrity of `sleeper_def` and `fp_def`.** Exactly as K1: rows read live in settled weeks,
+  re-read from the archive after the games; pass at ≥ 99% equal on what feeds μ (the stat line, the rank), with at
+  least 2 live weeks and 40 rows a source. On a pass the source leaves `untrusted`; on a fail its archive rows stay
+  display-only. When: the week-13 checkpoint if the sample is there, else season end.
+- **DEF2. The DEF range.** Pool: the 20 best by the plain average of the DEF projection sources among defenses who
+  played, live settled weeks. σ_pred = √(σ_μ² + σ_out,DEF²) from the frozen record. Primary: the spread ratio
+  RMS((actual − μ)/σ_pred), aim 1.00, ± 2 SE by week. Report only in-season; at season end keep 5.7 if the margin
+  contains 1.00, else refit for 2027 as a prior to check on 2027.
+- **DEF3. Do the DEF weights differ from their priors?** α̂ for defenses ± its leave-one-week-out margin against
+  0.6, on the weeks the DEF weights count. Report only; |t| ≥ 2.5 for a claim (one position). No in-season change.
+- **T1. Expected points-allowed tier points.** The league scores the tier the points allowed fall in, and Sleeper's
+  line sets the one-hot tier of the projected mean, so a defense projected to allow 20.4 scores +1 and one at 20.6
+  scores 0: a step where the outcome is a spread.
+  - **Variant:** replace the one-hot tier with tier probabilities, E[T(PA)] = mean over j of T(max(0, m + r_j)),
+    where m is the projected `pts_allow` and r_j the residuals (actual − projected points allowed) of the *other*
+    season; T is the league's tier table (boundaries at half-integers). Every other key as published.
+  - **Current:** the tier of the projected mean, as Sleeper publishes it.
+  - **Data:** the Sleeper DEF archives of 2024 and 2025 (weeks 1–18, projections and results, team defenses with
+    `gp` and an opponent). Fit on 2024 and score 2025, then the reverse.
+  - **Primary statistic:** the paired difference (variant − current) in within-week Spearman between projected and
+    actual points over the defenses that played, averaged over weeks, SE clustered by week, per direction.
+  - **Guardrail:** the paired MAE of total points, not worse by more than 1 SE in either direction.
+  - **Pass:** at least 2 SE better in both directions, and the guardrail holds. One candidate only: no normal or
+    Poisson variant, no tuning of the residual window.
+  - **Adoption:** a Crooked launch choice for the owner: it can apply from the next pre-waiver page, and never during
+    Crooked's playoffs (week 15 on); if it is not adopted by the week-14 pre-waiver page (Tue 2026-12-08), it waits
+    for 2027. Whatever the result, it goes in the ledger.
+  - **Result (run 2026-11-25, after this text was committed): fails.** Fit 2024 → score 2025: +0.017 ± 0.011
+    (t +1.6); fit 2025 → score 2024: −0.005 ± 0.009 (t −0.5); the MAE guardrail holds both ways. Not 2 SE better
+    in either direction, so the tier of the projected mean stays (`docs/methods-review.md`).
+
 ## Owner questions still open
 - Vegas player props (would need an Odds API key): untested. Game lines (spread, total, implied points) were tested and rejected (ledger in `docs/methods-review.md`), apart from the DL game total, which stays shadow-only inside the DL matchup candidate.

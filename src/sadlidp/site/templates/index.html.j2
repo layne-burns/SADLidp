@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SADL streamer</title>
+<title>{{ lg.short }} streamer</title>
 <style>
 {% include "_style.j2" %}
 </style>
@@ -271,9 +271,14 @@
 {%- endmacro %}
 <header>
   <div class="top">
-    <h1>SADL streamer</h1>
+    <h1>{{ lg.short }} streamer</h1>
     <p class="meta">{{ d.season }} Week {{ d.week }} · <time id="asof" datetime="{{ d.generated_at }}">{{ d.generated_at|et('%a %-I:%M %p' if live else '%a %b %-d') }}</time></p>
   </div>
+  {%- if lg.switch %}
+  <nav class="leagues" aria-label="Leagues">
+    {%- for x in lg.switch %} <a href="{{ x.href }}"{% if x.here %} class="here" aria-current="page"{% endif %}>{{ x.label }}</a>{% endfor %}
+  </nav>
+  {%- endif %}
   {% if nav and nav|length > 1 -%}
   <nav class="weeks" aria-label="Weeks">
     {% if nav_prev %}<a href="{{ nav_prev.href }}">‹ Wk {{ nav_prev.week }}</a>{% endif %}
@@ -334,7 +339,7 @@
         {%- elif card or lw_slots -%}
         <a class="tap" href="#lw-h">{% if card %}Week {{ card.week }} report card{% else %}Last week's suggestions{% endif %} ↓</a>
         {%- endif %}
-        <a class="tap" href="stats.html">How the numbers did →</a>
+        {% if lg.stats %}<a class="tap" href="stats.html">How the numbers did →</a>{% endif %}
       </p>
     </div>
   </section>
@@ -447,10 +452,12 @@
       <h3 id="rc-h">Week {{ c.week }} report card{% if c.provisional %} <small>provisional</small>{% endif %}</h3>
       <div class="report">
         <p class="headline">
-          {%- if c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).
+          {%- if not idp_slots %}
+          {%- elif c.counted %}Your IDPs scored <b>{{ '%.0f'|format(c.scored) }}</b> against <b>{{ '%.0f'|format(c.projected) }}</b> projected ({{ c.counted }} who played and had a projection).
           {%- else %}None of your IDPs had both a projection and a final score.
           {%- endif %}
-          {% if c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}
+          {% if not idp_slots %}
+          {%- elif c.decided %}Suggestions paid off in <b>{{ c.hits }} of {{ c.decided }}</b> decision{{ 's' if c.decided != 1 else '' }}
             {%- if c.badges > c.decided %} <small>({{ c.badges }} badges; several over the same player count once)</small>{% endif %}
             {%- if c.rebuilt %} (rebuilt){% endif %}.
           {%- else %}No suggestions were decided that week.
@@ -469,6 +476,9 @@
         {% for x in c.kickers or [] -%}
         <p class="rck">Your kicker: {{ x.name }}, {{ rc_num(x, true) }}</p>
         {%- endfor %}
+        {%- for x in c.defenses or [] %}
+        <p class="rck">Your defense: {{ x.name }}, {{ rc_num(x, true) }}</p>
+        {%- endfor %}
         {% set mm = c.median_miss or {} %}
         {% set mm_any = [] %}{% for slot in idp_slots if mm[slot] is defined and mm[slot] is not none %}{% set _ = mm_any.append(slot) %}{% endfor %}
         {% if mm_any -%}
@@ -484,16 +494,18 @@
           {% if c.worst_call %}<dt>Worst call</dt><dd>{{ call(c.worst_call) }}</dd>{% endif %}
         </dl>
         {%- endif %}
-        <p class="meta"><a class="tap" href="stats.html#w{{ c.week }}">All of week {{ c.week }}'s numbers →</a></p>
+        {% if lg.stats %}<p class="meta"><a class="tap" href="stats.html#w{{ c.week }}">All of week {{ c.week }}'s numbers →</a></p>{% endif %}
       </div>
       {% endif %}
       {% if lw_slots %}
       <h3>Last week's suggestions (week {{ lw.week }})</h3>
       <p class="note">
-        {%- if lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).
+        {%- if not idp_slots %}
+        {%- elif lw.summary.decided %}{{ lw.summary.hits }} of {{ lw.summary.decided }} suggestions paid off (the suggested player outscored the one he was compared with).
         {%- else %}No suggestions were decided.
         {%- endif %}
         {%- if lw.summary_k and lw.summary_k.decided %} Kicker suggestions, counted apart: {{ lw.summary_k.hits }} of {{ lw.summary_k.decided }} paid off.{% endif %}
+        {%- if lw.summary_def and lw.summary_def.decided %} Team-defense suggestions, counted apart: {{ lw.summary_def.hits }} of {{ lw.summary_def.decided }} paid off.{% endif %}
         {% if lw.provisional %}Scores are provisional until stat corrections close {{ lw.settles|et }}.{% else %}Final scores.{% endif %}</p>
       {% for slot in lw_slots %}{% for s in lw.slots[slot] %}
       <div class="sugg{% if s.reference %} ref{% endif %}">
@@ -516,7 +528,7 @@
     <div class="foldbody">
       {% if show_tueq %}<p class="note">Questionable on Tuesday: {{ tueq.sat }} of the {{ tueq.tagged }} waiver players tagged Q on a pre-waiver page this season sat out (untagged: {{ (100 * tueq.untagged_sat / tueq.untagged)|round|int }}%).</p>{% endif %}
       {# One line on purpose: a test renders this block alone, from its first tag to its last, and pins its text. #}
-      {% if faab is defined and faab %}<p class="note">IDP waivers this season: {{ faab.won_token }} of {{ faab.claims }} claims were won with a token bid (at most {{ faab.token_label }}% of the starting budget){% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested, won at {{ faab.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '%.0f'|format(faab.budget) }}.)</small>{% if faab.fa_adds %} {{ faab.fa_adds }} {{ 'IDP was picked up as a free agent' if faab.fa_adds == 1 else 'IDPs were picked up as free agents' }}{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
+      {% if faab is defined and faab %}<p class="note">{{ faab.what or 'IDP' }} waivers this season: {{ faab.won_token }} of {{ faab.claims }} claims were won with a token bid (at most {{ faab.token_label }}% of the starting budget){% if faab.contested %}; {{ faab.contested }} {{ 'was' if faab.contested == 1 else 'were' }} contested, won at {{ faab.contested_label }}% of it{% endif %}. <small>(Starting budget ${{ '%.0f'|format(faab.budget) }}.)</small>{% if faab.fa_adds %} {{ faab.fa_adds }} {{ (faab.what or 'IDP') ~ (' was picked up as a free agent' if faab.fa_adds == 1 else (' players were picked up as free agents' if faab.what else 's were picked up as free agents')) }}{% if faab.fa_top_day %}, most often on a {{ faab.fa_top_day[0] }} ({{ faab.fa_top_day[1] }}){% endif %}.{% endif %}</p>{% endif %}
     </div>
   </details>
   {% endif %}
@@ -526,26 +538,30 @@
     <summary><h2>How to read this page</h2></summary>
     <div class="foldbody">
       <ul class="howto">
-        <li>Points are SADL scoring.</li>
+        <li>Points are {{ lg.short }} scoring.</li>
         <li>± is how much the sources disagree, not game-to-game luck; START/UPGRADE odds include game-to-game swing{% if d.swing %}, each player's own from his projected stat mix (the small floor–ceiling under his points: one game in five below, one in five above), or{% endif %} the position's typical spread (σ<sub>out</sub>
           {%- for slot in slots if d.sigma_out[slot] is defined %} {{ slot }} {{ d.sigma_out[slot] }}{{ ',' if not loop.last else '' }}{% endfor %}).</li>
         <li>Tiers group players statistically indistinguishable from each tier's best.</li>
-        <li>Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.</li>
+        {% if idp_slots %}<li>Form: once a player has played this season, his number also carries his earlier misses (shrunk toward 0) and his last game's share of his team's defensive snaps; tap him to see both.</li>{% endif %}
         {% if 'K' in slots -%}
         <li>Kickers: no form is added to a kicker's number. His range, when one is shown, comes from how many field goals and extra points he is projected for; without one, his odds use the typical kicker spread above.</li>
         <li>Kicker moves: the league sets no limit on kickers, so only roster room counts. With a free roster spot you just add; with a full roster you drop your other kicker, or swap the new one for your starter.</li>
         {%- endif %}
+        {%- if 'DEF' in slots %}
+        <li>Team defenses: no form and no range of their own; their odds use the typical defense spread above. Points allowed score the tier that the projected points allowed fall in.</li>
+        <li>Defense moves: the league sets no limit on defenses, so only roster room counts. With a free roster spot you just add; with a full roster you drop your other defense (with no other playable one, one of yours that can't play this week, usually on bye), or swap the new one for your starter.</li>
+        {%- endif %}
         <li>Matched: the share of a source's players with an NFL team that were matched to a Sleeper player (unmatched ones are listed, never dropped silently).</li>
         <li>* Projection first captured after kickoff, so it can't be proven pre-game; Sleeper's projections haven't been seen to change once games start.</li>
-        <li>Scores are SADL points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff.</li>
+        <li>Scores are {{ lg.short }} points from Sleeper's stats: "so far" while a game is on, final 4 hours after kickoff.</li>
       </ul>
     </div>
   </details>
   <details class="fold">
     <summary><h2>Sources</h2>
       <small>
-        {%- for g in source_groups %}{% if source_groups|length > 1 %}{{ 'IDP' if g.key == 'idp' else 'kickers' }} {% endif %}{{ g.used }} of {{ g.rows|length }} in{{ ' · ' if not loop.last else '' }}{% endfor %}
-        {%- for g in source_groups %}{% for name, s in g.out[:2] %} · {{ s.label or name }}{{ ' (kickers)' if g.key == 'k' else '' }} {{ src_status(s, true) }}{% endfor %}{% endfor -%}
+        {%- for g in source_groups %}{% if source_groups|length > 1 %}{{ {'idp': 'IDP', 'k': 'kickers', 'def': 'defenses'}[g.key] }} {% endif %}{{ g.used }} of {{ g.rows|length }} in{{ ' · ' if not loop.last else '' }}{% endfor %}
+        {%- for g in source_groups %}{% for name, s in g.out[:2] %} · {{ s.label or name }}{{ {'k': ' (kickers)', 'def': ' (defenses)'}.get(g.key, '') }} {{ src_status(s, true) }}{% endfor %}{% endfor -%}
       </small></summary>
     <div class="foldbody">
       <div class="scroll"><table class="sources">
@@ -563,7 +579,7 @@
     </div>
   </details>
   <p class="meta">{{ d.league.name }} · {{ d.league.waiver_type }} waivers · data as of {{ d.generated_at|et }}</p>
-  <p class="meta"><a class="tap" href="stats.html">How the numbers did →</a> · <a class="tap" href="{{ data_href or 'data.json' }}">data.json</a></p>
+  <p class="meta">{% if lg.stats %}<a class="tap" href="stats.html">How the numbers did →</a> · {% endif %}<a class="tap" href="{{ data_href or 'data.json' }}">data.json</a></p>
 </footer>
 <script>
 /* Optional: without it the page works the same, it just forgets the chosen position. */

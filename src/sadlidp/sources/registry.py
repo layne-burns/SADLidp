@@ -1,6 +1,7 @@
 """The source registry (SPEC.md §5): every source, the group it belongs to, its kind and its page label.
 
-Two groups, kept apart end to end (`positions.GROUPS`): the five IDP sources and the six kicker sources. A
+Three groups, kept apart end to end (`positions.GROUPS`): the five IDP sources, the six kicker sources and the
+team-defense sources (D25). A
 source is fetched with its own group's players and matcher, blended and weighted with its own group's sources
 only, and measured against its own group's results. `SOURCES` (the IDP sources) keeps its name and shape
 (name -> (module, kind)); `K_SOURCES` has the same shape.
@@ -36,6 +37,8 @@ DECLARED: dict[str, tuple[str, str, str]] = {
     "fp_k": ("k", "rank", "FantasyPros"),
     "fantasydata_k": ("k", "rank", "FantasyData"),
     "rotoballer_k": ("k", "rank", "RotoBaller"),
+    "sleeper_def": ("def", "projection", "Sleeper"),  # team defenses (D25): their own group, like the kickers
+    "fp_def": ("def", "rank", "FantasyPros"),
 }
 SIGNAL_LABELS = {"fp_dst": "FantasyPros D/ST"}
 
@@ -47,6 +50,10 @@ K_MODULES = (
     "fantasydata_k",
     "rotoballer_k",
 )  # one line per kicker module that exists
+DEF_MODULES = (
+    "sleeper_def",
+    "fp_def",
+)  # one line per team-defense module that exists (ESPN, CBS, FantasyData, RotoBaller: after a live probe each)
 
 
 def _load(name: str):
@@ -66,8 +73,9 @@ SOURCES = {
     fantasydata.NAME: (fantasydata, "rank"),
 }
 K_SOURCES = {name: (_load(name), DECLARED[name][1]) for name in DECLARED if name in K_MODULES}
+DEF_SOURCES = {name: (_load(name), DECLARED[name][1]) for name in DECLARED if name in DEF_MODULES}
 SIGNALS = {fp_dst.NAME: (fp_dst, "signal")}  # stored and backfilled, never blended (D18)
-BY_GROUP = {"idp": SOURCES, "k": K_SOURCES}
+BY_GROUP = {"idp": SOURCES, "k": K_SOURCES, "def": DEF_SOURCES}
 
 
 def sources_for(group: str) -> dict[str, tuple]:
@@ -76,8 +84,8 @@ def sources_for(group: str) -> dict[str, tuple]:
 
 
 def group_of_source(name: str) -> str:
-    """ "k" for a declared kicker source; "idp" for everything else (an unknown name is an IDP source, as
-    every source was before kickers)."""
+    """ "k" for a declared kicker source, "def" for a declared team-defense source; "idp" for everything else
+    (an unknown name is an IDP source, as every source was before kickers, and so is the fp_dst signal)."""
     return DECLARED.get(name, ("idp",))[0]
 
 
@@ -98,8 +106,9 @@ def projection_count(group: str) -> int:
 
 
 def labels() -> dict[str, str]:
-    """name -> page label: the IDP sources, the D/ST signal, then the kicker sources (the order other modules
-    sort source files by; the IDP part is what it always was)."""
+    """name -> page label: the IDP sources, the D/ST signal, the kicker sources, then the team-defense sources
+    (the order other modules sort source files by; the IDP and kicker parts are what they always were)."""
     idp = {name: label for name, (g, _kind, label) in DECLARED.items() if g == "idp"}
     kick = {name: label for name, (g, _kind, label) in DECLARED.items() if g == "k"}
-    return {**idp, **SIGNAL_LABELS, **kick}
+    dfn = {name: label for name, (g, _kind, label) in DECLARED.items() if g == "def"}
+    return {**idp, **SIGNAL_LABELS, **kick, **dfn}

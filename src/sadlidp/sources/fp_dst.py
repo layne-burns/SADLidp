@@ -11,13 +11,14 @@ from .base import OK, AdapterResult, FetchContext
 from .fp_ecr import HOST, published, read_page, team_of
 
 NAME = "fp_dst"
-URL = "https://www.fantasypros.com/nfl/rankings/dst.php?week={week}"  # for the backfill runner's host budget
-__all__ = ["HOST", "NAME", "URL", "fetch"]
+PAGE = "dst"  # also read by fp_def (the DEF ranking, D25), from the same request (fp_ecr.SHARED_PAGES)
+URL = f"https://www.fantasypros.com/nfl/rankings/{PAGE}.php?week={{week}}"  # for the backfill runner's host budget
+__all__ = ["HOST", "NAME", "PAGE", "URL", "fetch"]
 
 
 def fetch(ctx: FetchContext) -> AdapterResult:
     result = AdapterResult(name=NAME, kind="signal", status="failed", week=ctx.week, fetched_at=ctx.now.isoformat())
-    data, status, error = read_page(ctx, "dst")
+    data, status, error = read_page(ctx, PAGE)
     result.report = {"archive": ctx.archive, "experts": (data or {}).get("total_experts")}
     if status != OK:
         result.status, result.error = status, error

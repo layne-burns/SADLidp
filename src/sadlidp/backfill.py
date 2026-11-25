@@ -102,13 +102,15 @@ def run(
     clock: Callable[[], float] = time.monotonic,
     sched=None,
     matchers: dict[str, object] | None = None,
+    pages: dict | None = None,
 ) -> dict[str, list[int]]:
     """Fetch and save the missing past `weeks` of every archive source (`only` one, if named): {name: [weeks]}.
 
     `sources` is the sync's registry (name -> (module, kind)); `players` the tracked players. Each source is
-    fetched with its own group's players (`positions.in_group`: a kicker source the kickers, any other source
-    everyone else), its group's matcher (`matchers[group]`, else `matcher`), and no imputer for a kicker source
-    (a kicker line is never imputed). With `redo`, a week
+    fetched with its own group's players (`positions.in_group`: a kicker source the kickers, a team-defense
+    source the team defenses, any other source everyone else), its group's matcher (`matchers[group]`; for an
+    IDP source, else `matcher`), and no imputer for a kicker or team-defense source (their lines are never
+    imputed). `pages` is the sync's memo of pages two adapters read (fp_ecr.SHARED_PAGES). With `redo`, a week
     that was backfilled before is fetched again; a week with live rows is never overwritten. With `fill_gaps`
     (SPEC §5.3 Gap fill, 2026-11-17), a week with live rows gains archive rows for the players it has no row
     for, marked `backfill`, and only if the archive agrees with ≥ 99% of its live rows; live rows stay as they are.
@@ -120,6 +122,7 @@ def run(
     start = clock()
     used: Counter[str] = Counter()
     done: dict[str, list[int]] = {}
+    pages = {} if pages is None else pages  # one memo for the whole run: fp_dst and fp_def share each dst.php
     for name, (module, _kind) in sources.items():
         scfg = (cfg.get("sources") or {}).get(name) or {}
         if only and name != only:
@@ -152,9 +155,10 @@ def run(
             group = registry.group_of_source(name)
             mine = in_group(players, group)
             ctx = FetchContext(client, sleeper, season, w, now, mine, source_cfg(cfg, name),
-                               (matchers or {}).get(group, None if group == "k" else matcher),
-                               None if group == "k" else imputer_for(cfg, priors, data_dir, season, w, mine),
-                               archive=True, kickoff_of=week_kickoffs(sched, mine, w))  # fmt: skip
+                               (matchers or {}).get(group, matcher if group == "idp" else None),
+                               imputer_for(cfg, priors, data_dir, season, w, mine) if group == "idp" else None,
+                               archive=True, kickoff_of=week_kickoffs(sched, mine, w),
+                               pages=pages)  # fmt: skip
             try:
                 res = module.fetch(ctx)
                 why = None if res.ok else res.status + (f" ({res.error})" if res.error else "")

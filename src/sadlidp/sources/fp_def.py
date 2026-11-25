@@ -4,7 +4,7 @@ D25).
 The sibling of `fp_k`, reading the D/ST page (`dst.php?week=N`) that the `fp_dst` signal already reads: one
 request a run serves both (`fp_ecr.SHARED_PAGES`), and `fp_dst` stays exactly as it was (D18). One list, "DEF":
 one row per team playing. A row's team code (`player_team_id`, through `fp_teams.json`: JAC → JAX) is the
-team's Sleeper DEF id, so it matches by id; FantasyPros' own player ids (8000–8310) are kept as `fp_id`. Past
+team's Sleeper DEF id, so it matches by that id; FantasyPros' own player ids (8000–8310) are kept as `fp_id`. Past
 weeks are served through `?week=N`.
 """
 
@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections import Counter
 
 from ..config import load_alias
-from ..matching import Matcher, MatchReport
+from ..matching import Match, Matcher, MatchReport
 from ..positions import DEF
 from .base import OK, SUSPECT, AdapterResult, FetchContext
 from .fp_dst import PAGE, URL
@@ -52,7 +52,9 @@ def fetch(ctx: FetchContext) -> AdapterResult:
         name, team = p.get("player_name"), team_of(code, teams)
         if code and code != FREE_AGENT and team not in (ctx.players or {}):
             unresolved[code] += 1  # a code missing from fp_teams.json (§6.1 code tables)
-        m = matcher.match(NAME, source_id=team, id_field="player_id", name=name, team=team, slot=DEF)
+        # the team code is the Sleeper DEF id; a code the players DB lacks falls back to the name steps
+        m = Match(team, "source_id") if team in (ctx.players or {}) else matcher.match(NAME, name=name, team=team,
+                                                                                     slot=DEF)  # fmt: skip
         match.add(m, name=name, team=team, slot=DEF)
         if m.pid is None:
             continue

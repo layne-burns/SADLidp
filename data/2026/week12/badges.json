@@ -1,6 +1,6 @@
 {
  "badges": {
-  "11261|UPGRADE|12713": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"12713","first_p":0.623,"first_seen":"2026-11-24T18:52:47-05:00","last_seen":"2026-11-25T15:29:48-05:00","lock_at":"2026-11-29T16:05:00-05:00","mu_over":7.011,"mu_w":9.317,"over":"12713","p":0.623,"reference":false,"sigma_out":5.0,"slot":"K","swing_over":4.77,"swing_w":5.45,"w":"11261","why":[]},
+  "11261|UPGRADE|12713": {"action":"add_drop","active":true,"badge":"UPGRADE","drop":"12713","first_p":0.623,"first_seen":"2026-11-24T18:52:47-05:00","last_seen":"2026-11-26T11:50:48-05:00","lock_at":"2026-11-29T16:05:00-05:00","mu_over":7.07,"mu_w":9.242,"over":"12713","p":0.616,"reference":false,"sigma_out":5.0,"slot":"K","swing_over":4.81,"swing_w":5.45,"w":"11261","why":[]},
   "13833|UPGRADE|12713": {"action":"add_drop","active":true,"badge":"UPGRADE","claimed_at":"2026-11-25T15:29:48-05:00","claimed_by":"other","drop":"12713","first_p":0.637,"first_seen":"2026-11-24T18:52:47-05:00","last_seen":"2026-11-24T18:52:47-05:00","lock_at":"2026-11-29T13:00:00-05:00","mu_over":7.01,"mu_w":9.556,"over":"12713","p":0.637,"reference":false,"sigma_out":5.0,"slot":"K","swing_over":4.77,"swing_w":5.38,"w":"13833","why":[]}
  },
  "schema_version": 1
